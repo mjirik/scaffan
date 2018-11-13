@@ -16,6 +16,7 @@ import os
 import numpy as np
 import skimage.color
 
+
 def import_openslide():
     pth = op.expanduser(r"~\Downloads\openslide\openslide-win64\bin")
     # pth = op.expanduser(r"~\projects\scaffan\devel\knihovny")
@@ -42,3 +43,31 @@ def get_image_with_center(imsl, center, level=3, size=None, as_gray=True):
     if as_gray:
         im = skimage.color.rgb2gray(im)
     return im
+
+
+def get_pixelsize(imsl):
+    """
+    imageslice
+    :param imsl: image slice obtained by openslice.OpenSlide(path)
+    :return: pixelsize, pixelunit
+    """
+    pm = imsl.properties
+    resolution_unit = pm.get("tiff.ResolutionUnit")
+    resolution_x= pm.get("tiff.XResolution")
+    resolution_y= pm.get("tiff.YResolution")
+#     print("Resolution {}x{} pixels/{}".format(resolution_x, resolution_y, resolution_unit))
+    pixelsize = [10./float(resolution_x), 10./float(resolution_y)]
+    pixelunit = "mm"
+    return pixelsize, pixelunit
+
+
+def get_offset_px(imsl):
+
+    pm = imsl.properties
+    pixelsize, pixelunit = get_pixelsize(imsl)
+    offset = np.asarray((int(pm['hamamatsu.XOffsetFromSlideCentre']), int(pm['hamamatsu.YOffsetFromSlideCentre'])))
+    offset_mm = offset * 0.000001
+    offset_from_center_px = offset_mm / pixelsize
+    im_center_px = np.asarray(imsl.dimensions) / 2.
+    offset_px = im_center_px - offset_from_center_px
+    return offset_px

@@ -11,6 +11,7 @@ import json
 import os.path as op
 import glob
 import matplotlib.pyplot as plt
+import numpy as np
 
 
 def get_one_annotation(viewstate):
@@ -65,7 +66,61 @@ def read_annotations(pth):
         data = json.load(f)
     return data
 
-def plot_annotations(annotations):
+# def plot_annotations(annotations):
+#     for annotation in annotations:
+#         plt.hold(True)
+#         plt.plot(annotation["x"], annotation["y"], c=annotation["color"])
+
+
+def plot_annotations(annotations, x_key="x", y_key="y"):
+    if type(annotations) is dict:
+        annotations = [annotations]
+
     for annotation in annotations:
+        x = np.asarray(annotation[x_key])
+        y = np.asarray(annotation[y_key])
         plt.hold(True)
-        plt.plot(annotation["x"], annotation["y"], c=annotation["color"])
+        plt.plot(x, y, c=annotation["color"])
+
+
+def adjust_xy_to_image_view(imsl, x_px, y_px, center, level, size):
+    x_px_view = ((x_px - center[0]) / imsl.level_downsamples[level]) + (size[0] / 2)
+    y_px_view = ((y_px - center[1]) / imsl.level_downsamples[level]) + (size[1] / 2)
+    return x_px_view, y_px_view
+
+
+def adjust_to_image_view(imsl, annotations, center, level, size):
+    output = []
+    for annotation in annotations:
+        ann_out = annotation
+        x_px_view, y_px_view = adjust_xy_to_image_view(imsl, annotation["x_px"], annotation["y_px"], center, level,
+                                                       size)
+        ann_out["view_x_px"] = x_px_view
+        ann_out["view_y_px"] = y_px_view
+        ann_out["view_center"] = center
+        ann_out["view_level"] = level
+        ann_out["view_size"] = size
+        output.append(ann_out)
+
+    return output
+
+
+def annotations_to_px(imsl, annotations):
+    offset_px = get_offset_px(imsl)
+    for annotation in annotations:
+        x_nm = np.asarray(annotation['x'])
+        y_nm = np.asarray(annotation['y'])
+        x_mm = x_nm * 0.000001
+        y_mm = y_nm * 0.000001
+        x_px = x_mm / pixelsize[0] + offset_px[0]
+        y_px = y_mm / pixelsize[1] + offset_px[1]
+        annotation["x_nm"] = x_nm
+        annotation["y_nm"] = y_nm
+        annotation["x_mm"] = x_mm
+        annotation["y_mm"] = y_mm
+        annotation["x_px"] = x_px
+        annotation["y_px"] = y_px
+    return annotations
+
+
+
