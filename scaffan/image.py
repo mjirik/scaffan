@@ -79,3 +79,18 @@ def get_offset_px(imsl):
     im_center_px = np.asarray(imsl.dimensions) / 2.
     offset_px = im_center_px - offset_from_center_px
     return offset_px
+
+
+def get_resize_parameters(imsl, former_level, former_size, new_level):
+    """
+    Get scale factor and size of image on different level.
+
+    :param imsl: OpenSlide
+    :param former_level: int
+    :param former_size: list of ints
+    :param new_level: int
+    :return: scale_factor, new_size
+    """
+    scale_factor = imsl.level_downsamples[former_level] / imsl.level_downsamples[new_level]
+    new_size = (np.asarray(former_size) * scale_factor).astype(np.int)
+    return scale_factor, new_size
