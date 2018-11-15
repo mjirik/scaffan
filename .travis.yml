@@ -73,6 +73,9 @@ install:
 #    - 'sudo ldconfig -v'
 #    - conda list -e
     - python -m io3d.datasets -l CMU-1 CMU-1-annotation
+    - ls data
+    - ls data/medical
+    - ls data/medical/orig
 
 
 # command to run tests
