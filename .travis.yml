@@ -1,0 +1,79 @@
+language: python
+python:
+  #  - "2.6"
+  - "2.7"
+  # - "3.2"
+  # - "3.3"
+  # - "3.4"
+
+
+os: linux
+# Ubuntu 14.04 Trusty support
+sudo: required
+dist: trusty
+# install new cmake
+#addons:
+#  apt:
+#    packages:
+#      - cmake
+#    sources:
+#      - kalakris-cmake
+virtualenv:
+  system_site_packages: true
+before_script:
+    # GUI
+    - "export DISPLAY=:99.0"
+    - "sh -e /etc/init.d/xvfb start"
+    - sleep 3 # give xvfb sume time to start
+
+before_install:
+    # We do this conditionally because it saves us some downloading if the
+    # version is the same.
+    - if [[ "$CONDA_PYTHON_VERSION" == "2.7" ]]; then
+        wget https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh -O miniconda.sh;
+      else
+        wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
+      fi
+#    - wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh
+#    - chmod +x miniconda.sh
+#    - ./miniconda.sh -b
+    - bash miniconda.sh -b -p $HOME/miniconda
+    - export PATH="$HOME/miniconda/bin:$PATH"
+    - hash -r
+    - conda config --set always_yes yes --set changeps1 no
+    - conda update -q conda
+    - conda config --add channels conda-forge
+#    - conda config --add channels SimpleITK
+    - conda config --add channels mjirik
+    # Useful for debugging any issues with conda
+    - conda info -a
+# command to install dependencies
+install:
+
+#    - sudo apt-get install -qq $(< apt_requirements.txt)
+
+    - conda update --yes conda
+    - conda install --yes pip nose
+    - pip install python-coveralls
+
+#    - Install dependencies
+    - conda install --yes --file requirements_conda.txt
+#    - pip install -r requirements_pip.txt
+#    - "echo $LD_LIBRARY_PATH"
+#    - "pip install -r requirements.txt"
+#    - 'mkdir build'
+#    - "cd build"
+#    - "cmake .."
+#    - "cmake --build ."
+#    - "sudo make install"
+#    - pip install .
+#    - "cd .."
+#    - 'echo "include /usr/local/lib" | sudo tee -a /etc/ld.so.conf'
+#    - 'sudo ldconfig -v'
+#    - conda list -e
+
+
+# command to run tests
+script: nosetests -v --with-coverage --cover-package=scaffan
+after_success:
+    - coveralls
