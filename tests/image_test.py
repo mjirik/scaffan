@@ -22,29 +22,32 @@ sys.path.insert(0, op.abspath(op.join(path_to_script, "../../imma")))
 import numpy as np
 import io3d
 import scaffan
-import scaffan.annotation
+import scaffan.image as scim
 
 import glob
 import os
 
 skip_on_local = False
 
+scim.import_openslide()
+import openslide
+
 class ParseAnnotationTest(unittest.TestCase):
 
-    unittest.skip("local ")
-    def test_bodynavigation(self):
-        slices_dir = io3d.datasets.join_path("scaffold/Hamamatsu", get_root=True)
+    def test_get_pixelsize_on_different_levels(self):
+        fn = io3d.datasets.join_path("medical", "orig", "CMU-1.ndpi", get_root=True)
+        imsl = openslide.OpenSlide(fn)
 
-        json_files = glob.glob(op.join(slices_dir, "*.json"))
-        import sys
-        for fn in json_files:
-            os.remove(fn)
+        pixelsize1, pixelunit1 = scim.get_pixelsize(imsl)
+        self.assertGreater(pixelsize1[0], 0)
+        self.assertGreater(pixelsize1[1], 0)
 
-        scaffan.annotation.ndpa_to_json(slices_dir)
+        pixelsize2, pixelunit2 = scim.get_pixelsize(imsl, level=2)
+        self.assertGreater(pixelsize2[0], 0)
+        self.assertGreater(pixelsize2[1], 0)
 
-        json_files = glob.glob(op.join(slices_dir, "*.json"))
-
-        self.assertGreater(len(json_files), 0)
+        self.assertGreater(pixelsize2[0], pixelsize1[0])
+        self.assertGreater(pixelsize2[1], pixelsize1[1])
 
 
 if __name__ == "__main__":

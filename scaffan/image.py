@@ -45,7 +45,7 @@ def get_image_with_center(imsl, center, level=3, size=None, as_gray=True):
     return im
 
 
-def get_pixelsize(imsl):
+def get_pixelsize(imsl, level=0):
     """
     imageslice
     :param imsl: image slice obtained by openslice.OpenSlide(path)
@@ -56,8 +56,16 @@ def get_pixelsize(imsl):
     resolution_x= pm.get("tiff.XResolution")
     resolution_y= pm.get("tiff.YResolution")
 #     print("Resolution {}x{} pixels/{}".format(resolution_x, resolution_y, resolution_unit))
-    pixelsize = [10./float(resolution_x), 10./float(resolution_y)]
-    pixelunit = "mm"
+    downsamples = imsl.level_downsamples[level]
+
+    if resolution_unit is "cm":
+        downsamples = downsamples * 10.
+        pixelunit = "mm"
+    else:
+        pixelunit = resolution_unit
+
+    pixelsize = [downsamples /float(resolution_x), downsamples /float(resolution_y)]
+
     return pixelsize, pixelunit
 
 

@@ -63,7 +63,7 @@ class ParseAnnotationTest(unittest.TestCase):
     #     self.assertEqual(np.sum(oseg.select_label("tumor")), 0)
     #     self.assertGreater(np.sum(oseg.select_label("liver")), 100)
 
-    def test_bodynavigation_hamamatsu_data(self):
+    def test_convert_annotation_hamamatsu_data(self):
         slices_dir = io3d.datasets.join_path("medical/orig/", get_root=True)
 
         json_files = glob.glob(op.join(slices_dir, "*.json"))
@@ -77,9 +77,8 @@ class ParseAnnotationTest(unittest.TestCase):
 
         self.assertGreater(len(json_files), 0)
 
-
     @unittest.skipIf(os.environ.get("TRAVIS", skip_on_local), "Skip on Travis-CI")
-    def test_bodynavigation(self):
+    def test_convert_annotation_scaffold_data(self):
         slices_dir = io3d.datasets.join_path("scaffold/Hamamatsu", get_root=True)
 
         json_files = glob.glob(op.join(slices_dir, "*.json"))
