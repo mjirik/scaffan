@@ -27,9 +27,11 @@ import scaffan.annotation
 import glob
 import os
 
+skip_on_local = False
 
 class ParseAnnotationTest(unittest.TestCase):
 
+    unittest.skip("local ")
     def test_bodynavigation(self):
         slices_dir = io3d.datasets.join_path("scaffold/Hamamatsu", get_root=True)
 

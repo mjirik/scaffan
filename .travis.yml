@@ -71,6 +71,7 @@ install:
 #    - 'echo "include /usr/local/lib" | sudo tee -a /etc/ld.so.conf'
 #    - 'sudo ldconfig -v'
 #    - conda list -e
+    - python -m io3d.datasets -l CMU-1 CMU-1-anotation
 
 
 # command to run tests
