@@ -75,9 +75,9 @@ install:
     - python -m io3d.datasets -v -gdp
     - python -m io3d.datasets -v -l CMU-1 CMU-1-annotation
     - pwd
-    - ls data
-    - ls data/medical
-    - ls data/medical/orig
+    - ls ~/data
+    - ls ~/data/medical
+    - ls ~/data/medical/orig
 
 
 # command to run tests
