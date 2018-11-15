@@ -27,7 +27,8 @@ import scaffan.annotation
 import glob
 import os
 
-class OrganSegmentationNavigation(unittest.TestCase):
+
+class ParseAnnotationTest(unittest.TestCase):
 
     # def test_relabel_organ_segmentation(self):
     #     import lisa.organ_segmentation
