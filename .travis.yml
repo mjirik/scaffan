@@ -45,6 +45,7 @@ before_install:
     - conda config --add channels conda-forge
 #    - conda config --add channels SimpleITK
     - conda config --add channels mjirik
+    - conda config --add channels bioconda
     # Useful for debugging any issues with conda
     - conda info -a
 # command to install dependencies
