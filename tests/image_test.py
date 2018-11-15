@@ -36,6 +36,7 @@ class ParseAnnotationTest(unittest.TestCase):
 
     def test_get_pixelsize_on_different_levels(self):
         fn = io3d.datasets.join_path("medical", "orig", "CMU-1.ndpi", get_root=True)
+        logger.debug("filename {}".format(fn))
         imsl = openslide.OpenSlide(fn)
 
         pixelsize1, pixelunit1 = scim.get_pixelsize(imsl)
