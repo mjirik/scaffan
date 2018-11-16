@@ -54,8 +54,8 @@ install:
 #    - sudo apt-get install -qq $(< apt_requirements.txt)
 
     - conda update --yes conda
-    - conda install --yes pip nose
-    - pip install python-coveralls
+    - conda install --yes pip nose coveralls
+#    - pip install python-coveralls
 
 #    - Install dependencies
     - conda install --yes --file requirements_conda.txt
