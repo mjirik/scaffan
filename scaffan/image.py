@@ -15,6 +15,7 @@ import sys
 import os
 import numpy as np
 import skimage.color
+import scaffan.annotation as scan
 
 
 def import_openslide():
@@ -38,7 +39,7 @@ def get_image_by_center(imsl, center, level=3, size=None, as_gray=True):
     if size is None:
         size = np.array([800, 800])
 
-    location = get_view_location_by_center(imsl, center, level, size)
+    location = get_region_location_by_center(imsl, center, level, size)
 
     imcr = imsl.read_region(location, level=level, size=size)
     im = np.asarray(imcr)
@@ -47,13 +48,20 @@ def get_image_by_center(imsl, center, level=3, size=None, as_gray=True):
     return im
 
 
-def get_view_location_by_center(imsl, center, level, size):
+def get_region_location_by_center(imsl, center, level, size):
     size2 = (size/2).astype(int)
 
     offset = size2 * imsl.level_downsamples[level]
     location = (np.asarray(center) - offset).astype(np.int)
     return location
 
+
+def get_region_center_by_location(imsl, location, level, size):
+    size2 = (size/2).astype(int)
+
+    offset = size2 * imsl.level_downsamples[level]
+    center = (np.asarray(location) + offset).astype(np.int)
+    return center
 
 def get_pixelsize(imsl, level=0):
     """
@@ -107,9 +115,17 @@ def get_resize_parameters(imsl, former_level, former_size, new_level):
 
 
 class AnnotatedImage:
-    def __init__(self, path):
+    def __init__(self, path, skip_read_annotations=False):
         self.path = path
         self.openslide = openslide.OpenSlide(path)
+        self.region_location = None
+        self.region_size = None
+        self.region_level = None
+        self.region_pixelsize = None
+        self.region_pixelunit = None
+
+        if not skip_read_annotations:
+            self.read_annotations()
 
     def get_resize_parameters(self, former_level, former_size, new_level):
         """
@@ -130,12 +146,38 @@ class AnnotatedImage:
     def get_image_by_center(self, center, level=3, size=None, as_gray=True):
         return get_image_by_center(self.openslide, center, level, size, as_gray)
 
-    def get_view_location_by_center(self, center, level, size):
-        return get_view_location_by_center(self.openslide, center, level, size)
+    def get_region_location_by_center(self, center, level, size):
+        return get_region_location_by_center(self.openslide, center, level, size)
 
-    def get_annotations(self):
-        import scaffan.annotation as scan
-        annotations = scan.read_annotations(self.path)
-        annotations = scan.annotations_to_px(self.openslide, annotations)
-        return annotations
+    def get_region_center_by_location(self, location, level, size):
+        return get_region_center_by_location(self.openslide, location, level, size)
+
+    def read_annotations(self):
+        self.annotations = scan.read_annotations(self.path)
+        self.annotations = scan.annotations_to_px(self.openslide, self.annotations)
+        return self.annotations
+
+    def set_region(self, location=None, level=0, size=None, center=None):
+
+        if location is None:
+            location = self.get_region_location_by_center(center, level, size)
+        else:
+            center = self.get_region_center_by_location(location, level, size)
+
+        self.region_location = location
+        self.region_size = size
+        self.region_level = level
+        self.region_center = level
+        self.region_pixelsize, self.region_pixelunit = self.get_pixel_size(level)
+        scan.adjust_to_image_view(self.openslide, self.annotations,
+                                  center, level, size)
+
+    def get_region(self, as_gray=False):
+        imcr = openslide.read_region(
+            self.region_location, level=self.region_level, size=self.region_size)
+        im = np.asarray(imcr)
+        if as_gray:
+            im = skimage.color.rgb2gray(im)
+        return im
+
 
