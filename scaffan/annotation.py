@@ -111,7 +111,7 @@ def adjust_to_image_view(imsl, annotations, center, level, size):
 def annotations_to_px(imsl, annotations):
     from .image import get_offset_px, get_pixelsize
     offset_px = get_offset_px(imsl)
-    pixelsize = get_pixelsize(imsl)
+    pixelsize, pixelunit = get_pixelsize(imsl)
     for annotation in annotations:
         x_nm = np.asarray(annotation['x'])
         y_nm = np.asarray(annotation['y'])
