@@ -51,6 +51,9 @@ def ndpa_to_json(path):
     :param path: path to file or dir contaning .ndpa files
     """
     if op.isfile(path):
+        fn, ext = op.splitext(path)
+        if ext == ".ndpi":
+            path = path + ".ndpa"
         ndpa_file_to_json(path)
     else:
         extended_path = op.join(path, "*.ndpa")
