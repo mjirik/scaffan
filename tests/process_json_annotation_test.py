@@ -81,7 +81,7 @@ class ParseAnnotationTest(unittest.TestCase):
     def test_convert_annotation_hamamatsu_data_single_file(self):
         # slices_dir = io3d.datasets.join_path("medical/orig/", get_root=True)
         fn = io3d.datasets.join_path("medical", "orig", "CMU-1.ndpi", get_root=True)
-        # json_file = io3d.datasets.join_path("medical", "orig", "CMU-1.ndpi.ndpa.json", get_root=True)
+        json_file = io3d.datasets.join_path("medical", "orig", "CMU-1.ndpi.ndpa.json", get_root=True)
         json_file = fn + ".ndpa.json"
         import sys
         if op.exists(json_file):
@@ -108,6 +108,9 @@ class ParseAnnotationTest(unittest.TestCase):
 
         self.assertGreater(len(json_files), 0)
 
+    def test_read_annotations(self):
+        annotations = scan.read_annotations(pth)
+        scan.annotations_to_px(imsl, annotations)
 
 if __name__ == "__main__":
     # logging.basicConfig(stream=sys.stderr)

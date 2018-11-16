@@ -51,6 +51,7 @@ class ParseAnnotationTest(unittest.TestCase):
         self.assertGreater(pixelsize2[1], pixelsize1[1])
 
 
+
 if __name__ == "__main__":
     # logging.basicConfig(stream=sys.stderr)
     logger.setLevel(logging.DEBUG)
