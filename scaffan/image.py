@@ -108,9 +108,17 @@ def get_resize_parameters(imsl, former_level, former_size, new_level):
 
 class AnnotatedImage:
     def __init__(self, path):
+        self.path = path
         self.openslide = openslide.OpenSlide(path)
 
     def get_resize_parameters(self, former_level, former_size, new_level):
+        """
+        Get scale and size of image after resize to other level
+        :param former_level:
+        :param former_size:
+        :param new_level:
+        :return: scale_factor, new_size
+        """
         return get_resize_parameters(self.openslide, former_level, former_size, new_level)
 
     def get_offset_px(self):
@@ -124,3 +132,10 @@ class AnnotatedImage:
 
     def get_view_location_by_center(self, center, level, size):
         return get_view_location_by_center(self.openslide, center, level, size)
+
+    def get_annotations(self):
+        import scaffan.annotation as scan
+        annotations = scan.read_annotations(self.path)
+        annotations = scan.annotations_to_px(self.openslide, annotations)
+        return annotations
+
