@@ -30,19 +30,25 @@ def import_openslide():
 
 
 # def
-def get_image_with_center(imsl, center, level=3, size=None, as_gray=True):
+def get_image_by_center(imsl, center, level=3, size=None, as_gray=True):
     if size is None:
         size = np.array([800, 800])
-    size2 = (size/2).astype(int)
 
-    offset = size2 * imsl.level_downsamples[level]
-    location = (np.asarray(center) - offset).astype(np.int)
+    location = get_view_location_by_center(imsl, center, level, size)
 
     imcr = imsl.read_region(location, level=level, size=size)
     im = np.asarray(imcr)
     if as_gray:
         im = skimage.color.rgb2gray(im)
     return im
+
+
+def get_view_location_by_center(imsl, center, level, size):
+    size2 = (size/2).astype(int)
+
+    offset = size2 * imsl.level_downsamples[level]
+    location = (np.asarray(center) - offset).astype(np.int)
+    return location
 
 
 def get_pixelsize(imsl, level=0):
@@ -94,3 +100,23 @@ def get_resize_parameters(imsl, former_level, former_size, new_level):
     scale_factor = imsl.level_downsamples[former_level] / imsl.level_downsamples[new_level]
     new_size = (np.asarray(former_size) * scale_factor).astype(np.int)
     return scale_factor, new_size
+
+
+class AnnotatedImage:
+    def __init__(self, imsl):
+        self.imsl = imsl
+
+    def get_resize_parameters(self, former_level, former_size, new_level):
+        return get_resize_parameters(self.imsl, former_level, former_size, new_level)
+
+    def get_offset_px(self):
+        return get_offset_px(self.imsl)
+
+    def get_pixel_size(self, level=0):
+        return get_pixelsize(self.imsl, level)
+
+    def get_image_by_center(self, imsl, center, level=3, size=None, as_gray=True):
+        return get_image_by_center(self.imsl, center, level, size, as_gray)
+
+    def get_view_location_by_center(self, imsl, center, level, size):
+        return get_view_location_by_center(self.imsl, center, level, size)
