@@ -64,7 +64,15 @@ def ndpa_to_json(path):
 
 
 def read_annotations(pth):
+    """
+    Read the ndpa annotations. Annotation is converted to json if it is not done before. This step
+    works on Linux but not on Windows.
+    :param pth: path to .ndpi file
+    :return: readed annotatios
+    """
     fn = pth + ".ndpa.json"
+    if not op.exists(fn):
+        ndpa_to_json(pth)
     with open(fn) as f:
         data = json.load(f)
     return data
