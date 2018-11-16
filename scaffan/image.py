@@ -23,10 +23,13 @@ def import_openslide():
     # pth = op.expanduser(r"~\Miniconda3\envs\lisa36\Library\bin")
     sys.path.insert(0, pth)
     orig_PATH = os.environ["PATH"]
-    os.environ["PATH"] = pth + ";" + os.environ["PATH"]
+    orig_split = orig_PATH.split(";")
+    if pth not in orig_split:
+        os.environ["PATH"] = pth + ";" + os.environ["PATH"]
     import openslide
 
-# import_openslide()
+import_openslide()
+import openslide
 
 
 # def
@@ -103,8 +106,8 @@ def get_resize_parameters(imsl, former_level, former_size, new_level):
 
 
 class AnnotatedImage:
-    def __init__(self, imsl):
-        self.imsl = imsl
+    def __init__(self, path):
+        self.imsl = openslide.OpenSlide(path)
 
     def get_resize_parameters(self, former_level, former_size, new_level):
         return get_resize_parameters(self.imsl, former_level, former_size, new_level)
