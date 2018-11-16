@@ -25,7 +25,8 @@ def import_openslide():
     orig_PATH = os.environ["PATH"]
     orig_split = orig_PATH.split(";")
     if pth not in orig_split:
-        os.environ["PATH"] = pth + ";" + os.environ["PATH"]
+        print("add path {}".format(pth))
+    os.environ["PATH"] = pth + ";" + os.environ["PATH"]
     import openslide
 
 import_openslide()
@@ -107,19 +108,19 @@ def get_resize_parameters(imsl, former_level, former_size, new_level):
 
 class AnnotatedImage:
     def __init__(self, path):
-        self.imsl = openslide.OpenSlide(path)
+        self.openslide = openslide.OpenSlide(path)
 
     def get_resize_parameters(self, former_level, former_size, new_level):
-        return get_resize_parameters(self.imsl, former_level, former_size, new_level)
+        return get_resize_parameters(self.openslide, former_level, former_size, new_level)
 
     def get_offset_px(self):
-        return get_offset_px(self.imsl)
+        return get_offset_px(self.openslide)
 
     def get_pixel_size(self, level=0):
-        return get_pixelsize(self.imsl, level)
+        return get_pixelsize(self.openslide, level)
 
-    def get_image_by_center(self, imsl, center, level=3, size=None, as_gray=True):
-        return get_image_by_center(self.imsl, center, level, size, as_gray)
+    def get_image_by_center(self, center, level=3, size=None, as_gray=True):
+        return get_image_by_center(self.openslide, center, level, size, as_gray)
 
-    def get_view_location_by_center(self, imsl, center, level, size):
-        return get_view_location_by_center(self.imsl, center, level, size)
+    def get_view_location_by_center(self, center, level, size):
+        return get_view_location_by_center(self.openslide, center, level, size)

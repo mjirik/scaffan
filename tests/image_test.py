@@ -31,6 +31,7 @@ skip_on_local = False
 
 scim.import_openslide()
 import openslide
+import scaffan.image as scim
 
 class ParseAnnotationTest(unittest.TestCase):
 
@@ -49,6 +50,16 @@ class ParseAnnotationTest(unittest.TestCase):
 
         self.assertGreater(pixelsize2[0], pixelsize1[0])
         self.assertGreater(pixelsize2[1], pixelsize1[1])
+
+    def test_anim(self):
+        fn = io3d.datasets.join_path("medical", "orig", "CMU-1.ndpi", get_root=True)
+        anim = scim.AnnotatedImage(fn)
+        offset = anim.get_offset_px()
+        self.assertEqual(len(offset), 2, "should be 2D")
+        im = anim.get_image_by_center((10000, 10000), as_gray=True )
+        self.assertEqual(len(im.shape), 2, "should be 2D")
+
+
 
 
 
