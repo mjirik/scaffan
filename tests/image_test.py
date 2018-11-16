@@ -59,6 +59,9 @@ class ParseAnnotationTest(unittest.TestCase):
         im = anim.get_image_by_center((10000, 10000), as_gray=True )
         self.assertEqual(len(im.shape), 2, "should be 2D")
 
+        annotations = anim.get_annotations()
+        self.assertGreater(len(annotations), 1, "there should be 2 annotations")
+
 
 
 
