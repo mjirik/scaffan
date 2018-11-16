@@ -63,6 +63,7 @@ def get_region_center_by_location(imsl, location, level, size):
     center = (np.asarray(location) + offset).astype(np.int)
     return center
 
+
 def get_pixelsize(imsl, level=0):
     """
     imageslice
@@ -159,21 +160,26 @@ class AnnotatedImage:
 
     def set_region(self, location=None, level=0, size=None, center=None):
 
+        if size is None:
+            size = [256, 256]
+
+        size = np.asarray(size)
+
         if location is None:
             location = self.get_region_location_by_center(center, level, size)
         else:
             center = self.get_region_center_by_location(location, level, size)
 
         self.region_location = location
+        self.region_center = center
         self.region_size = size
         self.region_level = level
-        self.region_center = level
         self.region_pixelsize, self.region_pixelunit = self.get_pixel_size(level)
         scan.adjust_to_image_view(self.openslide, self.annotations,
                                   center, level, size)
 
     def get_region(self, as_gray=False):
-        imcr = openslide.read_region(
+        imcr = self.openslide.read_region(
             self.region_location, level=self.region_level, size=self.region_size)
         im = np.asarray(imcr)
         if as_gray:

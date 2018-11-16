@@ -83,9 +83,13 @@ def read_annotations(pth):
 #         plt.plot(annotation["x"], annotation["y"], c=annotation["color"])
 
 
-def plot_annotations(annotations, x_key="x", y_key="y"):
+def plot_annotations(annotations, x_key="x", y_key="y", in_region=False):
     if type(annotations) is dict:
         annotations = [annotations]
+
+    if in_region:
+        x_key = "region_x_px"
+        y_key = "region_y_px"
 
     for annotation in annotations:
         x = np.asarray(annotation[x_key])
@@ -106,11 +110,11 @@ def adjust_to_image_view(imsl, annotations, center, level, size):
         ann_out = annotation
         x_px_view, y_px_view = adjust_xy_to_image_view(imsl, annotation["x_px"], annotation["y_px"], center, level,
                                                        size)
-        ann_out["view_x_px"] = x_px_view
-        ann_out["view_y_px"] = y_px_view
-        ann_out["view_center"] = center
-        ann_out["view_level"] = level
-        ann_out["view_size"] = size
+        ann_out["region_x_px"] = x_px_view
+        ann_out["region_y_px"] = y_px_view
+        ann_out["region_center"] = center
+        ann_out["region_level"] = level
+        ann_out["region_size"] = size
         output.append(ann_out)
 
     return output
