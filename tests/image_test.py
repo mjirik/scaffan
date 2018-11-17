@@ -19,19 +19,22 @@ sys.path.insert(0, op.abspath(op.join(path_to_script, "../../imma")))
 
 # imcut_path =  os.path.join(path_to_script, "../../imcut/")
 # sys.path.insert(0, imcut_path)
+
+import glob
+import os
 import numpy as np
+import matplotlib.pyplot as plt
+
+skip_on_local = False
+
+import scaffan.image as scim
+scim.import_openslide()
+import openslide
+
 import io3d
 import scaffan
 import scaffan.image as scim
 
-import glob
-import os
-
-skip_on_local = False
-
-scim.import_openslide()
-import openslide
-import scaffan.image as scim
 
 class ParseAnnotationTest(unittest.TestCase):
 
@@ -61,6 +64,18 @@ class ParseAnnotationTest(unittest.TestCase):
 
         annotations = anim.read_annotations()
         self.assertGreater(len(annotations), 1, "there should be 2 annotations")
+
+
+    def test_region(self):
+        fn = io3d.datasets.join_path("medical", "orig", "CMU-1.ndpi", get_root=True)
+        anim = scim.AnnotatedImage(fn)
+        anim.set_region_on_annotations(0, 3)
+        mask = anim.get_annotation_region_raster(0)
+        image = anim.get_region_image()
+        plt.imshow(image)
+        plt.contour(mask)
+        # plt.show()
+        self.assertGreater(np.sum(mask), 20)
 
 
 

@@ -16,6 +16,7 @@ import os
 import numpy as np
 import skimage.color
 import scaffan.annotation as scan
+from matplotlib.path import Path
 
 
 def import_openslide():
@@ -77,7 +78,7 @@ def get_pixelsize(imsl, level=0):
 #     print("Resolution {}x{} pixels/{}".format(resolution_x, resolution_y, resolution_unit))
     downsamples = imsl.level_downsamples[level]
 
-    if resolution_unit is "cm":
+    if resolution_unit in ("cm", "centimeter"):
         downsamples = downsamples * 10.
         pixelunit = "mm"
     else:
@@ -93,7 +94,10 @@ def get_offset_px(imsl):
     pm = imsl.properties
     pixelsize, pixelunit = get_pixelsize(imsl)
     offset = np.asarray((int(pm['hamamatsu.XOffsetFromSlideCentre']), int(pm['hamamatsu.YOffsetFromSlideCentre'])))
+    # resolution_unit = pm["tiff.ResolutionUnit"]
     offset_mm = offset * 0.000001
+    if pixelunit is not "mm":
+        raise ValueError("Cannot convert pixelunit {} to milimeters".format(pixelunit))
     offset_from_center_px = offset_mm / pixelsize
     im_center_px = np.asarray(imsl.dimensions) / 2.
     offset_px = im_center_px - offset_from_center_px
@@ -158,7 +162,7 @@ class AnnotatedImage:
         self.annotations = scan.annotations_to_px(self.openslide, self.annotations)
         return self.annotations
 
-    def set_region(self, location=None, level=0, size=None, center=None):
+    def set_region(self, center=None, level=0, size=None, location=None):
 
         if size is None:
             size = [256, 256]
@@ -175,10 +179,34 @@ class AnnotatedImage:
         self.region_size = size
         self.region_level = level
         self.region_pixelsize, self.region_pixelunit = self.get_pixel_size(level)
-        scan.adjust_to_image_view(self.openslide, self.annotations,
-                                  center, level, size)
+        scan.adjust_annotation_to_image_view(self.openslide, self.annotations,
+                                             center, level, size)
 
-    def get_region(self, as_gray=False):
+    def set_region_on_annotations(self, i=None, level=2, boundary_px = 10):
+        center, size = self.get_annotations_bounds_px(i)
+        region_size = ((size / self.openslide.level_downsamples[level]) + 2 * boundary_px).astype(int)
+        self.set_region(center=center, level=level, size=region_size)
+
+    def get_annotations_bounds_px(self, i=None):
+        if i is not None:
+            anns = [self.annotations[i]]
+
+        x_px = []
+        y_px = []
+
+        for ann in anns:
+            x_px.append(ann["x_px"])
+            y_px.append(ann["y_px"])
+
+        mx = np.array([np.max(x_px), np.max(y_px)])
+        mi = np.array([np.min(x_px), np.min(y_px)])
+        all = [mi, mx]
+        center = np.mean(all, 0)
+        size = mx - mi
+        return center, size
+
+
+    def get_region_image(self, as_gray=False):
         imcr = self.openslide.read_region(
             self.region_location, level=self.region_level, size=self.region_size)
         im = np.asarray(imcr)
@@ -186,4 +214,19 @@ class AnnotatedImage:
             im = skimage.color.rgb2gray(im)
         return im
 
+    def plot_annotations(self):
+        scan.plot_annotations(self.annotations, in_region=True)
+
+    def get_annotation_region_raster(self, i):
+        polygon_x = self.annotations[i]["region_x_px"]
+        polygon_y = self.annotations[i]["region_y_px"]
+        polygon = list(zip(polygon_x, polygon_y))
+        poly_path = Path(polygon)
+
+        x, y = np.mgrid[:self.region_size[0], :self.region_size[1]]
+        coors = np.hstack((x.reshape(-1, 1), y.reshape(-1, 1)))  # coors.shape is (4000000,2)
+
+        mask = poly_path.contains_points(coors)
+        mask = mask.reshape(self.region_size)
+        return mask
 

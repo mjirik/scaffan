@@ -104,7 +104,7 @@ def adjust_xy_to_image_view(imsl, x_px, y_px, center, level, size):
     return x_px_view, y_px_view
 
 
-def adjust_to_image_view(imsl, annotations, center, level, size):
+def adjust_annotation_to_image_view(imsl, annotations, center, level, size):
     output = []
     for annotation in annotations:
         ann_out = annotation
