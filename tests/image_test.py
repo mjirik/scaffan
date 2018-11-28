@@ -74,10 +74,19 @@ class ParseAnnotationTest(unittest.TestCase):
         image = anim.get_region_image()
         plt.imshow(image)
         plt.contour(mask)
-        # plt.show()
+        plt.show()
         self.assertGreater(np.sum(mask), 20)
 
-
+    def test_region_select_by_title(self):
+        fn = io3d.datasets.join_path("medical", "orig", "CMU-1.ndpi", get_root=True)
+        anim = scim.AnnotatedImage(fn)
+        anim.set_region_on_annotations("obj1", 3)
+        mask = anim.get_annotation_region_raster("obj1")
+        image = anim.get_region_image()
+        plt.imshow(image)
+        plt.contour(mask)
+        plt.show()
+        self.assertGreater(np.sum(mask), 20)
 
 
 if __name__ == "__main__":

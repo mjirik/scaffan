@@ -160,6 +160,7 @@ class AnnotatedImage:
     def read_annotations(self):
         self.annotations = scan.read_annotations(self.path)
         self.annotations = scan.annotations_to_px(self.openslide, self.annotations)
+        self.titles = scan.annotation_titles(self.annotations)
         return self.annotations
 
     def set_region(self, center=None, level=0, size=None, location=None):
@@ -182,12 +183,26 @@ class AnnotatedImage:
         scan.adjust_annotation_to_image_view(self.openslide, self.annotations,
                                              center, level, size)
 
+    def __select_region(self, i):
+        if type(i) is str:
+            i = self.titles[i][0]
+        return i
+
     def set_region_on_annotations(self, i=None, level=2, boundary_px = 10):
+        """
+
+        :param i: index of annotation or annotation title
+        :param level:
+        :param boundary_px:
+        :return:
+        """
+        i = self.__select_region(i)
         center, size = self.get_annotations_bounds_px(i)
         region_size = ((size / self.openslide.level_downsamples[level]) + 2 * boundary_px).astype(int)
         self.set_region(center=center, level=level, size=region_size)
 
     def get_annotations_bounds_px(self, i=None):
+        i = self.__select_region(i)
         if i is not None:
             anns = [self.annotations[i]]
 
@@ -218,9 +233,10 @@ class AnnotatedImage:
         scan.plot_annotations(self.annotations, in_region=True)
 
     def get_annotation_region_raster(self, i):
+        i = self.__select_region(i)
         polygon_x = self.annotations[i]["region_x_px"]
         polygon_y = self.annotations[i]["region_y_px"]
-        polygon = list(zip(polygon_x, polygon_y))
+        polygon = list(zip(polygon_y, polygon_x))
         poly_path = Path(polygon)
 
         x, y = np.mgrid[:self.region_size[0], :self.region_size[1]]

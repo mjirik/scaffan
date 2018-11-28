@@ -139,5 +139,16 @@ def annotations_to_px(imsl, annotations):
         annotation["y_px"] = y_px
     return annotations
 
+def annotation_titles(annotations):
+    titles = {}
+    for i, an in enumerate(annotations):
+        title = an["title"]
+        if title in titles:
+            titles[title].append(i)
+        else:
+            titles[title] = [i]
+
+    return titles
+
 
 
