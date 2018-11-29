@@ -84,7 +84,7 @@ class ParseAnnotationTest(unittest.TestCase):
         image = anim.get_region_image()
         plt.imshow(image)
         plt.contour(mask)
-        plt.show()
+        # plt.show()
         self.assertGreater(np.sum(mask), 20)
         self.assertTrue(np.array_equal(mask.shape[:2], image.shape[:2]), "shape of mask should be the same as shape of image")
 
