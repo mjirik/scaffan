@@ -33,7 +33,14 @@ def match(refs, img):
     lbp = local_binary_pattern(img, n_points, radius, METHOD)
     n_bins = int(lbp.max() + 1)
     hist, _ = np.histogram(lbp, density=True, bins=n_bins, range=(0, n_bins))
-    for name, ref in refs.items():
+    if type(refs) is dict:
+        itms = refs.items()
+    elif type(refs) is list:
+        itms = refs
+    else:
+        ValueError("Wrong type for 'refs'")
+
+    for name, ref in itms:
         ref_hist, _ = np.histogram(ref, density=True, bins=n_bins,
                                    range=(0, n_bins))
         score = kullback_leibler_divergence(hist, ref_hist)
