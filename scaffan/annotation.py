@@ -94,7 +94,7 @@ def plot_annotations(annotations, x_key="x", y_key="y", in_region=False):
     for annotation in annotations:
         x = np.asarray(annotation[x_key])
         y = np.asarray(annotation[y_key])
-        plt.hold(True)
+        # plt.hold(True)
         plt.plot(x, y, c=annotation["color"])
 
 
