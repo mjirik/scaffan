@@ -78,7 +78,7 @@ class TextureTest(unittest.TestCase):
         nz = satex.select_texture_patch_centers_from_one_annotation(anim, "obj1", tile_size=32, level=3, step=20)
         nz_view_px = view.coords_glob_px_to_view_px(nz)
         plt.plot(nz_view_px[1], nz_view_px[0], "bo")
-        plt.show()
+        # plt.show()
 
         x = nz_view_px[0].astype(int)
         y = nz_view_px[1].astype(int)
@@ -119,6 +119,12 @@ class TextureTest(unittest.TestCase):
             2: local_binary_pattern(im2, n_points, radius, METHOD),
             3: local_binary_pattern(im3, n_points, radius, METHOD)
         }
+        refs = [
+            [0, local_binary_pattern(im0, n_points, radius, METHOD)],
+            [1, local_binary_pattern(im1, n_points, radius, METHOD)],
+            [2, local_binary_pattern(im2, n_points, radius, METHOD)],
+            [3, local_binary_pattern(im3, n_points, radius, METHOD)]
+        ]
         view_test = anim.get_view_on_annotation("test2", level=level)
         test_image = view_test.get_region_image(as_gray=True)
 
