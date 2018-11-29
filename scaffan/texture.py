@@ -23,13 +23,15 @@ def texture_segmentation(image, decision_function, models, tile_size):
     return output
 
 
-def select_texture_patch_centers_from_one_annotation(anim, i, tile_size, step=50):
-    mask = anim.get_annotation_region_raster(i)
+def select_texture_patch_centers_from_one_annotation(anim, i, tile_size, level, step=50):
+    view = anim.get_view_on_annotation(i, level=level)
+    mask = view.get_annotation_region_raster(i)
     dst = scipy.ndimage.morphology.distance_transform_edt(mask)
     middle_pixels = dst > (tile_size / 2)
     nz = nonzero_with_step(middle_pixels, step)
-    anim.
-    return nz
+    nz_global_px = view.coords_view_px_to_glob_px(nz)
+    # anim.
+    return nz_global_px
 
 
 def nonzero_with_step(data, step):
