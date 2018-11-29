@@ -188,7 +188,7 @@ class AnnotatedImage:
             i = self.titles[i][0]
         return i
 
-    def set_region_on_annotations(self, i=None, level=2, boundary_px = 10):
+    def set_region_on_annotations(self, i=None, level=2, boundary_px=10, show=False):
         """
 
         :param i: index of annotation or annotation title
@@ -200,6 +200,8 @@ class AnnotatedImage:
         center, size = self.get_annotations_bounds_px(i)
         region_size = ((size / self.openslide.level_downsamples[level]) + 2 * boundary_px).astype(int)
         self.set_region(center=center, level=level, size=region_size)
+        if show:
+            self.region_imshow_annotation(i)
 
     def get_annotations_bounds_px(self, i=None):
         i = self.__select_region(i)
@@ -220,6 +222,82 @@ class AnnotatedImage:
         size = mx - mi
         return center, size
 
+    def get_region_image(self, as_gray=False):
+        imcr = self.openslide.read_region(
+            self.region_location, level=self.region_level, size=self.region_size)
+        im = np.asarray(imcr)
+        if as_gray:
+            im = skimage.color.rgb2gray(im)
+        return im
+
+    def plot_annotations(self, i=None):
+        if i is None:
+            anns = self.annotations
+        else:
+            i = self.__select_region(i)
+            anns = [self.annotations[i]]
+        scan.plot_annotations(anns, in_region=True)
+
+    def get_annotation_region_raster(self, i):
+        i = self.__select_region(i)
+        polygon_x = self.annotations[i]["region_x_px"]
+        polygon_y = self.annotations[i]["region_y_px"]
+        polygon = list(zip(polygon_y, polygon_x))
+        poly_path = Path(polygon)
+
+        x, y = np.mgrid[:self.region_size[1], :self.region_size[0]]
+        coors = np.hstack((x.reshape(-1, 1), y.reshape(-1, 1)))  # coors.shape is (4000000,2)
+
+        mask = poly_path.contains_points(coors)
+        mask = mask.reshape(self.region_size[::-1])
+        return mask
+
+    def region_imshow_annotation(self, i):
+        region = self.get_region_image()
+        plt.imshow(region)
+        self.plot_annotations(i)
+
+    def coords_region_px_to_global_px(self, points):
+        """
+        :param points: [[x0, x1, ...], [y0, y1, ...]]
+        :return:
+        """
+
+        px_factor = self.openslide.level_downsamples[self.region_level]
+        print(px_factor)
+        x_px = self.region_location[0] + points[0] * px_factor
+        y_px = self.region_location[1] + points[1] * px_factor
+
+        return x_px, y_px
+
+
+class View:
+
+    def __init__(self, anim, center=None, level=0, size=None, location=None):
+        self.anim = anim
+        self.set_region(center=center, level=level, size=size, location=location)
+
+    def set_region(self, center=None, level=0, size=None, location=None):
+
+        if size is None:
+            size = [256, 256]
+
+        size = np.asarray(size)
+
+        if location is None:
+            location = self.get_region_location_by_center(center, level, size)
+        else:
+            center = self.get_region_center_by_location(location, level, size)
+
+        self.region_location = location
+        self.region_center = center
+        self.region_size = size
+        self.region_level = level
+        self.region_pixelsize, self.region_pixelunit = self.get_pixel_size(level)
+        import copy
+        copy.deepcopy(self.anim.annotations)
+        scan.adjust_annotation_to_image_view(self.anim.openslide, self.annotations,
+                                             center, level, size)
 
     def get_region_image(self, as_gray=False):
         imcr = self.openslide.read_region(
@@ -229,8 +307,23 @@ class AnnotatedImage:
             im = skimage.color.rgb2gray(im)
         return im
 
-    def plot_annotations(self):
-        scan.plot_annotations(self.annotations, in_region=True)
+    def region_imshow_annotation(self, i):
+        region = self.get_region_image()
+        plt.imshow(region)
+        self.plot_annotations(i)
+
+    def coords_region_px_to_global_px(self, points_region_px):
+        """
+        :param points_region_px: [[x0, x1, ...], [y0, y1, ...]]
+        :return:
+        """
+
+        px_factor = self.openslide.level_downsamples[self.region_level]
+        print(px_factor)
+        x_px = self.region_location[0] + points_region_px[0] * px_factor
+        y_px = self.region_location[1] + points_region_px[1] * px_factor
+
+        return x_px, y_px
 
     def get_annotation_region_raster(self, i):
         i = self.__select_region(i)
@@ -239,10 +332,14 @@ class AnnotatedImage:
         polygon = list(zip(polygon_y, polygon_x))
         poly_path = Path(polygon)
 
-        x, y = np.mgrid[:self.region_size[0], :self.region_size[1]]
+        x, y = np.mgrid[:self.region_size[1], :self.region_size[0]]
         coors = np.hstack((x.reshape(-1, 1), y.reshape(-1, 1)))  # coors.shape is (4000000,2)
 
         mask = poly_path.contains_points(coors)
-        mask = mask.reshape(self.region_size)
+        mask = mask.reshape(self.region_size[::-1])
         return mask
 
+    def region_imshow_annotation(self, i):
+        region = self.get_region_image()
+        plt.imshow(region)
+        self.plot_annotations(i)

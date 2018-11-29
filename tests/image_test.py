@@ -65,7 +65,6 @@ class ParseAnnotationTest(unittest.TestCase):
         annotations = anim.read_annotations()
         self.assertGreater(len(annotations), 1, "there should be 2 annotations")
 
-
     def test_region(self):
         fn = io3d.datasets.join_path("medical", "orig", "CMU-1.ndpi", get_root=True)
         anim = scim.AnnotatedImage(fn)
@@ -74,7 +73,7 @@ class ParseAnnotationTest(unittest.TestCase):
         image = anim.get_region_image()
         plt.imshow(image)
         plt.contour(mask)
-        plt.show()
+        # plt.show()
         self.assertGreater(np.sum(mask), 20)
 
     def test_region_select_by_title(self):
@@ -87,6 +86,18 @@ class ParseAnnotationTest(unittest.TestCase):
         plt.contour(mask)
         plt.show()
         self.assertGreater(np.sum(mask), 20)
+        self.assertTrue(np.array_equal(mask.shape[:2], image.shape[:2]), "shape of mask should be the same as shape of image")
+
+    def test_select_by_title_and_plot(self):
+        fn = io3d.datasets.join_path("medical", "orig", "CMU-1.ndpi", get_root=True)
+        anim = scim.AnnotatedImage(fn)
+        anim.set_region_on_annotations("obj1", 3)
+        image = anim.get_region_image()
+        plt.imshow(image)
+        anim.plot_annotations("obj1")
+        # plt.show()
+        self.assertGreater(image.shape[0], 100)
+
 
 
 if __name__ == "__main__":
