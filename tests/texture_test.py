@@ -139,6 +139,20 @@ class TextureTest(unittest.TestCase):
 
 
 
+    def test_texture_segmentation_object(self):
+        level=0
+        title_size = 128
+        size = [128, 128]
+        fn = io3d.datasets.join_path("medical", "orig", "CMU-1.ndpi", get_root=True)
+        anim = scim.AnnotatedImage(fn)
+
+        texseg = satex.TextureSegmentation()
+        texseg.add_training_data(anim, "obj1", 1)
+        texseg.add_training_data(anim, "obj2", 2)
+        texseg.add_training_data(anim, "obj3", 3)
+
+        texseg.fit(anim.get_view_on_annotation("test2", level=1), show=True )
+        # plt.show()
 
 
 if __name__ == "__main__":
