@@ -52,8 +52,8 @@ def nonzero_with_step(data, step):
 
 class TextureSegmentation:
     def __init__(self):
-        self.tile_size = [128, 128]
-        self.tile_size1 = 128
+        self.tile_size = [256, 256]
+        self.tile_size1 = 256
         self.level = 1
         self.step = 64
         self.refs = []
@@ -66,13 +66,29 @@ class TextureSegmentation:
         self.feature_function_args = [n_points, radius, METHOD]
         pass
 
-    def add_training_data(self, anim, title, numeric_label):
-        patch_centers1 = select_texture_patch_centers_from_one_annotation(anim, title, tile_size=self.tile_size1,
+    def get_tile_centers(self, anim, tile):
+        patch_centers1 = select_texture_patch_centers_from_one_annotation(anim, tile, tile_size=self.tile_size1,
                                                                           level=self.level, step=self.step)
         patch_centers1_points = list(zip(*patch_centers1))
+        return patch_centers1_points
 
-        for patch_center in patch_centers1_points:
-            view = anim.get_view(center=[patch_center[0], patch_center[1]], level=self.level, size=self.tile_size)
+    def get_patch_view(self,anim, patch_center):
+        view = anim.get_view(center=[patch_center[0], patch_center[1]], level=self.level, size=self.tile_size)
+
+        return view
+
+    def show_tiles(self, anim, tile, tile_ids):
+        patch_center_points = self.get_tile_centers(anim, tile)
+        for id in tile_ids:
+            view = self.get_patch_view(anim, patch_center_points[id])
+            plt.figure()
+            plt.imshow(view.get_region_image(as_gray=True), cmap="gray")
+
+    def add_training_data(self, anim, tile, numeric_label):
+        patch_center_points = self.get_tile_centers(anim, tile)
+
+        for patch_center in patch_center_points:
+            view = self.get_patch_view(anim, patch_center)
             imgray = view.get_region_image(as_gray=True)
             self.refs.append([numeric_label, self.feature_function(imgray, *self.feature_function_args)])
 

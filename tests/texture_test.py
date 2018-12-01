@@ -155,6 +155,33 @@ class TextureTest(unittest.TestCase):
         # plt.show()
 
 
+    def test_texture_segmentation_object_lobulus_data(self):
+        fn = io3d.datasets.join_path("scaffold", "Hamamatsu", "PIG-008_P008 LL-P_HE_parenchyme perif..ndpi", get_root=True)
+        anim = scim.AnnotatedImage(fn)
+
+        texseg = satex.TextureSegmentation()
+        # texseg.add_training_data(anim, "empty1", 0)
+        texseg.add_training_data(anim, "intralobular1", 1)
+        # centers = texseg.get_tile_centers(anim, "intralobular1")
+        # view1 = texseg.get_patch_view(anim, centers[0])
+        # plt.imshow(view1.get_region_image())
+        # view1 = texseg.get_patch_view(anim, centers[1])
+        # plt.imshow(view1.get_region_image())
+        # plt.show()
+        print("number of patches: {}".format(len(texseg.refs)))
+        texseg.add_training_data(anim, "extralobular1", 2)
+        print("number of patches: {}".format(len(texseg.refs)))
+
+        texseg.show_tiles(anim, "intralobular1", [0, -1])
+        texseg.show_tiles(anim, "extralobular1", [0, -1])
+        plt.show()
+        logger.debug("number of patches: {}".format(len(texseg.refs)))
+        # texseg.add_training_data(anim, "obj3", 3)
+
+        texseg.fit(anim.get_view_on_annotation("test2", level=texseg.level), show=True )
+        plt.savefig("segmentation.png")
+        plt.show()
+
 if __name__ == "__main__":
     # logging.basicConfig(stream=sys.stderr)
     logger.setLevel(logging.DEBUG)
