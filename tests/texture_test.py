@@ -138,6 +138,7 @@ class TextureTest(unittest.TestCase):
         # plt.show()
 
     def test_texture_segmentation_object(self):
+
         level = 0
         tile_size1 = 128
         tile_size = [128, 128]
@@ -157,11 +158,14 @@ class TextureTest(unittest.TestCase):
         texseg.add_training_data(anim, "obj2", 2, show=True)
         plt.figure()
         texseg.add_training_data(anim, "obj3", 3, show=True)
-        plt.show()
+        # plt.show()
 
         texseg.fit(anim.get_view_on_annotation("test2", level=texseg.level), show=True )
-        plt.show()
+        # plt.show()
 
+
+    skip_on_local = False
+    @unittest.skipIf(os.environ.get("TRAVIS", skip_on_local), "Skip on Travis-CI")
     def test_texture_segmentation_object_lobulus_data(self):
         fn = io3d.datasets.join_path("scaffold", "Hamamatsu", "PIG-008_P008 LL-P_HE_parenchyme perif..ndpi", get_root=True)
         anim = scim.AnnotatedImage(fn)
