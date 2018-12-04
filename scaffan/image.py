@@ -245,12 +245,12 @@ class AnnotatedImage:
             im = skimage.color.rgb2gray(im)
         return im
 
-    def plot_annotations(self, i=None):
-        if i is None:
+    def plot_annotations(self, annotation_id=None):
+        if annotation_id is None:
             anns = self.annotations
         else:
-            i = self.get_annotation_id(i)
-            anns = [self.annotations[i]]
+            annotation_id = self.get_annotation_id(annotation_id)
+            anns = [self.annotations[annotation_id]]
         scan.plot_annotations(anns, in_region=True)
 
     def get_annotation_region_raster(self, i):
@@ -272,18 +272,34 @@ class AnnotatedImage:
         plt.imshow(region)
         self.plot_annotations(i)
 
-    def coords_region_px_to_global_px(self, points):
+    def coords_region_px_to_global_px(self, points_view_px):
         """
-        :param points: [[x0, x1, ...], [y0, y1, ...]]
+        :param points_view_px: [[x0, x1, ...], [y0, y1, ...]]
         :return:
         """
 
         px_factor = self.openslide.level_downsamples[self.region_level]
         print(px_factor)
-        x_px = self.region_location[0] + points[0] * px_factor
-        y_px = self.region_location[1] + points[1] * px_factor
+        x_px = self.region_location[0] + points_view_px[0] * px_factor
+        y_px = self.region_location[1] + points_view_px[1] * px_factor
 
         return x_px, y_px
+
+    def coords_global_px_to_view_px(self, points_glob_px):
+        """
+        :param points_glob_px: [[x0, x1, ...], [y0, y1, ...]]
+        :return:
+        """
+
+        px_factor = self.openslide.level_downsamples[self.region_level]
+        print(px_factor)
+        x_glob_px = points_glob_px[0]
+        y_glob_px = points_glob_px[1]
+        x_view_px = (x_glob_px - self.region_location[0]) / px_factor
+        y_view_px = (y_glob_px - self.region_location[1]) / px_factor
+
+        return x_view_px, y_view_px
+
 
 
 class View:
@@ -332,26 +348,31 @@ class View:
         plt.imshow(region)
         self.plot_annotations(i)
 
-    def coords_glob_px_to_view_px(self, points_glob_px):
+    def coords_glob_px_to_view_px(self, x_glob_px, y_glob_px):
         px_factor = self.anim.openslide.level_downsamples[self.region_level]
 
-        x_px = (points_glob_px[0] - self.region_location[0]) / px_factor
-        y_px = (points_glob_px[1] - self.region_location[1]) / px_factor
+        x_px = (x_glob_px - self.region_location[0]) / px_factor
+        y_px = (y_glob_px - self.region_location[1]) / px_factor
 
         return x_px, y_px
 
-    def coords_view_px_to_glob_px(self, points_view_px):
+    def coords_view_px_to_glob_px(self, x_view_px, y_view_px):
         """
-        :param points_view_px: [[x0, x1, ...], [y0, y1, ...]]
+        :param x_view_px: [x0, x1, ...]
+        :param y_view_px: [y0, y1, ...]]
         :return:
         """
-
         px_factor = self.anim.openslide.level_downsamples[self.region_level]
         # print(px_factor)
-        x_px = self.region_location[0] + points_view_px[0] * px_factor
-        y_px = self.region_location[1] + points_view_px[1] * px_factor
+        x_px = self.region_location[0] + x_view_px * px_factor
+        y_px = self.region_location[1] + y_view_px * px_factor
 
         return x_px, y_px
+
+    def plot_points(self, x_glob_px, y_glob_px):
+        # points = [x_glob_px, y_glob_px]
+        x_view_px, y_view_px = self.coords_glob_px_to_view_px(x_glob_px, y_glob_px)
+        plt.plot(x_view_px, y_view_px, "oy")
 
     def get_annotation_region_raster(self, i):
         i = self.anim.get_annotation_id(i)
@@ -390,3 +411,7 @@ class View:
         if as_gray:
             im = skimage.color.rgb2gray(im)
         return im
+
+    def imshow(self, as_gray=False):
+        plt.imshow(self.get_region_image(as_gray=as_gray))
+

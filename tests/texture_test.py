@@ -75,9 +75,9 @@ class TextureTest(unittest.TestCase):
         mask = view.get_annotation_region_raster("obj1")
         self.assertTrue(np.array_equal(mask.shape[:2], image.shape[:2]), "shape of mask should be the same as shape of image")
 
-        nz = satex.select_texture_patch_centers_from_one_annotation(anim, "obj1", tile_size=32, level=3, step=20)
-        nz_view_px = view.coords_glob_px_to_view_px(nz)
-        plt.plot(nz_view_px[1], nz_view_px[0], "bo")
+        x_nz, y_nz = satex.select_texture_patch_centers_from_one_annotation(anim, "obj1", tile_size=32, level=3, step=20)
+        nz_view_px = view.coords_glob_px_to_view_px(x_nz, y_nz)
+        plt.plot(nz_view_px[0], nz_view_px[1], "bo")
         # plt.show()
 
         x = nz_view_px[0].astype(int)
@@ -137,23 +137,30 @@ class TextureTest(unittest.TestCase):
         plt.imshow(skimage.color.label2rgb(seg, test_image))
         # plt.show()
 
-
-
     def test_texture_segmentation_object(self):
-        level=0
-        title_size = 128
-        size = [128, 128]
+        level = 0
+        tile_size1 = 128
+        tile_size = [128, 128]
         fn = io3d.datasets.join_path("medical", "orig", "CMU-1.ndpi", get_root=True)
         anim = scim.AnnotatedImage(fn)
 
         texseg = satex.TextureSegmentation()
-        texseg.add_training_data(anim, "obj1", 1)
-        texseg.add_training_data(anim, "obj2", 2)
-        texseg.add_training_data(anim, "obj3", 3)
+        texseg.level = level
+        texseg.tile_size = tile_size
+        texseg.tile_size1 = tile_size1
+        texseg.step = 128
 
-        texseg.fit(anim.get_view_on_annotation("test2", level=1), show=True )
-        # plt.show()
+        plt.figure()
+        texseg.add_training_data(anim, "obj1", 1, show=True)
+        texseg.show_tiles(anim, "obj1", [0, 1, -2, -1])
+        plt.figure()
+        texseg.add_training_data(anim, "obj2", 2, show=True)
+        plt.figure()
+        texseg.add_training_data(anim, "obj3", 3, show=True)
+        plt.show()
 
+        texseg.fit(anim.get_view_on_annotation("test2", level=texseg.level), show=True )
+        plt.show()
 
     def test_texture_segmentation_object_lobulus_data(self):
         fn = io3d.datasets.join_path("scaffold", "Hamamatsu", "PIG-008_P008 LL-P_HE_parenchyme perif..ndpi", get_root=True)
@@ -161,16 +168,19 @@ class TextureTest(unittest.TestCase):
 
         texseg = satex.TextureSegmentation()
         # texseg.add_training_data(anim, "empty1", 0)
-        texseg.add_training_data(anim, "intralobular1", 1)
+        plt.figure()
+        texseg.add_training_data(anim, "intralobular1", 1, show=True)
         # centers = texseg.get_tile_centers(anim, "intralobular1")
         # view1 = texseg.get_patch_view(anim, centers[0])
         # plt.imshow(view1.get_region_image())
         # view1 = texseg.get_patch_view(anim, centers[1])
         # plt.imshow(view1.get_region_image())
         # plt.show()
-        print("number of patches: {}".format(len(texseg.refs)))
-        texseg.add_training_data(anim, "extralobular1", 2)
-        print("number of patches: {}".format(len(texseg.refs)))
+        plt.figure()
+        # print("number of patches: {}".format(len(texseg.refs)))
+        texseg.add_training_data(anim, "extralobular1", 2, show=True)
+
+        # print("number of patches: {}".format(len(texseg.refs)))
 
         texseg.show_tiles(anim, "intralobular1", [0, -1])
         texseg.show_tiles(anim, "extralobular1", [0, -1])
@@ -181,6 +191,7 @@ class TextureTest(unittest.TestCase):
         texseg.fit(anim.get_view_on_annotation("test2", level=texseg.level), show=True )
         plt.savefig("segmentation.png")
         plt.show()
+
 
 if __name__ == "__main__":
     # logging.basicConfig(stream=sys.stderr)

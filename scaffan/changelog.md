@@ -8,3 +8,4 @@
 * [new] Convert annotation to json automatically if necessery
 * [new] Get mask from annotation
 * [new] Views can be used for looking on one annotated image
+* [new] Show tile centers in fit() and in add_training_data()

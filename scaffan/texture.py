@@ -11,7 +11,10 @@ import scipy.ndimage
 import matplotlib.pyplot as plt
 
 
-def texture_segmentation(image, decision_function, models, tile_size):
+def texture_segmentation(image, decision_function, models, tile_size, return_centers=False):
+    if return_centers:
+        tile_size2 = [int(tile_size[0] / 2), int(tile_size[1] / 2)]
+        centers = []
     output = np.asarray(image, dtype=np.int8)
     for x0 in range(0, image.shape[0], tile_size[0]):
         for x1 in range(0, image.shape[1], tile_size[1]):
@@ -20,24 +23,30 @@ def texture_segmentation(image, decision_function, models, tile_size):
                 slice(x1, x1 + tile_size[1])
             ]
             output[sl] = decision_function(models, image[sl])
+            if return_centers:
+                centers.append([x0 + tile_size2[0], x1 + tile_size2[1]])
 
-    return output
+    if return_centers:
+        return output, centers
+    else:
+        return output
 
 
-def select_texture_patch_centers_from_one_annotation(anim, i, tile_size, level, step=50):
+def select_texture_patch_centers_from_one_annotation(anim, title, tile_size, level, step=50):
     if not np.isscalar(tile_size):
         if tile_size[0] == tile_size[1]:
             tile_size = tile_size[0]
         else:
             # it would be possible to add factor (1./tile_size) into distance transform
             raise ValueError("Both sides of tile should be the same. Other option is not implemented.")
-    view = anim.get_view_on_annotation(i, level=level)
-    mask = view.get_annotation_region_raster(i)
+    view = anim.get_view_on_annotation(title, level=level)
+    mask = view.get_annotation_region_raster(title)
 
     dst = scipy.ndimage.morphology.distance_transform_edt(mask)
     middle_pixels = dst > (tile_size / 2)
-    nz = nonzero_with_step(middle_pixels, step)
-    nz_global_px = view.coords_view_px_to_glob_px(nz)
+    # x_nz, y_nz = nonzero_with_step(middle_pixels, step)
+    y_nz, x_nz = nonzero_with_step(middle_pixels, step)
+    nz_global_px = view.coords_view_px_to_glob_px(x_nz, y_nz)
     # anim.
     return nz_global_px
 
@@ -66,39 +75,74 @@ class TextureSegmentation:
         self.feature_function_args = [n_points, radius, METHOD]
         pass
 
-    def get_tile_centers(self, anim, tile):
-        patch_centers1 = select_texture_patch_centers_from_one_annotation(anim, tile, tile_size=self.tile_size1,
+    def get_tile_centers(self, anim, annotation_id, return_xy=False):
+        """
+        Calculate centers for specific annotation.
+        :param anim:
+        :param annotation_id:
+        :return: [[x0, y0], [x1, y1], ...]
+        """
+        patch_centers1 = select_texture_patch_centers_from_one_annotation(anim, annotation_id, tile_size=self.tile_size1,
                                                                           level=self.level, step=self.step)
-        patch_centers1_points = list(zip(*patch_centers1))
-        return patch_centers1_points
+        if return_xy:
+            return patch_centers1
+        else:
+            patch_centers1_points = list(zip(*patch_centers1))
+            return patch_centers1_points
 
-    def get_patch_view(self,anim, patch_center):
-        view = anim.get_view(center=[patch_center[0], patch_center[1]], level=self.level, size=self.tile_size)
+    def get_patch_view(self, anim, patch_center=None, annotation_id=None):
+        if patch_center is not None:
+            view = anim.get_view(center=[patch_center[0], patch_center[1]], level=self.level, size=self.tile_size)
+        elif patch_center is not None:
+            view = anim.get_view_on_annotation(annotation_id=annotation_id, level= self.level, size=self.tile_size)
 
         return view
 
-    def show_tiles(self, anim, tile, tile_ids):
-        patch_center_points = self.get_tile_centers(anim, tile)
+    def show_tiles(self, anim, annotation_id, tile_ids):
+        """
+        Show tiles from annotation selected by list of its id
+        :param anim:
+        :param annotation_id:
+        :param tile_ids: list of int, [0, 5] means show first and sixth tile
+        :return:
+        """
+        patch_center_points = self.get_tile_centers(anim, annotation_id)
         for id in tile_ids:
             view = self.get_patch_view(anim, patch_center_points[id])
             plt.figure()
             plt.imshow(view.get_region_image(as_gray=True), cmap="gray")
 
-    def add_training_data(self, anim, tile, numeric_label):
-        patch_center_points = self.get_tile_centers(anim, tile)
+    def add_training_data(self, anim, annotation_id, numeric_label, show=False):
+        patch_center_points = self.get_tile_centers(anim, annotation_id)
 
         for patch_center in patch_center_points:
             view = self.get_patch_view(anim, patch_center)
             imgray = view.get_region_image(as_gray=True)
             self.refs.append([numeric_label, self.feature_function(imgray, *self.feature_function_args)])
 
+        if show:
+            view = anim.get_view_on_annotation(annotation_id=annotation_id)
+            view.imshow()
+            lst = list(zip(*patch_center_points))
+            x, y = lst
+            view.plot_points(x, y)
+        return patch_center_points
+
 
     def fit(self, view, show=False):
         test_image = view.get_region_image(as_gray=True)
         import scaffan.texture_lbp as salbp
-        seg = texture_segmentation(test_image, salbp.match, self.refs, tile_size=self.tile_size)
+
+        out = texture_segmentation(test_image, salbp.match, self.refs, tile_size=self.tile_size, return_centers=show)
+
         if show:
+            seg, centers = out
             import skimage.color
             plt.imshow(skimage.color.label2rgb(seg, test_image))
+            x, y = list(zip(*centers))
+            plt.plot(x, y, "xy")
+            # view.plot_points()
+        else:
+            seg = out
         return seg
 
