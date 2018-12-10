@@ -15,7 +15,7 @@ import sys
 import os
 import numpy as np
 import skimage.color
-import scaffan.annotation as scan
+from . import annotation as scan
 from matplotlib.path import Path
 
 
