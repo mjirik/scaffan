@@ -1,0 +1,13 @@
+name: scaffan
+channels:
+    - mjirik
+    - conda-forge
+    - bioconda
+dependencies:
+    - python=3.6
+    - pip
+    - numpy
+    - io3d
+    - imma
+#    - openslide-python
+    - lxml
