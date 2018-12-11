@@ -34,7 +34,7 @@ def get_one_annotation(viewstate):
     return dict(title=an_title, color=an_color, x=an_x, y=an_y)
 
 
-def ndpa_file_to_json(pth):
+def _ndpa_file_to_json(pth):
 
     # problem is loading lxml together with openslide
     from lxml import etree
@@ -54,13 +54,13 @@ def ndpa_to_json(path):
         fn, ext = op.splitext(path)
         if ext == ".ndpi":
             path = path + ".ndpa"
-        ndpa_file_to_json(path)
+        _ndpa_file_to_json(path)
     else:
         extended_path = op.join(path, "*.ndpa")
         #         print(extended_path)
         files = glob.glob(extended_path)
         for fl in files:
-            ndpa_file_to_json(fl)
+            _ndpa_file_to_json(fl)
 
 
 def read_annotations(pth):
@@ -71,7 +71,18 @@ def read_annotations(pth):
     :return: readed annotatios
     """
     fn = pth + ".ndpa.json"
-    if not op.exists(fn):
+
+    import platform
+    if platform.system() == "Windows":
+        import subprocess
+        output = subprocess.check_output(["pwd"])
+        print(output)
+        output = subprocess.check_output(["where", "python"])
+        print(output)
+        output = subprocess.check_output(["python", "-m", "scaffan.ann_to_json"])
+        print(output)
+    else:
+    # if not op.exists(fn):
         ndpa_to_json(pth)
     with open(fn) as f:
         data = json.load(f)

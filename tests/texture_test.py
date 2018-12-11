@@ -86,7 +86,7 @@ class TextureTest(unittest.TestCase):
         self.assertTrue(np.all(pixels > 0), "centers positions should be inside of mask")
 
     def test_simple_texture_segmentation(self):
-        level=0
+        level = 0
         title_size = 128
         size = [128, 128]
         fn = io3d.datasets.join_path("medical", "orig", "CMU-1.ndpi", get_root=True)
@@ -174,6 +174,8 @@ class TextureTest(unittest.TestCase):
         # texseg.add_training_data(anim, "empty1", 0)
         plt.figure()
         texseg.add_training_data(anim, "intralobular1", 1, show=True)
+        plt.figure()
+        texseg.add_training_data(anim, "intralobular2", 1, show=True)
         # centers = texseg.get_tile_centers(anim, "intralobular1")
         # view1 = texseg.get_patch_view(anim, centers[0])
         # plt.imshow(view1.get_region_image())
@@ -183,16 +185,20 @@ class TextureTest(unittest.TestCase):
         plt.figure()
         # print("number of patches: {}".format(len(texseg.refs)))
         texseg.add_training_data(anim, "extralobular1", 2, show=True)
+        plt.figure()
+        texseg.add_training_data(anim, "extralobular3", 2, show=True)
 
         # print("number of patches: {}".format(len(texseg.refs)))
 
         texseg.show_tiles(anim, "intralobular1", [0, -1])
+        texseg.show_tiles(anim, "intralobular2", [0, -1])
         texseg.show_tiles(anim, "extralobular1", [0, -1])
+        texseg.show_tiles(anim, "extralobular3", [0, -1])
         plt.show()
         logger.debug("number of patches: {}".format(len(texseg.refs)))
         # texseg.add_training_data(anim, "obj3", 3)
 
-        texseg.fit(anim.get_view_on_annotation("test2", level=texseg.level), show=True )
+        texseg.fit(anim.get_view_on_annotation("test3", level=texseg.level), show=True )
         plt.savefig("segmentation.png")
         plt.show()
 
