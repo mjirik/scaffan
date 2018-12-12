@@ -68,8 +68,11 @@ def prepare_default_output_dir():
 def run():
     fnparam = p.param("Input", "File Path")
     from .image import AnnotatedImage
-    path = p.param("Input", "File Path").value
-    anim = AnnotatedImage(path)
+    path = p.param("Input", "File Path")
+
+    print(path, type(path))
+    print(path.getValue())
+    anim = AnnotatedImage(str(path))
 
 
 
