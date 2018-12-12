@@ -67,6 +67,9 @@ def prepare_default_output_dir():
 
 def run():
     fnparam = p.param("Input", "File Path")
+    from .image import AnnotatedImage
+    path = p.param("Input", "File Path").value
+    anim = AnnotatedImage(path)
 
 
 
@@ -126,12 +129,10 @@ params = [
 ]
 
 
-
 from PyQt5 import QtWidgets
 # import QApplication, QFileDialog
 app = QtWidgets.QApplication(sys.argv)
 p = Parameter.create(name='params', type='group', children=params)
-
 
 
 p.param('Input', 'Select').sigActivated.connect(select_file)
