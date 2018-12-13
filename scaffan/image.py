@@ -161,21 +161,40 @@ class AnnotatedImage:
         self.annotations = scan.read_annotations(self.path)
         self.annotations = scan.annotations_to_px(self.openslide, self.annotations)
         self.titles = scan.annotation_titles(self.annotations)
+        self.colors = scan.annotation_colors(self.annotations)
         return self.annotations
 
     def get_view(self, center=None, level=0, size=None, location=None):
         view = View(anim=self, center=center, level=level, size=size, location=location)
         return view
 
-    def get_view_on_annotation(self, annotation_id=None, level=2, boundary_px=10, show=False):
-        annotation_id = self.get_annotation_id(annotation_id)
-        center, size = self.get_annotations_bounds_px(annotation_id)
-        region_size = ((size / self.openslide.level_downsamples[level]) + 2 * boundary_px).astype(int)
-        view = self.get_view(center=center, level=level, size=region_size)
-        if show:
-            view.region_imshow_annotation(annotation_id)
+    def get_views_by_title(self, title=None, level=2, **kwargs):
+        annotation_ids = self.get_annotation_ids(title)
+        return self.get_views(annotation_ids, level=level, **kwargs), annotation_ids
 
-        return view
+    def select_annotations_by_title(self, title):
+        return self.get_annotation_ids(title)
+        # return self.get_views(annotation_ids, level=level, **kwargs), annotation_ids
+
+    def get_views_by_annotation_color(self):
+        pass
+
+
+    def get_views(self, annotation_ids=None, level=2, margin=0.5, margin_in_pixels=False, show=False):
+        views = [None] * len(annotation_ids)
+        for i, annotation_id in enumerate(annotation_ids):
+            center, size = self.get_annotations_bounds_px(annotation_id)
+            if margin_in_pixels:
+                margin_px = int(margin)
+            else:
+                margin_px = (size * margin).astype(np.int)
+            region_size = ((size / self.openslide.level_downsamples[level]) + 2 * margin_px).astype(int)
+            view = self.get_view(center=center, level=level, size=region_size)
+            if show:
+                view.region_imshow_annotation(annotation_id)
+            views[i] = view
+
+        return views
 
 
     def set_region(self, center=None, level=0, size=None, location=None):
@@ -197,6 +216,20 @@ class AnnotatedImage:
         self.region_pixelsize, self.region_pixelunit = self.get_pixel_size(level)
         scan.adjust_annotation_to_image_view(self.openslide, self.annotations,
                                              center, level, size)
+
+    def select_annotations_by_color(self, id):
+        if type(id) is str:
+            id = self.colors[id]
+        else:
+            id = [id]
+        return id
+
+    def get_annotation_ids(self, id):
+        if type(id) is str:
+            id = self.titles[id]
+        else:
+            id = [id]
+        return id
 
     def get_annotation_id(self, i):
         if type(i) is str:

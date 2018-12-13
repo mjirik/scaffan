@@ -66,7 +66,8 @@ class TextureTest(unittest.TestCase):
     def test_select_view_by_title_and_plot(self):
         fn = io3d.datasets.join_path("medical", "orig", "CMU-1.ndpi", get_root=True)
         anim = scim.AnnotatedImage(fn)
-        view = anim.get_view_on_annotation("obj1", 3)
+        annotation_ids = anim.select_annotations_by_title("obj1", 3)
+        view = anim.get_views(annotation_ids)[0]
         image = view.get_region_image()
         plt.imshow(image)
         view.plot_annotations("obj1")
@@ -125,7 +126,8 @@ class TextureTest(unittest.TestCase):
             [2, local_binary_pattern(im2, n_points, radius, METHOD)],
             [3, local_binary_pattern(im3, n_points, radius, METHOD)]
         ]
-        view_test = anim.get_view_on_annotation("test2", level=level)
+        annotation_ids = anim.select_annotations_by_title("test2", level=level)
+        view_test = anim.get_views(annotation_ids)[0]
         test_image = view_test.get_region_image(as_gray=True)
 
         seg = satex.texture_segmentation(test_image, salbp.match, refs, tile_size=size)
@@ -160,7 +162,7 @@ class TextureTest(unittest.TestCase):
         texseg.add_training_data(anim, "obj3", 3, show=True)
         # plt.show()
 
-        texseg.fit(anim.get_view_on_annotation("test2", level=texseg.level), show=True )
+        texseg.fit(anim.get_views_by_title("test2", level=texseg.level)[0], show=True)
         # plt.show()
 
 
@@ -198,7 +200,7 @@ class TextureTest(unittest.TestCase):
         logger.debug("number of patches: {}".format(len(texseg.refs)))
         # texseg.add_training_data(anim, "obj3", 3)
 
-        texseg.fit(anim.get_view_on_annotation("test3", level=texseg.level), show=True )
+        texseg.fit(anim.get_views_by_title("test3", level=texseg.level)[0], show=True)
         plt.savefig("segmentation.png")
         plt.show()
 

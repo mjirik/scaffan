@@ -39,7 +39,8 @@ def select_texture_patch_centers_from_one_annotation(anim, title, tile_size, lev
         else:
             # it would be possible to add factor (1./tile_size) into distance transform
             raise ValueError("Both sides of tile should be the same. Other option is not implemented.")
-    view = anim.get_view_on_annotation(title, level=level)
+    annotation_ids = anim.select_annotations_by_title(title, level=level)
+    view = anim.get_views(annotation_ids)[0]
     mask = view.get_annotation_region_raster(title)
 
     dst = scipy.ndimage.morphology.distance_transform_edt(mask)
@@ -94,7 +95,8 @@ class TextureSegmentation:
         if patch_center is not None:
             view = anim.get_view(center=[patch_center[0], patch_center[1]], level=self.level, size=self.tile_size)
         elif patch_center is not None:
-            view = anim.get_view_on_annotation(annotation_id=annotation_id, level= self.level, size=self.tile_size)
+            annotation_ids = anim.select_annotations_by_title(title=annotation_id, level= self.level, size=self.tile_size)
+            view = anim.get_views(annotation_ids)[0]
 
         return view
 
@@ -121,7 +123,8 @@ class TextureSegmentation:
             self.refs.append([numeric_label, self.feature_function(imgray, *self.feature_function_args)])
 
         if show:
-            view = anim.get_view_on_annotation(annotation_id=annotation_id)
+            annotation_ids = anim.select_annotations_by_title(title=annotation_id)
+            view = anim.get_views(annotation_ids)[0]
             view.imshow()
             lst = list(zip(*patch_center_points))
             x, y = lst

@@ -162,4 +162,14 @@ def annotation_titles(annotations):
     return titles
 
 
+def annotation_colors(annotations):
+    colors = {}
+    for i, an in enumerate(annotations):
+        title = an["color"]
+        if title in colors:
+            colors[title].append(i)
+        else:
+            colors[title] = [i]
+
+    return colors
 
