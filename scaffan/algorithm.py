@@ -28,6 +28,19 @@ class Scaffan:
             {"name": "Input", "type": "group", "children": [
                 {'name': 'File Path', 'type': 'str'},
                 {'name': 'Select', 'type': 'action'},
+                {'name': 'Annotation Color', 'type': 'list', 'values': {
+                    "None": None,
+                    "White": "#FFFFFF",
+                    "Black": "#000000",
+                    "Red": "#FF0000",
+                    "Green": "#00FF00",
+                    "Blue": "#0000FF",
+                    "Cyan": "#00FFFF",
+                    "Magenta": "#FF00FF",
+                    "Yellow": "#FFFF00"},
+                 'value': 0},
+                # {'name': 'Boolean', 'type': 'bool', 'value': True, 'tip': "This is a checkbox"},
+                # {'name': 'Color', 'type': 'color', 'value': "FF0", 'tip': "This is a color button"},
             ], },
             {"name": "Output", "type": "group", "children": [
                 {'name': 'Directory Path', 'type': 'str', 'value': self._prepare_default_output_dir()},
@@ -90,15 +103,17 @@ class Scaffan:
             default_dir = op.expanduser("~")
         return default_dir
 
-    def run(self):
+    def run_lobuluses(self):
         fnparam = self.parameters.param("Input", "File Path")
         from .image import AnnotatedImage
         path = self.parameters.param("Input", "File Path")
+        anim = AnnotatedImage(path.value())
+        print(anim.colors)
+        anim.select_annotations_by_color(list(anim.colors.keys())[0])
+        print("ahoj")
 
-        print(path, type(path))
-        print(path.getValue())
 
-    def run_gui(self):
+    def start_gui(self):
 
         from PyQt5 import QtWidgets
         # import QApplication, QFileDialog
@@ -107,7 +122,7 @@ class Scaffan:
 
         self.parameters.param('Input', 'Select').sigActivated.connect(self.select_file_gui)
         self.parameters.param('Output', 'Select').sigActivated.connect(self.select_output_dir_gui)
-        self.parameters.param('Processing', 'Run').sigActivated.connect(self.run)
+        self.parameters.param('Processing', 'Run').sigActivated.connect(self.run_lobuluses)
 
 
         t = ParameterTree()

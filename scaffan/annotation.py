@@ -70,20 +70,22 @@ def read_annotations(pth):
     :param pth: path to .ndpi file
     :return: readed annotatios
     """
-    fn = pth + ".ndpa.json"
 
     import platform
     if platform.system() == "Windows":
         import subprocess
-        output = subprocess.check_output(["pwd"])
-        print(output)
-        output = subprocess.check_output(["where", "python"])
-        print(output)
-        output = subprocess.check_output(["python", "-m", "scaffan.ann_to_json"])
+        import sys
+        # output = subprocess.check_output(["pwd"])
+        # print(output)
+        # output = subprocess.check_output(["where", "python"])
+        # print(output)
+        output = subprocess.check_output([sys.executable, "-m", "scaffan.ann_to_json", pth])
         print(output)
     else:
     # if not op.exists(fn):
         ndpa_to_json(pth)
+
+    fn = pth + ".ndpa.json"
     with open(fn) as f:
         data = json.load(f)
     return data
