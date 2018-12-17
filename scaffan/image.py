@@ -7,6 +7,7 @@ import logging
 logger = logging.getLogger(__name__)
 # problem is loading lxml together with openslide
 # from lxml import etree
+from typing import List
 import json
 import os.path as op
 import glob
@@ -182,8 +183,7 @@ class AnnotatedImage:
     def get_views_by_annotation_color(self):
         pass
 
-
-    def get_views(self, annotation_ids=None, level=2, margin=0.5, margin_in_pixels=False, show=False):
+    def get_views(self, annotation_ids=None, level=2, margin=0.5, margin_in_pixels=False, show=False) -> List['View']:
         views = [None] * len(annotation_ids)
         for i, annotation_id in enumerate(annotation_ids):
             center, size = self.get_annotations_bounds_px(annotation_id)
@@ -198,7 +198,6 @@ class AnnotatedImage:
             views[i] = view
 
         return views
-
 
     def set_region(self, center=None, level=0, size=None, location=None):
 
@@ -336,8 +335,6 @@ class AnnotatedImage:
 
         return x_view_px, y_view_px
 
-
-
 class View:
 
     def __init__(self, anim, center=None, level=0, size=None, location=None):
@@ -410,13 +407,14 @@ class View:
         x_view_px, y_view_px = self.coords_glob_px_to_view_px(x_glob_px, y_glob_px)
         plt.plot(x_view_px, y_view_px, "oy")
 
-    def get_annotation_region_raster(self, i):
-        i = self.anim.get_annotation_id(i)
-        polygon_x = self.annotations[i]["region_x_px"]
-        polygon_y = self.annotations[i]["region_y_px"]
+    def get_annotation_region_raster(self, annotation_id):
+        annotation_id = self.anim.get_annotation_id(annotation_id)
+        polygon_x = self.annotations[annotation_id]["region_x_px"]
+        polygon_y = self.annotations[annotation_id]["region_y_px"]
         polygon = list(zip(polygon_y, polygon_x))
         poly_path = Path(polygon)
 
+        # TODO coordinates are swapped here
         x, y = np.mgrid[:self.region_size[1], :self.region_size[0]]
         coors = np.hstack((x.reshape(-1, 1), y.reshape(-1, 1)))  # coors.shape is (4000000,2)
 
