@@ -66,8 +66,8 @@ class TextureTest(unittest.TestCase):
     def test_select_view_by_title_and_plot(self):
         fn = io3d.datasets.join_path("medical", "orig", "CMU-1.ndpi", get_root=True)
         anim = scim.AnnotatedImage(fn)
-        annotation_ids = anim.select_annotations_by_title("obj1", 3)
-        view = anim.get_views(annotation_ids)[0]
+        annotation_ids = anim.select_annotations_by_title("obj1")
+        view = anim.get_views(annotation_ids, level=3)[0]
         image = view.get_region_image()
         plt.imshow(image)
         view.plot_annotations("obj1")
@@ -81,8 +81,9 @@ class TextureTest(unittest.TestCase):
         plt.plot(nz_view_px[0], nz_view_px[1], "bo")
         # plt.show()
 
-        x = nz_view_px[0].astype(int)
-        y = nz_view_px[1].astype(int)
+        # TODO findout why are the axis swapped
+        x = nz_view_px[1].astype(int)
+        y = nz_view_px[0].astype(int)
         pixels = mask[(x, y)]
         self.assertTrue(np.all(pixels > 0), "centers positions should be inside of mask")
 
@@ -126,8 +127,8 @@ class TextureTest(unittest.TestCase):
             [2, local_binary_pattern(im2, n_points, radius, METHOD)],
             [3, local_binary_pattern(im3, n_points, radius, METHOD)]
         ]
-        annotation_ids = anim.select_annotations_by_title("test2", level=level)
-        view_test = anim.get_views(annotation_ids)[0]
+        annotation_ids = anim.select_annotations_by_title("test2")
+        view_test = anim.get_views(annotation_ids, level=level)[0]
         test_image = view_test.get_region_image(as_gray=True)
 
         seg = satex.texture_segmentation(test_image, salbp.match, refs, tile_size=size)
@@ -161,12 +162,12 @@ class TextureTest(unittest.TestCase):
         plt.figure()
         texseg.add_training_data(anim, "obj3", 3, show=True)
         # plt.show()
-
-        texseg.fit(anim.get_views_by_title("test2", level=texseg.level)[0], show=True)
+        views = anim.get_views_by_title("test2", level=texseg.level)
+        texseg.fit(views[0], show=True)
         # plt.show()
 
 
-    skip_on_local = False
+    skip_on_local = True
     @unittest.skipIf(os.environ.get("TRAVIS", skip_on_local), "Skip on Travis-CI")
     def test_texture_segmentation_object_lobulus_data(self):
         fn = io3d.datasets.join_path("scaffold", "Hamamatsu", "PIG-008_P008 LL-P_HE_parenchyme perif..ndpi", get_root=True)
@@ -193,16 +194,17 @@ class TextureTest(unittest.TestCase):
         # print("number of patches: {}".format(len(texseg.refs)))
 
         texseg.show_tiles(anim, "intralobular1", [0, -1])
-        texseg.show_tiles(anim, "intralobular2", [0, -1])
-        texseg.show_tiles(anim, "extralobular1", [0, -1])
+        # texseg.show_tiles(anim, "intralobular2", [0, -1])
+        # texseg.show_tiles(anim, "extralobular1", [0, -1])
         texseg.show_tiles(anim, "extralobular3", [0, -1])
-        plt.show()
+        # plt.show()
         logger.debug("number of patches: {}".format(len(texseg.refs)))
         # texseg.add_training_data(anim, "obj3", 3)
 
-        texseg.fit(anim.get_views_by_title("test3", level=texseg.level)[0], show=True)
+        views = anim.get_views_by_title("test3", level=texseg.level)
+        texseg.fit(views[0], show=True)
         plt.savefig("segmentation.png")
-        plt.show()
+        # plt.show()
 
 
 if __name__ == "__main__":

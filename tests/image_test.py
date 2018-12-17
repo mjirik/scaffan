@@ -91,8 +91,8 @@ class ParseAnnotationTest(unittest.TestCase):
     def test_select_view_by_title_and_plot(self):
         fn = io3d.datasets.join_path("medical", "orig", "CMU-1.ndpi", get_root=True)
         anim = scim.AnnotatedImage(fn)
-        annotation_ids = anim.select_annotations_by_title("obj1", 3)
-        view = self.get_views(annotation_ids)[0]
+        annotation_ids = anim.select_annotations_by_title("obj1")
+        view = anim.get_views(annotation_ids)[0]
         image = view.get_region_image()
         plt.imshow(image)
         view.plot_annotations("obj1")

@@ -25,7 +25,7 @@ class MainGuiTest(unittest.TestCase):
         # scan.annotations_to_px(imsl, annotations)
         mainapp = scaffan.algorithm.Scaffan()
         mainapp.set_input_file(fn)
-        mainapp.start_gui()
+        # mainapp.start_gui()
 
 
 

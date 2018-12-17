@@ -168,9 +168,12 @@ class AnnotatedImage:
         view = View(anim=self, center=center, level=level, size=size, location=location)
         return view
 
-    def get_views_by_title(self, title=None, level=2, **kwargs):
+    def get_views_by_title(self, title=None, level=2, return_ids=False, **kwargs):
         annotation_ids = self.get_annotation_ids(title)
-        return self.get_views(annotation_ids, level=level, **kwargs), annotation_ids
+        if return_ids:
+            return self.get_views(annotation_ids, level=level, **kwargs), annotation_ids
+        else:
+            return self.get_views(annotation_ids, level=level, **kwargs)
 
     def select_annotations_by_title(self, title):
         return self.get_annotation_ids(title)

@@ -39,8 +39,8 @@ def select_texture_patch_centers_from_one_annotation(anim, title, tile_size, lev
         else:
             # it would be possible to add factor (1./tile_size) into distance transform
             raise ValueError("Both sides of tile should be the same. Other option is not implemented.")
-    annotation_ids = anim.select_annotations_by_title(title, level=level)
-    view = anim.get_views(annotation_ids)[0]
+    annotation_ids = anim.select_annotations_by_title(title)
+    view = anim.get_views(annotation_ids, level=level)[0]
     mask = view.get_annotation_region_raster(title)
 
     dst = scipy.ndimage.morphology.distance_transform_edt(mask)
