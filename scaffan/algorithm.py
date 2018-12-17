@@ -109,8 +109,9 @@ class Scaffan:
         path = self.parameters.param("Input", "File Path")
         anim = AnnotatedImage(path.value())
         print(anim.colors)
-        anim.select_annotations_by_color(list(anim.colors.keys())[0])
-        print("ahoj")
+        annotation_ids = anim.select_annotations_by_color(list(anim.colors.keys())[0])
+        logger.debug("Annotation IDs: {}".format(annotation_ids))
+        # print("ann ids", annotation_ids)
 
 
     def start_gui(self):
