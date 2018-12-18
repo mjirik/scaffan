@@ -17,10 +17,11 @@ from PyQt5 import QtGui
 import pyqtgraph as pg
 from pyqtgraph.parametertree import Parameter, ParameterTree
 
-from . import image
+from scaffan import image
 import io3d
 import io3d.datasets
 import scaffan.lobulus
+import scaffan.report
 
 class Scaffan:
 
@@ -100,20 +101,37 @@ class Scaffan:
             default_dir = op.expanduser("~")
         return default_dir
 
-    def load(self):
+    def init_run(self):
         fnparam = self.parameters.param("Input", "File Path")
         path = fnparam.value()
         self.anim = image.AnnotatedImage(path)
+        fnparam = self.parameters.param("Output", "Directory Path")
+        self.report = scaffan.report.Report(fnparam.value())
+
+
+    def set_annotation_color_selection(self, color):
+        pcolor = self.parameters.param("Input", "Annotation Color")
+        color = color.upper()
+        if color in pcolor.reverse[0]:
+            val = pcolor.reverse[0].index(color)
+            pcolor.setValue(val)
+        else:
+            raise ValueError("Color '{}' not found in allowed colors.".format(color))
+
 
 
     def run_lobuluses(self, color=None):
+        self.init_run()
+        pcolor = self.parameters.param("Input", "Annotation Color")
+        color = pcolor.reverse[0][pcolor.value()]
+        print("Color ", color)
         # fnparam = self.parameters.param("Input", "File Path")
         from .image import AnnotatedImage
         # path = self.parameters.param("Input", "File Path")
         # anim = AnnotatedImage(path.value())
-        if color is None:
-            color = list(self.anim.colors.keys())[0]
-        print(self.anim.colors)
+        # if color is None:
+        #     color = list(self.anim.colors.keys())[0]
+        # print(self.anim.colors)
         annotation_ids = self.anim.select_annotations_by_color(color)
         logger.debug("Annotation IDs: {}".format(annotation_ids))
         for id in annotation_ids:
@@ -121,7 +139,7 @@ class Scaffan:
 
         # print("ann ids", annotation_ids)
     def _run_lobulus(self, annotation_id):
-        lobulus = scaffan.lobulus.Lobulus(self.anim, annotation_id)
+        lobulus = scaffan.lobulus.Lobulus(self.anim, annotation_id, report=self.report)
         lobulus.find_border()
         pass
 

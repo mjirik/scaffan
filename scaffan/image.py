@@ -16,12 +16,19 @@ import sys
 import os
 import numpy as np
 import skimage.color
-from . import annotation as scan
+from scaffan import annotation as scan
+from scaffan import libfixer
+
 from matplotlib.path import Path
 
 
 def import_openslide():
-    pth = op.expanduser(r"~\Downloads\openslide\openslide-win64\bin")
+
+    pth = op.expanduser(r"~\Downloads\openslide-win64-20171122\bin")
+    dll_list = glob.glob(op.join(pth, "*.dll"))
+    if len(dll_list) < 5:
+        print("Trying to download openslide dll files in {}".format(pth))
+        libfixer.libfix()
     # pth = op.expanduser(r"~\projects\scaffan\devel\knihovny")
     # pth = op.expanduser(r"~\Miniconda3\envs\lisa36\Library\bin")
     sys.path.insert(0, pth)

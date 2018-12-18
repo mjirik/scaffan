@@ -6,6 +6,7 @@ Process lobulus analysis.
 import logging
 logger = logging.getLogger(__name__)
 import skimage.filters
+import os.path as op
 import morphsnakes as ms
 from matplotlib import pyplot as plt
 from scaffan import annotation as scan
@@ -13,9 +14,11 @@ from scaffan import image as scim
 
 
 class Lobulus:
-    def __init__(self, anim: scim.AnnotatedImage, annotation_id, level=3):
+    def __init__(self, anim: scim.AnnotatedImage, annotation_id, level=3, report=None):
         self.anim = anim
         self.level = level
+        self.report = report
+        self.annotation_id = annotation_id
         self._init_by_annotation_id(annotation_id)
 
         pass
@@ -26,7 +29,7 @@ class Lobulus:
         self.mask = self.view.get_annotation_region_raster(annotation_id=annotation_id)
         pass
 
-    def find_border(self):
+    def find_border(self, show=False):
         im_gradient0 = skimage.filters.frangi(self.image)
         im_gradient1 = ms.gborders(self.image, alpha=1000, sigma=2)
         im_gradient = im_gradient1 - (im_gradient0 * 10000)
@@ -70,9 +73,11 @@ class Lobulus:
         plt.imshow(self.image, cmap="gray")
         plt.colorbar()
         plt.contour(circle + inner + outer)
-        plt.show()
+        if self.report is not None:
+            plt.savefig(op.join(self.report.outputdir, "lobulus_{}.png".format(self.annotation_id)))
+        if show:
+            plt.show()
 
-        pass
 
     def find_cetral_vein(self):
         pass

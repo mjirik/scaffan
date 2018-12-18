@@ -168,7 +168,9 @@ def annotation_colors(annotations):
     colors = {}
     for i, an in enumerate(annotations):
         title = an["color"]
+        title = title.upper()
         if title in colors:
+
             colors[title].append(i)
         else:
             colors[title] = [i]

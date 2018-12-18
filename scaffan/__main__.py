@@ -13,9 +13,12 @@ import io3d
 # print("start 6")
 import io3d.datasets
 
-from . import image
+from scaffan import image
+from scaffan import algorithm
 
 print("Running __main__.py")
+mainapp = algorithm.Scaffan()
+mainapp.start_gui()
 
 
 
