@@ -4,3 +4,4 @@ openslide-python
 lxml
 pyqtgraph
 morphsnakes
+pandas

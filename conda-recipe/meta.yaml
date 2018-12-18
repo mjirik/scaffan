@@ -38,9 +38,15 @@ requirements:
   build:
     - python
     - setuptools
+    - io3d
+    - imma
+    - lxml
 
   run:
     - python
+    - io3d
+    - imma
+    - lxml
     # - numpy
     # - pyqt 4.11.*
 
