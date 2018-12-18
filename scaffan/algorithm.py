@@ -20,6 +20,7 @@ from pyqtgraph.parametertree import Parameter, ParameterTree
 from . import image
 import io3d
 import io3d.datasets
+import scaffan.lobulus
 
 class Scaffan:
 
@@ -55,11 +56,7 @@ class Scaffan:
         self.anim = None
         pass
 
-    def load(self, path):
-        self.anim = image.AnnotatedImage(path)
 
-    def run_lobulus(self):
-        pass
 
     def select_file_gui(self):
         from PyQt5 import QtWidgets
@@ -103,15 +100,30 @@ class Scaffan:
             default_dir = op.expanduser("~")
         return default_dir
 
-    def run_lobuluses(self):
+    def load(self):
         fnparam = self.parameters.param("Input", "File Path")
+        path = fnparam.value()
+        self.anim = image.AnnotatedImage(path)
+
+
+    def run_lobuluses(self, color=None):
+        # fnparam = self.parameters.param("Input", "File Path")
         from .image import AnnotatedImage
-        path = self.parameters.param("Input", "File Path")
-        anim = AnnotatedImage(path.value())
-        print(anim.colors)
-        annotation_ids = anim.select_annotations_by_color(list(anim.colors.keys())[0])
+        # path = self.parameters.param("Input", "File Path")
+        # anim = AnnotatedImage(path.value())
+        if color is None:
+            color = list(self.anim.colors.keys())[0]
+        print(self.anim.colors)
+        annotation_ids = self.anim.select_annotations_by_color(color)
         logger.debug("Annotation IDs: {}".format(annotation_ids))
+        for id in annotation_ids:
+            self._run_lobulus(id)
+
         # print("ann ids", annotation_ids)
+    def _run_lobulus(self, annotation_id):
+        lobulus = scaffan.lobulus.Lobulus(self.anim, annotation_id)
+        lobulus.find_border()
+        pass
 
 
     def start_gui(self):

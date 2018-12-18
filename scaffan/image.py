@@ -184,13 +184,23 @@ class AnnotatedImage:
         pass
 
     def get_views(self, annotation_ids=None, level=2, margin=0.5, margin_in_pixels=False, show=False) -> List['View']:
+        """
+
+        :param annotation_ids:
+        :param level:
+        :param margin: based on "margin_in_pixels" the margin in pixels(accoarding to the requested level) are used or
+        margin is proportional to size of annotation object.
+        :param margin_in_pixels: bool
+        :param show:
+        :return:
+        """
         views = [None] * len(annotation_ids)
         for i, annotation_id in enumerate(annotation_ids):
             center, size = self.get_annotations_bounds_px(annotation_id)
             if margin_in_pixels:
                 margin_px = int(margin)
             else:
-                margin_px = (size * margin).astype(np.int)
+                margin_px = (size * margin).astype(np.int) / self.openslide.level_downsamples[level]
             region_size = ((size / self.openslide.level_downsamples[level]) + 2 * margin_px).astype(int)
             view = self.get_view(center=center, level=level, size=region_size)
             if show:
