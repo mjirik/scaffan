@@ -14,7 +14,10 @@ source:
 #  patches:
    # List any patch files here
    # - fix.patch
-
+build:
+  ignore_prefix_files:
+    - devel
+    - examples
 # build:
   # noarch_python: True
   # preserve_egg_dir: True
