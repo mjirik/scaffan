@@ -13,7 +13,7 @@ from scaffan import image as scim
 
 
 class Lobulus:
-    def __init__(self, anim: scim.AnnotatedImage, annotation_id, level=4):
+    def __init__(self, anim: scim.AnnotatedImage, annotation_id, level=3):
         self.anim = anim
         self.level = level
         self._init_by_annotation_id(annotation_id)
@@ -28,6 +28,8 @@ class Lobulus:
 
     def find_border(self):
         im_gradient0 = skimage.filters.frangi(self.image)
+        im_gradient1 = ms.gborders(self.image, alpha=1000, sigma=2)
+        im_gradient = im_gradient1 - (im_gradient0 * 10000)
         # circle = circle_level_set(imgr.shape, size2, 75, scalerow=0.75)
         circle = self.mask
         logger.debug("Image size {}".format(self.image.shape))
@@ -41,26 +43,35 @@ class Lobulus:
         # mgac.run(iterations=100)
         # inner = mgac.levelset.copy()
 
-        mgac = ms.MorphGAC(0.00001 -im_gradient0, smoothing=2, threshold=0.7, balloon=-50.0)
-        # mgac = ms.MorphACWE(0.0001 - im_gradient0, smoothing=2, lambda1=1.5, lambda2=10.0)
+        mgac = ms.MorphGAC(im_gradient, smoothing=2, threshold=0.4, balloon=-1.0)
+        # mgac = ms.MorphACWE(im_gradient0, smoothing=2, lambda1=.1, lambda2=.05)
         mgac.levelset = circle.copy()
         mgac.run(iterations=100)
         inner = mgac.levelset.copy()
         # mgac = ms.MorphGAC(im_gradient, smoothing=2, threshold=0.2, balloon=+1)
         # mgac = ms.MorphACWE(im_gradient0, smoothing=2, lambda1=0.5, lambda2=1.0)
 
-        mgac = ms.MorphACWE(im_gradient0, smoothing=2, lambda1=1.5, lambda2=1.0)
+        mgac = ms.MorphACWE(im_gradient0, smoothing=2, lambda1=1.0, lambda2=2.0)
         mgac.levelset = circle.copy()
-        mgac.run(iterations=10)
+        mgac.run(iterations=150)
         outer = mgac.levelset.copy()
 
         # circle = circle_level_set(imgr.shape, (200, 200), 75, scalerow=0.75)
 
-        plt.figure(figsize=(15, 10))
-        plt.imshow(im_gradient0, cmap="gray")
+        plt.figure()
+        plt.imshow(im_gradient0)
+        plt.colorbar()
+        plt.contour(circle + inner + outer)
+        plt.figure()
+        plt.imshow(im_gradient)
+        plt.colorbar()
+        plt.contour(circle + inner + outer)
+        plt.figure()
+        plt.imshow(self.image, cmap="gray")
         plt.colorbar()
         plt.contour(circle + inner + outer)
         plt.show()
+
         pass
 
     def find_cetral_vein(self):
