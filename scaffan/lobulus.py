@@ -130,7 +130,7 @@ class Lobulus:
 
         conv[conv > 3] = 0
         label, num = scipy.ndimage.label(conv, )
-        datarow["Element number"] = num
+        datarow["Branch number"] = num
 
         self.report.add_row(datarow)
 
