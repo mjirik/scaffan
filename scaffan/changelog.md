@@ -11,3 +11,4 @@
 * [new] Show tile centers in fit() and in add_training_data()
 * [new] Build by conda
 * [new] Automatic download missing dll's no Windows
+* [new] Save to excel
