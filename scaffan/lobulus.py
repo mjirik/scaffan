@@ -52,14 +52,14 @@ class Lobulus:
         mgac = ms.MorphGAC(im_gradient, smoothing=2, threshold=0.4, balloon=-1.0)
         # mgac = ms.MorphACWE(im_gradient0, smoothing=2, lambda1=.1, lambda2=.05)
         mgac.levelset = circle.copy()
-        mgac.run(iterations=100)
+        mgac.run(iterations=150)
         inner = mgac.levelset.copy()
         # mgac = ms.MorphGAC(im_gradient, smoothing=2, threshold=0.2, balloon=+1)
         # mgac = ms.MorphACWE(im_gradient0, smoothing=2, lambda1=0.5, lambda2=1.0)
 
         mgac = ms.MorphACWE(im_gradient0, smoothing=2, lambda1=1.0, lambda2=2.0)
         mgac.levelset = circle.copy()
-        mgac.run(iterations=150)
+        mgac.run(iterations=200)
         outer = mgac.levelset.copy()
 
         # circle = circle_level_set(imgr.shape, (200, 200), 75, scalerow=0.75)
