@@ -59,7 +59,7 @@ class Lobulus:
 
         mgac = ms.MorphACWE(im_gradient0, smoothing=2, lambda1=1.0, lambda2=2.0)
         mgac.levelset = circle.copy()
-        mgac.run(iterations=200)
+        mgac.run(iterations=400)
         outer = mgac.levelset.copy()
 
         # circle = circle_level_set(imgr.shape, (200, 200), 75, scalerow=0.75)
@@ -110,9 +110,14 @@ class Lobulus:
         plt.figure()
         plt.imshow(skeleton + imthr)
         if self.report is not None:
-            plt.savefig(op.join(self.report.outputdir, "skeleton_{}.png".format(self.annotation_id)))
+            plt.savefig(op.join(self.report.outputdir, "skeleton_thumb_{}.png".format(self.annotation_id)))
         if show:
             plt.show()
+
+        if self.report is not None:
+            plt.imsave(op.join(self.report.outputdir, "skeleton_thr_{}.png".format(self.annotation_id)), skeleton + imthr)
+            plt.imsave(op.join(self.report.outputdir, "skeleton_{}.png".format(self.annotation_id)), skeleton)
+            plt.imsave(op.join(self.report.outputdir, "thr_{}.png".format(self.annotation_id)), imthr)
 
         conv = scipy.signal.convolve2d(skeleton, np.ones([3, 3]), mode="same")
         conv = conv * skeleton
