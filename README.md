@@ -4,6 +4,8 @@ Scaffold Analyser
 
 # Install
 
+
+
 # Linux
 
 ```commandline
@@ -11,6 +13,8 @@ conda install -c mjirik -c bioconda -c conda-forge openslides-python lxml imma i
 ```
 
 # Windows
+
+[Install Conda](https://conda.io/miniconda.html)
 
 ```commandline
 pip install openslide-python
