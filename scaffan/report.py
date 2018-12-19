@@ -21,7 +21,7 @@ class Report():
 
     def add_row(self, data):
         df = pd.DataFrame([list(data.values())], columns=list(data.keys()))
-        self.df.append(df, ignore_index=True)
+        self.df = self.df.append(df, ignore_index=True)
 
     # def write_table(self, filename):
 
