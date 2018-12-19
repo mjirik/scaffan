@@ -455,6 +455,9 @@ class View:
     def get_region_location_by_center(self, center, level, size):
         return get_region_location_by_center(self.anim.openslide, center, level, size)
 
+    def get_region_center_by_location(self, location, level, size):
+        return get_region_center_by_location(self.anim.openslide, location, level, size)
+
     def get_region_image(self, as_gray=False):
         imcr = self.anim.openslide.read_region(
             self.region_location, level=self.region_level, size=self.region_size)
@@ -465,4 +468,18 @@ class View:
 
     def imshow(self, as_gray=False):
         plt.imshow(self.get_region_image(as_gray=as_gray))
+
+    def get_size_on_level(self, new_level):
+        imsl = self.anim.openslide
+        former_level = self.region_level
+        former_size = self.region_size
+        scale_factor = imsl.level_downsamples[former_level] / imsl.level_downsamples[new_level]
+        new_size = (np.asarray(former_size) * scale_factor).astype(np.int)
+
+        return new_size
+
+    def to_level(self, new_level):
+        size = self.get_size_on_level(new_level)
+        newview = View(self.anim, location=self.region_location, size=size, level=new_level)
+        return newview
 

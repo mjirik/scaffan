@@ -51,6 +51,7 @@ class Scaffan:
             {"name": "Processing", "type": "group", "children": [
                 # {'name': 'Directory Path', 'type': 'str', 'value': prepare_default_output_dir()},
                 {'name': 'Run', 'type': 'action'},
+                {'name': 'Show', 'type': 'bool', 'value': False , 'tip': "Show images"},
             ], }
         ]
         self.parameters = Parameter.create(name='params', type='group', children=params)
@@ -124,7 +125,7 @@ class Scaffan:
         self.init_run()
         pcolor = self.parameters.param("Input", "Annotation Color")
         color = pcolor.reverse[0][pcolor.value()]
-        print("Color ", color)
+        # print("Color ", color)
         # fnparam = self.parameters.param("Input", "File Path")
         from .image import AnnotatedImage
         # path = self.parameters.param("Input", "File Path")
@@ -136,11 +137,13 @@ class Scaffan:
         logger.debug("Annotation IDs: {}".format(annotation_ids))
         for id in annotation_ids:
             self._run_lobulus(id)
+        self.report.df.to_excel(op.join(self.report.outputdir, "data.xlsx"))
 
         # print("ann ids", annotation_ids)
     def _run_lobulus(self, annotation_id):
+        show = self.parameters.param("Processing", "Show").value()
         lobulus = scaffan.lobulus.Lobulus(self.anim, annotation_id, report=self.report)
-        lobulus.find_border()
+        lobulus.find_border(show=show)
         pass
 
 
