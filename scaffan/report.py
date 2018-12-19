@@ -20,7 +20,8 @@ class Report():
         self.df = pd.DataFrame()
 
     def add_row(self, data):
-        self.df.append(pd.DataFrame(data), ignore_index=True)
+        df = pd.DataFrame([list(data.values())], columns=list(data.keys()))
+        self.df.append(df, ignore_index=True)
 
     # def write_table(self, filename):
 

@@ -134,7 +134,7 @@ def adjust_annotation_to_image_view(imsl, annotations, center, level, size):
 
 
 def annotations_to_px(imsl, annotations):
-    from .image import get_offset_px, get_pixelsize
+    from scaffan.image import get_offset_px, get_pixelsize
     offset_px = get_offset_px(imsl)
     pixelsize, pixelunit = get_pixelsize(imsl)
     for annotation in annotations:

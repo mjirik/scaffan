@@ -127,7 +127,7 @@ class Scaffan:
         color = pcolor.reverse[0][pcolor.value()]
         # print("Color ", color)
         # fnparam = self.parameters.param("Input", "File Path")
-        from .image import AnnotatedImage
+        # from .image import AnnotatedImage
         # path = self.parameters.param("Input", "File Path")
         # anim = AnnotatedImage(path.value())
         # if color is None:

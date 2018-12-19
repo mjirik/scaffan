@@ -12,7 +12,7 @@ import os.path as op
 import glob
 import sys
 
-from . import annotation
+from scaffan import annotation
 print("ann to json")
 
 if __name__ == "__main__":

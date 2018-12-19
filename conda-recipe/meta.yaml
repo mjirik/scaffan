@@ -41,12 +41,18 @@ requirements:
     - io3d
     - imma
     - lxml
+    - pandas
+    - openpyxl
+    - morphsnakes
 
   run:
     - python
     - io3d
     - imma
     - lxml
+    - pandas
+    - openpyxl
+    - morphsnakes
     # - numpy
     # - pyqt 4.11.*
 
