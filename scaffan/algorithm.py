@@ -114,8 +114,9 @@ class Scaffan:
         pcolor = self.parameters.param("Input", "Annotation Color")
         color = color.upper()
         if color in pcolor.reverse[0]:
-            val = pcolor.reverse[0].index(color)
-            pcolor.setValue(val)
+            # val = pcolor.reverse[0].index(color)
+            # pcolor.setValue(val)
+            pcolor.setValue(color)
         else:
             raise ValueError("Color '{}' not found in allowed colors.".format(color))
 
@@ -124,7 +125,9 @@ class Scaffan:
     def run_lobuluses(self, color=None):
         self.init_run()
         pcolor = self.parameters.param("Input", "Annotation Color")
-        color = pcolor.reverse[0][pcolor.value()]
+        print("color ", pcolor.value())
+        # color = pcolor.reverse[0][pcolor.value()]
+        color = pcolor.value()
         # print("Color ", color)
         # fnparam = self.parameters.param("Input", "File Path")
         # from .image import AnnotatedImage

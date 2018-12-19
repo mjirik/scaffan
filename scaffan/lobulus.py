@@ -78,6 +78,7 @@ class Lobulus:
         plt.contour(circle + inner + outer)
 
         datarow = {}
+        datarow["Annotation ID"] = self.annotation_id
         if self.report is not None:
             plt.savefig(op.join(self.report.outputdir, "lobulus_{}.png".format(self.annotation_id)))
         if show:
@@ -100,10 +101,10 @@ class Lobulus:
         threshold = skimage.filters.threshold_otsu(detail_image[detail_mask == 1])
         imthr = (detail_image < threshold)
         imthr[detail_mask != 1] = 0
-        plt.figure()
-        plt.imshow(imthr)
-        if show:
-            plt.show()
+        # plt.figure()
+        # plt.imshow(imthr)
+        # if show:
+        #     plt.show()
         skeleton = skeletonize(imthr)
         datarow["Skeleton lenght"] = np.sum(skeleton) * self.view.region_pixelsize[0]
         plt.figure()
