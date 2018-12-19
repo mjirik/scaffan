@@ -17,8 +17,8 @@ conda install -c mjirik -c bioconda -c conda-forge openslides-python lxml imma i
 [Install Conda](https://conda.io/miniconda.html)
 
 ```commandline
-pip install openslide-python
-conda create -n scaffan -c mjirik -c bioconda -c conda-forge python=3.6 pip lxml imma io3d
+
+conda create -n scaffan -c mjirik -c bioconda -c conda-forge python=3.6 pip scaffan
 activate scaffan
 pip install openslide-python keras tensorflow
 
