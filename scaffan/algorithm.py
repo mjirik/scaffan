@@ -167,9 +167,9 @@ class Scaffan:
         t.setWindowTitle('pyqtgraph example: Parameter Tree')
         # t.show()
 
-
-        print("run scaffan")
+        # print("run scaffan")
         win = QtGui.QWidget()
+        win.setWindowTitle("ScaffAn {}".format(scaffan.__version__))
         layout = QtGui.QGridLayout()
         win.setLayout(layout)
         # layout.addWidget(QtGui.QLabel("These are two views of the same data. They should always display the same values."), 0,  0, 1, 2)

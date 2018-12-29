@@ -79,7 +79,9 @@ def read_annotations(pth):
         # print(output)
         # output = subprocess.check_output(["where", "python"])
         # print(output)
-        output = subprocess.check_output([sys.executable, "-m", "scaffan.ann_to_json", pth])
+
+        cwd = op.dirname(op.dirname(__file__))
+        output = subprocess.check_output([sys.executable, "-m", "scaffan.ann_to_json", pth], cwd=cwd)
         print(output)
     else:
     # if not op.exists(fn):
