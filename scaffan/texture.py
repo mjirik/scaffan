@@ -132,11 +132,13 @@ class TextureSegmentation:
         return patch_center_points
 
 
-    def fit(self, view, show=False):
+    def fit(self, view, show=False, function=None):
         test_image = view.get_region_image(as_gray=True)
         import scaffan.texture_lbp as salbp
+        if function is None:
+            function = salbp.match
 
-        out = texture_segmentation(test_image, salbp.match, self.refs, tile_size=self.tile_size, return_centers=show)
+        out = texture_segmentation(test_image, function, self.refs, tile_size=self.tile_size, return_centers=show)
 
         if show:
             seg, centers = out

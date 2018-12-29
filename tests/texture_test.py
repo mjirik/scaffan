@@ -206,6 +206,59 @@ class TextureTest(unittest.TestCase):
         plt.savefig("segmentation.png")
         # plt.show()
 
+    skip_on_local = True
+    @unittest.skipIf(os.environ.get("TRAVIS", False), "Skip on Travis-CI")
+    def test_texture_energy_on_lobulus(self):
+        fn = io3d.datasets.join_path("scaffold", "Hamamatsu", "PIG-008_P008 LL-P_HE_parenchyme perif..ndpi", get_root=True)
+        anim = scim.AnnotatedImage(fn)
+
+        texseg = satex.TextureSegmentation()
+        # texseg.add_training_data(anim, "empty1", 0)
+        # plt.figure()
+        # texseg.add_training_data(anim, "intralobular1", 1, show=True)
+        # plt.figure()
+        # texseg.add_training_data(anim, "intralobular2", 1, show=True)
+        # centers = texseg.get_tile_centers(anim, "intralobular1")
+        # view1 = texseg.get_patch_view(anim, centers[0])
+        # plt.imshow(view1.get_region_image())
+        # view1 = texseg.get_patch_view(anim, centers[1])
+        # plt.imshow(view1.get_region_image())
+        # plt.show()
+        # plt.figure()
+        # print("number of patches: {}".format(len(texseg.refs)))
+        # texseg.add_training_data(anim, "extralobular1", 2, show=True)
+        # plt.figure()
+        # texseg.add_training_data(anim, "extralobular3", 2, show=True)
+
+        # print("number of patches: {}".format(len(texseg.refs)))
+
+        # texseg.show_tiles(anim, "intralobular1", [0, -1])
+        # texseg.show_tiles(anim, "intralobular2", [0, -1])
+        # texseg.show_tiles(anim, "extralobular1", [0, -1])
+        # texseg.show_tiles(anim, "extralobular3", [0, -1])
+        # plt.show()
+        # logger.debug("number of patches: {}".format(len(texseg.refs)))
+        # texseg.add_training_data(anim, "obj3", 3)
+
+        views = anim.get_views_by_title("test1", level=texseg.level)
+        seg = texseg.fit(views[0], show=False, function=texture_energy)
+        plt.figure()
+        plt.subplot(121)
+        img = views[0].get_region_image(as_gray=True)
+        plt.imshow(img, cmap='gray')
+        plt.colorbar()
+        plt.subplot(122)
+        plt.imshow(seg)
+        plt.colorbar()
+        plt.savefig("segmentation.png")
+        # plt.show()
+
+def texture_energy(refs, img):
+    import skimage.feature.texture
+    P = skimage.feature.greycomatrix((img * 31).astype(np.uint8), [1], [0, np.pi/2], levels=32, symmetric=True, normed=True)
+    en = skimage.feature.texture.greycoprops(P, prop="energy")
+    return np.max(en) * 100
+
 
 if __name__ == "__main__":
     # logging.basicConfig(stream=sys.stderr)
