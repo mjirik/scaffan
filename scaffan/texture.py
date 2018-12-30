@@ -68,8 +68,8 @@ class TextureSegmentation:
         self.tile_size1 = 256
         self.level = 1
         self.step = 64
-        self.refs = []
-        self.targets = []
+        self.data = []
+        self.target = []
         if feature_function is None:
             import scaffan.texture_lbp as salbp
             feature_function = salbp.lbp_fv
@@ -79,10 +79,10 @@ class TextureSegmentation:
             classifier = salbp.KLDClassifier()
         self.classifier = classifier
 
-        n_points = 8
-        radius = 3
-        METHOD = "uniform"
-        self.feature_function_args = [n_points, radius, METHOD]
+        # n_points = 8
+        # radius = 3
+        # METHOD = "uniform"
+        # self.feature_function_args = [n_points, radius, METHOD]
         pass
 
     def get_tile_centers(self, anim, annotation_id, return_xy=False):
@@ -129,8 +129,8 @@ class TextureSegmentation:
         for patch_center in patch_center_points:
             view = self.get_patch_view(anim, patch_center)
             imgray = view.get_region_image(as_gray=True)
-            self.refs.append(self.feature_function(imgray, *self.feature_function_args))
-            self.targets.append(numeric_label)
+            self.data.append(self.feature_function(imgray))
+            self.target.append(numeric_label)
 
         if show:
             annotation_ids = anim.select_annotations_by_title(title=annotation_id)

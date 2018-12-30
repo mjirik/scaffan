@@ -41,7 +41,7 @@ def kullback_leibler_divergence(p, q):
     return np.sum(p[filt] * np.log2(p[filt] / q[filt]))
 
 
-def lbp_fv(img, n_points, radius, METHOD):
+def lbp_fv(img):  # , n_points, radius, METHOD):
     lbp = local_binary_pattern01(img, n_points, radius, METHOD)
     n_bins = int(lbp.max() + 1)
     hist, _ = np.histogram(lbp, density=True, bins=n_bins, range=(0, n_bins))
@@ -85,7 +85,8 @@ class KLDClassifier():
         pass
 
     def predict_one(self, hist):
-        for name, ref_hist in zip(self.target, data):
+        best_score = 10
+        for name, ref_hist in zip(self.target, self.data):
             score = kullback_leibler_divergence(hist, ref_hist)
             if score < best_score:
                 best_score = score

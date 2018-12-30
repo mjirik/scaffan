@@ -123,10 +123,10 @@ class TextureTest(unittest.TestCase):
         #     3: local_binary_pattern(im3, n_points, radius, METHOD)
         # }
         refs = [
-            [0, salbp.lbp_fv(im0, n_points, radius, METHOD)],
-            [1, salbp.lbp_fv(im1, n_points, radius, METHOD)],
-            [2, salbp.lbp_fv(im2, n_points, radius, METHOD)],
-            [3, salbp.lbp_fv(im3, n_points, radius, METHOD)]
+            [0, salbp.lbp_fv(im0)],  # n_points, radius, METHOD)],
+            [1, salbp.lbp_fv(im1)],  # n_points, radius, METHOD)],
+            [2, salbp.lbp_fv(im2)],  # n_points, radius, METHOD)],
+            [3, salbp.lbp_fv(im3)],  # n_points, radius, METHOD)]
         ]
         annotation_ids = anim.select_annotations_by_title("test2")
         view_test = anim.get_views(annotation_ids, level=level)[0]
@@ -200,10 +200,11 @@ class TextureTest(unittest.TestCase):
         # texseg.show_tiles(anim, "intralobular2", [0, -1])
         # texseg.show_tiles(anim, "extralobular1", [0, -1])
         texseg.show_tiles(anim, "extralobular3", [0, -1])
-        plt.show()
-        logger.debug("number of patches: {}".format(len(texseg.refs)))
+        # plt.show()
+        logger.debug("number of patches: {}".format(len(texseg.data)))
         # texseg.add_training_data(anim, "obj3", 3)
 
+        texseg.fit()
         views = anim.get_views_by_title("test3", level=texseg.level)
         texseg.predict(views[0], show=True)
         plt.savefig("segmentation.png")
