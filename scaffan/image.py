@@ -289,12 +289,14 @@ class AnnotatedImage:
         size = mx - mi
         return center, size
 
-    def get_region_image(self, as_gray=False):
+    def get_region_image(self, as_gray=False, as_unit8=False):
         imcr = self.openslide.read_region(
             self.region_location, level=self.region_level, size=self.region_size)
         im = np.asarray(imcr)
         if as_gray:
             im = skimage.color.rgb2gray(im)
+            if as_unit8:
+                im = (im * 255).astype(np.uint8)
         return im
 
     def plot_annotations(self, annotation_id=None):

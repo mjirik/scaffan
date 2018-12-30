@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 import numpy as np
 from skimage.transform import rotate
-from skimage.feature import local_binary_pattern
+import skimage.feature
 from skimage import data
 from skimage.color import label2rgb
 import matplotlib.pyplot as plt
@@ -20,6 +20,20 @@ n_points = 8 * radius
 METHOD = 'uniform'
 
 
+def local_binary_pattern01(img, n_points, radius, method):
+    """
+    LBP for input image from 0.0 to 1.0
+    :param img:
+    :param n_points:
+    :param radius:
+    :param method:
+    :return:
+    """
+    img = (img * 255).astype(np.uint8)
+    lbp = skimage.feature.local_binary_pattern(img, n_points, radius, method)
+    return lbp
+
+
 def kullback_leibler_divergence(p, q):
     p = np.asarray(p)
     q = np.asarray(q)
@@ -27,30 +41,65 @@ def kullback_leibler_divergence(p, q):
     return np.sum(p[filt] * np.log2(p[filt] / q[filt]))
 
 
-def match(refs, img):
-    best_score = 10
-    best_name = None
-    lbp = local_binary_pattern(img, n_points, radius, METHOD)
+def lbp_fv(img, n_points, radius, METHOD):
+    lbp = local_binary_pattern01(img, n_points, radius, METHOD)
     n_bins = int(lbp.max() + 1)
     hist, _ = np.histogram(lbp, density=True, bins=n_bins, range=(0, n_bins))
-    if type(refs) is dict:
-        itms = refs.items()
-    elif type(refs) is list:
-        itms = refs
-    else:
-        ValueError("Wrong type for 'refs'")
+    return hist
 
-    for name, ref in itms:
-        ref_hist, _ = np.histogram(ref, density=True, bins=n_bins,
-                                   range=(0, n_bins))
-        score = kullback_leibler_divergence(hist, ref_hist)
-        if score < best_score:
-            best_score = score
-            best_name = name
-    return best_name
+# def match(refs, img):
+#     best_score = 10
+#     best_name = None
+#     if type(refs) is dict:
+#         itms = refs.items()
+#     elif type(refs) is list:
+#         itms = refs
+#     else:
+#         ValueError("Wrong type for 'refs'")
+#
+#     for name, ref in itms:
+#         ref_hist, _ = np.histogram(ref, density=True, bins=n_bins,
+#                                    range=(0, n_bins))
+#         score = kullback_leibler_divergence(hist, ref_hist)
+#         if score < best_score:
+#             best_score = score
+#             best_name = name
+#     return best_name
+
 
 def show_lbp(lbp):
     n_bins = int(lbp.max() + 1)
     plt.hist(lbp.ravel(), range=(0, n_bins), bins=n_bins, normed=True)
     plt.xlim(xmax=n_points + 2)
+
+
+class KLDClassifier():
+    def __init__(self):
+        pass
+
+    def fit(self, data, target):
+
+        self.data = data
+        self.target = target
+        # self.refs = list(zip(data, target))
+        pass
+
+    def predict_one(self, hist):
+        for name, ref_hist in zip(self.target, data):
+            score = kullback_leibler_divergence(hist, ref_hist)
+            if score < best_score:
+                best_score = score
+                best_name = name
+        return best_name
+
+    def predict(self, x):
+        out = [None] * len(x)
+        for i, hist in enumerate(x):
+            out[i] = self.predict_one(hist)
+
+        return out
+
+
+
+
 

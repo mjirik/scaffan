@@ -11,7 +11,7 @@ import scipy.ndimage
 import matplotlib.pyplot as plt
 
 
-def texture_segmentation(image, decision_function, models, tile_size, return_centers=False):
+def texture_segmentation(image, fv_function, classif, tile_size, return_centers=False):
     if return_centers:
         tile_size2 = [int(tile_size[0] / 2), int(tile_size[1] / 2)]
         centers = []
@@ -22,7 +22,8 @@ def texture_segmentation(image, decision_function, models, tile_size, return_cen
                 slice(x0, x0 + tile_size[0]),
                 slice(x1, x1 + tile_size[1])
             ]
-            output[sl] = decision_function(models, image[sl])
+            fv = fv_function(image[sl])
+            output[sl] = classif.predict([fv])[0]
             if return_centers:
                 centers.append([x0 + tile_size2[0], x1 + tile_size2[1]])
 
@@ -60,15 +61,23 @@ def nonzero_with_step(data, step):
 
     return nzx * step, nzy * step
 
+
 class TextureSegmentation:
-    def __init__(self):
+    def __init__(self, feature_function=None, classifier=None):
         self.tile_size = [256, 256]
         self.tile_size1 = 256
         self.level = 1
         self.step = 64
         self.refs = []
-        import scaffan.texture_lbp as salbp
-        self.feature_function = salbp.local_binary_pattern
+        self.targets = []
+        if feature_function is None:
+            import scaffan.texture_lbp as salbp
+            feature_function = salbp.lbp_fv
+        self.feature_function = feature_function
+        if classifier is None:
+            import scaffan.texture_lbp as salbp
+            classifier = salbp.KLDClassifier()
+        self.classifier = classifier
 
         n_points = 8
         radius = 3
@@ -120,7 +129,8 @@ class TextureSegmentation:
         for patch_center in patch_center_points:
             view = self.get_patch_view(anim, patch_center)
             imgray = view.get_region_image(as_gray=True)
-            self.refs.append([numeric_label, self.feature_function(imgray, *self.feature_function_args)])
+            self.refs.append(self.feature_function(imgray, *self.feature_function_args))
+            self.targets.append(numeric_label)
 
         if show:
             annotation_ids = anim.select_annotations_by_title(title=annotation_id)
@@ -131,14 +141,14 @@ class TextureSegmentation:
             view.plot_points(x, y)
         return patch_center_points
 
+    def fit(self):
+        self.classifier.fit(self.data, self.target)
+        pass
 
-    def fit(self, view, show=False, function=None):
+    def predict(self, view, show=False):
         test_image = view.get_region_image(as_gray=True)
-        import scaffan.texture_lbp as salbp
-        if function is None:
-            function = salbp.match
 
-        out = texture_segmentation(test_image, function, self.refs, tile_size=self.tile_size, return_centers=show)
+        out = texture_segmentation(test_image, self.feature_function, self.classifier, tile_size=self.tile_size, return_centers=show)
 
         if show:
             seg, centers = out

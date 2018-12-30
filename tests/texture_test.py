@@ -36,7 +36,8 @@ import scaffan
 import scaffan.image as scim
 import scaffan.texture as satex
 import scaffan.texture_lbp as salbp
-from scaffan.texture_lbp import local_binary_pattern
+# from scaffan.texture_lbp import local_binary_pattern
+from skimage.feature import local_binary_pattern
 
 
 class TextureTest(unittest.TestCase):
@@ -115,23 +116,25 @@ class TextureTest(unittest.TestCase):
         radius = 3
         n_points = 8
         METHOD = "uniform"
-        refs = {
-            0: local_binary_pattern(im0, n_points, radius, METHOD),
-            1: local_binary_pattern(im1, n_points, radius, METHOD),
-            2: local_binary_pattern(im2, n_points, radius, METHOD),
-            3: local_binary_pattern(im3, n_points, radius, METHOD)
-        }
+        # refs = {
+        #     0: local_binary_pattern(im0, n_points, radius, METHOD),
+        #     1: local_binary_pattern(im1, n_points, radius, METHOD),
+        #     2: local_binary_pattern(im2, n_points, radius, METHOD),
+        #     3: local_binary_pattern(im3, n_points, radius, METHOD)
+        # }
         refs = [
-            [0, local_binary_pattern(im0, n_points, radius, METHOD)],
-            [1, local_binary_pattern(im1, n_points, radius, METHOD)],
-            [2, local_binary_pattern(im2, n_points, radius, METHOD)],
-            [3, local_binary_pattern(im3, n_points, radius, METHOD)]
+            [0, salbp.lbp_fv(im0, n_points, radius, METHOD)],
+            [1, salbp.lbp_fv(im1, n_points, radius, METHOD)],
+            [2, salbp.lbp_fv(im2, n_points, radius, METHOD)],
+            [3, salbp.lbp_fv(im3, n_points, radius, METHOD)]
         ]
         annotation_ids = anim.select_annotations_by_title("test2")
         view_test = anim.get_views(annotation_ids, level=level)[0]
         test_image = view_test.get_region_image(as_gray=True)
-
-        seg = satex.texture_segmentation(test_image, salbp.match, refs, tile_size=size)
+        target, data = list(zip(refs))
+        cls = salbp.KLDClassifier()
+        cls.fit(data, target)
+        seg = satex.texture_segmentation(test_image, salbp.lbp_fv, cls, tile_size=size)
         plt.figure()
         plt.imshow(test_image)
         plt.contour(seg)
@@ -163,18 +166,18 @@ class TextureTest(unittest.TestCase):
         texseg.add_training_data(anim, "obj3", 3, show=True)
         # plt.show()
         views = anim.get_views_by_title("test2", level=texseg.level)
-        texseg.fit(views[0], show=True)
+        texseg.predict(views[0], show=True)
         # plt.show()
 
-
     skip_on_local = True
-    @unittest.skipIf(os.environ.get("TRAVIS", skip_on_local), "Skip on Travis-CI")
+
+    @unittest.skipIf(os.environ.get("TRAVIS", False), "Skip on Travis-CI")
     def test_texture_segmentation_object_lobulus_data(self):
         fn = io3d.datasets.join_path("scaffold", "Hamamatsu", "PIG-008_P008 LL-P_HE_parenchyme perif..ndpi", get_root=True)
         anim = scim.AnnotatedImage(fn)
 
         texseg = satex.TextureSegmentation()
-        # texseg.add_training_data(anim, "empty1", 0)
+        texseg.add_training_data(anim, "empty1", 0)
         plt.figure()
         texseg.add_training_data(anim, "intralobular1", 1, show=True)
         plt.figure()
@@ -197,12 +200,12 @@ class TextureTest(unittest.TestCase):
         # texseg.show_tiles(anim, "intralobular2", [0, -1])
         # texseg.show_tiles(anim, "extralobular1", [0, -1])
         texseg.show_tiles(anim, "extralobular3", [0, -1])
-        # plt.show()
+        plt.show()
         logger.debug("number of patches: {}".format(len(texseg.refs)))
         # texseg.add_training_data(anim, "obj3", 3)
 
         views = anim.get_views_by_title("test3", level=texseg.level)
-        texseg.fit(views[0], show=True)
+        texseg.predict(views[0], show=True)
         plt.savefig("segmentation.png")
         # plt.show()
 
@@ -241,7 +244,7 @@ class TextureTest(unittest.TestCase):
         # texseg.add_training_data(anim, "obj3", 3)
 
         views = anim.get_views_by_title("test1", level=texseg.level)
-        seg = texseg.fit(views[0], show=False, function=texture_energy)
+        seg = texseg.predict(views[0], show=False, function=texture_energy)
         plt.figure()
         plt.subplot(121)
         img = views[0].get_region_image(as_gray=True)
@@ -250,8 +253,9 @@ class TextureTest(unittest.TestCase):
         plt.subplot(122)
         plt.imshow(seg)
         plt.colorbar()
-        plt.savefig("segmentation.png")
+        plt.savefig("glcm_energy.png")
         # plt.show()
+
 
 def texture_energy(refs, img):
     import skimage.feature.texture
