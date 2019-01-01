@@ -7,7 +7,9 @@ import logging
 logger = logging.getLogger(__name__)
 import skimage.filters
 from skimage.morphology import skeletonize
+import skimage.io
 import scipy.signal
+import scipy.ndimage
 import os.path as op
 import numpy as np
 import morphsnakes as ms
@@ -89,10 +91,9 @@ class Lobulus:
         datarow["Area unit"] = self.view.region_pixelunit
 
         # eroded image for threshold analysis
-        import scipy.ndimage
         dstmask = scipy.ndimage.morphology.distance_transform_edt(self.lobulus_mask, self.view.region_pixelsize)
         inner_lobulus_mask = (dstmask > inner_lobulus_margin_mm)
-        print("inner_lobulus_mask" , np.sum(inner_lobulus_mask==0), np.sum(inner_lobulus_mask==1))
+        # print("inner_lobulus_mask" , np.sum(inner_lobulus_mask==0), np.sum(inner_lobulus_mask==1))
 
         detail_level = 2
         new_size = self.view.get_size_on_level(detail_level)
@@ -120,7 +121,8 @@ class Lobulus:
         plt.figure()
         plt.imshow(skeleton + imthr)
         if self.report is not None:
-            plt.savefig(op.join(self.report.outputdir, "skeleton_thumb_{}.png".format(self.annotation_id)))
+            plt.savefig(op.join(self.report.outputdir, "figure_skeleton_thumb_{}.png".format(self.annotation_id)))
+            skimage.io.imsave(op.join(self.report.outputdir, "figure_skeleton_thumb_{}.png".format(self.annotation_id)))
         if show:
             plt.show()
 
@@ -128,9 +130,9 @@ class Lobulus:
             plt.imsave(op.join(self.report.outputdir, "figure_skeleton_thr_{}.png".format(self.annotation_id)), skeleton + imthr)
             plt.imsave(op.join(self.report.outputdir, "figure_skeleton_{}.png".format(self.annotation_id)), skeleton)
             plt.imsave(op.join(self.report.outputdir, "figure_thr_{}.png".format(self.annotation_id)), imthr)
-            # skimage.io.imsave(op.join(self.report.outputdir, "skeleton_thr_{}.png".format(self.annotation_id)), skeleton + imthr)
-            # skimage.io.imsave(op.join(self.report.outputdir, "skeleton_{}.png".format(self.annotation_id)), skeleton)
-            # skimage.io.imsave(op.join(self.report.outputdir, "thr_{}.png".format(self.annotation_id)), imthr)
+            skimage.io.imsave(op.join(self.report.outputdir, "skeleton_thr_{}.png".format(self.annotation_id)), skeleton + imthr)
+            skimage.io.imsave(op.join(self.report.outputdir, "skeleton_{}.png".format(self.annotation_id)), skeleton)
+            skimage.io.imsave(op.join(self.report.outputdir, "thr_{}.png".format(self.annotation_id)), imthr)
 
         conv = scipy.signal.convolve2d(skeleton, np.ones([3, 3]), mode="same")
         conv = conv * skeleton
@@ -138,7 +140,7 @@ class Lobulus:
         plt.imshow(conv)
         if self.report is not None:
             plt.savefig(op.join(self.report.outputdir, "figure_skeleton_nodes_{}.png".format(self.annotation_id)))
-            # skimage.io.imsave(op.join(self.report.outputdir, "skeleton_nodes_{}.png".format(self.annotation_id)))
+            skimage.io.imsave(op.join(self.report.outputdir, "skeleton_nodes_{}.png".format(self.annotation_id)))
         if show:
             plt.show()
 
