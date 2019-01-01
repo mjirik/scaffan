@@ -397,11 +397,11 @@ class View:
     def get_pixel_size(self, level=None):
         if level is None:
             level = self.region_level
-            pxsz, unit = self.anim.get_pixel_size(level)
-        return pxsz
+        return self.anim.get_pixel_size(level)
 
     def mm_to_px(self, mm):
-        return mm / self.get_pixel_size()
+        pxsz, unit = self.get_pixel_size()
+        return mm / pxsz
 
     def get_region_image(self, as_gray=False):
         imcr = self.openslide.read_region(
@@ -461,6 +461,17 @@ class View:
         region = self.get_region_image()
         plt.imshow(region)
         self.plot_annotations(i)
+        self.add_ticks()
+
+    def add_ticks(self):
+        locs, labels = plt.xticks()
+        labels = ["{:.1e}".format(i * self.region_pixelsize[0]) for i in locs]
+        plt.xticks(locs, labels)
+
+        locs, labels = plt.yticks()
+        labels = ["{:.1e}".format(i * self.region_pixelsize[1]) for i in locs]
+        plt.yticks(locs, labels)
+
 
     def plot_annotations(self, i=None):
         if i is None:
