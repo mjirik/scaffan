@@ -3,6 +3,7 @@
 ## Unreleased
 
 * [new] Version number in window title
+* [enhancement] Skeleton threshold is calculated from inner part of lobulus
 
 ## 0.0
 * [new] AnotatedImage class
