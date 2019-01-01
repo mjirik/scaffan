@@ -8,13 +8,11 @@ logger = logging.getLogger(__name__)
 
 import sys
 import os.path as op
-import PyQt5
 # import PyQt5.QtWidgets
 # print("start 3")
 # from PyQt5.QtWidgets import QApplication, QFileDialog
 # print("start 4")
 from PyQt5 import QtGui
-import pyqtgraph as pg
 from pyqtgraph.parametertree import Parameter, ParameterTree
 
 from scaffan import image
@@ -120,14 +118,13 @@ class Scaffan:
         else:
             raise ValueError("Color '{}' not found in allowed colors.".format(color))
 
-
-
     def run_lobuluses(self, color=None):
         self.init_run()
-        pcolor = self.parameters.param("Input", "Annotation Color")
-        print("color ", pcolor.value())
+        if color is None:
+            pcolor = self.parameters.param("Input", "Annotation Color")
+            print("color ", pcolor.value())
         # color = pcolor.reverse[0][pcolor.value()]
-        color = pcolor.value()
+            color = pcolor.value()
         # print("Color ", color)
         # fnparam = self.parameters.param("Input", "File Path")
         # from .image import AnnotatedImage
