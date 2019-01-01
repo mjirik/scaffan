@@ -8,10 +8,7 @@ logger = logging.getLogger(__name__)
 
 
 import numpy as np
-from skimage.transform import rotate
 import skimage.feature
-from skimage import data
-from skimage.color import label2rgb
 import matplotlib.pyplot as plt
 
 # settings for LBP
@@ -85,7 +82,7 @@ class KLDClassifier():
         pass
 
     def predict_one(self, hist):
-        best_score = 10
+        best_score = np.inf
         for name, ref_hist in zip(self.target, self.data):
             score = kullback_leibler_divergence(hist, ref_hist)
             if score < best_score:

@@ -8,7 +8,6 @@ logger = logging.getLogger(__name__)
 # problem is loading lxml together with openslide
 # from lxml import etree
 from typing import List
-import json
 import os.path as op
 import glob
 import matplotlib.pyplot as plt
@@ -37,7 +36,7 @@ def import_openslide():
     if pth not in orig_split:
         print("add path {}".format(pth))
     os.environ["PATH"] = pth + ";" + os.environ["PATH"]
-    import openslide
+
 
 import_openslide()
 import openslide
@@ -73,7 +72,7 @@ def get_region_center_by_location(imsl, location, level, size):
     return center
 
 
-def get_pixelsize(imsl, level=0):
+def get_pixelsize(imsl, level=0, requested_unit="mm"):
     """
     imageslice
     :param imsl: image slice obtained by openslice.OpenSlide(path)
@@ -86,13 +85,25 @@ def get_pixelsize(imsl, level=0):
 #     print("Resolution {}x{} pixels/{}".format(resolution_x, resolution_y, resolution_unit))
     downsamples = imsl.level_downsamples[level]
 
-    if resolution_unit in ("cm", "centimeter"):
-        downsamples = downsamples * 10.
-        pixelunit = "mm"
-    else:
+    input_resolution_unit = resolution_unit
+    if resolution_unit is None:
         pixelunit = resolution_unit
+    elif requested_unit in ("mm"):
+        if resolution_unit in ("cm", "centimeter"):
+            downsamples = downsamples * 10.
+            pixelunit = "mm"
+        elif resolution_unit in ("mm"):
+            pixelunit = resolution_unit
+        else:
+            raise ValueError("Cannot covert from {} to {}.".format(input_resolution_unit, requested_unit))
+    else:
+        raise ValueError("Cannot covert from {} to {}.".format(input_resolution_unit, requested_unit))
 
-    pixelsize = [downsamples /float(resolution_x), downsamples /float(resolution_y)]
+
+    # if resolution_unit != resolution_unit:
+    #     raise ValueError("Cannot covert from {} to {}.".format(input_resolution_unit, requested_unit))
+
+    pixelsize = np.asarray([downsamples /float(resolution_x), downsamples /float(resolution_y)])
 
     return pixelsize, pixelunit
 
@@ -354,6 +365,7 @@ class AnnotatedImage:
 
         return x_view_px, y_view_px
 
+
 class View:
 
     def __init__(self, anim, center=None, level=0, size=None, location=None):
@@ -385,7 +397,11 @@ class View:
     def get_pixel_size(self, level=None):
         if level is None:
             level = self.region_level
-        return self.anim.get_pixel_size(level)
+            pxsz, unit = self.anim.get_pixel_size(level)
+        return pxsz
+
+    def mm_to_px(self, mm):
+        return mm / self.get_pixel_size()
 
     def get_region_image(self, as_gray=False):
         imcr = self.openslide.read_region(
