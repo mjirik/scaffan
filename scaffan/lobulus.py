@@ -6,13 +6,12 @@ Process lobulus analysis.
 import logging
 logger = logging.getLogger(__name__)
 import skimage.filters
-from skimage.morphology import medial_axis, skeletonize, skeletonize_3d
+from skimage.morphology import skeletonize
 import scipy.signal
 import os.path as op
 import numpy as np
 import morphsnakes as ms
 from matplotlib import pyplot as plt
-from scaffan import annotation as scan
 from scaffan import image as scim
 
 
@@ -33,6 +32,8 @@ class Lobulus:
         pass
 
     def find_border(self, show=True):
+        inner_lobulus_margin_mm = 0.02
+
         im_gradient0 = skimage.filters.frangi(self.image)
         im_gradient1 = ms.gborders(self.image, alpha=1000, sigma=2)
         im_gradient = im_gradient1 - (im_gradient0 * 10000)
@@ -87,18 +88,27 @@ class Lobulus:
         datarow["Area"] = np.sum(self.lobulus_mask) * np.prod(self.view.region_pixelsize)
         datarow["Area unit"] = self.view.region_pixelunit
 
+        # eroded image for threshold analysis
+        import scipy.ndimage
+        dstmask = scipy.ndimage.morphology.distance_transform_edt(self.lobulus_mask, self.view.region_pixelsize)
+        inner_lobulus_mask = (dstmask > inner_lobulus_margin_mm)
+        print("inner_lobulus_mask" , np.sum(inner_lobulus_mask==0), np.sum(inner_lobulus_mask==1))
+
         detail_level = 2
         new_size = self.view.get_size_on_level(detail_level)
 
-        detail_mask = skimage.transform.resize(self.lobulus_mask, [new_size[1], new_size[0]], mode="reflect")
+        detail_mask = skimage.transform.resize(self.lobulus_mask, [new_size[1], new_size[0]], mode="reflect", order=0)
+        detail_inner_lobulus_mask = skimage.transform.resize(inner_lobulus_mask, [new_size[1], new_size[0]], mode="reflect", order=0)
+
         detail_view = self.view.to_level(detail_level)
         detail_image = detail_view.get_region_image(as_gray=True)
         plt.figure()
         plt.imshow(detail_image)
-        plt.contour(detail_mask)
+        plt.contour(detail_mask + detail_inner_lobulus_mask)
+        detail_view.add_ticks()
         if show:
             plt.show()
-        threshold = skimage.filters.threshold_otsu(detail_image[detail_mask == 1])
+        threshold = skimage.filters.threshold_otsu(detail_image[detail_inner_lobulus_mask == 1])
         imthr = (detail_image < threshold)
         imthr[detail_mask != 1] = 0
         # plt.figure()
@@ -115,16 +125,20 @@ class Lobulus:
             plt.show()
 
         if self.report is not None:
-            plt.imsave(op.join(self.report.outputdir, "skeleton_thr_{}.png".format(self.annotation_id)), skeleton + imthr)
-            plt.imsave(op.join(self.report.outputdir, "skeleton_{}.png".format(self.annotation_id)), skeleton)
-            plt.imsave(op.join(self.report.outputdir, "thr_{}.png".format(self.annotation_id)), imthr)
+            plt.imsave(op.join(self.report.outputdir, "figure_skeleton_thr_{}.png".format(self.annotation_id)), skeleton + imthr)
+            plt.imsave(op.join(self.report.outputdir, "figure_skeleton_{}.png".format(self.annotation_id)), skeleton)
+            plt.imsave(op.join(self.report.outputdir, "figure_thr_{}.png".format(self.annotation_id)), imthr)
+            # skimage.io.imsave(op.join(self.report.outputdir, "skeleton_thr_{}.png".format(self.annotation_id)), skeleton + imthr)
+            # skimage.io.imsave(op.join(self.report.outputdir, "skeleton_{}.png".format(self.annotation_id)), skeleton)
+            # skimage.io.imsave(op.join(self.report.outputdir, "thr_{}.png".format(self.annotation_id)), imthr)
 
         conv = scipy.signal.convolve2d(skeleton, np.ones([3, 3]), mode="same")
         conv = conv * skeleton
         plt.figure()
         plt.imshow(conv)
         if self.report is not None:
-            plt.savefig(op.join(self.report.outputdir, "skeleton_nodes_{}.png".format(self.annotation_id)))
+            plt.savefig(op.join(self.report.outputdir, "figure_skeleton_nodes_{}.png".format(self.annotation_id)))
+            # skimage.io.imsave(op.join(self.report.outputdir, "skeleton_nodes_{}.png".format(self.annotation_id)))
         if show:
             plt.show()
 
