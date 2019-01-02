@@ -7,6 +7,7 @@
 * [enhancement] Write images in high resolution
 * [new] Figures in mm
 * [new] Resolution and size of output images is stored in report
+* [new] Suggest output dir name by date and time
 
 ## 0.0
 * [new] AnotatedImage class

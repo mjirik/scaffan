@@ -8,6 +8,7 @@ logger = logging.getLogger(__name__)
 
 import sys
 import os.path as op
+import datetime
 # import PyQt5.QtWidgets
 # print("start 3")
 # from PyQt5.QtWidgets import QApplication, QFileDialog
@@ -84,20 +85,27 @@ class Scaffan:
     def select_output_dir_gui(self):
         from PyQt5 import QtWidgets
         default_dir = self._prepare_default_output_dir()
+        if op.exists(default_dir):
+            start_dir = default_dir
+        else:
+            start_dir = op.dirname(default_dir)
 
         fn = QtWidgets.QFileDialog.getExistingDirectory(
-            None, "Select Output Directory", directory=default_dir,
+            None, "Select Output Directory", directory=start_dir,
             # filter="NanoZoomer Digital Pathology Image(*.ndpi)"
         )
         # print (fn)
         self.set_output_dir(fn)
-
 
     def _prepare_default_output_dir(self):
         default_dir = io3d.datasets.join_path(get_root=True)
         # default_dir = op.expanduser("~/data")
         if not op.exists(default_dir):
             default_dir = op.expanduser("~")
+
+        # timestamp = datetime.datetime.now().strftime("SA_%Y-%m-%d_%H:%M:%S")
+        timestamp = datetime.datetime.now().strftime("SA_%Y%m%d_%H%M%S")
+        default_dir = op.join(default_dir, timestamp)
         return default_dir
 
     def init_run(self):
