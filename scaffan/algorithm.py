@@ -117,7 +117,6 @@ class Scaffan:
         fnparam = self.parameters.param("Output", "Directory Path")
         self.report = scaffan.report.Report(fnparam.value())
 
-
     def set_annotation_color_selection(self, color):
         pcolor = self.parameters.param("Input", "Annotation Color")
         color = color.upper()
@@ -132,7 +131,7 @@ class Scaffan:
         self.init_run()
         # if color is None:
         pcolor = self.parameters.param("Input", "Annotation Color")
-        print("color ", pcolor.value())
+        # print("color ", pcolor.value())
         # color = pcolor.reverse[0][pcolor.value()]
         color = pcolor.value()
         # print("Color ", color)
@@ -152,12 +151,11 @@ class Scaffan:
         self.report.df.to_excel(op.join(self.report.outputdir, "data.xlsx"))
 
         # print("ann ids", annotation_ids)
+
     def _run_lobulus(self, annotation_id):
         show = self.parameters.param("Processing", "Show").value()
         lobulus = scaffan.lobulus.Lobulus(self.anim, annotation_id, report=self.report)
         lobulus.find_border(show=show)
-        pass
-
 
     def start_gui(self):
 
@@ -166,11 +164,9 @@ class Scaffan:
         # import QApplication, QFileDialog
         app = QtWidgets.QApplication(sys.argv)
 
-
         self.parameters.param('Input', 'Select').sigActivated.connect(self.select_file_gui)
         self.parameters.param('Output', 'Select').sigActivated.connect(self.select_output_dir_gui)
         self.parameters.param('Processing', 'Run').sigActivated.connect(self.run_lobuluses)
-
 
         t = ParameterTree()
         t.setParameters(self.parameters, showTop=False)
