@@ -117,30 +117,36 @@ class Lobulus:
         # if show:
         #     plt.show()
         skeleton = skeletonize(imthr)
-        datarow["Skeleton lenght"] = np.sum(skeleton) * self.view.region_pixelsize[0]
-        plt.figure()
+        datarow["Skeleton lenght"] = np.sum(skeleton) * detail_view.region_pixelsize[0]
+        datarow["Output pixel size 0"] = detail_view.region_pixelsize[0]
+        datarow["Output pixel size 1"] = detail_view.region_pixelsize[1]
+        datarow["Output image size 0"] = detail_view.region_pixelsize[0] * imthr.shape[0]
+        datarow["Output image size 1"] = detail_view.region_pixelsize[1] * imthr.shape[1]
+        plt.figure(figsize = (15, 10))
         plt.imshow(skeleton + imthr)
+        detail_view.add_ticks()
         if self.report is not None:
-            plt.savefig(op.join(self.report.outputdir, "figure_skeleton_thumb_{}.png".format(self.annotation_id)))
-            skimage.io.imsave(op.join(self.report.outputdir, "figure_skeleton_thumb_{}.png".format(self.annotation_id)))
+            plt.savefig(op.join(self.report.outputdir, "thumb_skeleton_thr_{}.png".format(self.annotation_id)))
+            # skimage.io.imsave(op.join(self.report.outputdir, "figure_skeleton_thumb_{}.png".format(self.annotation_id)), 50 * skeleton + 50 * imthr)
         if show:
             plt.show()
 
         if self.report is not None:
-            plt.imsave(op.join(self.report.outputdir, "figure_skeleton_thr_{}.png".format(self.annotation_id)), skeleton + imthr)
-            plt.imsave(op.join(self.report.outputdir, "figure_skeleton_{}.png".format(self.annotation_id)), skeleton)
-            plt.imsave(op.join(self.report.outputdir, "figure_thr_{}.png".format(self.annotation_id)), imthr)
-            skimage.io.imsave(op.join(self.report.outputdir, "skeleton_thr_{}.png".format(self.annotation_id)), skeleton + imthr)
-            skimage.io.imsave(op.join(self.report.outputdir, "skeleton_{}.png".format(self.annotation_id)), skeleton)
-            skimage.io.imsave(op.join(self.report.outputdir, "thr_{}.png".format(self.annotation_id)), imthr)
+            plt.imsave(op.join(self.report.outputdir, "skeleton_thr_lobulus_{}.png".format(self.annotation_id)), skeleton + imthr + detail_mask)
+            plt.imsave(op.join(self.report.outputdir, "skeleton_{}.png".format(self.annotation_id)), skeleton)
+            plt.imsave(op.join(self.report.outputdir, "thr_{}.png".format(self.annotation_id)), imthr)
+            skimage.io.imsave(op.join(self.report.outputdir, "raw_skeleton_thr_lobulus_{}.png".format(self.annotation_id)), 50 * skeleton + 50 * imthr + 50 * detail_mask)
+            skimage.io.imsave(op.join(self.report.outputdir, "raw_skeleton_{}.png".format(self.annotation_id)), 50 * skeleton)
+            skimage.io.imsave(op.join(self.report.outputdir, "raw_thr_{}.png".format(self.annotation_id)), 50 * imthr)
 
         conv = scipy.signal.convolve2d(skeleton, np.ones([3, 3]), mode="same")
         conv = conv * skeleton
-        plt.figure()
+        plt.figure(figsize=(15,10))
         plt.imshow(conv)
+        detail_view.add_ticks()
         if self.report is not None:
             plt.savefig(op.join(self.report.outputdir, "figure_skeleton_nodes_{}.png".format(self.annotation_id)))
-            skimage.io.imsave(op.join(self.report.outputdir, "skeleton_nodes_{}.png".format(self.annotation_id)))
+            skimage.io.imsave(op.join(self.report.outputdir, "skeleton_nodes_{}.png".format(self.annotation_id)), (conv * 10).astype(np.uint8))
         if show:
             plt.show()
 
@@ -150,7 +156,17 @@ class Lobulus:
 
         self.report.add_row(datarow)
 
+    # def imfigsave(self, base_fn, arr):
 
+    def imsave(self, base_fn, arr, k=50):
+        """
+
+        :param base_fn: with a format slot for annotation id like "skeleton_{}.png"
+        :param arr:
+        :return:
+        """
+        plt.imsave(op.join(self.report.outputdir, base_fn.format(self.annotation_id)), arr)
+        skimage.io.imsave(op.join(self.report.outputdir, "raw_" + base_fn.format(self.annotation_id)), k * arr)
 
     def find_cetral_vein(self):
         pass

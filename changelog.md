@@ -5,6 +5,8 @@
 * [new] Version number in window title
 * [enhancement] Skeleton threshold is calculated from inner part of lobulus
 * [enhancement] Write images in high resolution
+* [new] Figures in mm
+* [new] Resolution and size of output images is stored in report
 
 ## 0.0
 * [new] AnotatedImage class

@@ -8,10 +8,7 @@ import unittest
 import io3d
 # import openslide
 import scaffan
-from scaffan import image as scan
 import scaffan.algorithm
-
-
 
 
 class MainGuiTest(unittest.TestCase):
@@ -27,6 +24,7 @@ class MainGuiTest(unittest.TestCase):
         mainapp.set_input_file(fn)
         mainapp.init_run()
         mainapp.set_annotation_color_selection("#FF00FF")
+        # mainapp.parameters.param("Processing", "Show").setValue(True)
         mainapp.run_lobuluses()
         # mainapp.start_gui()
 

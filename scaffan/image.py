@@ -465,8 +465,9 @@ class View:
 
     def add_ticks(self):
         locs, labels = plt.xticks()
-        labels = ["{:.1e}".format(i * self.region_pixelsize[0]) for i in locs]
-        plt.xticks(locs, labels)
+        in_mm = locs * self.region_pixelsize[0]
+        labels = ["{:.1e}".format(i) for i in in_mm]
+        plt.xticks(locs, labels, rotation="vertical")
 
         locs, labels = plt.yticks()
         labels = ["{:.1e}".format(i * self.region_pixelsize[1]) for i in locs]
