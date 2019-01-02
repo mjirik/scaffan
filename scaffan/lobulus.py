@@ -52,7 +52,7 @@ class Lobulus:
         # mgac.run(iterations=100)
         # inner = mgac.levelset.copy()
 
-        mgac = ms.MorphGAC(im_gradient, smoothing=2, threshold=0.4, balloon=-1.0)
+        mgac = ms.MorphGAC(im_gradient, smoothing=2, threshold=0.3, balloon=-1.0)
         # mgac = ms.MorphACWE(im_gradient0, smoothing=2, lambda1=.1, lambda2=.05)
         mgac.levelset = circle.copy()
         mgac.run(iterations=150)
