@@ -44,6 +44,7 @@ requirements:
     - pandas
     - openpyxl
     - morphsnakes
+    - pyqt=5.9.2 # tested
     - pyqtgraph
 
   run:
@@ -54,6 +55,7 @@ requirements:
     - pandas
     - openpyxl
     - morphsnakes
+    - pyqt=5.9.2 # tested
     - pyqtgraph
     # - numpy
     # - pyqt 4.11.*
