@@ -14,7 +14,9 @@ import datetime
 # from PyQt5.QtWidgets import QApplication, QFileDialog
 # print("start 4")
 from PyQt5 import QtGui
+# print("start 5")
 from pyqtgraph.parametertree import Parameter, ParameterTree
+# print("start 6")
 
 from scaffan import image
 import io3d
