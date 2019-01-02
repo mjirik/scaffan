@@ -10,6 +10,7 @@
 * [Added] Suggest output dir name by date and time
 * [Added] Error message in GUI
 * [Changed] Threshold level for central vein segmentation 
+* [Changed] Size of view according to size of user input increased
 
 ## 0.0.*
 * [Added] AnotatedImage class
