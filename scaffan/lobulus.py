@@ -28,7 +28,7 @@ class Lobulus:
         pass
 
     def _init_by_annotation_id(self, annotation_id):
-        self.view = self.anim.get_views(annotation_ids=[annotation_id], level=self.level, margin=1.5)[0]
+        self.view = self.anim.get_views(annotation_ids=[annotation_id], level=self.level, margin=1.8)[0]
         self.image = self.view.get_region_image(as_gray=True)
         self.mask = self.view.get_annotation_region_raster(annotation_id=annotation_id)
         pass
@@ -52,7 +52,8 @@ class Lobulus:
         # mgac.run(iterations=100)
         # inner = mgac.levelset.copy()
 
-        mgac = ms.MorphGAC(im_gradient, smoothing=2, threshold=0.2, balloon=-1.0)
+        # central vein
+        mgac = ms.MorphGAC(im_gradient, smoothing=2, threshold=0.3, balloon=-1.0)
         # mgac = ms.MorphACWE(im_gradient0, smoothing=2, lambda1=.1, lambda2=.05)
         mgac.levelset = circle.copy()
         mgac.run(iterations=150)
