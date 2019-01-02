@@ -52,7 +52,7 @@ class Lobulus:
         # mgac.run(iterations=100)
         # inner = mgac.levelset.copy()
 
-        mgac = ms.MorphGAC(im_gradient, smoothing=2, threshold=0.3, balloon=-1.0)
+        mgac = ms.MorphGAC(im_gradient, smoothing=2, threshold=0.2, balloon=-1.0)
         # mgac = ms.MorphACWE(im_gradient0, smoothing=2, lambda1=.1, lambda2=.05)
         mgac.levelset = circle.copy()
         mgac.run(iterations=150)
@@ -75,10 +75,11 @@ class Lobulus:
         # plt.imshow(im_gradient)
         # plt.colorbar()
         # plt.contour(circle + inner + outer)
-        plt.figure()
+        plt.figure(figsize=(12, 10))
         plt.imshow(self.image, cmap="gray")
         plt.colorbar()
         plt.contour(circle + inner + outer)
+        self.view.add_ticks()
 
         datarow = {}
         datarow["Annotation ID"] = self.annotation_id
@@ -100,6 +101,7 @@ class Lobulus:
 
         detail_mask = skimage.transform.resize(self.lobulus_mask, [new_size[1], new_size[0]], mode="reflect", order=0)
         detail_inner_lobulus_mask = skimage.transform.resize(inner_lobulus_mask, [new_size[1], new_size[0]], mode="reflect", order=0)
+        detail_central_vein_mask = skimage.transform.resize(inner == 1, [new_size[1], new_size[0]], mode="reflect", order=0)
 
         detail_view = self.view.to_level(detail_level)
         detail_image = detail_view.get_region_image(as_gray=True)
@@ -122,7 +124,7 @@ class Lobulus:
         datarow["Output pixel size 1"] = detail_view.region_pixelsize[1]
         datarow["Output image size 0"] = detail_view.region_pixelsize[0] * imthr.shape[0]
         datarow["Output image size 1"] = detail_view.region_pixelsize[1] * imthr.shape[1]
-        plt.figure(figsize = (15, 10))
+        plt.figure(figsize=(12, 10))
         plt.imshow(skeleton + imthr)
         detail_view.add_ticks()
         if self.report is not None:
@@ -132,7 +134,9 @@ class Lobulus:
             plt.show()
 
         if self.report is not None:
-            plt.imsave(op.join(self.report.outputdir, "skeleton_thr_lobulus_{}.png".format(self.annotation_id)), skeleton + imthr + detail_mask)
+            imall = skeleton.astype(np.uint8) + imthr.astype(np.uint8) + detail_mask.astype(np.uint8) + (detail_central_vein_mask * 4)
+            self.imsave("skeleton_lobulus_thr_central_{}.png", imall)
+            plt.imsave(op.join(self.report.outputdir, "skeleton_thr_lobulus_{}.png".format(self.annotation_id)), skeleton.astype(np.uint8) + imthr + detail_mask)
             plt.imsave(op.join(self.report.outputdir, "skeleton_{}.png".format(self.annotation_id)), skeleton)
             plt.imsave(op.join(self.report.outputdir, "thr_{}.png".format(self.annotation_id)), imthr)
             skimage.io.imsave(op.join(self.report.outputdir, "raw_skeleton_thr_lobulus_{}.png".format(self.annotation_id)),
@@ -142,12 +146,13 @@ class Lobulus:
 
         conv = scipy.signal.convolve2d(skeleton, np.ones([3, 3]), mode="same")
         conv = conv * skeleton
-        plt.figure(figsize=(15,10))
+        plt.figure(figsize=(12, 10))
         plt.imshow(conv)
         detail_view.add_ticks()
         if self.report is not None:
             plt.savefig(op.join(self.report.outputdir, "figure_skeleton_nodes_{}.png".format(self.annotation_id)))
-            skimage.io.imsave(op.join(self.report.outputdir, "skeleton_nodes_{}.png".format(self.annotation_id)), (conv * 10).astype(np.uint8))
+            plt.imsave(op.join(self.report.outputdir, "skeleton_nodes_{}.png".format(self.annotation_id)), conv.astype(np.uint8))
+            skimage.io.imsave(op.join(self.report.outputdir, "raw_skeleton_nodes_{}.png".format(self.annotation_id)), (conv * 20).astype(np.uint8))
         if show:
             plt.show()
 
