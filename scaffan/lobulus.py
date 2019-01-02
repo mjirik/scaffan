@@ -134,7 +134,7 @@ class Lobulus:
             plt.show()
 
         if self.report is not None:
-            imall = skeleton.astype(np.uint8) + imthr.astype(np.uint8) + detail_mask.astype(np.uint8) + (detail_central_vein_mask * 4)
+            imall = (skeleton.astype(np.uint8) + imthr.astype(np.uint8) + detail_mask.astype(np.uint8) + (detail_central_vein_mask * 4)).astype(np.uint8)
             self.imsave("skeleton_lobulus_thr_central_{}.png", imall)
             plt.imsave(op.join(self.report.outputdir, "skeleton_thr_lobulus_{}.png".format(self.annotation_id)), skeleton.astype(np.uint8) + imthr + detail_mask)
             plt.imsave(op.join(self.report.outputdir, "skeleton_{}.png".format(self.annotation_id)), skeleton)
