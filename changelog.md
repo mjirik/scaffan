@@ -8,6 +8,7 @@
 * [new] Figures in mm
 * [new] Resolution and size of output images is stored in report
 * [new] Suggest output dir name by date and time
+* [new] Error message in GUI
 
 ## 0.0
 * [new] AnotatedImage class

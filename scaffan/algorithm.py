@@ -126,13 +126,13 @@ class Scaffan:
         else:
             raise ValueError("Color '{}' not found in allowed colors.".format(color))
 
-    def run_lobuluses(self, color=None):
+    def run_lobuluses(self, event):
         self.init_run()
-        if color is None:
-            pcolor = self.parameters.param("Input", "Annotation Color")
-            print("color ", pcolor.value())
+        # if color is None:
+        pcolor = self.parameters.param("Input", "Annotation Color")
+        print("color ", pcolor.value())
         # color = pcolor.reverse[0][pcolor.value()]
-            color = pcolor.value()
+        color = pcolor.value()
         # print("Color ", color)
         # fnparam = self.parameters.param("Input", "File Path")
         # from .image import AnnotatedImage
@@ -143,6 +143,8 @@ class Scaffan:
         # print(self.anim.colors)
         annotation_ids = self.anim.select_annotations_by_color(color)
         logger.debug("Annotation IDs: {}".format(annotation_ids))
+        # if annotation_ids is None:
+        #     logger.error("No color selected")
         for id in annotation_ids:
             self._run_lobulus(id)
         self.report.df.to_excel(op.join(self.report.outputdir, "data.xlsx"))
@@ -158,6 +160,7 @@ class Scaffan:
     def start_gui(self):
 
         from PyQt5 import QtWidgets
+        import scaffan.qtexceptionhook
         # import QApplication, QFileDialog
         app = QtWidgets.QApplication(sys.argv)
 

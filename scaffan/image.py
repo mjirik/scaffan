@@ -248,7 +248,15 @@ class AnnotatedImage:
                                              center, level, size)
 
     def select_annotations_by_color(self, id):
+        if id is None:
+            # probably should return all ids for all colors
+            raise ColorError()
+            return None
+
         if type(id) is str:
+            if id not in self.colors:
+                raise ColorError()
+                return None
             id = self.colors[id]
         else:
             id = [id]
@@ -513,3 +521,5 @@ class View:
         newview = View(self.anim, location=self.region_location, size=size, level=new_level)
         return newview
 
+class ColorError(Exception):
+    pass
