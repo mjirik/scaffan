@@ -1,23 +1,24 @@
 # Changelog
 
-## Unreleased
+## 0.1.*
 
-* [new] Version number in window title
-* [enhancement] Skeleton threshold is calculated from inner part of lobulus
-* [enhancement] Write images in high resolution
-* [new] Figures in mm
-* [new] Resolution and size of output images is stored in report
-* [new] Suggest output dir name by date and time
-* [new] Error message in GUI
+* [Added] Version number in window title
+* [Added] Skeleton threshold is calculated from inner part of lobulus
+* [Changed] Write images in high resolution
+* [Added] Figures in mm
+* [Added] Resolution and size of output images is stored in report
+* [Added] Suggest output dir name by date and time
+* [Added] Error message in GUI
+* [Changed] Threshold level for central vein segmentation 
 
-## 0.0
-* [new] AnotatedImage class
-* [new] Read pixelsize from image
-* [new] Export annotation to json
-* [new] Convert annotation to json automatically if necessery
-* [new] Get mask from annotation
-* [new] Views can be used for looking on one annotated image
-* [new] Show tile centers in fit() and in add_training_data()
-* [new] Build by conda
-* [new] Automatic download missing dll's no Windows
-* [new] Save to excel
+## 0.0.*
+* [Added] AnotatedImage class
+* [Added] Read pixelsize from image
+* [Added] Export annotation to json
+* [Added] Convert annotation to json automatically if necessery
+* [Added] Get mask from annotation
+* [Added] Views can be used for looking on one annotated image
+* [Added] Show tile centers in fit() and in add_training_data()
+* [Added] Build by conda
+* [Added] Automatic download missing dll's no Windows
+* [Added] Save to excel
