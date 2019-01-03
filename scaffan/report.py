@@ -7,8 +7,9 @@ import logging
 logger = logging.getLogger(__name__)
 import pandas as pd
 import os.path as op
-import sys
 import os
+import matplotlib.pyplot as plt
+import skimage.io
 
 
 class Report():
@@ -18,6 +19,7 @@ class Report():
             os.makedirs(self.outputdir)
 
         self.df = pd.DataFrame()
+        self.imgs = {}
 
     def add_row(self, data):
         df = pd.DataFrame([list(data.values())], columns=list(data.keys()))
@@ -25,6 +27,19 @@ class Report():
 
     # def write_table(self, filename):
 
-
     def add_table(self):
         pass
+
+    def write(self):
+        self.df.to_excel(op.join(self.outputdir, "data.xlsx"))
+
+    def imsave(self, base_fn, arr, k=50):
+        """
+        :param base_fn: with a format slot for annotation id like "skeleton_{}.png"
+        :param arr:
+        :return:
+        """
+        plt.imsave(op.join(self.report.outputdir, base_fn.format(self.annotation_id)), arr)
+        skimage.io.imsave(op.join(self.report.outputdir, "raw_" + base_fn.format(self.annotation_id)), k * arr)
+        self.imgs[base_fn] = arr
+

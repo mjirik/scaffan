@@ -136,12 +136,13 @@ class Lobulus:
 
         if self.report is not None:
             imall = (skeleton.astype(np.uint8) + imthr.astype(np.uint8) + detail_mask.astype(np.uint8) * 2 + (detail_central_vein_mask.astype(np.uint8))).astype(np.uint8)
-            self.imsave("skeleton_lobulus_thr_central_{}.png", imall)
-            plt.imsave(op.join(self.report.outputdir, "skeleton_thr_lobulus_{}.png".format(self.annotation_id)), skeleton.astype(np.uint8) + imthr + detail_mask)
+            self.imsave("lobulus_central_thr_skeleton_{}.png", imall)
+            self.imsave("lobulus_thr_skeleton_{}.png", skeleton.astype(np.uint8) + imthr + detail_mask)
+            # plt.imsave(op.join(self.report.outputdir, "skeleton_thr_lobulus_{}.png".format(self.annotation_id)), skeleton.astype(np.uint8) + imthr + detail_mask)
             plt.imsave(op.join(self.report.outputdir, "skeleton_{}.png".format(self.annotation_id)), skeleton)
             plt.imsave(op.join(self.report.outputdir, "thr_{}.png".format(self.annotation_id)), imthr)
-            skimage.io.imsave(op.join(self.report.outputdir, "raw_skeleton_thr_lobulus_{}.png".format(self.annotation_id)),
-                              (50 * skeleton + 50 * imthr + 50 * detail_mask).astype(np.uint8))
+            # skimage.io.imsave(op.join(self.report.outputdir, "raw_skeleton_thr_lobulus_{}.png".format(self.annotation_id)),
+            #                   (50 * skeleton + 50 * imthr + 50 * detail_mask).astype(np.uint8))
             skimage.io.imsave(op.join(self.report.outputdir, "raw_skeleton_{}.png".format(self.annotation_id)), 50 * skeleton)
             skimage.io.imsave(op.join(self.report.outputdir, "raw_thr_{}.png".format(self.annotation_id)), 50 * imthr)
 
@@ -165,16 +166,10 @@ class Lobulus:
 
     # def imfigsave(self, base_fn, arr):
 
-    def imsave(self, base_fn, arr, k=50):
-        """
-
-        :param base_fn: with a format slot for annotation id like "skeleton_{}.png"
-        :param arr:
-        :return:
-        """
-        plt.imsave(op.join(self.report.outputdir, base_fn.format(self.annotation_id)), arr)
-        skimage.io.imsave(op.join(self.report.outputdir, "raw_" + base_fn.format(self.annotation_id)), k * arr)
-
     def find_cetral_vein(self):
         pass
+
+    def imsave(self, base_fn, arr, k=50):
+        base_fn = base_fn.format(self.annotation_id)
+        self.report.imsave(base_fn, arr, k)
 

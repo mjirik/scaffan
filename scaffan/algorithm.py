@@ -127,7 +127,7 @@ class Scaffan:
         else:
             raise ValueError("Color '{}' not found in allowed colors.".format(color))
 
-    def run_lobuluses(self, event):
+    def run_lobuluses(self, event=None):
         self.init_run()
         # if color is None:
         pcolor = self.parameters.param("Input", "Annotation Color")
