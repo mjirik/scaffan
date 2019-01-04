@@ -10,6 +10,7 @@ import os.path as op
 import os
 import matplotlib.pyplot as plt
 import skimage.io
+import warnings
 
 
 class Report():
@@ -41,6 +42,8 @@ class Report():
         """
         plt.imsave(op.join(self.outputdir, base_fn), arr)
         filename, ext = op.splitext(base_fn)
-        skimage.io.imsave(op.join(self.outputdir, filename + "_raw" + ext), k * arr)
+        with warnings.catch_warnings():
+            warnings.simplefilter("low contrast image")
+            skimage.io.imsave(op.join(self.outputdir, filename + "_raw" + ext), k * arr)
         self.imgs[base_fn] = arr
 
