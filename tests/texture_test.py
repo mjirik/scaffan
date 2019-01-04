@@ -99,12 +99,15 @@ class TextureTest(unittest.TestCase):
         view2 = anim.get_view(center=[patch_centers2[0][0], patch_centers2[1][0]], level=level, size=size)
         view3 = anim.get_view(center=[patch_centers3[0][0], patch_centers3[1][0]], level=level, size=size)
 
+        print("before imshow")
         plt.imshow(view1.get_region_image())
+        print("before first figure")
         plt.figure()
         plt.imshow(view2.get_region_image())
         plt.figure()
         plt.imshow(view3.get_region_image())
         # plt.show()
+        print("before get image")
         im0 = view0.get_region_image(as_gray=True)
         im1 = view1.get_region_image(as_gray=True)
         im2 = view2.get_region_image(as_gray=True)
@@ -118,19 +121,23 @@ class TextureTest(unittest.TestCase):
         #     2: local_binary_pattern(im2, n_points, radius, METHOD),
         #     3: local_binary_pattern(im3, n_points, radius, METHOD)
         # }
+        print("before lbp")
         refs = [
             [0, salbp.lbp_fv(im0)],  # n_points, radius, METHOD)],
             [1, salbp.lbp_fv(im1)],  # n_points, radius, METHOD)],
             [2, salbp.lbp_fv(im2)],  # n_points, radius, METHOD)],
             [3, salbp.lbp_fv(im3)],  # n_points, radius, METHOD)]
         ]
+        print("before annotation")
         annotation_ids = anim.select_annotations_by_title("test2")
         view_test = anim.get_views(annotation_ids, level=level)[0]
         test_image = view_test.get_region_image(as_gray=True)
         target, data = list(zip(*refs))
+        print("before fit")
         cls = salbp.KLDClassifier()
         cls.fit(data, target)
         tile_fnc = lambda tile: satex.get_feature_and_predict(tile, salbp.lbp_fv, cls)
+        print("before tile processing")
         seg = satex.tiles_processing(test_image, tile_fnc, tile_size=size)
         plt.figure()
         plt.imshow(test_image)

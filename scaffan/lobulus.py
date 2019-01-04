@@ -12,6 +12,7 @@ import scipy.signal
 import scipy.ndimage
 import os.path as op
 import numpy as np
+import warnings
 import morphsnakes as ms
 from matplotlib import pyplot as plt
 from scaffan import image as scim
@@ -159,7 +160,10 @@ class Lobulus:
         detail_view.add_ticks()
         if self.report is not None:
             plt.savefig(op.join(self.report.outputdir, "figure_skeleton_nodes_{}.png".format(self.annotation_id)))
-            self.imsave("skeleton_nodes_{}.png", imthr, 20)
+
+            with warnings.catch_warnings():
+                warnings.simplefilter("low contrast image")
+                self.imsave("skeleton_nodes_{}.png", imthr, 20)
             # plt.imsave(op.join(self.report.outputdir, "skeleton_nodes_{}.png".format(self.annotation_id)), conv.astype(np.uint8))
             # skimage.io.imsave(op.join(self.report.outputdir, "raw_skeleton_nodes_{}.png".format(self.annotation_id)), (conv * 20).astype(np.uint8))
         if show:
