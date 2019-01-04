@@ -77,7 +77,7 @@ install:
 #    - 'sudo ldconfig -v'
 #    - conda list -e
     - python -m io3d.datasets -v -gdp
-    - python -m io3d.datasets -v -l CMU-1 CMU-1-annotation
+    - python -m io3d.datasets -v -l CMU-1 CMU-1-annotation SCP003
     - pwd
     - ls ~/data
     - ls ~/data/medical

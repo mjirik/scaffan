@@ -49,7 +49,7 @@ requirements:
 
   run:
     - python
-    - io3d
+    - io3d>=1.21
     - imma
     - lxml
     - pandas
