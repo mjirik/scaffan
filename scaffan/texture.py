@@ -11,7 +11,7 @@ import scipy.ndimage
 import matplotlib.pyplot as plt
 
 
-def texture_segmentation(image, fv_function, classif, tile_size, return_centers=False):
+def block_processing(image, fcn, tile_size, return_centers=False):
     if return_centers:
         tile_size2 = [int(tile_size[0] / 2), int(tile_size[1] / 2)]
         centers = []
@@ -22,8 +22,9 @@ def texture_segmentation(image, fv_function, classif, tile_size, return_centers=
                 slice(x0, x0 + tile_size[0]),
                 slice(x1, x1 + tile_size[1])
             ]
-            fv = fv_function(image[sl])
-            output[sl] = classif.predict([fv])[0]
+            img = image[sl]
+            output [sl] = fcn(img)
+
             if return_centers:
                 centers.append([x0 + tile_size2[0], x1 + tile_size2[1]])
 
@@ -31,6 +32,10 @@ def texture_segmentation(image, fv_function, classif, tile_size, return_centers=
         return output, centers
     else:
         return output
+
+def get_feature_and_predict(img, fv_function, classif):
+    fv = fv_function(img)
+    return classif.predict([fv])[0]
 
 
 def select_texture_patch_centers_from_one_annotation(anim, title, tile_size, level, step=50):
@@ -148,7 +153,8 @@ class TextureSegmentation:
     def predict(self, view, show=False):
         test_image = view.get_region_image(as_gray=True)
 
-        out = texture_segmentation(test_image, self.feature_function, self.classifier, tile_size=self.tile_size, return_centers=show)
+        tile_fcn = lambda img: get_feature_and_predict(img, self.feature_function, self.classifier)
+        out = block_processing(test_image, tile_fcn, tile_size=self.tile_size, return_centers=show)
 
         if show:
             seg, centers = out

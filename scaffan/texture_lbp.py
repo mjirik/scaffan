@@ -14,21 +14,9 @@ import matplotlib.pyplot as plt
 # settings for LBP
 radius = 2
 n_points = 8 * radius
-METHOD = 'uniform'
+method = 'uniform'
 
 
-def local_binary_pattern01(img, n_points, radius, method):
-    """
-    LBP for input image from 0.0 to 1.0
-    :param img:
-    :param n_points:
-    :param radius:
-    :param method:
-    :return:
-    """
-    img = (img * 255).astype(np.uint8)
-    lbp = skimage.feature.local_binary_pattern(img, n_points, radius, method)
-    return lbp
 
 
 def kullback_leibler_divergence(p, q):
@@ -39,7 +27,13 @@ def kullback_leibler_divergence(p, q):
 
 
 def lbp_fv(img):  # , n_points, radius, METHOD):
-    lbp = local_binary_pattern01(img, n_points, radius, METHOD)
+    """
+
+    :param img: img in range 0.0-1.0
+    :return:
+    """
+    img = (img * 255).astype(np.uint8)
+    lbp = skimage.feature.local_binary_pattern(img, n_points, radius, method)
     n_bins = int(lbp.max() + 1)
     hist, _ = np.histogram(lbp, density=True, bins=n_bins, range=(0, n_bins))
     return hist
