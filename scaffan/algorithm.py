@@ -157,7 +157,7 @@ class Scaffan:
         lobulus = scaffan.lobulus.Lobulus(self.anim, annotation_id, report=self.report)
         lobulus.find_border(show=show)
 
-    def start_gui(self):
+    def start_gui(self, skip_exec=False):
 
         from PyQt5 import QtWidgets
         import scaffan.qtexceptionhook
@@ -184,5 +184,6 @@ class Scaffan:
         win.show()
         win.resize(800, 800)
 
-        app.exec_()
+        if not skip_exec:
+            app.exec_()
 
