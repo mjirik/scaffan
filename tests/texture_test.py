@@ -20,7 +20,6 @@ sys.path.insert(0, op.abspath(op.join(path_to_script, "../../imma")))
 # imcut_path =  os.path.join(path_to_script, "../../imcut/")
 # sys.path.insert(0, imcut_path)
 
-import glob
 import os
 import numpy as np
 import matplotlib.pyplot as plt
@@ -29,15 +28,12 @@ skip_on_local = False
 
 import scaffan.image as scim
 scim.import_openslide()
-import openslide
 
 import io3d
-import scaffan
 import scaffan.image as scim
 import scaffan.texture as satex
 import scaffan.texture_lbp as salbp
 # from scaffan.texture_lbp import local_binary_pattern
-from skimage.feature import local_binary_pattern
 
 
 class TextureTest(unittest.TestCase):
@@ -134,7 +130,8 @@ class TextureTest(unittest.TestCase):
         target, data = list(zip(refs))
         cls = salbp.KLDClassifier()
         cls.fit(data, target)
-        seg = satex.texture_segmentation(test_image, salbp.lbp_fv, cls, tile_size=size)
+        tile_fnc = lambda tile: satex.get_feature_and_predict(tile, salbp.lbp_fv, cls)
+        seg = satex.block_processing(test_image, salbp.lbp_fv, cls, tile_size=size)
         plt.figure()
         plt.imshow(test_image)
         plt.contour(seg)
@@ -166,6 +163,7 @@ class TextureTest(unittest.TestCase):
         texseg.add_training_data(anim, "obj3", 3, show=True)
         # plt.show()
         views = anim.get_views_by_title("test2", level=texseg.level)
+        texseg.fit()
         texseg.predict(views[0], show=True)
         # plt.show()
 
