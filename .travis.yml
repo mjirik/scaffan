@@ -85,6 +85,6 @@ install:
 
 
 # command to run tests
-script: nosetests -v --with-coverage --cover-package=scaffan
+script: nosetests -v --with-coverage -s --cover-package=scaffan
 after_success:
     - coveralls
