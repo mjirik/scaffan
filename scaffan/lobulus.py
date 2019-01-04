@@ -135,16 +135,22 @@ class Lobulus:
             plt.show()
 
         if self.report is not None:
-            imall = (skeleton.astype(np.uint8) + imthr.astype(np.uint8) + detail_mask.astype(np.uint8) * 2 + (detail_central_vein_mask.astype(np.uint8))).astype(np.uint8)
+            imall = detail_mask.astype(np.uint8)
+            imall[detail_central_vein_mask > 0] = 2
+            imall[imthr > 0] = 3
+            imall[skeleton > 0] = 4
+            # imall = (skeleton.astype(np.uint8) + imthr.astype(np.uint8) +  + (detail_central_vein_mask.astype(np.uint8) * 2)).astype(np.uint8)
             self.imsave("lobulus_central_thr_skeleton_{}.png", imall)
-            self.imsave("lobulus_thr_skeleton_{}.png", skeleton.astype(np.uint8) + imthr + detail_mask)
+            self.imsave("lobulus_thr_skeleton_{}.png", (skeleton.astype(np.uint8) + imthr + detail_mask).astype(np.uint8))
+            self.imsave("skeleton_{}.png", skeleton)
+            self.imsave("thr_{}.png", imthr)
             # plt.imsave(op.join(self.report.outputdir, "skeleton_thr_lobulus_{}.png".format(self.annotation_id)), skeleton.astype(np.uint8) + imthr + detail_mask)
-            plt.imsave(op.join(self.report.outputdir, "skeleton_{}.png".format(self.annotation_id)), skeleton)
-            plt.imsave(op.join(self.report.outputdir, "thr_{}.png".format(self.annotation_id)), imthr)
+            # plt.imsave(op.join(self.report.outputdir, "skeleton_{}.png".format(self.annotation_id)), skeleton)
+            # plt.imsave(op.join(self.report.outputdir, "thr_{}.png".format(self.annotation_id)), imthr)
             # skimage.io.imsave(op.join(self.report.outputdir, "raw_skeleton_thr_lobulus_{}.png".format(self.annotation_id)),
             #                   (50 * skeleton + 50 * imthr + 50 * detail_mask).astype(np.uint8))
-            skimage.io.imsave(op.join(self.report.outputdir, "raw_skeleton_{}.png".format(self.annotation_id)), 50 * skeleton)
-            skimage.io.imsave(op.join(self.report.outputdir, "raw_thr_{}.png".format(self.annotation_id)), 50 * imthr)
+            # skimage.io.imsave(op.join(self.report.outputdir, "raw_skeleton_{}.png".format(self.annotation_id)), 50 * skeleton)
+            # skimage.io.imsave(op.join(self.report.outputdir, "raw_thr_{}.png".format(self.annotation_id)), 50 * imthr)
 
         conv = scipy.signal.convolve2d(skeleton, np.ones([3, 3]), mode="same")
         conv = conv * skeleton
@@ -153,8 +159,9 @@ class Lobulus:
         detail_view.add_ticks()
         if self.report is not None:
             plt.savefig(op.join(self.report.outputdir, "figure_skeleton_nodes_{}.png".format(self.annotation_id)))
-            plt.imsave(op.join(self.report.outputdir, "skeleton_nodes_{}.png".format(self.annotation_id)), conv.astype(np.uint8))
-            skimage.io.imsave(op.join(self.report.outputdir, "raw_skeleton_nodes_{}.png".format(self.annotation_id)), (conv * 20).astype(np.uint8))
+            self.imsave("skeleton_nodes_{}.png", imthr, 20)
+            # plt.imsave(op.join(self.report.outputdir, "skeleton_nodes_{}.png".format(self.annotation_id)), conv.astype(np.uint8))
+            # skimage.io.imsave(op.join(self.report.outputdir, "raw_skeleton_nodes_{}.png".format(self.annotation_id)), (conv * 20).astype(np.uint8))
         if show:
             plt.show()
 

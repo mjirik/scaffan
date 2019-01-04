@@ -39,7 +39,8 @@ class Report():
         :param arr:
         :return:
         """
-        plt.imsave(op.join(self.report.outputdir, base_fn.format(self.annotation_id)), arr)
-        skimage.io.imsave(op.join(self.report.outputdir, "raw_" + base_fn.format(self.annotation_id)), k * arr)
+        plt.imsave(op.join(self.outputdir, base_fn), arr)
+        filename, ext = op.splitext(base_fn)
+        skimage.io.imsave(op.join(self.outputdir, filename + "_raw" + ext), k * arr)
         self.imgs[base_fn] = arr
 
