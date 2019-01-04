@@ -11,11 +11,19 @@ import scipy.ndimage
 import matplotlib.pyplot as plt
 
 
-def block_processing(image, fcn, tile_size, return_centers=False):
-    if return_centers:
-        tile_size2 = [int(tile_size[0] / 2), int(tile_size[1] / 2)]
-        centers = []
-    output = np.asarray(image, dtype=np.int8)
+def tile_centers(image_shape, tile_size):
+    tile_size2 = [int(tile_size[0] / 2), int(tile_size[1] / 2)]
+    centers = []
+    for x0 in range(0, image_shape[0], tile_size[0]):
+        for x1 in range(0, image_shape[1], tile_size[1]):
+            centers.append([x0 + tile_size2[0], x1 + tile_size2[1]])
+    return centers
+
+def tiles_processing(image, fcn, tile_size, fcn_output_n=None):
+    shape = image.shape
+    if fcn_output_n is not None:
+        shape.append(fcn_output_n)
+    output = np.zeros(shape, dtype=np.int8)
     for x0 in range(0, image.shape[0], tile_size[0]):
         for x1 in range(0, image.shape[1], tile_size[1]):
             sl = [
@@ -25,11 +33,6 @@ def block_processing(image, fcn, tile_size, return_centers=False):
             img = image[sl]
             output [sl] = fcn(img)
 
-            if return_centers:
-                centers.append([x0 + tile_size2[0], x1 + tile_size2[1]])
-
-    if return_centers:
-        return output, centers
     else:
         return output
 
@@ -154,16 +157,14 @@ class TextureSegmentation:
         test_image = view.get_region_image(as_gray=True)
 
         tile_fcn = lambda img: get_feature_and_predict(img, self.feature_function, self.classifier)
-        out = block_processing(test_image, tile_fcn, tile_size=self.tile_size, return_centers=show)
+        seg = tiles_processing(test_image, tile_fcn, tile_size=self.tile_size)
 
         if show:
-            seg, centers = out
+            centers = tile_centers(test_image.shape, tile_size=self.tile_size)
             import skimage.color
             plt.imshow(skimage.color.label2rgb(seg, test_image))
             x, y = list(zip(*centers))
             plt.plot(x, y, "xy")
             # view.plot_points()
-        else:
-            seg = out
         return seg
 

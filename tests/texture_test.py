@@ -127,11 +127,11 @@ class TextureTest(unittest.TestCase):
         annotation_ids = anim.select_annotations_by_title("test2")
         view_test = anim.get_views(annotation_ids, level=level)[0]
         test_image = view_test.get_region_image(as_gray=True)
-        target, data = list(zip(refs))
+        target, data = list(zip(*refs))
         cls = salbp.KLDClassifier()
         cls.fit(data, target)
         tile_fnc = lambda tile: satex.get_feature_and_predict(tile, salbp.lbp_fv, cls)
-        seg = satex.block_processing(test_image, salbp.lbp_fv, cls, tile_size=size)
+        seg = satex.tiles_processing(test_image, tile_fnc, tile_size=size)
         plt.figure()
         plt.imshow(test_image)
         plt.contour(seg)
@@ -243,20 +243,22 @@ class TextureTest(unittest.TestCase):
         # texseg.add_training_data(anim, "obj3", 3)
 
         views = anim.get_views_by_title("test1", level=texseg.level)
-        seg = texseg.predict(views[0], show=False, function=texture_energy)
+        energy = satex.tiles_processing(views[0].get_region_image(as_gray=True),
+                                        fcn=texture_energy, tile_size=texseg.tile_size)
+        # seg = texseg.predict(views[0], show=False, function=texture_energy)
         plt.figure()
         plt.subplot(121)
         img = views[0].get_region_image(as_gray=True)
         plt.imshow(img, cmap='gray')
         plt.colorbar()
         plt.subplot(122)
-        plt.imshow(seg)
+        plt.imshow(energy)
         plt.colorbar()
         plt.savefig("glcm_energy.png")
         # plt.show()
 
 
-def texture_energy(refs, img):
+def texture_energy(img):
     import skimage.feature.texture
     P = skimage.feature.greycomatrix((img * 31).astype(np.uint8), [1], [0, np.pi/2], levels=32, symmetric=True, normed=True)
     en = skimage.feature.texture.greycoprops(P, prop="energy")
