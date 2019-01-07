@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 import logging
-
 logger = logging.getLogger(__name__)
 import unittest
 import os.path as op
@@ -58,6 +57,7 @@ class TextureTest(unittest.TestCase):
         plt.imshow(image)
         anim.plot_annotations("obj1")
         # plt.show()
+        plt.gcf().clear()
         self.assertGreater(image.shape[0], 100)
 
     def test_select_view_by_title_and_plot(self):
@@ -77,6 +77,7 @@ class TextureTest(unittest.TestCase):
         nz_view_px = view.coords_glob_px_to_view_px(x_nz, y_nz)
         plt.plot(nz_view_px[0], nz_view_px[1], "bo")
         # plt.show()
+        plt.gcf().clear()
 
         # TODO findout why are the axis swapped
         x = nz_view_px[1].astype(int)
@@ -88,6 +89,8 @@ class TextureTest(unittest.TestCase):
         level = 0
         title_size = 128
         size = [128, 128]
+        # clear all figures from prev tests
+        # plt.gcf().clear()
         fn = io3d.datasets.join_path("medical", "orig", "CMU-1.ndpi", get_root=True)
         anim = scim.AnnotatedImage(fn)
         patch_centers0 = satex.select_texture_patch_centers_from_one_annotation(anim, "obj_empty", tile_size=title_size, level=level, step=64)
@@ -99,13 +102,18 @@ class TextureTest(unittest.TestCase):
         view2 = anim.get_view(center=[patch_centers2[0][0], patch_centers2[1][0]], level=level, size=size)
         view3 = anim.get_view(center=[patch_centers3[0][0], patch_centers3[1][0]], level=level, size=size)
 
-        print("before imshow")
-        plt.imshow(view1.get_region_image())
+        print("before imshow 1")
+        imrgb = view1.get_region_image(as_gray=False)
+        # import pdb; pdb.set_trace()
+        plt.imshow(imrgb)
         print("before first figure")
+        # plt.show()
         plt.figure()
-        plt.imshow(view2.get_region_image())
+        print("before imshow 2")
+        plt.imshow(view2.get_region_image(as_gray=False))
         plt.figure()
-        plt.imshow(view3.get_region_image())
+        print("before imshow 3")
+        plt.imshow(view3.get_region_image(as_gray=False))
         # plt.show()
         print("before get image")
         im0 = view0.get_region_image(as_gray=True)
@@ -146,6 +154,7 @@ class TextureTest(unittest.TestCase):
         plt.figure()
         plt.imshow(skimage.color.label2rgb(seg, test_image))
         # plt.show()
+        plt.gcf().clear()
 
     def test_texture_segmentation_object(self):
 
