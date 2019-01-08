@@ -96,9 +96,13 @@ class ParseAnnotationTest(unittest.TestCase):
         self.assertTrue(op.exists(json_file))
 
 
-    @unittest.skipIf(os.environ.get("TRAVIS", skip_on_local), "Skip on Travis-CI")
+    # @unittest.skipIf(os.environ.get("TRAVIS", skip_on_local), "Skip on Travis-CI")
+    @unittest.skipIf(
+        platform.system() == "Windows",
+        "On windows there is problem with openslides import. Test works standalone but not together with the others."
+    )
     def test_convert_annotation_scaffold_data(self):
-        slices_dir = io3d.datasets.join_path("scaffold/Hamamatsu", get_root=True)
+        slices_dir = io3d.datasets.join_path("medical", "orig", "SCP003", get_root=True)
 
         json_files = glob.glob(op.join(slices_dir, "*.json"))
         for fn in json_files:
