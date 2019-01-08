@@ -82,7 +82,8 @@ def read_annotations(pth):
 
         cwd = op.dirname(op.dirname(__file__))
         output = subprocess.check_output([sys.executable, "-m", "scaffan.ann_to_json", pth], cwd=cwd)
-        print(output)
+        logger.debug("windows annotation output:" +str(output))
+        # print(output)
     else:
     # if not op.exists(fn):
         ndpa_to_json(pth)
