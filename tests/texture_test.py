@@ -1,89 +1,66 @@
-# #! /usr/bin/python
-# # -*- coding: utf-8 -*-
-#
-# import logging
-# logger = logging.getLogger(__name__)
-# import unittest
-# import os.path as op
-# # from nose.plugins.attrib import attr
-#
-# path_to_script = op.dirname(op.abspath(__file__))
-#
+#! /usr/bin/python
+# -*- coding: utf-8 -*-
+
+import logging
+logger = logging.getLogger(__name__)
+import unittest
+import os.path as op
+# from nose.plugins.attrib import attr
+
+path_to_script = op.dirname(op.abspath(__file__))
+
+import sys
+
+sys.path.insert(0, op.abspath(op.join(path_to_script, "../../io3d")))
+sys.path.insert(0, op.abspath(op.join(path_to_script, "../../imma")))
 # import sys
-#
-# sys.path.insert(0, op.abspath(op.join(path_to_script, "../../io3d")))
-# sys.path.insert(0, op.abspath(op.join(path_to_script, "../../imma")))
-# # import sys
-# # import os.path
-#
-# # imcut_path =  os.path.join(path_to_script, "../../imcut/")
-# # sys.path.insert(0, imcut_path)
-#
-# import os
-# import numpy as np
-# import matplotlib.pyplot as plt
-#
-# skip_on_local = False
-#
-# import scaffan.image as scim
-# scim.import_openslide()
-#
-# import io3d
-# import scaffan.image as scim
-# import scaffan.texture as satex
-# import scaffan.texture_lbp as salbp
-# # from scaffan.texture_lbp import local_binary_pattern
-#
-#
-# class TextureTest(unittest.TestCase):
-#
-#
-#     def test_region_select_by_title(self):
-#         fn = io3d.datasets.join_path("medical", "orig", "CMU-1.ndpi", get_root=True)
-#         anim = scim.AnnotatedImage(fn)
-#         anim.set_region_on_annotations("obj1", 3)
-#         mask = anim.get_annotation_region_raster("obj1")
-#         image = anim.get_region_image()
-#         plt.imshow(image)
-#         plt.contour(mask)
-#         # plt.show()
-#         self.assertGreater(np.sum(mask), 20)
-#
-#     def test_select_by_title_and_plot(self):
-#         fn = io3d.datasets.join_path("medical", "orig", "CMU-1.ndpi", get_root=True)
-#         anim = scim.AnnotatedImage(fn)
-#         anim.set_region_on_annotations("obj1", level=3)
-#         image = anim.get_region_image()
-#         plt.imshow(image)
-#         anim.plot_annotations("obj1")
-#         # plt.show()
-#         plt.gcf().clear()
-#         self.assertGreater(image.shape[0], 100)
-#
-#     def test_select_view_by_title_and_plot(self):
-#         fn = io3d.datasets.join_path("medical", "orig", "CMU-1.ndpi", get_root=True)
-#         anim = scim.AnnotatedImage(fn)
-#         annotation_ids = anim.select_annotations_by_title("obj1")
-#         view = anim.get_views(annotation_ids, level=3)[0]
-#         image = view.get_region_image()
-#         plt.imshow(image)
-#         view.plot_annotations("obj1")
-#         # plt.show()
-#         self.assertGreater(image.shape[0], 100)
-#         mask = view.get_annotation_region_raster("obj1")
-#         self.assertTrue(np.array_equal(mask.shape[:2], image.shape[:2]), "shape of mask should be the same as shape of image")
-#
-#         x_nz, y_nz = satex.select_texture_patch_centers_from_one_annotation(anim, "obj1", tile_size=32, level=3, step=20)
-#         nz_view_px = view.coords_glob_px_to_view_px(x_nz, y_nz)
-#         plt.plot(nz_view_px[0], nz_view_px[1], "bo")
-#         # plt.show()
-#         plt.gcf().clear()
-#
-#         # TODO findout why are the axis swapped
-#         x = nz_view_px[1].astype(int)
-#         y = nz_view_px[0].astype(int)
-#         pixels = mask[(x, y)]
-#         self.assertTrue(np.all(pixels > 0), "centers positions should be inside of mask")
+# import os.path
+
+# imcut_path =  os.path.join(path_to_script, "../../imcut/")
+# sys.path.insert(0, imcut_path)
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+skip_on_local = False
+
+import scaffan.image as scim
+scim.import_openslide()
+
+import io3d
+import scaffan.image as scim
+import scaffan.texture as satex
+
+
+# from scaffan.texture_lbp import local_binary_pattern
+
+
+class TextureTest(unittest.TestCase):
+
+    def test_select_view_by_title_and_plot_patch_centers(self):
+        fn = io3d.datasets.join_path("medical", "orig", "CMU-1.ndpi", get_root=True)
+        anim = scim.AnnotatedImage(fn)
+        annotation_ids = anim.select_annotations_by_title("obj1")
+        view = anim.get_views(annotation_ids, level=3)[0]
+        image = view.get_region_image()
+        plt.imshow(image)
+        view.plot_annotations("obj1")
+        # plt.show()
+        self.assertGreater(image.shape[0], 100)
+        mask = view.get_annotation_region_raster("obj1")
+        self.assertTrue(np.array_equal(mask.shape[:2], image.shape[:2]), "shape of mask should be the same as shape of image")
+
+        x_nz, y_nz = satex.select_texture_patch_centers_from_one_annotation(anim, "obj1", tile_size=32, level=3, step=20)
+        nz_view_px = view.coords_glob_px_to_view_px(x_nz, y_nz)
+        plt.plot(nz_view_px[0], nz_view_px[1], "bo")
+        # plt.show()
+        plt.gcf().clear()
+
+        # TODO findout why are the axis swapped
+        x = nz_view_px[1].astype(int)
+        y = nz_view_px[0].astype(int)
+        pixels = mask[(x, y)]
+        self.assertTrue(np.all(pixels > 0), "centers positions should be inside of mask")
 #
 #     @unittest.skipIf(os.environ.get("TRAVIS", False), "Skip on Travis-CI #TODO make it run")
 #     def test_simple_texture_segmentation(self):
@@ -283,9 +260,9 @@
 #     P = skimage.feature.greycomatrix((img * 31).astype(np.uint8), [1], [0, np.pi/2], levels=32, symmetric=True, normed=True)
 #     en = skimage.feature.texture.greycoprops(P, prop="energy")
 #     return np.max(en) * 100
-#
-#
-# if __name__ == "__main__":
-#     # logging.basicConfig(stream=sys.stderr)
-#     logger.setLevel(logging.DEBUG)
-#     unittest.main()
+
+
+if __name__ == "__main__":
+    # logging.basicConfig(stream=sys.stderr)
+    logger.setLevel(logging.DEBUG)
+    unittest.main()
