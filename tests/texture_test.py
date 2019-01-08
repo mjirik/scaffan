@@ -91,6 +91,7 @@ class TextureTest(unittest.TestCase):
         title_size = 128
         size = [128, 128]
         # clear all figures from prev tests
+        # plt.close("all")
         # plt.gcf().clear()
         fn = io3d.datasets.join_path("medical", "orig", "CMU-1.ndpi", get_root=True)
         anim = scim.AnnotatedImage(fn)
@@ -104,10 +105,12 @@ class TextureTest(unittest.TestCase):
         view3 = anim.get_view(center=[patch_centers3[0][0], patch_centers3[1][0]], level=level, size=size)
 
         print("before imshow 1")
+        import pdb; pdb.set_trace()
         imrgb = view1.get_region_image(as_gray=False)
         # import pdb; pdb.set_trace()
         plt.imshow(imrgb)
         print("before first figure")
+        import pdb; pdb.set_trace()
         # plt.show()
         plt.figure()
         print("before imshow 2")
