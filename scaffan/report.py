@@ -43,7 +43,7 @@ class Report():
         plt.imsave(op.join(self.outputdir, base_fn), arr)
         filename, ext = op.splitext(base_fn)
         with warnings.catch_warnings():
-            warnings.filterwarnings("ignore", "low contrast image")
+            warnings.filterwarnings("ignore", ".*low contrast image.*")
             # warnings.simplefilter("low contrast image")
             skimage.io.imsave(op.join(self.outputdir, filename + "_raw" + ext), k * arr)
         self.imgs[base_fn] = arr

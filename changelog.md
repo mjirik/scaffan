@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+* [Added] Suppression of unimportant warnings
+
 ## 0.1.*
 
 * [Added] Version number in window title

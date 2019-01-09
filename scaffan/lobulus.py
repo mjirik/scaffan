@@ -101,9 +101,10 @@ class Lobulus:
         detail_level = 2
         new_size = self.view.get_size_on_level(detail_level)
 
-        detail_mask = skimage.transform.resize(self.lobulus_mask, [new_size[1], new_size[0]], mode="reflect", order=0)
-        detail_inner_lobulus_mask = skimage.transform.resize(inner_lobulus_mask, [new_size[1], new_size[0]], mode="reflect", order=0)
-        detail_central_vein_mask = skimage.transform.resize(inner == 1, [new_size[1], new_size[0]], mode="reflect", order=0)
+        resize_params = dict(output_shape=[new_size[1], new_size[0]], mode="reflect", order=0, anti_aliasing=False)
+        detail_mask = skimage.transform.resize(self.lobulus_mask, **resize_params)
+        detail_inner_lobulus_mask = skimage.transform.resize(inner_lobulus_mask, **resize_params)
+        detail_central_vein_mask = skimage.transform.resize(inner == 1, **resize_params)
 
         detail_view = self.view.to_level(detail_level)
         detail_image = detail_view.get_region_image(as_gray=True)
@@ -163,7 +164,7 @@ class Lobulus:
 
             with warnings.catch_warnings():
                 # warnings.simplefilter("low contrast image")
-                warnings.filterwarnings("ignore", "low contrast image")
+                warnings.filterwarnings("ignore", ".*low contrast image.*")
                 self.imsave("skeleton_nodes_{}.png", imthr, 20)
             # plt.imsave(op.join(self.report.outputdir, "skeleton_nodes_{}.png".format(self.annotation_id)), conv.astype(np.uint8))
             # skimage.io.imsave(op.join(self.report.outputdir, "raw_skeleton_nodes_{}.png".format(self.annotation_id)), (conv * 20).astype(np.uint8))

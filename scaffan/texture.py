@@ -6,6 +6,7 @@ Modul is used for texrure analysis.
 import logging
 logger = logging.getLogger(__name__)
 
+# import warnings
 import numpy as np
 import scipy.ndimage
 import matplotlib.pyplot as plt
@@ -26,15 +27,16 @@ def tiles_processing(image, fcn, tile_size, fcn_output_n=None):
     output = np.zeros(shape, dtype=np.int8)
     for x0 in range(0, image.shape[0], tile_size[0]):
         for x1 in range(0, image.shape[1], tile_size[1]):
-            sl = [
+            sl = (
                 slice(x0, x0 + tile_size[0]),
                 slice(x1, x1 + tile_size[1])
-            ]
+            )
             img = image[sl]
-            output [sl] = fcn(img)
+            output[sl] = fcn(img)
 
     else:
         return output
+
 
 def get_feature_and_predict(img, fv_function, classif):
     fv = fv_function(img)
@@ -52,6 +54,8 @@ def select_texture_patch_centers_from_one_annotation(anim, title, tile_size, lev
     view = anim.get_views(annotation_ids, level=level)[0]
     mask = view.get_annotation_region_raster(title)
 
+    # with warnings.catch_warnings():
+    #     warnings.filterwarnings("ignore", "low contrast image")
     dst = scipy.ndimage.morphology.distance_transform_edt(mask)
     middle_pixels = dst > (tile_size / 2)
     # x_nz, y_nz = nonzero_with_step(middle_pixels, step)
