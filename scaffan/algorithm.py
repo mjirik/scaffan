@@ -157,12 +157,13 @@ class Scaffan:
         lobulus = scaffan.lobulus.Lobulus(self.anim, annotation_id, report=self.report)
         lobulus.find_border(show=show)
 
-    def start_gui(self, skip_exec=False):
+    def start_gui(self, skip_exec=False, qapp=None):
 
         from PyQt5 import QtWidgets
         import scaffan.qtexceptionhook
         # import QApplication, QFileDialog
-        app = QtWidgets.QApplication(sys.argv)
+        if not skip_exec and qapp == None:
+            qapp = QtWidgets.QApplication(sys.argv)
 
         self.parameters.param('Input', 'Select').sigActivated.connect(self.select_file_gui)
         self.parameters.param('Output', 'Select').sigActivated.connect(self.select_output_dir_gui)
@@ -181,9 +182,10 @@ class Scaffan:
         # layout.addWidget(QtGui.QLabel("These are two views of the same data. They should always display the same values."), 0,  0, 1, 2)
         layout.addWidget(t, 1, 0, 1, 1)
         # layout.addWidget(t2, 1, 1, 1, 1)
+
         win.show()
         win.resize(800, 800)
-
         if not skip_exec:
-            app.exec_()
+
+            qapp.exec_()
 

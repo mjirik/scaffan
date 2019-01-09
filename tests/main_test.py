@@ -42,7 +42,7 @@ class MainGuiTest(unittest.TestCase):
     #     mainapp.run_lobuluses()
 
 
-    def test_init_app(self):
+    def test_start_gui_no_exec(self):
         # fn = io3d.datasets.join_path("medical", "orig", "CMU-1.ndpi", get_root=True)
         # fn = io3d.datasets.join_path("medical", "orig", "CMU-1.ndpi", get_root=True)
         fn = io3d.datasets.join_path("medical", "orig", "SCP003", "SCP003.ndpi", get_root=True)
@@ -56,5 +56,5 @@ class MainGuiTest(unittest.TestCase):
         # mainapp.init_run()
         skip_exec = True
         # skip_exec = False
-        mainapp.start_gui(skip_exec=skip_exec)
+        mainapp.start_gui(skip_exec=skip_exec, qapp=None)
 
