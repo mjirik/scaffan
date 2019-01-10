@@ -6,6 +6,7 @@ import logging
 logger = logging.getLogger(__name__)
 import unittest
 import io3d
+
 # import openslide
 import scaffan
 import scaffan.algorithm
@@ -14,10 +15,11 @@ import os.path as op
 
 
 class LobulusTest(unittest.TestCase):
-
     def test_run_lobuluses(self):
         # fn = io3d.datasets.join_path("medical", "orig", "CMU-1.ndpi", get_root=True)
-        fn = io3d.datasets.join_path("medical", "orig", "SCP003", "SCP003.ndpi", get_root=True)
+        fn = io3d.datasets.join_path(
+            "medical", "orig", "sample_data", "SCP003", "SCP003.ndpi", get_root=True
+        )
         # fn = io3d.datasets.join_path("scaffold", "Hamamatsu", "PIG-003_J-18-0165_HE.ndpi", get_root=True)
         # imsl = openslide.OpenSlide(fn)
         # annotations = scan.read_annotations(fn)
@@ -43,9 +45,10 @@ class LobulusTest(unittest.TestCase):
         self.assertGreater(skeleton_size, 0.001, "Skeleton size 0.1%")
         self.assertGreater(thr_size, skeleton_size, "More threshold than Skeleton")
 
-        self.assertTrue(op.exists(op.join("test_output_dir", "lobulus_central_thr_skeleton_15_raw.png")))
+        self.assertTrue(
+            op.exists(
+                op.join("test_output_dir", "lobulus_central_thr_skeleton_15_raw.png")
+            )
+        )
         self.assertTrue(op.exists(op.join("test_output_dir", "data.xlsx")))
         # mainapp.start_gui()
-
-
-

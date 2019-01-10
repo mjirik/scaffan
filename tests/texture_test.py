@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import logging
+
 logger = logging.getLogger(__name__)
 import unittest
 import os
@@ -29,6 +30,7 @@ skip_on_local = False
 import scaffan.image as scim
 import scaffan.texture as satex
 import scaffan.texture_lbp as salbp
+
 scim.import_openslide()
 import io3d
 
@@ -37,7 +39,6 @@ import io3d
 
 
 class TextureTest(unittest.TestCase):
-
     def test_select_view_by_title_and_plot_patch_centers(self):
         fn = io3d.datasets.join_path("medical", "orig", "CMU-1.ndpi", get_root=True)
         anim = scim.AnnotatedImage(fn)
@@ -49,9 +50,14 @@ class TextureTest(unittest.TestCase):
         # plt.show()
         self.assertGreater(image.shape[0], 100)
         mask = view.get_annotation_region_raster("obj1")
-        self.assertTrue(np.array_equal(mask.shape[:2], image.shape[:2]), "shape of mask should be the same as shape of image")
+        self.assertTrue(
+            np.array_equal(mask.shape[:2], image.shape[:2]),
+            "shape of mask should be the same as shape of image",
+        )
 
-        x_nz, y_nz = satex.select_texture_patch_centers_from_one_annotation(anim, "obj1", tile_size=32, level=3, step=20)
+        x_nz, y_nz = satex.select_texture_patch_centers_from_one_annotation(
+            anim, "obj1", tile_size=32, level=3, step=20
+        )
         nz_view_px = view.coords_glob_px_to_view_px(x_nz, y_nz)
         plt.plot(nz_view_px[0], nz_view_px[1], "bo")
         # plt.show()
@@ -61,7 +67,9 @@ class TextureTest(unittest.TestCase):
         x = nz_view_px[1].astype(int)
         y = nz_view_px[0].astype(int)
         pixels = mask[(x, y)]
-        self.assertTrue(np.all(pixels > 0), "centers positions should be inside of mask")
+        self.assertTrue(
+            np.all(pixels > 0), "centers positions should be inside of mask"
+        )
 
     def test_plot(self):
 
@@ -70,7 +78,9 @@ class TextureTest(unittest.TestCase):
         plt.figure()
         print("test plot ok")
 
-    @unittest.skipIf(os.environ.get("TRAVIS", False), "Skip on Travis-CI #TODO make it run")
+    @unittest.skipIf(
+        os.environ.get("TRAVIS", False), "Skip on Travis-CI #TODO make it run"
+    )
     def test_simple_texture_segmentation(self):
         # import pdb; pdb.set_trace()
         level = 0
@@ -82,16 +92,32 @@ class TextureTest(unittest.TestCase):
         fn = io3d.datasets.join_path("medical", "orig", "CMU-1.ndpi", get_root=True)
         anim = scim.AnnotatedImage(fn)
         # import pdb; pdb.set_trace()
-        patch_centers0 = satex.select_texture_patch_centers_from_one_annotation(anim, "obj_empty", tile_size=title_size, level=level, step=64)
+        patch_centers0 = satex.select_texture_patch_centers_from_one_annotation(
+            anim, "obj_empty", tile_size=title_size, level=level, step=64
+        )
         # import pdb; pdb.set_trace()
-        patch_centers1 = satex.select_texture_patch_centers_from_one_annotation(anim, "obj1", tile_size=title_size, level=level, step=64)
-        patch_centers2 = satex.select_texture_patch_centers_from_one_annotation(anim, "obj2", tile_size=title_size, level=level, step=64)
-        patch_centers3 = satex.select_texture_patch_centers_from_one_annotation(anim, "obj3", tile_size=title_size, level=level, step=64)
+        patch_centers1 = satex.select_texture_patch_centers_from_one_annotation(
+            anim, "obj1", tile_size=title_size, level=level, step=64
+        )
+        patch_centers2 = satex.select_texture_patch_centers_from_one_annotation(
+            anim, "obj2", tile_size=title_size, level=level, step=64
+        )
+        patch_centers3 = satex.select_texture_patch_centers_from_one_annotation(
+            anim, "obj3", tile_size=title_size, level=level, step=64
+        )
         # import pdb; pdb.set_trace()
-        view0 = anim.get_view(center=[patch_centers0[0][0], patch_centers0[1][0]], level=level, size=size)
-        view1 = anim.get_view(center=[patch_centers1[0][0], patch_centers1[1][0]], level=level, size=size)
-        view2 = anim.get_view(center=[patch_centers2[0][0], patch_centers2[1][0]], level=level, size=size)
-        view3 = anim.get_view(center=[patch_centers3[0][0], patch_centers3[1][0]], level=level, size=size)
+        view0 = anim.get_view(
+            center=[patch_centers0[0][0], patch_centers0[1][0]], level=level, size=size
+        )
+        view1 = anim.get_view(
+            center=[patch_centers1[0][0], patch_centers1[1][0]], level=level, size=size
+        )
+        view2 = anim.get_view(
+            center=[patch_centers2[0][0], patch_centers2[1][0]], level=level, size=size
+        )
+        view3 = anim.get_view(
+            center=[patch_centers3[0][0], patch_centers3[1][0]], level=level, size=size
+        )
 
         print("before imshow 1")
         # import pdb; pdb.set_trace()
@@ -144,6 +170,7 @@ class TextureTest(unittest.TestCase):
         plt.imshow(test_image)
         plt.contour(seg)
         import skimage.color
+
         plt.figure()
         plt.imshow(skimage.color.label2rgb(seg, test_image))
         # plt.show()
@@ -180,7 +207,12 @@ class TextureTest(unittest.TestCase):
 
     @unittest.skipIf(os.environ.get("TRAVIS", False), "Skip on Travis-CI")
     def test_texture_segmentation_object_lobulus_data(self):
-        fn = io3d.datasets.join_path("scaffold", "Hamamatsu", "PIG-008_P008 LL-P_HE_parenchyme perif..ndpi", get_root=True)
+        fn = io3d.datasets.join_path(
+            "scaffold",
+            "Hamamatsu",
+            "PIG-008_P008 LL-P_HE_parenchyme perif..ndpi",
+            get_root=True,
+        )
         anim = scim.AnnotatedImage(fn)
 
         texseg = satex.TextureSegmentation()
@@ -218,7 +250,9 @@ class TextureTest(unittest.TestCase):
         # plt.show()
 
     def test_texture_energy_on_lobulus(self):
-        fn = io3d.datasets.join_path("medical", "orig", "SCP003", "SCP003.ndpi", get_root=True)
+        fn = io3d.datasets.join_path(
+            "medical", "orig", "sample_data", "SCP003", "SCP003.ndpi", get_root=True
+        )
         # fn = io3d.datasets.join_path("scaffold", "Hamamatsu", "PIG-008_P008 LL-P_HE_parenchyme perif..ndpi", get_root=True)
         anim = scim.AnnotatedImage(fn)
 
@@ -227,13 +261,16 @@ class TextureTest(unittest.TestCase):
         # title = "test3"
         title = "test1"
         views = anim.get_views_by_title(title, level=texseg.level)
-        energy = satex.tiles_processing(views[0].get_region_image(as_gray=True),
-                                        fcn=texture_energy, tile_size=texseg.tile_size)
+        energy = satex.tiles_processing(
+            views[0].get_region_image(as_gray=True),
+            fcn=texture_energy,
+            tile_size=texseg.tile_size,
+        )
         # seg = texseg.predict(views[0], show=False, function=texture_energy)
         plt.figure(figsize=(10, 12))
         plt.subplot(211)
         img = views[0].get_region_image(as_gray=True)
-        plt.imshow(img, cmap='gray')
+        plt.imshow(img, cmap="gray")
         # plt.colorbar()
         plt.subplot(212)
         plt.imshow(energy)
@@ -244,7 +281,15 @@ class TextureTest(unittest.TestCase):
 
 def texture_energy(img):
     import skimage.feature.texture
-    P = skimage.feature.greycomatrix((img * 31).astype(np.uint8), [1], [0, np.pi/2], levels=32, symmetric=True, normed=True)
+
+    P = skimage.feature.greycomatrix(
+        (img * 31).astype(np.uint8),
+        [1],
+        [0, np.pi / 2],
+        levels=32,
+        symmetric=True,
+        normed=True,
+    )
     en = skimage.feature.texture.greycoprops(P, prop="energy")
     return np.max(en) * 100
 
