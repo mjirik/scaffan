@@ -78,9 +78,9 @@ class TextureTest(unittest.TestCase):
         plt.figure()
         print("test plot ok")
 
-    @unittest.skipIf(
-        os.environ.get("TRAVIS", False), "Skip on Travis-CI #TODO make it run"
-    )
+    # @unittest.skipIf(
+    #     os.environ.get("TRAVIS", False), "Skip on Travis-CI #TODO make it run"
+    # )
     def test_simple_texture_segmentation(self):
         # import pdb; pdb.set_trace()
         level = 0
@@ -92,18 +92,19 @@ class TextureTest(unittest.TestCase):
         fn = io3d.datasets.join_path("medical", "orig", "CMU-1.ndpi", get_root=True)
         anim = scim.AnnotatedImage(fn)
         # import pdb; pdb.set_trace()
+        ann_params = dict(tile_size=title_size, level=level, step=64)
         patch_centers0 = satex.select_texture_patch_centers_from_one_annotation(
-            anim, "obj_empty", tile_size=title_size, level=level, step=64
+            anim, "obj_empty", **ann_params
         )
         # import pdb; pdb.set_trace()
         patch_centers1 = satex.select_texture_patch_centers_from_one_annotation(
-            anim, "obj1", tile_size=title_size, level=level, step=64
+            anim, "obj1", **ann_params
         )
         patch_centers2 = satex.select_texture_patch_centers_from_one_annotation(
-            anim, "obj2", tile_size=title_size, level=level, step=64
+            anim, "obj2", **ann_params
         )
         patch_centers3 = satex.select_texture_patch_centers_from_one_annotation(
-            anim, "obj3", tile_size=title_size, level=level, step=64
+            anim, "obj3", **ann_params
         )
         # import pdb; pdb.set_trace()
         view0 = anim.get_view(
