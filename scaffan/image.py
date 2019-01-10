@@ -4,6 +4,7 @@
 Modul is used for GUI of Lisa
 """
 import logging
+
 logger = logging.getLogger(__name__)
 # problem is loading lxml together with openslide
 # from lxml import etree
@@ -57,7 +58,7 @@ def get_image_by_center(imsl, center, level=3, size=None, as_gray=True):
 
 
 def get_region_location_by_center(imsl, center, level, size):
-    size2 = (size/2).astype(int)
+    size2 = (size / 2).astype(int)
 
     offset = size2 * imsl.level_downsamples[level]
     location = (np.asarray(center) - offset).astype(np.int)
@@ -65,7 +66,7 @@ def get_region_location_by_center(imsl, center, level, size):
 
 
 def get_region_center_by_location(imsl, location, level, size):
-    size2 = (size/2).astype(int)
+    size2 = (size / 2).astype(int)
 
     offset = size2 * imsl.level_downsamples[level]
     center = (np.asarray(location) + offset).astype(np.int)
@@ -80,9 +81,9 @@ def get_pixelsize(imsl, level=0, requested_unit="mm"):
     """
     pm = imsl.properties
     resolution_unit = pm.get("tiff.ResolutionUnit")
-    resolution_x= pm.get("tiff.XResolution")
-    resolution_y= pm.get("tiff.YResolution")
-#     print("Resolution {}x{} pixels/{}".format(resolution_x, resolution_y, resolution_unit))
+    resolution_x = pm.get("tiff.XResolution")
+    resolution_y = pm.get("tiff.YResolution")
+    #     print("Resolution {}x{} pixels/{}".format(resolution_x, resolution_y, resolution_unit))
     downsamples = imsl.level_downsamples[level]
 
     input_resolution_unit = resolution_unit
@@ -90,20 +91,27 @@ def get_pixelsize(imsl, level=0, requested_unit="mm"):
         pixelunit = resolution_unit
     elif requested_unit in ("mm"):
         if resolution_unit in ("cm", "centimeter"):
-            downsamples = downsamples * 10.
+            downsamples = downsamples * 10.0
             pixelunit = "mm"
         elif resolution_unit in ("mm"):
             pixelunit = resolution_unit
         else:
-            raise ValueError("Cannot covert from {} to {}.".format(input_resolution_unit, requested_unit))
+            raise ValueError(
+                "Cannot covert from {} to {}.".format(
+                    input_resolution_unit, requested_unit
+                )
+            )
     else:
-        raise ValueError("Cannot covert from {} to {}.".format(input_resolution_unit, requested_unit))
-
+        raise ValueError(
+            "Cannot covert from {} to {}.".format(input_resolution_unit, requested_unit)
+        )
 
     # if resolution_unit != resolution_unit:
     #     raise ValueError("Cannot covert from {} to {}.".format(input_resolution_unit, requested_unit))
 
-    pixelsize = np.asarray([downsamples /float(resolution_x), downsamples /float(resolution_y)])
+    pixelsize = np.asarray(
+        [downsamples / float(resolution_x), downsamples / float(resolution_y)]
+    )
 
     return pixelsize, pixelunit
 
@@ -112,13 +120,18 @@ def get_offset_px(imsl):
 
     pm = imsl.properties
     pixelsize, pixelunit = get_pixelsize(imsl)
-    offset = np.asarray((int(pm['hamamatsu.XOffsetFromSlideCentre']), int(pm['hamamatsu.YOffsetFromSlideCentre'])))
+    offset = np.asarray(
+        (
+            int(pm["hamamatsu.XOffsetFromSlideCentre"]),
+            int(pm["hamamatsu.YOffsetFromSlideCentre"]),
+        )
+    )
     # resolution_unit = pm["tiff.ResolutionUnit"]
     offset_mm = offset * 0.000001
     if pixelunit is not "mm":
         raise ValueError("Cannot convert pixelunit {} to milimeters".format(pixelunit))
     offset_from_center_px = offset_mm / pixelsize
-    im_center_px = np.asarray(imsl.dimensions) / 2.
+    im_center_px = np.asarray(imsl.dimensions) / 2.0
     offset_px = im_center_px - offset_from_center_px
     return offset_px
 
@@ -133,7 +146,9 @@ def get_resize_parameters(imsl, former_level, former_size, new_level):
     :param new_level: int
     :return: scale_factor, new_size
     """
-    scale_factor = imsl.level_downsamples[former_level] / imsl.level_downsamples[new_level]
+    scale_factor = (
+        imsl.level_downsamples[former_level] / imsl.level_downsamples[new_level]
+    )
     new_size = (np.asarray(former_size) * scale_factor).astype(np.int)
     return scale_factor, new_size
 
@@ -159,7 +174,9 @@ class AnnotatedImage:
         :param new_level:
         :return: scale_factor, new_size
         """
-        return get_resize_parameters(self.openslide, former_level, former_size, new_level)
+        return get_resize_parameters(
+            self.openslide, former_level, former_size, new_level
+        )
 
     def get_offset_px(self):
         return get_offset_px(self.openslide)
@@ -201,7 +218,14 @@ class AnnotatedImage:
     def get_views_by_annotation_color(self):
         pass
 
-    def get_views(self, annotation_ids=None, level=2, margin=0.5, margin_in_pixels=False, show=False) -> List['View']:
+    def get_views(
+        self,
+        annotation_ids=None,
+        level=2,
+        margin=0.5,
+        margin_in_pixels=False,
+        show=False,
+    ) -> List["View"]:
         """
 
         :param annotation_ids:
@@ -218,8 +242,12 @@ class AnnotatedImage:
             if margin_in_pixels:
                 margin_px = int(margin)
             else:
-                margin_px = (size * margin).astype(np.int) / self.openslide.level_downsamples[level]
-            region_size = ((size / self.openslide.level_downsamples[level]) + 2 * margin_px).astype(int)
+                margin_px = (size * margin).astype(
+                    np.int
+                ) / self.openslide.level_downsamples[level]
+            region_size = (
+                (size / self.openslide.level_downsamples[level]) + 2 * margin_px
+            ).astype(int)
             view = self.get_view(center=center, level=level, size=region_size)
             if show:
                 view.region_imshow_annotation(annotation_id)
@@ -244,8 +272,9 @@ class AnnotatedImage:
         self.region_size = size
         self.region_level = level
         self.region_pixelsize, self.region_pixelunit = self.get_pixel_size(level)
-        scan.adjust_annotation_to_image_view(self.openslide, self.annotations,
-                                             center, level, size)
+        scan.adjust_annotation_to_image_view(
+            self.openslide, self.annotations, center, level, size
+        )
 
     def select_annotations_by_color(self, id):
         if id is None:
@@ -284,7 +313,9 @@ class AnnotatedImage:
         """
         i = self.get_annotation_id(i)
         center, size = self.get_annotations_bounds_px(i)
-        region_size = ((size / self.openslide.level_downsamples[level]) + 2 * boundary_px).astype(int)
+        region_size = (
+            (size / self.openslide.level_downsamples[level]) + 2 * boundary_px
+        ).astype(int)
         self.set_region(center=center, level=level, size=region_size)
         if show:
             self.region_imshow_annotation(i)
@@ -310,7 +341,8 @@ class AnnotatedImage:
 
     def get_region_image(self, as_gray=False, as_unit8=False):
         imcr = self.openslide.read_region(
-            self.region_location, level=self.region_level, size=self.region_size)
+            self.region_location, level=self.region_level, size=self.region_size
+        )
         im = np.asarray(imcr)
         if as_gray:
             im = skimage.color.rgb2gray(im)
@@ -333,8 +365,10 @@ class AnnotatedImage:
         polygon = list(zip(polygon_y, polygon_x))
         poly_path = Path(polygon)
 
-        x, y = np.mgrid[:self.region_size[1], :self.region_size[0]]
-        coors = np.hstack((x.reshape(-1, 1), y.reshape(-1, 1)))  # coors.shape is (4000000,2)
+        x, y = np.mgrid[: self.region_size[1], : self.region_size[0]]
+        coors = np.hstack(
+            (x.reshape(-1, 1), y.reshape(-1, 1))
+        )  # coors.shape is (4000000,2)
 
         mask = poly_path.contains_points(coors)
         mask = mask.reshape(self.region_size[::-1])
@@ -375,7 +409,6 @@ class AnnotatedImage:
 
 
 class View:
-
     def __init__(self, anim, center=None, level=0, size=None, location=None):
         self.anim = anim
         self.set_region(center=center, level=level, size=size, location=location)
@@ -398,9 +431,11 @@ class View:
         self.region_level = level
         self.region_pixelsize, self.region_pixelunit = self.get_pixel_size(level)
         import copy
+
         self.annotations = copy.deepcopy(self.anim.annotations)
-        scan.adjust_annotation_to_image_view(self.anim.openslide, self.annotations,
-                                             center, level, size)
+        scan.adjust_annotation_to_image_view(
+            self.anim.openslide, self.annotations, center, level, size
+        )
 
     def get_pixel_size(self, level=None):
         if level is None:
@@ -413,7 +448,8 @@ class View:
 
     def get_region_image(self, as_gray=False):
         imcr = self.openslide.read_region(
-            self.region_location, level=self.region_level, size=self.region_size)
+            self.region_location, level=self.region_level, size=self.region_size
+        )
         im = np.asarray(imcr)
         if as_gray:
             im = skimage.color.rgb2gray(im)
@@ -458,8 +494,10 @@ class View:
         poly_path = Path(polygon)
 
         # TODO coordinates are swapped here
-        x, y = np.mgrid[:self.region_size[1], :self.region_size[0]]
-        coors = np.hstack((x.reshape(-1, 1), y.reshape(-1, 1)))  # coors.shape is (4000000,2)
+        x, y = np.mgrid[: self.region_size[1], : self.region_size[0]]
+        coors = np.hstack(
+            (x.reshape(-1, 1), y.reshape(-1, 1))
+        )  # coors.shape is (4000000,2)
 
         mask = poly_path.contains_points(coors)
         mask = mask.reshape(self.region_size[::-1])
@@ -481,7 +519,6 @@ class View:
         labels = ["{:.1e}".format(i * self.region_pixelsize[1]) for i in locs]
         plt.yticks(locs, labels)
 
-
     def plot_annotations(self, i=None):
         if i is None:
             anns = self.annotations
@@ -498,7 +535,8 @@ class View:
 
     def get_region_image(self, as_gray=False):
         imcr = self.anim.openslide.read_region(
-            self.region_location, level=self.region_level, size=self.region_size)
+            self.region_location, level=self.region_level, size=self.region_size
+        )
         im = np.asarray(imcr)
         if as_gray:
             im = skimage.color.rgb2gray(im)
@@ -511,15 +549,20 @@ class View:
         imsl = self.anim.openslide
         former_level = self.region_level
         former_size = self.region_size
-        scale_factor = imsl.level_downsamples[former_level] / imsl.level_downsamples[new_level]
+        scale_factor = (
+            imsl.level_downsamples[former_level] / imsl.level_downsamples[new_level]
+        )
         new_size = (np.asarray(former_size) * scale_factor).astype(np.int)
 
         return new_size
 
     def to_level(self, new_level):
         size = self.get_size_on_level(new_level)
-        newview = View(self.anim, location=self.region_location, size=size, level=new_level)
+        newview = View(
+            self.anim, location=self.region_location, size=size, level=new_level
+        )
         return newview
+
 
 class ColorError(Exception):
     pass

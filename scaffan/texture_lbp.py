@@ -4,6 +4,7 @@
 Modul is used for texrure analysis.
 """
 import logging
+
 logger = logging.getLogger(__name__)
 
 
@@ -14,9 +15,7 @@ import matplotlib.pyplot as plt
 # settings for LBP
 radius = 2
 n_points = 8 * radius
-method = 'uniform'
-
-
+method = "uniform"
 
 
 def kullback_leibler_divergence(p, q):
@@ -37,6 +36,7 @@ def lbp_fv(img):  # , n_points, radius, METHOD):
     n_bins = int(lbp.max() + 1)
     hist, _ = np.histogram(lbp, density=True, bins=n_bins, range=(0, n_bins))
     return hist
+
 
 # def match(refs, img):
 #     best_score = 10
@@ -64,7 +64,7 @@ def show_lbp(lbp):
     plt.xlim(xmax=n_points + 2)
 
 
-class KLDClassifier():
+class KLDClassifier:
     def __init__(self):
         pass
 
@@ -90,8 +90,3 @@ class KLDClassifier():
             out[i] = self.predict_one(hist)
 
         return out
-
-
-
-
-

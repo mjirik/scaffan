@@ -4,6 +4,7 @@
 Modul is used for texrure analysis.
 """
 import logging
+
 logger = logging.getLogger(__name__)
 
 # import warnings
@@ -20,6 +21,7 @@ def tile_centers(image_shape, tile_size):
             centers.append([x0 + tile_size2[0], x1 + tile_size2[1]])
     return centers
 
+
 def tiles_processing(image, fcn, tile_size, fcn_output_n=None):
     shape = image.shape
     if fcn_output_n is not None:
@@ -27,10 +29,7 @@ def tiles_processing(image, fcn, tile_size, fcn_output_n=None):
     output = np.zeros(shape, dtype=np.int8)
     for x0 in range(0, image.shape[0], tile_size[0]):
         for x1 in range(0, image.shape[1], tile_size[1]):
-            sl = (
-                slice(x0, x0 + tile_size[0]),
-                slice(x1, x1 + tile_size[1])
-            )
+            sl = (slice(x0, x0 + tile_size[0]), slice(x1, x1 + tile_size[1]))
             img = image[sl]
             output[sl] = fcn(img)
 
@@ -43,13 +42,17 @@ def get_feature_and_predict(img, fv_function, classif):
     return classif.predict([fv])[0]
 
 
-def select_texture_patch_centers_from_one_annotation(anim, title, tile_size, level, step=50):
+def select_texture_patch_centers_from_one_annotation(
+    anim, title, tile_size, level, step=50
+):
     if not np.isscalar(tile_size):
         if tile_size[0] == tile_size[1]:
             tile_size = tile_size[0]
         else:
             # it would be possible to add factor (1./tile_size) into distance transform
-            raise ValueError("Both sides of tile should be the same. Other option is not implemented.")
+            raise ValueError(
+                "Both sides of tile should be the same. Other option is not implemented."
+            )
     annotation_ids = anim.select_annotations_by_title(title)
     view = anim.get_views(annotation_ids, level=level)[0]
     mask = view.get_annotation_region_raster(title)
@@ -84,10 +87,12 @@ class TextureSegmentation:
         self.target = []
         if feature_function is None:
             import scaffan.texture_lbp as salbp
+
             feature_function = salbp.lbp_fv
         self.feature_function = feature_function
         if classifier is None:
             import scaffan.texture_lbp as salbp
+
             classifier = salbp.KLDClassifier()
         self.classifier = classifier
 
@@ -104,8 +109,13 @@ class TextureSegmentation:
         :param annotation_id:
         :return: [[x0, y0], [x1, y1], ...]
         """
-        patch_centers1 = select_texture_patch_centers_from_one_annotation(anim, annotation_id, tile_size=self.tile_size1,
-                                                                          level=self.level, step=self.step)
+        patch_centers1 = select_texture_patch_centers_from_one_annotation(
+            anim,
+            annotation_id,
+            tile_size=self.tile_size1,
+            level=self.level,
+            step=self.step,
+        )
         if return_xy:
             return patch_centers1
         else:
@@ -114,9 +124,15 @@ class TextureSegmentation:
 
     def get_patch_view(self, anim, patch_center=None, annotation_id=None):
         if patch_center is not None:
-            view = anim.get_view(center=[patch_center[0], patch_center[1]], level=self.level, size=self.tile_size)
+            view = anim.get_view(
+                center=[patch_center[0], patch_center[1]],
+                level=self.level,
+                size=self.tile_size,
+            )
         elif patch_center is not None:
-            annotation_ids = anim.select_annotations_by_title(title=annotation_id, level= self.level, size=self.tile_size)
+            annotation_ids = anim.select_annotations_by_title(
+                title=annotation_id, level=self.level, size=self.tile_size
+            )
             view = anim.get_views(annotation_ids)[0]
 
         return view
@@ -160,15 +176,17 @@ class TextureSegmentation:
     def predict(self, view, show=False):
         test_image = view.get_region_image(as_gray=True)
 
-        tile_fcn = lambda img: get_feature_and_predict(img, self.feature_function, self.classifier)
+        tile_fcn = lambda img: get_feature_and_predict(
+            img, self.feature_function, self.classifier
+        )
         seg = tiles_processing(test_image, tile_fcn, tile_size=self.tile_size)
 
         if show:
             centers = tile_centers(test_image.shape, tile_size=self.tile_size)
             import skimage.color
+
             plt.imshow(skimage.color.label2rgb(seg, test_image))
             x, y = list(zip(*centers))
             plt.plot(x, y, "xy")
             # view.plot_points()
         return seg
-

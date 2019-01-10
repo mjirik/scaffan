@@ -3,6 +3,7 @@
 ## Unreleased
 
 * [Added] Suppression of unimportant warnings
+* [Added] Black code format 
 
 ## 0.1.*
 

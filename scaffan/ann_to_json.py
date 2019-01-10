@@ -4,11 +4,13 @@
 Modul is used for GUI of Lisa
 """
 import logging
+
 logger = logging.getLogger(__name__)
 import os.path as op
 import sys
 
 from scaffan import annotation
+
 # print("ann to json")
 
 if __name__ == "__main__":

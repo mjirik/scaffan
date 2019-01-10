@@ -4,6 +4,7 @@
 Process lobulus analysis.
 """
 import logging
+
 logger = logging.getLogger(__name__)
 import skimage.filters
 from skimage.morphology import skeletonize
@@ -29,7 +30,9 @@ class Lobulus:
         pass
 
     def _init_by_annotation_id(self, annotation_id):
-        self.view = self.anim.get_views(annotation_ids=[annotation_id], level=self.level, margin=1.8)[0]
+        self.view = self.anim.get_views(
+            annotation_ids=[annotation_id], level=self.level, margin=1.8
+        )[0]
         self.image = self.view.get_region_image(as_gray=True)
         self.mask = self.view.get_annotation_region_raster(annotation_id=annotation_id)
         pass
@@ -86,24 +89,39 @@ class Lobulus:
         datarow = {}
         datarow["Annotation ID"] = self.annotation_id
         if self.report is not None:
-            plt.savefig(op.join(self.report.outputdir, "lobulus_{}.png".format(self.annotation_id)))
+            plt.savefig(
+                op.join(
+                    self.report.outputdir, "lobulus_{}.png".format(self.annotation_id)
+                )
+            )
         if show:
             plt.show()
         self.lobulus_mask = (inner + outer) == 1
-        datarow["Area"] = np.sum(self.lobulus_mask) * np.prod(self.view.region_pixelsize)
+        datarow["Area"] = np.sum(self.lobulus_mask) * np.prod(
+            self.view.region_pixelsize
+        )
         datarow["Area unit"] = self.view.region_pixelunit
 
         # eroded image for threshold analysis
-        dstmask = scipy.ndimage.morphology.distance_transform_edt(self.lobulus_mask, self.view.region_pixelsize)
-        inner_lobulus_mask = (dstmask > inner_lobulus_margin_mm)
+        dstmask = scipy.ndimage.morphology.distance_transform_edt(
+            self.lobulus_mask, self.view.region_pixelsize
+        )
+        inner_lobulus_mask = dstmask > inner_lobulus_margin_mm
         # print("inner_lobulus_mask" , np.sum(inner_lobulus_mask==0), np.sum(inner_lobulus_mask==1))
 
         detail_level = 2
         new_size = self.view.get_size_on_level(detail_level)
 
-        resize_params = dict(output_shape=[new_size[1], new_size[0]], mode="reflect", order=0, anti_aliasing=False)
+        resize_params = dict(
+            output_shape=[new_size[1], new_size[0]],
+            mode="reflect",
+            order=0,
+            anti_aliasing=False,
+        )
         detail_mask = skimage.transform.resize(self.lobulus_mask, **resize_params)
-        detail_inner_lobulus_mask = skimage.transform.resize(inner_lobulus_mask, **resize_params)
+        detail_inner_lobulus_mask = skimage.transform.resize(
+            inner_lobulus_mask, **resize_params
+        )
         detail_central_vein_mask = skimage.transform.resize(inner == 1, **resize_params)
 
         detail_view = self.view.to_level(detail_level)
@@ -114,8 +132,10 @@ class Lobulus:
         detail_view.add_ticks()
         if show:
             plt.show()
-        threshold = skimage.filters.threshold_otsu(detail_image[detail_inner_lobulus_mask == 1])
-        imthr = (detail_image < threshold)
+        threshold = skimage.filters.threshold_otsu(
+            detail_image[detail_inner_lobulus_mask == 1]
+        )
+        imthr = detail_image < threshold
         imthr[detail_mask != 1] = 0
         # plt.figure()
         # plt.imshow(imthr)
@@ -125,13 +145,22 @@ class Lobulus:
         datarow["Skeleton lenght"] = np.sum(skeleton) * detail_view.region_pixelsize[0]
         datarow["Output pixel size 0"] = detail_view.region_pixelsize[0]
         datarow["Output pixel size 1"] = detail_view.region_pixelsize[1]
-        datarow["Output image size 0"] = detail_view.region_pixelsize[0] * imthr.shape[0]
-        datarow["Output image size 1"] = detail_view.region_pixelsize[1] * imthr.shape[1]
+        datarow["Output image size 0"] = (
+            detail_view.region_pixelsize[0] * imthr.shape[0]
+        )
+        datarow["Output image size 1"] = (
+            detail_view.region_pixelsize[1] * imthr.shape[1]
+        )
         plt.figure(figsize=(12, 10))
         plt.imshow(skeleton + imthr)
         detail_view.add_ticks()
         if self.report is not None:
-            plt.savefig(op.join(self.report.outputdir, "thumb_skeleton_thr_{}.png".format(self.annotation_id)))
+            plt.savefig(
+                op.join(
+                    self.report.outputdir,
+                    "thumb_skeleton_thr_{}.png".format(self.annotation_id),
+                )
+            )
             # skimage.io.imsave(op.join(self.report.outputdir, "figure_skeleton_thumb_{}.png".format(self.annotation_id)), 50 * skeleton + 50 * imthr)
         if show:
             plt.show()
@@ -143,7 +172,10 @@ class Lobulus:
             imall[skeleton > 0] = 4
             # imall = (skeleton.astype(np.uint8) + imthr.astype(np.uint8) +  + (detail_central_vein_mask.astype(np.uint8) * 2)).astype(np.uint8)
             self.imsave("lobulus_central_thr_skeleton_{}.png", imall)
-            self.imsave("lobulus_thr_skeleton_{}.png", (skeleton.astype(np.uint8) + imthr + detail_mask).astype(np.uint8))
+            self.imsave(
+                "lobulus_thr_skeleton_{}.png",
+                (skeleton.astype(np.uint8) + imthr + detail_mask).astype(np.uint8),
+            )
             self.imsave("skeleton_{}.png", skeleton)
             self.imsave("thr_{}.png", imthr)
             # plt.imsave(op.join(self.report.outputdir, "skeleton_thr_lobulus_{}.png".format(self.annotation_id)), skeleton.astype(np.uint8) + imthr + detail_mask)
@@ -160,7 +192,12 @@ class Lobulus:
         plt.imshow(conv)
         detail_view.add_ticks()
         if self.report is not None:
-            plt.savefig(op.join(self.report.outputdir, "figure_skeleton_nodes_{}.png".format(self.annotation_id)))
+            plt.savefig(
+                op.join(
+                    self.report.outputdir,
+                    "figure_skeleton_nodes_{}.png".format(self.annotation_id),
+                )
+            )
 
             with warnings.catch_warnings():
                 # warnings.simplefilter("low contrast image")
@@ -172,7 +209,7 @@ class Lobulus:
             plt.show()
 
         conv[conv > 3] = 0
-        label, num = scipy.ndimage.label(conv, )
+        label, num = scipy.ndimage.label(conv)
         datarow["Branch number"] = num
 
         self.report.add_row(datarow)
@@ -185,4 +222,3 @@ class Lobulus:
     def imsave(self, base_fn, arr, k=50):
         base_fn = base_fn.format(self.annotation_id)
         self.report.imsave(base_fn, arr, k)
-

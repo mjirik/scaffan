@@ -4,6 +4,7 @@
 Modul is used for GUI of Lisa
 """
 import logging
+
 logger = logging.getLogger(__name__)
 # problem is loading lxml together with openslide
 # from lxml import etree
@@ -38,11 +39,12 @@ def _ndpa_file_to_json(pth):
 
     # problem is loading lxml together with openslide
     from lxml import etree
+
     tree = etree.parse(pth)
     viewstates = tree.xpath("//ndpviewstate")
     all_anotations = list(map(get_one_annotation, viewstates))
     fn = pth + ".json"
-    with open(fn, 'w') as outfile:
+    with open(fn, "w") as outfile:
         json.dump(all_anotations, outfile)
 
 
@@ -72,31 +74,30 @@ def read_annotations(pth):
     """
 
     import platform
+
     if platform.system() == "Windows":
         import subprocess
         import sys
+
         # output = subprocess.check_output(["pwd"])
         # print(output)
         # output = subprocess.check_output(["where", "python"])
         # print(output)
 
         cwd = op.dirname(op.dirname(__file__))
-        output = subprocess.check_output([sys.executable, "-m", "scaffan.ann_to_json", pth], cwd=cwd)
-        logger.debug("windows annotation output:" +str(output))
+        output = subprocess.check_output(
+            [sys.executable, "-m", "scaffan.ann_to_json", pth], cwd=cwd
+        )
+        logger.debug("windows annotation output:" + str(output))
         # print(output)
     else:
-    # if not op.exists(fn):
+        # if not op.exists(fn):
         ndpa_to_json(pth)
 
     fn = pth + ".ndpa.json"
     with open(fn) as f:
         data = json.load(f)
     return data
-
-# def plot_annotations(annotations):
-#     for annotation in annotations:
-#         plt.hold(True)
-#         plt.plot(annotation["x"], annotation["y"], c=annotation["color"])
 
 
 def plot_annotations(annotations, x_key="x", y_key="y", in_region=False):
@@ -124,8 +125,9 @@ def adjust_annotation_to_image_view(imsl, annotations, center, level, size):
     output = []
     for annotation in annotations:
         ann_out = annotation
-        x_px_view, y_px_view = adjust_xy_to_image_view(imsl, annotation["x_px"], annotation["y_px"], center, level,
-                                                       size)
+        x_px_view, y_px_view = adjust_xy_to_image_view(
+            imsl, annotation["x_px"], annotation["y_px"], center, level, size
+        )
         ann_out["region_x_px"] = x_px_view
         ann_out["region_y_px"] = y_px_view
         ann_out["region_center"] = center
@@ -138,11 +140,12 @@ def adjust_annotation_to_image_view(imsl, annotations, center, level, size):
 
 def annotations_to_px(imsl, annotations):
     from scaffan.image import get_offset_px, get_pixelsize
+
     offset_px = get_offset_px(imsl)
     pixelsize, pixelunit = get_pixelsize(imsl)
     for annotation in annotations:
-        x_nm = np.asarray(annotation['x'])
-        y_nm = np.asarray(annotation['y'])
+        x_nm = np.asarray(annotation["x"])
+        y_nm = np.asarray(annotation["y"])
         x_mm = x_nm * 0.000001
         y_mm = y_nm * 0.000001
         x_px = x_mm / pixelsize[0] + offset_px[0]
@@ -154,6 +157,7 @@ def annotations_to_px(imsl, annotations):
         annotation["x_px"] = x_px
         annotation["y_px"] = y_px
     return annotations
+
 
 def annotation_titles(annotations):
     titles = {}
@@ -179,4 +183,3 @@ def annotation_colors(annotations):
             colors[title] = [i]
 
     return colors
-

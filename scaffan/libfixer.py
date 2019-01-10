@@ -3,20 +3,20 @@
 
 
 import logging
+
 logger = logging.getLogger(__name__)
 
 import zipfile
-import glob
-import shutil
 import os
 import os.path as op
-import stat
 import tempfile
 import sys
+
 if sys.version_info < (3, 0):
     import urllib as urllibr
 else:
     import urllib.request as urllibr
+
 
 def download_and_unzip(url, outdir):
     # try:
@@ -43,16 +43,18 @@ def download_and_unzip(url, outdir):
     zf.close()
     return outdir
 
+
 def libfix():
 
     # glob.glob(op.expanduser("~/Downloads/"))
-    if sys.platform.startswith('win'):
+    if sys.platform.startswith("win"):
         # print("Trying to download .dll libraries")
         libfix_windows()
-    if sys.platform.startswith('linux'):
+    if sys.platform.startswith("linux"):
         # print("Trying to download .so libraries")
         pass
         # libfix_linux_conda()
+
 
 # def get_conda_dir():
 #     """
@@ -70,8 +72,10 @@ def libfix():
 #         conda_dir = conda_dir[:idx]
 #     return conda_dir
 
+
 def libfix_windows(
-        url='https://github.com/openslide/openslide-winbuild/releases/download/v20171122/openslide-win64-20171122.zip'):
+    url="https://github.com/openslide/openslide-winbuild/releases/download/v20171122/openslide-win64-20171122.zip"
+):
     outdir = download_and_unzip(url, op.expanduser("~/Downloads/"))
 
     # dest_dir = get_conda_dir()

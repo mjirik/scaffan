@@ -4,18 +4,22 @@
 Modul is used for GUI of Lisa
 """
 import logging
+
 logger = logging.getLogger(__name__)
 
 import sys
 import os.path as op
 import datetime
+
 # import PyQt5.QtWidgets
 # print("start 3")
 # from PyQt5.QtWidgets import QApplication, QFileDialog
 # print("start 4")
 from PyQt5 import QtGui
+
 # print("start 5")
 from pyqtgraph.parametertree import Parameter, ParameterTree
+
 # print("start 6")
 
 from scaffan import image
@@ -24,53 +28,80 @@ import io3d.datasets
 import scaffan.lobulus
 import scaffan.report
 
-class Scaffan:
 
+class Scaffan:
     def __init__(self):
         params = [
-            {"name": "Input", "type": "group", "children": [
-                {'name': 'File Path', 'type': 'str'},
-                {'name': 'Select', 'type': 'action'},
-                {'name': 'Annotation Color', 'type': 'list', 'values': {
-                    "None": None,
-                    "White": "#FFFFFF",
-                    "Black": "#000000",
-                    "Red": "#FF0000",
-                    "Green": "#00FF00",
-                    "Blue": "#0000FF",
-                    "Cyan": "#00FFFF",
-                    "Magenta": "#FF00FF",
-                    "Yellow": "#FFFF00"},
-                 'value': 0},
-                # {'name': 'Boolean', 'type': 'bool', 'value': True, 'tip': "This is a checkbox"},
-                # {'name': 'Color', 'type': 'color', 'value': "FF0", 'tip': "This is a color button"},
-            ], },
-            {"name": "Output", "type": "group", "children": [
-                {'name': 'Directory Path', 'type': 'str', 'value': self._prepare_default_output_dir()},
-                {'name': 'Select', 'type': 'action'},
-            ], },
-            {"name": "Processing", "type": "group", "children": [
-                # {'name': 'Directory Path', 'type': 'str', 'value': prepare_default_output_dir()},
-                {'name': 'Run', 'type': 'action'},
-                {'name': 'Show', 'type': 'bool', 'value': False , 'tip': "Show images"},
-            ], }
+            {
+                "name": "Input",
+                "type": "group",
+                "children": [
+                    {"name": "File Path", "type": "str"},
+                    {"name": "Select", "type": "action"},
+                    {
+                        "name": "Annotation Color",
+                        "type": "list",
+                        "values": {
+                            "None": None,
+                            "White": "#FFFFFF",
+                            "Black": "#000000",
+                            "Red": "#FF0000",
+                            "Green": "#00FF00",
+                            "Blue": "#0000FF",
+                            "Cyan": "#00FFFF",
+                            "Magenta": "#FF00FF",
+                            "Yellow": "#FFFF00",
+                        },
+                        "value": 0,
+                    },
+                    # {'name': 'Boolean', 'type': 'bool', 'value': True, 'tip': "This is a checkbox"},
+                    # {'name': 'Color', 'type': 'color', 'value': "FF0", 'tip': "This is a color button"},
+                ],
+            },
+            {
+                "name": "Output",
+                "type": "group",
+                "children": [
+                    {
+                        "name": "Directory Path",
+                        "type": "str",
+                        "value": self._prepare_default_output_dir(),
+                    },
+                    {"name": "Select", "type": "action"},
+                ],
+            },
+            {
+                "name": "Processing",
+                "type": "group",
+                "children": [
+                    # {'name': 'Directory Path', 'type': 'str', 'value': prepare_default_output_dir()},
+                    {"name": "Run", "type": "action"},
+                    {
+                        "name": "Show",
+                        "type": "bool",
+                        "value": False,
+                        "tip": "Show images",
+                    },
+                ],
+            },
         ]
-        self.parameters = Parameter.create(name='params', type='group', children=params)
+        self.parameters = Parameter.create(name="params", type="group", children=params)
         self.anim = None
         pass
 
-
-
     def select_file_gui(self):
         from PyQt5 import QtWidgets
+
         default_dir = io3d.datasets.join_path(get_root=True)
         # default_dir = op.expanduser("~/data")
         if not op.exists(default_dir):
             default_dir = op.expanduser("~")
 
         fn, mask = QtWidgets.QFileDialog.getOpenFileName(
-            None, "Select Input File", directory=default_dir,
-            filter="NanoZoomer Digital Pathology Image(*.ndpi)"
+            None,
+            "Select Input File",
+            directory=default_dir,
+            filter="NanoZoomer Digital Pathology Image(*.ndpi)",
         )
         self.set_input_file(fn)
 
@@ -86,6 +117,7 @@ class Scaffan:
 
     def select_output_dir_gui(self):
         from PyQt5 import QtWidgets
+
         default_dir = self._prepare_default_output_dir()
         if op.exists(default_dir):
             start_dir = default_dir
@@ -93,7 +125,9 @@ class Scaffan:
             start_dir = op.dirname(default_dir)
 
         fn = QtWidgets.QFileDialog.getExistingDirectory(
-            None, "Select Output Directory", directory=start_dir,
+            None,
+            "Select Output Directory",
+            directory=start_dir,
             # filter="NanoZoomer Digital Pathology Image(*.ndpi)"
         )
         # print (fn)
@@ -161,17 +195,24 @@ class Scaffan:
 
         from PyQt5 import QtWidgets
         import scaffan.qtexceptionhook
+
         # import QApplication, QFileDialog
         if not skip_exec and qapp == None:
             qapp = QtWidgets.QApplication(sys.argv)
 
-        self.parameters.param('Input', 'Select').sigActivated.connect(self.select_file_gui)
-        self.parameters.param('Output', 'Select').sigActivated.connect(self.select_output_dir_gui)
-        self.parameters.param('Processing', 'Run').sigActivated.connect(self.run_lobuluses)
+        self.parameters.param("Input", "Select").sigActivated.connect(
+            self.select_file_gui
+        )
+        self.parameters.param("Output", "Select").sigActivated.connect(
+            self.select_output_dir_gui
+        )
+        self.parameters.param("Processing", "Run").sigActivated.connect(
+            self.run_lobuluses
+        )
 
         t = ParameterTree()
         t.setParameters(self.parameters, showTop=False)
-        t.setWindowTitle('pyqtgraph example: Parameter Tree')
+        t.setWindowTitle("pyqtgraph example: Parameter Tree")
         # t.show()
 
         # print("run scaffan")
@@ -188,4 +229,3 @@ class Scaffan:
         if not skip_exec:
 
             qapp.exec_()
-

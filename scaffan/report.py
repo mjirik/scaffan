@@ -4,6 +4,7 @@
 Process lobulus analysis.
 """
 import logging
+
 logger = logging.getLogger(__name__)
 import pandas as pd
 import os.path as op
@@ -13,7 +14,7 @@ import skimage.io
 import warnings
 
 
-class Report():
+class Report:
     def __init__(self, outputdir):
         self.outputdir = op.expanduser(outputdir)
         if not op.exists(self.outputdir):
@@ -47,4 +48,3 @@ class Report():
             # warnings.simplefilter("low contrast image")
             skimage.io.imsave(op.join(self.outputdir, filename + "_raw" + ext), k * arr)
         self.imgs[base_fn] = arr
-

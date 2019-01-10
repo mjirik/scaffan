@@ -39,7 +39,7 @@ requirements:
     - python
     - setuptools
 #    - io3d
-    - {{ pin_compatible('io3d', max_pin='x.x') }}
+    - {{ pin_compatible('io3d', max_pin='x') }}
     - imma
     - lxml
     - pandas
@@ -51,7 +51,7 @@ requirements:
   run:
     - python
 #    - io3d>=1.21
-    - {{ pin_compatible('io3d', max_pin='x.x') }}
+    - {{ pin_compatible('io3d', max_pin='x') }}
     - imma
     - lxml
     - pandas
