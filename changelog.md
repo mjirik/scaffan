@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.2.*
+
 * [Added] Suppression of unimportant warnings
 * [Added] Black code format 
 * [Added] Central vein area computation
