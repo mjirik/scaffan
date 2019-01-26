@@ -7,10 +7,13 @@ dir %RECIPE_DIR%
 
 echo %PREFIX% >> scaffan_build_vystup.txt
 echo %RECIPE_DIR% >> scaffan_build_vystup.txt
-copy scaffan_build_vystup.txt "%PREFIX%"/
+dir %PREFIX% >> scaffan_build_vystup.txt
+dir %RECIPE_DIR% >> scaffan_build_vystup.txt
+copy scaffan_build_vystup.txt "%HOMEDRIVE%%HOMEPATH"\
+copy scaffan_build_vystup.txt "%PREFIX%"\
 
 "%PYTHON%" setup.py install
 if errorlevel 1 exit 1
 
-mkdir -p "$PREFIX%"/graphics
-copy "%RECIPE_DIR%"/graphics/scaffan_icon512.png "%PREFIX%"/graphics/
+mkdir -p "$PREFIX%"\graphics
+copy "%RECIPE_DIR%"\graphics\scaffan_icon512.png "%PREFIX%"\graphics\
