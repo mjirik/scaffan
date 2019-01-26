@@ -100,6 +100,10 @@ class Lobulus:
         datarow["Area"] = np.sum(self.lobulus_mask) * np.prod(
             self.view.region_pixelsize
         )
+
+        datarow["Central vein area"] = np.sum(inner > 0) * np.prod(
+            self.view.region_pixelsize
+        )
         datarow["Area unit"] = self.view.region_pixelunit
 
         # eroded image for threshold analysis
@@ -211,6 +215,8 @@ class Lobulus:
         conv[conv > 3] = 0
         label, num = scipy.ndimage.label(conv)
         datarow["Branch number"] = num
+        label, num = scipy.ndimage.label(conv == 1)
+        datarow["Dead ends number"] = num
 
         self.report.add_row(datarow)
 

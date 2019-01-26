@@ -4,6 +4,8 @@
 
 * [Added] Suppression of unimportant warnings
 * [Added] Black code format 
+* [Added] Central vein area computation
+* [Added] Dead ends number oomputation
 
 ## 0.1.*
 
