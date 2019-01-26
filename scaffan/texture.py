@@ -22,11 +22,11 @@ def tile_centers(image_shape, tile_size):
     return centers
 
 
-def tiles_processing(image, fcn, tile_size, fcn_output_n=None):
-    shape = image.shape
+def tiles_processing(image, fcn, tile_size, fcn_output_n=None, dtype=np.int8):
+    shape = list(image.shape)
     if fcn_output_n is not None:
         shape.append(fcn_output_n)
-    output = np.zeros(shape, dtype=np.int8)
+    output = np.zeros(shape, dtype=dtype)
     for x0 in range(0, image.shape[0], tile_size[0]):
         for x1 in range(0, image.shape[1], tile_size[1]):
             sl = (slice(x0, x0 + tile_size[0]), slice(x1, x1 + tile_size[1]))
@@ -101,6 +101,10 @@ class TextureSegmentation:
         # METHOD = "uniform"
         # self.feature_function_args = [n_points, radius, METHOD]
         pass
+
+    def set_tile_size(self, tile_size1):
+        self.tile_size = [tile_size1, tile_size1]
+        self.tile_size1 = tile_size1
 
     def get_tile_centers(self, anim, annotation_id, return_xy=False):
         """

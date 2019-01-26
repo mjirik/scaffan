@@ -24,6 +24,7 @@ sys.path.insert(0, op.abspath(op.join(path_to_script, "../../imma")))
 # sys.path.insert(0, imcut_path)
 
 import matplotlib.pyplot as plt
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 skip_on_local = False
 
@@ -275,9 +276,82 @@ class TextureTest(unittest.TestCase):
         # plt.colorbar()
         plt.subplot(212)
         plt.imshow(energy)
-        plt.colorbar()
+        # plt.colorbar()
         plt.savefig("glcm_energy_{}.png".format(title))
         # plt.show()
+
+    def test_texture_glcm_features_on_lobulus(self):
+        fn = io3d.datasets.join_path(
+            "medical", "orig", "sample_data", "SCP003", "SCP003.ndpi", get_root=True
+        )
+        # fn = io3d.datasets.join_path("scaffold", "Hamamatsu", "PIG-008_P008 LL-P_HE_parenchyme perif..ndpi", get_root=True)
+        anim = scim.AnnotatedImage(fn)
+
+        texseg = satex.TextureSegmentation()
+        texseg.set_tile_size(64)
+
+        # title = "test3"
+        title = "test2"
+        # title = "test1"
+        views = anim.get_views_by_title(title, level=texseg.level)
+        energy = satex.tiles_processing(
+            views[0].get_region_image(as_gray=True),
+            fcn=texture_glcm_features,
+            tile_size=texseg.tile_size,
+            fcn_output_n=3,
+            dtype=None,
+        )
+        # seg = texseg.predict(views[0], show=False, function=texture_energy)
+        plt.figure(figsize=(10, 12))
+        plt.subplot(221)
+        img = views[0].get_region_image()
+        plt.imshow(img)
+        plt.title("original image")
+        plt.subplot(222)
+        plt.title("GLCM energy")
+        imshow_with_colorbar(energy[:, :, 0])
+        plt.subplot(223)
+        plt.title("GLCM homogeneity")
+        imshow_with_colorbar(energy[:, :, 1])
+        plt.subplot(224)
+        plt.title("GLCM correlation")
+        imshow_with_colorbar(energy[:, :, 2])
+        mx = np.max(energy, axis=(0, 1))
+        mn = np.min(energy, axis=(0, 1))
+        logger.debug(mx)
+        # plt.colorbar()
+        plt.savefig("glcm_features_{}.png".format(title))
+
+        plt.figure()
+        plt.imshow(energy)
+        plt.savefig("glcm_features_color_{}.png".format(title))
+        # plt.show()
+
+
+def imshow_with_colorbar(*args, **kwargs):
+    ax = plt.gca()
+    im = ax.imshow(*args, **kwargs)
+    divider = make_axes_locatable(ax)
+    cax = divider.append_axes("right", size="5%", pad=0.05)
+    plt.colorbar(im, cax=cax)
+
+
+def texture_glcm_features(img):
+    import skimage.feature.texture
+
+    P = skimage.feature.greycomatrix(
+        (img * 31).astype(np.uint8),
+        [1],
+        [0, np.pi / 2],
+        levels=32,
+        symmetric=True,
+        normed=True,
+    )
+    en = skimage.feature.texture.greycoprops(P, prop="energy")
+    # dissimilarity = skimage.feature.texture.greycoprops(P, prop="dissimilarity")
+    homogeneity = skimage.feature.texture.greycoprops(P, prop="homogeneity")
+    correlation = skimage.feature.texture.greycoprops(P, prop="correlation")
+    return np.array([np.mean(en), np.mean(homogeneity), np.mean(correlation)])
 
 
 def texture_energy(img):
@@ -292,7 +366,7 @@ def texture_energy(img):
         normed=True,
     )
     en = skimage.feature.texture.greycoprops(P, prop="energy")
-    return np.max(en) * 100
+    return np.mean(en) * 100
 
 
 if __name__ == "__main__":
