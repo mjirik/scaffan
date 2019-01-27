@@ -57,7 +57,11 @@ setup(
     # If there are data files included in your packages that need to be
     # installed, specify them here.  If using Python 2.6 or less, then these
     # have to be included in MANIFEST.in as well.
-    package_data={"sample": ["graphics/scaffan_icon512.png"], "": ["*.png"]},
+    package_data={
+        "sample1": ["scaffan_icon256.png"],
+        "": ["*.png"],
+        "sample2": ["scaffan/scaffan_icon256.png"],
+    },
     # Although 'package_data' is the preferred approach, in some case you may
     # need to place data files outside of your packages.
     # see
