@@ -218,14 +218,16 @@ class Scaffan:
         # print("run scaffan")
         win = QtGui.QWidget()
         win.setWindowTitle("ScaffAn {}".format(scaffan.__version__))
+        logo_fn = op.join(op.dirname(__file__), "scaffan_icon256.png")
+        app_icon = QtGui.QIcon()
+        # app_icon.addFile(logo_fn, QtCore.QSize(16, 16))
+        app_icon.addFile(logo_fn)
+        win.setWindowIcon(app_icon)
+        # qapp.setWindowIcon(app_icon)
         layout = QtGui.QGridLayout()
         win.setLayout(layout)
         pic = QtGui.QLabel()
-        pic.setPixmap(
-            QtGui.QPixmap(op.join(op.dirname(__file__), "scaffan_icon256.png")).scaled(
-                100, 100
-            )
-        )
+        pic.setPixmap(QtGui.QPixmap(logo_fn).scaled(100, 100))
         pic.show()
         # layout.addWidget(QtGui.QLabel("These are two views of the same data. They should always display the same values."), 0,  0, 1, 2)
         layout.addWidget(pic, 1, 0, 1, 1)
