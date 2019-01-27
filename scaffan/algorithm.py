@@ -220,8 +220,16 @@ class Scaffan:
         win.setWindowTitle("ScaffAn {}".format(scaffan.__version__))
         layout = QtGui.QGridLayout()
         win.setLayout(layout)
+        pic = QtGui.QLabel()
+        pic.setPixmap(
+            QtGui.QPixmap(op.join(op.dirname(__file__), "scaffan_icon256.png")).scaled(
+                100, 100
+            )
+        )
+        pic.show()
         # layout.addWidget(QtGui.QLabel("These are two views of the same data. They should always display the same values."), 0,  0, 1, 2)
-        layout.addWidget(t, 1, 0, 1, 1)
+        layout.addWidget(pic, 1, 0, 1, 1)
+        layout.addWidget(t, 2, 0, 1, 1)
         # layout.addWidget(t2, 1, 1, 1, 1)
 
         win.show()

@@ -8,6 +8,7 @@
 * [Added] Black code format 
 * [Added] Central vein area computation
 * [Added] Dead ends number oomputation
+* [Added] Logo
 
 ## 0.1.*
 
