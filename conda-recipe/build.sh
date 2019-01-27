@@ -1,27 +1,11 @@
 #!/bin/bash
-
-echo "==============================="
-echo "==============================="
 echo "======build.sh================="
-echo "==============================="
-echo "==============================="
-echo "build.sh"
-pwd
-ls
-echo "scaffan build.sh" > ~/scaffan.txt
-date >> ~/scaffan.txt
-echo "===== recipe dir $RECIPE_DIR" >> ~/scaffan.txt
-ls $RECIPE_DIR >> ~/scaffan.txt
-# rm -rf examples
-echo "===== prefix $PREFIX ======" >> ~/scaffan.txt
-ls $PREFIX >> ~/scaffan.txt
-echo "=========== prefix dir lib =====" >> ~/scaffan.txt
-ls $PREFIX/lib >> ~/scaffan.txt
-echo "prefix $PREFIX"
-ls $PREFIX
-echo "recipe dir $RECIPE_DIR ====="
-ls $RECIPE_DIR
+echo "build.sh" > ~/conda_build_log.txt
+date >> ~/conda_build_log.txt
+echo "===== recipe dir $RECIPE_DIR" >> ~/conda_build_log.txt
+ls -R $RECIPE_DIR >> ~/conda_build_log.txt
+echo "===== prefix $PREFIX ======" >> ~/conda_build_log.txt
+ls -R $PREFIX >> ~/scaffan.txt
+
 $PYTHON setup.py install
 
-echo "install finished ======= " >> ~/scaffan.txt
-# ls $PREFIX/lib >> ~/scaffan.txt
