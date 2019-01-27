@@ -18,6 +18,8 @@ echo "prefix $PREFIX" >> ~/scaffan.txt
 ls $PREFIX >> ~/scaffan.txt
 echo "recipe dir $RECIPE_DIR" >> ~/scaffan.txt
 ls $RECIPE_DIR >> ~/scaffan.txt
+echo "recipe dir lib =====" >> ~/scaffan.txt
+ls $RECIPE_DIR/lib >> ~/scaffan.txt
 # rm -rf examples
 $PYTHON setup.py install
 
