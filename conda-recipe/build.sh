@@ -21,5 +21,5 @@ ls $RECIPE_DIR >> ~/scaffan.txt
 # rm -rf examples
 $PYTHON setup.py install
 
-echo "install finished" >> ~/scaffan.txt
+echo "install finished ======= " >> ~/scaffan.txt
 ls $RECIPE_DIR/lib >> ~/scaffan.txt
