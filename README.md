@@ -34,3 +34,11 @@ activate scaffan
 conda install -c mjirik -c bioconda -c conda-forge -y scaffan 
 
 ```
+
+
+## Known issues
+
+There are two problems with openslide package on windows. 
+* The package is not in conda channel. This is solved by automatic download of the dll binaries.
+* Dll binaries cannot be used together with libxml. There is workaround in scaffan. 
+It uses subprocess call to process separately image data and image annotations.
