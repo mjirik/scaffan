@@ -15,7 +15,7 @@ conda install -c mjirik -c bioconda -c conda-forge openslides-python lxml imma i
 
 # Windows
 
-[Install Conda](https://conda.io/miniconda.html)
+[Install Conda](https://conda.io/miniconda.html) and check "Add Anaconda to my PATH environment variable" 
 
 Run in terminal:
 ```commandline
