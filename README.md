@@ -23,8 +23,6 @@ Run in terminal:
 conda create -n scaffan -c mjirik -c bioconda -c conda-forge python=3.6 pip scaffan
 activate scaffan
 pip install openslide-python keras tensorflow
-
-
 ```
 
 ## Update
@@ -32,7 +30,13 @@ pip install openslide-python keras tensorflow
 ```commandline
 activate scaffan
 conda install -c mjirik -c bioconda -c conda-forge -y scaffan 
+```
 
+## Run
+
+```commandline
+activate scaffan
+python -m scaffan
 ```
 
 
