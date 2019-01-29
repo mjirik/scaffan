@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 0.3.*
+
+* [Added] Support for Openslide on 32-bit Windows
+
 ## 0.2.*
 
 * [Added] Suppression of unimportant warnings
