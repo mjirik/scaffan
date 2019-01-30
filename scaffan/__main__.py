@@ -32,11 +32,12 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 @click.pass_context
 def run(ctx):
     if ctx.invoked_subcommand is None:
-        click.echo('I was invoked without subcommand')
+        # click.echo('I was invoked without subcommand')
         ctx.invoke(gui)
         # a.main()
     else:
-        click.echo('I am about to invoke %s' % ctx.invoked_subcommand)
+        pass
+        # click.echo('I am about to invoke %s' % ctx.invoked_subcommand)
 
     pass
 
