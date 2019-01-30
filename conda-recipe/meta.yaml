@@ -47,6 +47,7 @@ requirements:
     - morphsnakes
     - pyqt=5.9.2 # tested
     - pyqtgraph
+    - click
 
   run:
     - python
@@ -59,6 +60,7 @@ requirements:
     - morphsnakes
     - pyqt=5.9.2 # tested
     - pyqtgraph
+    - click
     # - numpy
     # - pyqt 4.11.*
 
