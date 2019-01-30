@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 0.4.* 
+
+* [Added] Create desktop icon from command line
+
 ## 0.3.*
 
 * [Added] Support for Openslide on 32-bit Windows

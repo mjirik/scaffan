@@ -25,6 +25,13 @@ activate scaffan
 pip install openslide-python keras tensorflow
 ```
 
+### Create icon
+
+```bash
+activate scaffan
+python -m scaffan install
+```
+
 ## Update
 
 ```commandline
@@ -36,7 +43,7 @@ conda install -c mjirik -c bioconda -c conda-forge -y scaffan
 
 ```commandline
 activate scaffan
-python -m scaffan
+python -m scaffan gui
 ```
 
 
