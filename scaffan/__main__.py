@@ -64,7 +64,7 @@ def install():
         pth = pth / "Desktop" / Path("Scaffan.lnk")
         shortcut = shell.CreateShortcut(str(pth))
         # cmd
-        ln =  "call activate scaffan; {} -m scaffan".format(sys.executable)
+        # ln =  "call activate scaffan; {} -m scaffan".format(sys.executable)
         shortcut.TargetPath = sys.executable
         shortcut.Arguments = "-m scaffan"
         # shortcut.TargetPath = cmd
