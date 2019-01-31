@@ -48,6 +48,7 @@ requirements:
     - pyqt=5.9.2 # tested
     - pyqtgraph
     - click
+    - pywin32
 
   run:
     - python
@@ -61,6 +62,7 @@ requirements:
     - pyqt=5.9.2 # tested
     - pyqtgraph
     - click
+    - pywin32
     # - numpy
     # - pyqt 4.11.*
 
