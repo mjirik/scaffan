@@ -59,7 +59,7 @@ setup(
     # have to be included in MANIFEST.in as well.
     package_data={
         "sample1": ["scaffan_icon256.png"],
-        "": ["*.png"],
+        "": ["*.png", "*.ico"],
         "sample2": ["scaffan/scaffan_icon256.png"],
     },
     # Although 'package_data' is the preferred approach, in some case you may
