@@ -162,9 +162,32 @@ class AnnotatedImage:
         self.region_level = None
         self.region_pixelsize = None
         self.region_pixelunit = None
+        self.pixelunit = "mm"
+        self.level_pixelsize = [
+            get_pixelsize(self.openslide, i, requested_unit=self.pixelunit)[0]
+            for i in range(0, self.openslide.level_count)
+        ]
 
         if not skip_read_annotations:
             self.read_annotations()
+
+    def get_optimal_parameters_for_fluent_resize(self, pixelsize_mm, safety_bound=2):
+        if np.isscalar(pixelsize_mm):
+            pixelsize_mm = np.asarray([pixelsize_mm, pixelsize_mm])
+
+
+        pixelsize_mm2 = pixelsize_mm / safety_bound
+        best_level = 0
+        # scale_factor = None
+        for i, pxsz in enumerate(self.level_pixelsize):
+            if np.array_equal(pxsz, pixelsize_mm):
+                best_level = i
+                # scale_factor = 1.0
+            elif all(pxsz < pixelsize_mm2):
+                best_level = i
+
+        return best_level
+
 
     def get_resize_parameters(self, former_level, former_size, new_level):
         """
@@ -182,7 +205,8 @@ class AnnotatedImage:
         return get_offset_px(self.openslide)
 
     def get_pixel_size(self, level=0):
-        return get_pixelsize(self.openslide, level)
+        return self.level_pixelsize[level], self.pixelunit
+        # return get_pixelsize(self.openslide, level)
 
     def get_image_by_center(self, center, level=3, size=None, as_gray=True):
         return get_image_by_center(self.openslide, center, level, size, as_gray)
@@ -272,6 +296,7 @@ class AnnotatedImage:
         self.region_size = size
         self.region_level = level
         self.region_pixelsize, self.region_pixelunit = self.get_pixel_size(level)
+        self.level_pixelsize = [get_pixelsize(self.openslide, level=i, requested_unit=self.region_pixelunit)[0] for i in range(0, self.openslide.level_count)]
         scan.adjust_annotation_to_image_view(
             self.openslide, self.annotations, center, level, size
         )
@@ -409,11 +434,29 @@ class AnnotatedImage:
 
 
 class View:
-    def __init__(self, anim, center=None, level=0, size=None, location=None):
+    def __init__(self, anim, center=None, level=0, size=None, location=None, size_mm=None, pixelsize_mm=None):
         self.anim = anim
-        self.set_region(center=center, level=level, size=size, location=location)
+        self.set_region(center=center, level=level, size=size, location=location, size_mm=size_mm)
 
-    def set_region(self, center=None, level=0, size=None, location=None):
+    def set_region(self, center=None, level=None, size=None, location=None, size_mm=None, pixelsize_mm=None):
+
+        if pixelsize_mm is not None:
+            if np.isscalar(pixelsize_mm):
+                pixelsize_mm = np.array([pixelsize_mm, pixelsize_mm])
+            self.region_pixelsize  = pixelsize_mm
+            self.region_pixelunit = "mm"
+            if level is None:
+                level = self.anim.get_optimal_parameters_for_fluent_resize(self.region_pixelsize)
+
+        else:
+            if level is None:
+                level = 0
+            self.region_pixelsize, self.region_pixelunit = self.get_pixel_size(level)
+
+        if size_mm is not None:
+            size = (size_mm / self.region_pixelsize).astype(np.int)
+            if size is not None:
+                raise ValueError("Parameter size and size_mm are exclusive.")
 
         if size is None:
             size = [256, 256]
@@ -429,7 +472,6 @@ class View:
         self.region_center = center
         self.region_size = size
         self.region_level = level
-        self.region_pixelsize, self.region_pixelunit = self.get_pixel_size(level)
         import copy
 
         self.annotations = copy.deepcopy(self.anim.annotations)
