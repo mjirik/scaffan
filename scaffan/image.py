@@ -455,6 +455,9 @@ class View:
             im = skimage.color.rgb2gray(im)
         return im
 
+    def get_region_image_resolution(self, resolution_mm, as_gray=False, ):
+        self.anim.openslide.level_downsamples
+
     def region_imshow_annotation(self, i):
         region = self.get_region_image()
         plt.imshow(region)

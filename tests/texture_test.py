@@ -280,7 +280,8 @@ class TextureTest(unittest.TestCase):
         plt.savefig("glcm_energy_{}.png".format(title))
         # plt.show()
 
-    def test_texture_glcm_features_on_lobulus(self):
+
+    def test_texture_glcm_features_on_lobulus_by_tiles_processing(self):
         fn = io3d.datasets.join_path(
             "medical", "orig", "sample_data", "SCP003", "SCP003.ndpi", get_root=True
         )

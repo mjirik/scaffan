@@ -13,6 +13,7 @@ import scaffan.algorithm
 
 
 class MainGuiTest(unittest.TestCase):
+
     def test_just_start_app(self):
         # fn = io3d.datasets.join_path("medical", "orig", "CMU-1.ndpi", get_root=True)
         # fn = io3d.datasets.join_path("medical", "orig", "CMU-1.ndpi", get_root=True)
@@ -25,7 +26,7 @@ class MainGuiTest(unittest.TestCase):
         # scan.annotations_to_px(imsl, annotations)
         mainapp = scaffan.algorithm.Scaffan()
         mainapp.set_input_file(fn)
-        # mainapp.start_gui()
+        mainapp.start_gui()
 
     # def test_run_lobuluses(self):
     #     # fn = io3d.datasets.join_path("medical", "orig", "CMU-1.ndpi", get_root=True)

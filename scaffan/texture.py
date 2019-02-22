@@ -11,6 +11,7 @@ logger = logging.getLogger(__name__)
 import numpy as np
 import scipy.ndimage
 import matplotlib.pyplot as plt
+from pyqtgraph.parametertree import Parameter, ParameterTree
 
 
 def tile_centers(image_shape, tile_size):
@@ -88,11 +89,98 @@ def nonzero_with_step(data, step):
 
     return nzx * step, nzy * step
 
+class GLCMTextureMeasurement:
+    def __init__(self):
+        params = [
+            {
+                "name": "Tile Size",
+                "type": "int",
+                "value" : 64
+            },
+            {
+                "name": "Working Resolution",
+                "type": "float",
+                "value": 0.001,
+                "suffix": "m",
+                "siPrefix": True
+
+            }
+
+        ]
+
+        self.parameters = Parameter.create(name="Texture Processing", type="group", children=params)
+
+    def set_lobulus(self, anim, id, ):
+        self.anim = anim
+        self.animid = id
+
+    def run(self):
+
+        # title = "test3"
+        title = "test2"
+        # title = "test1"
+        views = self.anim.get_views_by_title(title, level=texseg.level)
+        energy = tiles_processing(
+            views[0].get_region_image(as_gray=True),
+            fcn=texture_glcm_features,
+            tile_size=texseg.tile_size,
+            fcn_output_n=3,
+            dtype=None,
+        )
+        # seg = texseg.predict(views[0], show=False, function=texture_energy)
+        plt.figure(figsize=(10, 12))
+        plt.subplot(221)
+        img = views[0].get_region_image()
+        plt.imshow(img)
+        plt.title("original image")
+        plt.subplot(222)
+        plt.title("GLCM energy")
+        imshow_with_colorbar(energy[:, :, 0])
+        plt.subplot(223)
+        plt.title("GLCM homogeneity")
+        imshow_with_colorbar(energy[:, :, 1])
+        plt.subplot(224)
+        plt.title("GLCM correlation")
+        imshow_with_colorbar(energy[:, :, 2])
+        mx = np.max(energy, axis=(0, 1))
+        mn = np.min(energy, axis=(0, 1))
+        logger.debug(mx)
+        # plt.colorbar()
+        plt.savefig("glcm_features_{}.png".format(title))
+
+        plt.figure()
+        plt.imshow(energy)
+        plt.savefig("glcm_features_color_{}.png".format(title))
+        # plt.show()
+
 
 class TextureSegmentation:
     def __init__(self, feature_function=None, classifier=None):
-        self.tile_size = [256, 256]
-        self.tile_size1 = 256
+
+        params = [
+            {
+                "name": "Tile Size",
+                "type": "int",
+                "value" : 256
+            },
+            # {
+            #     "name": "Working Resolution",
+            #     "type": "float",
+            #     "value": 0.001,
+            #     "suffix": "m",
+            #     "siPrefix": True
+            #
+            # }
+
+        ]
+
+        self.parameters = Parameter.create(name="Texture Processing", type="group", children=params)
+        self.parameters
+        self.tile_size = None
+        self.tile_size1 = None
+        self.set_tile_size(self.parameters.param("Tile Size").value())
+        self.parameters.param("Tile Size").sigValueChanged.connect(self._seg_tile_size_params)
+
         self.level = 1
         self.step = 64
         self.data = []
@@ -113,6 +201,9 @@ class TextureSegmentation:
         # METHOD = "uniform"
         # self.feature_function_args = [n_points, radius, METHOD]
         pass
+
+    def _seg_tile_size_params(self):
+        self.set_tile_size(self.parameters.param("Tile Size").value())
 
     def set_tile_size(self, tile_size1):
         self.tile_size = [tile_size1, tile_size1]
