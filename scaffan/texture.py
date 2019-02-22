@@ -23,6 +23,18 @@ def tile_centers(image_shape, tile_size):
 
 
 def tiles_processing(image, fcn, tile_size, fcn_output_n=None, dtype=np.int8):
+    """
+    Process image tile by tile. Last tile in every row and avery column may be smaller if modulo of shape of image and
+    shape of tile is different from zero.
+
+    :param image: input image
+    :param fcn: Function used on each tile. Input of this function is just tile image.
+    :param tile_size: size of tile in pixels
+    :param fcn_output_n: dimension of output of fcn()
+    :param dtype: output data type
+    :return:
+    """
+
     shape = list(image.shape)
     if fcn_output_n is not None:
         shape.append(fcn_output_n)
