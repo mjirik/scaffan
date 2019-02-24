@@ -100,7 +100,7 @@ def read_annotations(pth):
     return data
 
 
-def plot_annotations(annotations, x_key="x", y_key="y", in_region=False):
+def plot_annotations(annotations, x_key="x", y_key="y", in_region=False, factor=[1, 1]):
     if type(annotations) is dict:
         annotations = [annotations]
 
@@ -109,8 +109,8 @@ def plot_annotations(annotations, x_key="x", y_key="y", in_region=False):
         y_key = "region_y_px"
 
     for annotation in annotations:
-        x = np.asarray(annotation[x_key])
-        y = np.asarray(annotation[y_key])
+        x = np.asarray(annotation[x_key]) * factor[0]
+        y = np.asarray(annotation[y_key]) * factor[1]
         # plt.hold(True)
         plt.plot(x, y, c=annotation["color"])
 

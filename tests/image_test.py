@@ -101,6 +101,37 @@ class ParseAnnotationTest(unittest.TestCase):
         mask = view.get_annotation_region_raster("obj1")
         self.assertTrue(np.array_equal(mask.shape[:2], image.shape[:2]), "shape of mask should be the same as shape of image")
 
+    def test_select_view_by_title_and_plot_floating_resolution(self):
+        fn = io3d.datasets.join_path("medical", "orig", "CMU-1.ndpi", get_root=True)
+        anim = scim.AnnotatedImage(fn)
+        annotation_ids = anim.select_annotations_by_title("obj1")
+        view = anim.get_views(annotation_ids)[0]
+        pxsize, pxunit = view.get_pixel_size()
+        image = view.get_region_image()
+        plt.subplot(221)
+        plt.imshow(image)
+        view.plot_annotations("obj1")
+        plt.suptitle("{} x {} [{}]".format(pxsize[0], pxsize[1], pxunit))
+
+        self.assertGreater(image.shape[0], 100)
+        mask = view.get_annotation_region_raster("obj1")
+        self.assertTrue(np.array_equal(mask.shape[:2], image.shape[:2]), "shape of mask should be the same as shape of image")
+        plt.subplot(222)
+        plt.imshow(mask)
+
+
+
+        view2 = view.to_pixelsize(pixelsize_mm=[0.01, 0.01])
+        image2 = view2.get_region_image()
+        plt.subplot(223)
+        plt.imshow(image2)
+        view2.plot_annotations("obj1")
+        mask = view2.get_annotation_region_raster("obj1")
+        plt.subplot(224)
+        plt.imshow(mask)
+        self.assertTrue(np.array_equal(mask.shape[:2], image2.shape[:2]), "shape of mask should be the same as shape of image")
+
+        # plt.show()
 
 if __name__ == "__main__":
     # logging.basicConfig(stream=sys.stderr)
