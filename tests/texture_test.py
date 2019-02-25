@@ -24,15 +24,14 @@ sys.path.insert(0, op.abspath(op.join(path_to_script, "../../imma")))
 # sys.path.insert(0, imcut_path)
 
 import matplotlib.pyplot as plt
-from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 skip_on_local = False
 
-import scaffan.image as scim
+import scaffan.image as saim
 import scaffan.texture as satex
 import scaffan.texture_lbp as salbp
 
-scim.import_openslide()
+saim.import_openslide()
 import io3d
 
 
@@ -42,7 +41,7 @@ import io3d
 class TextureTest(unittest.TestCase):
     def test_select_view_by_title_and_plot_patch_centers(self):
         fn = io3d.datasets.join_path("medical", "orig", "CMU-1.ndpi", get_root=True)
-        anim = scim.AnnotatedImage(fn)
+        anim = saim.AnnotatedImage(fn)
         annotation_ids = anim.select_annotations_by_title("obj1")
         view = anim.get_views(annotation_ids, level=3)[0]
         image = view.get_region_image()
@@ -91,7 +90,7 @@ class TextureTest(unittest.TestCase):
         # plt.close("all")
         # plt.gcf().clear()
         fn = io3d.datasets.join_path("medical", "orig", "CMU-1.ndpi", get_root=True)
-        anim = scim.AnnotatedImage(fn)
+        anim = saim.AnnotatedImage(fn)
         # import pdb; pdb.set_trace()
         ann_params = dict(tile_size=title_size, level=level, step=64)
         patch_centers0 = satex.select_texture_patch_centers_from_one_annotation(
@@ -184,7 +183,7 @@ class TextureTest(unittest.TestCase):
         tile_size1 = 128
         tile_size = [128, 128]
         fn = io3d.datasets.join_path("medical", "orig", "CMU-1.ndpi", get_root=True)
-        anim = scim.AnnotatedImage(fn)
+        anim = saim.AnnotatedImage(fn)
 
         texseg = satex.TextureSegmentation()
         texseg.level = level
@@ -215,7 +214,7 @@ class TextureTest(unittest.TestCase):
             "PIG-008_P008 LL-P_HE_parenchyme perif..ndpi",
             get_root=True,
         )
-        anim = scim.AnnotatedImage(fn)
+        anim = saim.AnnotatedImage(fn)
 
         texseg = satex.TextureSegmentation()
         texseg.add_training_data(anim, "empty1", 0)
@@ -256,7 +255,7 @@ class TextureTest(unittest.TestCase):
             "medical", "orig", "sample_data", "SCP003", "SCP003.ndpi", get_root=True
         )
         # fn = io3d.datasets.join_path("scaffold", "Hamamatsu", "PIG-008_P008 LL-P_HE_parenchyme perif..ndpi", get_root=True)
-        anim = scim.AnnotatedImage(fn)
+        anim = saim.AnnotatedImage(fn)
 
         texseg = satex.TextureSegmentation()
 
@@ -265,7 +264,7 @@ class TextureTest(unittest.TestCase):
         views = anim.get_views_by_title(title, level=texseg.level)
         energy = satex.tiles_processing(
             views[0].get_region_image(as_gray=True),
-            fcn=texture_energy,
+            fcn=satex.texture_energy,
             tile_size=texseg.tile_size,
         )
         # seg = texseg.predict(views[0], show=False, function=texture_energy)
@@ -280,13 +279,12 @@ class TextureTest(unittest.TestCase):
         plt.savefig("glcm_energy_{}.png".format(title))
         # plt.show()
 
-
     def test_texture_glcm_features_on_lobulus_by_tiles_processing(self):
         fn = io3d.datasets.join_path(
             "medical", "orig", "sample_data", "SCP003", "SCP003.ndpi", get_root=True
         )
         # fn = io3d.datasets.join_path("scaffold", "Hamamatsu", "PIG-008_P008 LL-P_HE_parenchyme perif..ndpi", get_root=True)
-        anim = scim.AnnotatedImage(fn)
+        anim = saim.AnnotatedImage(fn)
 
         texseg = satex.TextureSegmentation()
         texseg.set_tile_size(64)
@@ -297,7 +295,7 @@ class TextureTest(unittest.TestCase):
         views = anim.get_views_by_title(title, level=texseg.level)
         energy = satex.tiles_processing(
             views[0].get_region_image(as_gray=True),
-            fcn=texture_glcm_features,
+            fcn=satex.texture_glcm_features,
             tile_size=texseg.tile_size,
             fcn_output_n=3,
             dtype=None,
@@ -310,13 +308,13 @@ class TextureTest(unittest.TestCase):
         plt.title("original image")
         plt.subplot(222)
         plt.title("GLCM energy")
-        imshow_with_colorbar(energy[:, :, 0])
+        saim.imshow_with_colorbar(energy[:, :, 0])
         plt.subplot(223)
         plt.title("GLCM homogeneity")
-        imshow_with_colorbar(energy[:, :, 1])
+        saim.imshow_with_colorbar(energy[:, :, 1])
         plt.subplot(224)
         plt.title("GLCM correlation")
-        imshow_with_colorbar(energy[:, :, 2])
+        saim.imshow_with_colorbar(energy[:, :, 2])
         mx = np.max(energy, axis=(0, 1))
         mn = np.min(energy, axis=(0, 1))
         logger.debug(mx)
@@ -327,47 +325,6 @@ class TextureTest(unittest.TestCase):
         plt.imshow(energy)
         plt.savefig("glcm_features_color_{}.png".format(title))
         # plt.show()
-
-
-def imshow_with_colorbar(*args, **kwargs):
-    ax = plt.gca()
-    im = ax.imshow(*args, **kwargs)
-    divider = make_axes_locatable(ax)
-    cax = divider.append_axes("right", size="5%", pad=0.05)
-    plt.colorbar(im, cax=cax)
-
-
-def texture_glcm_features(img):
-    import skimage.feature.texture
-
-    P = skimage.feature.greycomatrix(
-        (img * 31).astype(np.uint8),
-        [1],
-        [0, np.pi / 2],
-        levels=32,
-        symmetric=True,
-        normed=True,
-    )
-    en = skimage.feature.texture.greycoprops(P, prop="energy")
-    # dissimilarity = skimage.feature.texture.greycoprops(P, prop="dissimilarity")
-    homogeneity = skimage.feature.texture.greycoprops(P, prop="homogeneity")
-    correlation = skimage.feature.texture.greycoprops(P, prop="correlation")
-    return np.array([np.mean(en), np.mean(homogeneity), np.mean(correlation)])
-
-
-def texture_energy(img):
-    import skimage.feature.texture
-
-    P = skimage.feature.greycomatrix(
-        (img * 31).astype(np.uint8),
-        [1],
-        [0, np.pi / 2],
-        levels=32,
-        symmetric=True,
-        normed=True,
-    )
-    en = skimage.feature.texture.greycoprops(P, prop="energy")
-    return np.mean(en) * 100
 
 
 if __name__ == "__main__":

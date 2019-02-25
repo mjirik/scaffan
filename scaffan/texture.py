@@ -12,6 +12,7 @@ import numpy as np
 import scipy.ndimage
 import matplotlib.pyplot as plt
 from pyqtgraph.parametertree import Parameter, ParameterTree
+from . import image
 
 
 def tile_centers(image_shape, tile_size):
@@ -110,20 +111,22 @@ class GLCMTextureMeasurement:
 
         self.parameters = Parameter.create(name="Texture Processing", type="group", children=params)
 
-    def set_lobulus(self, anim, id, ):
+    def set_lobulus(self, anim:image.AnnotatedImage, id):
         self.anim = anim
-        self.animid = id
+        self.annotation_id = id
 
     def run(self):
 
         # title = "test3"
         title = "test2"
         # title = "test1"
-        views = self.anim.get_views_by_title(title, level=texseg.level)
+        views = self.anim.get_views_by_title(self.annotation_id, level=0)
+        pxsize_mm = [self.parameters.param("Working Resolution").value() * 100] * 2
+        tilesize = [self.parameters.param("Tile Size").value()] * 2
         energy = tiles_processing(
-            views[0].get_region_image(as_gray=True),
+            views[0].to_pixelsize(pxsize_mm).get_region_image(as_gray=True),
             fcn=texture_glcm_features,
-            tile_size=texseg.tile_size,
+            tile_size=tilesize,
             fcn_output_n=3,
             dtype=None,
         )
@@ -135,13 +138,13 @@ class GLCMTextureMeasurement:
         plt.title("original image")
         plt.subplot(222)
         plt.title("GLCM energy")
-        imshow_with_colorbar(energy[:, :, 0])
+        image.imshow_with_colorbar(energy[:, :, 0])
         plt.subplot(223)
         plt.title("GLCM homogeneity")
-        imshow_with_colorbar(energy[:, :, 1])
+        image.imshow_with_colorbar(energy[:, :, 1])
         plt.subplot(224)
         plt.title("GLCM correlation")
-        imshow_with_colorbar(energy[:, :, 2])
+        image.imshow_with_colorbar(energy[:, :, 2])
         mx = np.max(energy, axis=(0, 1))
         mn = np.min(energy, axis=(0, 1))
         logger.debug(mx)
@@ -297,3 +300,37 @@ class TextureSegmentation:
             plt.plot(x, y, "xy")
             # view.plot_points()
         return seg
+
+
+def texture_glcm_features(img):
+    import skimage.feature.texture
+
+    P = skimage.feature.greycomatrix(
+        (img * 31).astype(np.uint8),
+        [1],
+        [0, np.pi / 2],
+        levels=32,
+        symmetric=True,
+        normed=True,
+    )
+    en = skimage.feature.texture.greycoprops(P, prop="energy")
+    # dissimilarity = skimage.feature.texture.greycoprops(P, prop="dissimilarity")
+    homogeneity = skimage.feature.texture.greycoprops(P, prop="homogeneity")
+    correlation = skimage.feature.texture.greycoprops(P, prop="correlation")
+    return np.array([np.mean(en), np.mean(homogeneity), np.mean(correlation)])
+
+
+def texture_energy(img):
+    import skimage.feature.texture
+
+    P = skimage.feature.greycomatrix(
+        (img * 31).astype(np.uint8),
+        [1],
+        [0, np.pi / 2],
+        levels=32,
+        symmetric=True,
+        normed=True,
+    )
+    en = skimage.feature.texture.greycoprops(P, prop="energy")
+    return np.mean(en) * 100
+

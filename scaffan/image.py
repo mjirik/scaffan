@@ -21,6 +21,7 @@ from scaffan import libfixer
 import imma
 
 from matplotlib.path import Path
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 
 def import_openslide():
@@ -230,7 +231,7 @@ class AnnotatedImage:
         view = View(anim=self, center=center, level=level, size_on_level=size, location=location)
         return view
 
-    def get_views_by_title(self, title=None, level=2, return_ids=False, **kwargs):
+    def get_views_by_title(self, title=None, level=2, return_ids=False, **kwargs) -> List['View']:
         annotation_ids = self.get_annotation_ids(title)
         if return_ids:
             return self.get_views(annotation_ids, level=level, **kwargs), annotation_ids
@@ -663,3 +664,12 @@ class View:
 
 class ColorError(Exception):
     pass
+
+
+
+def imshow_with_colorbar(*args, **kwargs):
+    ax = plt.gca()
+    im = ax.imshow(*args, **kwargs)
+    divider = make_axes_locatable(ax)
+    cax = divider.append_axes("right", size="5%", pad=0.05)
+    plt.colorbar(im, cax=cax)

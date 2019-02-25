@@ -202,7 +202,7 @@ class Scaffan:
         lobulus = scaffan.lobulus.Lobulus(self.anim, annotation_id, report=self.report)
         lobulus.find_border(show=show)
         if self.parameters.param("Processing", "Run Texture Analysis").value():
-            self.glcm_textures
+            self.glcm_textures.set_lobulus(self.anim, annotation_id)
             # self.glcm_textures.run
 
     def start_gui(self, skip_exec=False, qapp=None):
