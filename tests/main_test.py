@@ -26,7 +26,8 @@ class MainGuiTest(unittest.TestCase):
         # scan.annotations_to_px(imsl, annotations)
         mainapp = scaffan.algorithm.Scaffan()
         mainapp.set_input_file(fn)
-        mainapp.set_annotation_color_selection("#FF00FF")
+        # mainapp.set_annotation_color_selection("#FF00FF")
+        mainapp.set_annotation_color_selection("#FF0000")
         mainapp.start_gui()
 
 
