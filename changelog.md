@@ -4,8 +4,10 @@
 
 ## 0.5.*
 
+* [Added] Data file info in GUI
 * [Added] GLCM texture features analysis independent on input data pixelsize
 * [Added] Texture features parameters controled from GUI
+* [Changed] Inner view representation allow use pixelsize independent on input data levels
 
 ## 0.4.* 
 

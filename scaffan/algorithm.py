@@ -10,6 +10,7 @@ logger = logging.getLogger(__name__)
 import sys
 import os.path as op
 import datetime
+from pathlib import Path
 
 # import PyQt5.QtWidgets
 # print("start 3")
@@ -40,6 +41,7 @@ class Scaffan:
                 "type": "group",
                 "children": [
                     {"name": "File Path", "type": "str"},
+                    {"name": "Data Info", "type": "str"},
                     {"name": "Select", "type": "action"},
                     {
                         "name": "Annotation Color",
@@ -205,6 +207,12 @@ class Scaffan:
             self.glcm_textures.set_lobulus(self.anim, annotation_id)
             # self.glcm_textures.run
 
+    def _get_file_info(self):
+        fnparam = Path(self.parameters.param("Input", "File Path").value())
+        if fnparam.exists():
+            anim = scaffan.image.AnnotatedImage(str(fnparam))
+            self.parameters.param("Input", "Data Info").setValue(anim.get_file_info())
+
     def start_gui(self, skip_exec=False, qapp=None):
 
         from PyQt5 import QtWidgets
@@ -216,6 +224,9 @@ class Scaffan:
 
         self.parameters.param("Input", "Select").sigActivated.connect(
             self.select_file_gui
+        )
+        self.parameters.param("Input", "File Path").sigValueChanged.connect(
+            self._get_file_info
         )
         self.parameters.param("Output", "Select").sigActivated.connect(
             self.select_output_dir_gui

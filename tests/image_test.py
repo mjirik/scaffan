@@ -65,6 +65,13 @@ class ParseAnnotationTest(unittest.TestCase):
         annotations = anim.read_annotations()
         self.assertGreater(len(annotations), 1, "there should be 2 annotations")
 
+    def test_file_info(self):
+        fn = io3d.datasets.join_path("medical", "orig", "CMU-1.ndpi", get_root=True)
+        anim = scim.AnnotatedImage(fn)
+        msg = anim.get_file_info()
+        self.assertEqual(type(msg), str)
+        self.assertLess(0, msg.find("mm"))
+
     def test_region(self):
         fn = io3d.datasets.join_path("medical", "orig", "CMU-1.ndpi", get_root=True)
         anim = scim.AnnotatedImage(fn)

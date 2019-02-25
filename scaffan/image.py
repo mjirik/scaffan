@@ -173,6 +173,12 @@ class AnnotatedImage:
         if not skip_read_annotations:
             self.read_annotations()
 
+    def get_file_info(self):
+        pxsz, unit = self.get_pixel_size(0)
+        # self.titles
+        # self.colors
+        return "Pixelsize: {}x{} [{}], {} annotations".format(pxsz[0], pxsz[1], unit, len(self.colors))
+
     def get_optimal_parameters_for_fluent_resize(self, pixelsize_mm, safety_bound=2):
         if np.isscalar(pixelsize_mm):
             pixelsize_mm = [pixelsize_mm, pixelsize_mm]
