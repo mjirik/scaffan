@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+## 0.5.*
+
+* [Added] GLCM texture features analysis independent on input data pixelsize
+* [Added] Texture features parameters controled from GUI
+
 ## 0.4.* 
 
 * [Added] Create desktop icon from command line
