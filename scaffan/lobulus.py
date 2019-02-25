@@ -17,13 +17,14 @@ import warnings
 import morphsnakes as ms
 from matplotlib import pyplot as plt
 from scaffan import image as scim
+from .report import Report
 
 
 class Lobulus:
     def __init__(self, anim: scim.AnnotatedImage, annotation_id, level=3, report=None):
         self.anim = anim
         self.level = level
-        self.report = report
+        self.report: Report = report
         self.annotation_id = annotation_id
         self._init_by_annotation_id(annotation_id)
 
@@ -218,7 +219,7 @@ class Lobulus:
         label, num = scipy.ndimage.label(conv == 1)
         datarow["Dead ends number"] = num
 
-        self.report.add_row(datarow)
+        self.report.add_cols_to_actual_row(datarow)
 
     # def imfigsave(self, base_fn, arr):
 

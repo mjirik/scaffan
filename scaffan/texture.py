@@ -11,8 +11,10 @@ logger = logging.getLogger(__name__)
 import numpy as np
 import scipy.ndimage
 import matplotlib.pyplot as plt
+import os.path as op
 from pyqtgraph.parametertree import Parameter, ParameterTree
 from . import image
+from .report import Report
 
 
 def tile_centers(image_shape, tile_size):
@@ -110,6 +112,10 @@ class GLCMTextureMeasurement:
         ]
 
         self.parameters = Parameter.create(name="Texture Processing", type="group", children=params)
+        self.report: Report = None
+
+    def set_report(self, report: Report):
+        self.report = report
 
     def set_lobulus(self, anim:image.AnnotatedImage, id):
         self.anim = anim
@@ -149,11 +155,24 @@ class GLCMTextureMeasurement:
         mn = np.min(energy, axis=(0, 1))
         logger.debug(mx)
         # plt.colorbar()
-        plt.savefig("glcm_features_{}.png".format(title))
+        if self.report is not None:
+            plt.savefig(
+                op.join(
+                    self.report.outputdir, "glcm_features_{}.png".format(self.annotation_id)
+                )
+            )
+        # plt.savefig("glcm_features_{}.png".format(title))
 
         plt.figure()
         plt.imshow(energy)
         plt.savefig("glcm_features_color_{}.png".format(title))
+
+        row = {
+            "GLCM Energy": np.mean(energy[:, :, 0]),
+            "GLCM Homogenity": np.mean(energy[:, :, 1]),
+            "GLCM Correlation": np.mean(energy[:, :, 2]),
+        }
+        self.report.add_cols_to_actual_row(row)
         # plt.show()
 
 

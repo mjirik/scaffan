@@ -204,8 +204,11 @@ class Scaffan:
         lobulus = scaffan.lobulus.Lobulus(self.anim, annotation_id, report=self.report)
         lobulus.find_border(show=show)
         if self.parameters.param("Processing", "Run Texture Analysis").value():
+            self.glcm_textures.set_report(self.report)
+            # self.glcm_textures.report = self.report
             self.glcm_textures.set_lobulus(self.anim, annotation_id)
             # self.glcm_textures.run
+            self.report.finish_actual_row()
 
     def _get_file_info(self):
         fnparam = Path(self.parameters.param("Input", "File Path").value())

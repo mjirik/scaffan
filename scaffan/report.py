@@ -22,12 +22,17 @@ class Report:
 
         self.df = pd.DataFrame()
         self.imgs = {}
+        self.actual_row = {}
 
-    def add_row(self, data):
-        df = pd.DataFrame([list(data.values())], columns=list(data.keys()))
-        self.df = self.df.append(df, ignore_index=True)
+    def add_cols_to_actual_row(self, data):
+        self.actual_row.update(data)
 
     # def write_table(self, filename):
+    def finish_actual_row(self):
+        data = self.actual_row
+        df = pd.DataFrame([list(data.values())], columns=list(data.keys()))
+        self.df = self.df.append(df, ignore_index=True)
+        self.actual_row = {}
 
     def add_table(self):
         pass
