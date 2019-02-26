@@ -98,12 +98,12 @@ class GLCMTextureMeasurement:
             {
                 "name": "Tile Size",
                 "type": "int",
-                "value" : 64
+                "value" : 128
             },
             {
                 "name": "Working Resolution",
                 "type": "float",
-                "value": 0.001,
+                "value": 0.000001,
                 "suffix": "m",
                 "siPrefix": True
 
@@ -124,7 +124,7 @@ class GLCMTextureMeasurement:
     def run(self):
 
         # title = "test3"
-        title = "test2"
+        # title = "test2"
         # title = "test1"
         views = self.anim.get_views_by_title(self.annotation_id, level=0)
         pxsize_mm = [self.parameters.param("Working Resolution").value() * 100] * 2
@@ -165,7 +165,7 @@ class GLCMTextureMeasurement:
 
         plt.figure()
         plt.imshow(energy)
-        plt.savefig("glcm_features_color_{}.png".format(title))
+        plt.savefig(self.report.outputdir / "glcm_features_color_{}.png".format(self.annotation_id))
 
         row = {
             "GLCM Energy": np.mean(energy[:, :, 0]),
