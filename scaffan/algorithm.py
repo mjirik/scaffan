@@ -28,6 +28,7 @@ import io3d
 import io3d.datasets
 import scaffan.lobulus
 import scaffan.report
+from .report import Report
 
 
 class Scaffan:
@@ -80,7 +81,6 @@ class Scaffan:
                 "type": "group",
                 "children": [
                     # {'name': 'Directory Path', 'type': 'str', 'value': prepare_default_output_dir()},
-                    {"name": "Run", "type": "action"},
                     {
                         "name": "Show",
                         "type": "bool",
@@ -90,16 +90,18 @@ class Scaffan:
                     {
                         "name": "Run Texture Analysis",
                         "type": "bool",
-                        "value": False,
+                        "value": True,
                         # "tip": "Show images",
                     },
 
                     self.glcm_textures.parameters,
+                    {"name": "Run", "type": "action"},
                 ],
             },
         ]
         self.parameters = Parameter.create(name="params", type="group", children=params)
-        self.anim = None
+        self.anim: image.AnnotatedImage = None
+        self.report: Report = None
         pass
 
     def select_file_gui(self):
@@ -162,7 +164,7 @@ class Scaffan:
         path = fnparam.value()
         self.anim = image.AnnotatedImage(path)
         fnparam = self.parameters.param("Output", "Directory Path")
-        self.report = scaffan.report.Report(fnparam.value())
+        self.report: Report = scaffan.report.Report(fnparam.value())
 
     def set_annotation_color_selection(self, color):
         pcolor = self.parameters.param("Input", "Annotation Color")
@@ -196,6 +198,8 @@ class Scaffan:
         for id in annotation_ids:
             self._run_lobulus(id)
         self.report.df.to_excel(op.join(self.report.outputdir, "data.xlsx"))
+        from . import os_interaction
+        os_interaction.open_path(self.report.outputdir)
 
         # print("ann ids", annotation_ids)
 
@@ -207,7 +211,7 @@ class Scaffan:
             self.glcm_textures.set_report(self.report)
             # self.glcm_textures.report = self.report
             self.glcm_textures.set_lobulus(self.anim, annotation_id)
-            # self.glcm_textures.run
+            self.glcm_textures.run()
             self.report.finish_actual_row()
 
     def _get_file_info(self):

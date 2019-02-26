@@ -8,6 +8,7 @@
 * [Added] GLCM texture features analysis independent on input data pixelsize
 * [Added] Texture features parameters controled from GUI
 * [Changed] Inner view representation allow use pixelsize independent on input data levels
+* [Added] Open output directory when processing is finished
 
 ## 0.4.* 
 

@@ -12,11 +12,13 @@ import os
 import matplotlib.pyplot as plt
 import skimage.io
 import warnings
+from pathlib import Path
 
 
 class Report:
     def __init__(self, outputdir):
-        self.outputdir = op.expanduser(outputdir)
+        # self.outputdir = op.expanduser(outputdir)
+        self.outputdir = Path(outputdir).expanduser()
         if not op.exists(self.outputdir):
             os.makedirs(self.outputdir)
 
