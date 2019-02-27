@@ -147,7 +147,7 @@ class GLCMTextureMeasurement:
         img = view.get_region_image()
         plt.imshow(img)
         view.plot_annotations(self.annotation_id)
-        seg = imma.image.resize_to_shape(self.lobulus_segmentation, shape=img.shape, order=0)
+        seg = imma.image.resize_to_shape(self.lobulus_segmentation, shape=img.shape[:2], order=0)
         plt.contour(seg)
         plt.title("original image")
         plt.subplot(222)
@@ -175,10 +175,15 @@ class GLCMTextureMeasurement:
         plt.imshow(energy)
         plt.savefig(self.report.outputdir / "glcm_features_color_{}.png".format(self.annotation_id))
 
+        e0 = energy[:,:, 0]
+        e1 = energy[:,:, 0]
+        e2 = energy[:,:, 0]
+
+
         row = {
-            "GLCM Energy": np.mean(energy[:, :, 0]),
-            "GLCM Homogenity": np.mean(energy[:, :, 1]),
-            "GLCM Correlation": np.mean(energy[:, :, 2]),
+            "GLCM Energy": np.mean(e0[seg==1]),
+            "GLCM Homogenity": np.mean(e1[seg==1]),
+            "GLCM Correlation": np.mean(e2[seg==1]),
         }
         self.report.add_cols_to_actual_row(row)
         # plt.show()

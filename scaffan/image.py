@@ -1,7 +1,9 @@
 # /usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Modul is used for GUI of Lisa
+Modul is used for slice image and view processing. It cooperates with openslide.
+Some of coordinates are swapped. It is due to openslide. With request subimage with size=[A, B] it will
+return subimage with shape [B, A]. It is probably because of visualization.
 """
 import logging
 
@@ -22,6 +24,9 @@ import imma
 
 from matplotlib.path import Path as mplPath
 from mpl_toolkits.axes_grid1 import make_axes_locatable
+
+
+#
 
 
 def import_openslide():
