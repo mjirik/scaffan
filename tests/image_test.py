@@ -113,7 +113,7 @@ class ParseAnnotationTest(unittest.TestCase):
         anim = scim.AnnotatedImage(fn)
         annotation_ids = anim.select_annotations_by_title("obj1")
         view = anim.get_views(annotation_ids)[0]
-        pxsize, pxunit = view.get_pixel_size()
+        pxsize, pxunit = view.get_pixelsize_on_level()
         image = view.get_region_image()
         plt.subplot(221)
         plt.imshow(image)

@@ -212,7 +212,10 @@ class Scaffan:
         self.lobulus_processing.find_border(show=show)
         if self.parameters.param("Processing", "Run Texture Analysis").value():
             # self.glcm_textures.report = self.report
-            self.glcm_textures.set_lobulus(self.anim, annotation_id)
+            self.glcm_textures.set_input_data(self.anim, annotation_id,
+                                              view=self.lobulus_processing.view,
+                                              lobulus_segmentation=self.lobulus_processing.lobulus_mask
+                                              )
             self.glcm_textures.run()
             self.report.finish_actual_row()
 

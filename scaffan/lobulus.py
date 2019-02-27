@@ -19,20 +19,22 @@ from matplotlib import pyplot as plt
 from scaffan import image as scim
 from .report import Report
 from pyqtgraph.parametertree import Parameter
+import imma.image
 
 
 class Lobulus:
     def __init__(self):
         params = [
-            {
-                "name": "Tile Size",
-                "type": "int",
-                "value" : 128
-            },
+            # {
+            #     "name": "Tile Size",
+            #     "type": "int",
+            #     "value" : 128
+            # },
             {
                 "name": "Working Resolution",
                 "type": "float",
-                "value": 0.000001,
+                # "value": 0.000001,
+                "value": 0.00000091, # this is typical resolution on level 2
                 "suffix": "m",
                 "siPrefix": True
 
@@ -46,7 +48,33 @@ class Lobulus:
 
             },
             {
-                'name': 'Central Vein Segmentation', 'type': 'group', 'children': [
+                'name': 'Central Vein Segmentation', 'type': 'group',
+                'tip': "MorphGAC algorithm parameters",
+                'children': [
+                {
+                    "name": "Smoothing",
+                    "type": "float",
+                    "value": 2,
+                    "suffix": "px",
+                    "siPrefix": False,
+                    'tip': "MorphGAC algorithm parameter",
+                },
+                {
+                    "name": "Threshold",
+                    "type": "float",
+                    "value": 0.28,
+                    'tip': "MorphGAC algorithm parameter",
+                    # "suffix": "px",
+                    # "siPrefix": False
+                },
+                {
+                    "name": "Ballon",
+                    "type": "float",
+                    "value": -1,
+                    'tip': "MorphGAC algorithm parameter",
+                    # "suffix": "px",
+                    # "siPrefix": False
+                },
 
 
             ]
@@ -57,7 +85,14 @@ class Lobulus:
         self.parameters = Parameter.create(name="Lobulus Processing", type="group", children=params)
         self.report: Report = None
 
-    def set_annotated_image_and_id(self, anim: scim.AnnotatedImage, annotation_id, level=3):
+    def set_annotated_image_and_id(self, anim: scim.AnnotatedImage, annotation_id, level=None):
+        """
+
+        :param anim:
+        :param annotation_id:
+        :param level: Is used just for short time in funcion get_views()
+        :return:
+        """
         self.anim = anim
         self.level = level
         self.annotation_id = annotation_id
@@ -69,9 +104,19 @@ class Lobulus:
         self.report: Report = report
 
     def _init_by_annotation_id(self, annotation_id):
+        if not np.isscalar(annotation_id):
+            raise ValueError("Annotation ID should be scalar int value for lobulus processing.")
+
+        pixelsize_mm = [(self.parameters.param("Working Resolution").value() * 1000)] * 2
         self.view = self.anim.get_views(
-            annotation_ids=[annotation_id], level=self.level, margin=1.8
+            annotation_ids=[annotation_id], level=self.level, margin=1.8,
+            pixelsize_mm=pixelsize_mm
         )[0]
+        right_shape = imma.image.calculate_new_shape(
+            self.view.region_size_on_level,
+            self.view.get_pixelsize_on_level(self.view.region_level)[0],
+            self.view.region_pixelsize
+        )
         self.image = self.view.get_region_image(as_gray=True)
         self.mask = self.view.get_annotation_region_raster(annotation_id=annotation_id)
         pass
@@ -96,8 +141,14 @@ class Lobulus:
         # mgac.run(iterations=100)
         # inner = mgac.levelset.copy()
 
+        param_gac_smoothing = self.parameters.param("Central Vein Segmentation", "Smoothing").value()
+        param_gac_threshold = self.parameters.param("Central Vein Segmentation", "Threshold").value()
+        param_gac_baloon = self.parameters.param("Central Vein Segmentation", "Ballon").value()
+
         # central vein
-        mgac = ms.MorphGAC(im_gradient, smoothing=2, threshold=0.28, balloon=-1.0)
+        mgac = ms.MorphGAC(im_gradient, smoothing=param_gac_smoothing,
+                           threshold=param_gac_threshold, balloon=param_gac_baloon)
+        # mgac = ms.MorphGAC(im_gradient, smoothing=2, threshold=0.28, balloon=-1.0)
         # mgac = ms.MorphACWE(im_gradient0, smoothing=2, lambda1=.1, lambda2=.05)
         mgac.levelset = circle.copy()
         mgac.run(iterations=150)

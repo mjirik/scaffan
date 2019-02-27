@@ -15,6 +15,7 @@ import os.path as op
 from pyqtgraph.parametertree import Parameter, ParameterTree
 from . import image
 from .report import Report
+import imma.image
 
 
 def tile_centers(image_shape, tile_size):
@@ -98,7 +99,7 @@ class GLCMTextureMeasurement:
             {
                 "name": "Tile Size",
                 "type": "int",
-                "value" : 128
+                "value" : 64
             },
             {
                 "name": "Working Resolution",
@@ -117,20 +118,24 @@ class GLCMTextureMeasurement:
     def set_report(self, report: Report):
         self.report = report
 
-    def set_lobulus(self, anim:image.AnnotatedImage, id):
+    def set_input_data(self, anim:image.AnnotatedImage, id, view, lobulus_segmentation):
         self.anim = anim
         self.annotation_id = id
+        self.parent_view = view
+        self.lobulus_segmentation = lobulus_segmentation
 
     def run(self):
 
         # title = "test3"
         # title = "test2"
         # title = "test1"
-        views = self.anim.get_views_by_title(self.annotation_id, level=0)
+        # views = self.anim.get_views_by_title(self.annotation_id, level=0)
         pxsize_mm = [self.parameters.param("Working Resolution").value() * 1000] * 2
         tilesize = [self.parameters.param("Tile Size").value()] * 2
+        # view = views[0].to_pixelsize(pxsize_mm)
+        view = self.parent_view.to_pixelsize(pxsize_mm)
         energy = tiles_processing(
-            views[0].to_pixelsize(pxsize_mm).get_region_image(as_gray=True),
+            view.get_region_image(as_gray=True),
             fcn=texture_glcm_features,
             tile_size=tilesize,
             fcn_output_n=3,
@@ -139,8 +144,11 @@ class GLCMTextureMeasurement:
         # seg = texseg.predict(views[0], show=False, function=texture_energy)
         plt.figure(figsize=(10, 12))
         plt.subplot(221)
-        img = views[0].get_region_image()
+        img = view.get_region_image()
         plt.imshow(img)
+        view.plot_annotations(self.annotation_id)
+        seg = imma.image.resize_to_shape(self.lobulus_segmentation, shape=img.shape, order=0)
+        plt.contour(seg)
         plt.title("original image")
         plt.subplot(222)
         plt.title("GLCM energy")
@@ -251,12 +259,12 @@ class TextureSegmentation:
             patch_centers1_points = list(zip(*patch_centers1))
             return patch_centers1_points
 
-    def get_patch_view(self, anim, patch_center=None, annotation_id=None):
+    def get_patch_view(self, anim: image.AnnotatedImage, patch_center=None, annotation_id=None):
         if patch_center is not None:
-            view = anim.get_view(
+            view: image.View = anim.get_view(
                 center=[patch_center[0], patch_center[1]],
                 level=self.level,
-                size=self.tile_size,
+                size_on_level=self.tile_size,
             )
         elif patch_center is not None:
             annotation_ids = anim.select_annotations_by_title(

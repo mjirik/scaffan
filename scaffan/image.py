@@ -20,7 +20,7 @@ from scaffan import annotation as scan
 from scaffan import libfixer
 import imma
 
-from matplotlib.path import Path
+from matplotlib.path import Path as mplPath
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 
@@ -179,7 +179,7 @@ class AnnotatedImage:
         # self.colors
         return "Pixelsize: {}x{} [{}], {} annotations".format(pxsz[0], pxsz[1], unit, len(self.colors))
 
-    def get_optimal_parameters_for_fluent_resize(self, pixelsize_mm, safety_bound=2):
+    def get_optimal_level_for_fluent_resize(self, pixelsize_mm, safety_bound=2):
         if np.isscalar(pixelsize_mm):
             pixelsize_mm = [pixelsize_mm, pixelsize_mm]
         pixelsize_mm = np.asarray(pixelsize_mm)
@@ -233,8 +233,13 @@ class AnnotatedImage:
         self.colors = scan.annotation_colors(self.annotations)
         return self.annotations
 
-    def get_view(self, center=None, level=0, size=None, location=None):
-        view = View(anim=self, center=center, level=level, size_on_level=size, location=location)
+    def get_view(
+            self, center=None, level=0, size_on_level=None,
+            location=None, size_mm=None, pixelsize_mm=None, safety_bound=2) -> "View":
+        view = View(
+            anim=self, center=center, level=level, size_on_level=size_on_level,
+            location=location, size_mm=size_mm, pixelsize_mm=pixelsize_mm, safety_bound=safety_bound
+            )
         return view
 
     def get_views_by_title(self, title=None, level=2, return_ids=False, **kwargs) -> List['View']:
@@ -254,10 +259,12 @@ class AnnotatedImage:
     def get_views(
         self,
         annotation_ids=None,
-        level=2,
+        level=None,
         margin=0.5,
-        margin_in_pixels=False,
+        margin_in_pixels: bool=False,
         show=False,
+        pixelsize_mm=None,
+        safety_bound=2
     ) -> List["View"]:
         """
 
@@ -269,6 +276,8 @@ class AnnotatedImage:
         :param show:
         :return:
         """
+        if pixelsize_mm is not None:
+            level = self.get_optimal_level_for_fluent_resize(pixelsize_mm, safety_bound=safety_bound)
         views = [None] * len(annotation_ids)
         for i, annotation_id in enumerate(annotation_ids):
             center, size = self.get_annotations_bounds_px(annotation_id)
@@ -281,7 +290,8 @@ class AnnotatedImage:
             region_size = (
                 (size / self.openslide.level_downsamples[level]) + 2 * margin_px
             ).astype(int)
-            view = self.get_view(center=center, level=level, size=region_size)
+            view = self.get_view(center=center, level=level, size_on_level=region_size,
+                                 pixelsize_mm=pixelsize_mm)
             if show:
                 view.region_imshow_annotation(annotation_id)
             views[i] = view
@@ -305,7 +315,13 @@ class AnnotatedImage:
         self.region_size = size
         self.region_level = level
         self.region_pixelsize, self.region_pixelunit = self.get_pixel_size(level)
-        self.level_pixelsize = [get_pixelsize(self.openslide, level=i, requested_unit=self.region_pixelunit)[0] for i in range(0, self.openslide.level_count)]
+        self.level_pixelsize = [
+            get_pixelsize(
+                self.openslide,
+                level=i,
+                requested_unit=self.region_pixelunit)[0]
+            for i in range(0, self.openslide.level_count)
+        ]
         scan.adjust_annotation_to_image_view(
             self.openslide, self.annotations, center, level, size
         )
@@ -397,7 +413,7 @@ class AnnotatedImage:
         polygon_x = self.annotations[i]["region_x_px"]
         polygon_y = self.annotations[i]["region_y_px"]
         polygon = list(zip(polygon_y, polygon_x))
-        poly_path = Path(polygon)
+        poly_path = mplPath(polygon)
 
         x, y = np.mgrid[: self.region_size[1], : self.region_size[0]]
         coors = np.hstack(
@@ -443,11 +459,13 @@ class AnnotatedImage:
 
 
 class View:
-    def __init__(self, anim, center=None, level=0, size_on_level=None, location=None, size_mm=None, pixelsize_mm=None, safety_bound=2):
-        self.anim = anim
+    def __init__(self, anim: AnnotatedImage, center=None, level=0, size_on_level=None, location=None, size_mm=None, pixelsize_mm=None, safety_bound=2):
+        self.anim: AnnotatedImage = anim
         self.set_region(center=center, level=level, size_on_level=size_on_level, location=location, size_mm=size_mm, pixelsize_mm=pixelsize_mm, safety_bound=safety_bound)
 
     def set_region(self, center=None, level=None, size_on_level=None, location=None, size_mm=None, pixelsize_mm=None, safety_bound=2):
+        if (level is None) and (size_on_level is not None):
+                raise ValueError("Parameter 'size_on_level' cannot be used if 'level' is not defined")
         if pixelsize_mm is not None:
             self.is_resized_by_pixelsize = True
             if np.isscalar(pixelsize_mm):
@@ -456,7 +474,7 @@ class View:
             self.region_pixelsize  = pixelsize_mm
             self.region_pixelunit = "mm"
             if level is None:
-                level = self.anim.get_optimal_parameters_for_fluent_resize(self.region_pixelsize, safety_bound=safety_bound)
+                level = self.anim.get_optimal_level_for_fluent_resize(self.region_pixelsize, safety_bound=safety_bound)
 
         else:
             if level is None:
@@ -464,15 +482,15 @@ class View:
             self.is_resized_by_pixelsize = False
             # self.region_pixelsize = None
             # self.region_pixelunit = "mm"
-            self.region_pixelsize, self.region_pixelunit = self.get_pixel_size(level)
+            self.region_pixelsize, self.region_pixelunit = self.get_pixelsize_on_level(level)
 
         if size_mm is not None:
             if np.isscalar(size_mm):
-                lsize_mm = [size_mm, size_mm]
+                size_mm = [size_mm, size_mm]
             if size_on_level is not None:
                 raise ValueError("Parameter size and size_mm are exclusive.")
             size_mm = np.asarray(size_mm)
-            size_on_level = (size_mm / self.get_pixel_size(level)[0]).astype(np.int)
+            size_on_level = np.ceil(size_mm / self.get_pixelsize_on_level(level)[0]).astype(np.int)
 
         if size_on_level is None:
             size_on_level = [256, 256]
@@ -482,7 +500,7 @@ class View:
         self.region_size_on_level = size_on_level
 
         if pixelsize_mm is not None:
-            pxsz = self.get_pixel_size(level)[0]
+            pxsz = self.get_pixelsize_on_level(level)[0]
             self.zoom = pxsz/ (1.0 * pixelsize_mm)
             self.region_size_on_pixelsize_mm = np.ceil(size_on_level * self.zoom).astype(np.int)
         else:
@@ -504,13 +522,13 @@ class View:
             self.anim.openslide, self.annotations, center, level, size_on_level
         )
 
-    def get_pixel_size(self, level=None):
+    def get_pixelsize_on_level(self, level=None):
         if level is None:
             level = self.region_level
         return self.anim.get_pixel_size(level)
 
     def mm_to_px(self, mm):
-        pxsz, unit = self.get_pixel_size()
+        pxsz, unit = self.get_pixelsize_on_level()
         return mm / pxsz
 
 
@@ -521,7 +539,7 @@ class View:
 
     def coords_glob_px_to_view_px(self, x_glob_px, y_glob_px):
         # px_factor = self.anim.openslide.level_downsamples[self.region_level]
-        px_factor = self.region_pixelsize / self.get_pixel_size(0)[0]
+        px_factor = self.region_pixelsize / self.get_pixelsize_on_level(0)[0]
 
         x_px = (x_glob_px - self.region_location[0]) / px_factor
         y_px = (y_glob_px - self.region_location[1]) / px_factor
@@ -548,12 +566,14 @@ class View:
 
     def get_annotation_region_raster(self, annotation_id):
         annotation_id = self.anim.get_annotation_id(annotation_id)
+        # Coordinates swap
+        # coordinates are swapped here. Probably it is because Path uses different order from Image
         polygon_x = self.annotations[annotation_id]["region_x_px"] * self.zoom[0]
         polygon_y = self.annotations[annotation_id]["region_y_px"] * self.zoom[1]
         polygon = list(zip(polygon_y, polygon_x))
-        poly_path = Path(polygon)
+        poly_path = mplPath(polygon)
 
-        # TODO coordinates are swapped here
+        # coordinates are swapped also here
         # x, y = np.mgrid[: self.region_size_on_level[1], : self.region_size_on_level[0]]
         x, y = np.mgrid[: self.region_size_on_pixelsize_mm[1], : self.region_size_on_pixelsize_mm[0]]
         coors = np.hstack(
@@ -594,14 +614,14 @@ class View:
     def get_region_center_by_location(self, location, level, size):
         return get_region_center_by_location(self.anim.openslide, location, level, size)
 
-    def get_region_image(self, as_gray=False):
-        imcr = self.openslide.read_region(
-            self.region_location, level=self.region_level, size=self.region_size_on_level
-        )
-        im = np.asarray(imcr)
-        if as_gray:
-            im = skimage.color.rgb2gray(im)
-        return im
+    # def get_region_image(self, as_gray=False):
+    #     imcr = self.openslide.read_region(
+    #         self.region_location, level=self.region_level, size=self.region_size_on_level
+    #     )
+    #     im = np.asarray(imcr)
+    #     if as_gray:
+    #         im = skimage.color.rgb2gray(im)
+    #     return im
 
     def get_region_image_resolution(self, resolution_mm, as_gray=False, ):
         self.anim.openslide.level_downsamples
@@ -633,7 +653,10 @@ class View:
 
         if self.is_resized_by_pixelsize:
             pxsz_level, pxunit_level = self.anim.get_pixel_size(level=self.region_level)
-            im = imma.image.resize_to_mm(im, pxsz_level, self.region_pixelsize)
+
+            # im1 = imma.image.resize_to_mm(im, pxsz_level, self.region_pixelsize)
+            # swap coordinates because openslice output image have swapped image coordinates
+            im = imma.image.resize_to_mm(im, pxsz_level[::-1], self.region_pixelsize[::-1])
 
 
         return im
@@ -660,7 +683,7 @@ class View:
         return newview
 
     def to_pixelsize(self, pixelsize_mm, safety_bound=2.):
-        level = self.anim.get_optimal_parameters_for_fluent_resize(pixelsize_mm, safety_bound=safety_bound)
+        level = self.anim.get_optimal_level_for_fluent_resize(pixelsize_mm, safety_bound=safety_bound)
         size = self.get_size_on_level(level)
         newview = View(
             self.anim, location=self.region_location, size_on_level=size, level=level, pixelsize_mm=pixelsize_mm
