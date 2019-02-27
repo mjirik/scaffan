@@ -9,6 +9,7 @@
 * [Added] Texture features parameters controled from GUI
 * [Changed] Inner view representation allow use pixelsize independent on input data levels
 * [Added] Open output directory when processing is finished
+* [Changed] Lobulus segmentation pixelsize can be defined
 
 ## 0.4.* 
 
