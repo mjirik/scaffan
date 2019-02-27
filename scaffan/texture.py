@@ -127,7 +127,7 @@ class GLCMTextureMeasurement:
         # title = "test2"
         # title = "test1"
         views = self.anim.get_views_by_title(self.annotation_id, level=0)
-        pxsize_mm = [self.parameters.param("Working Resolution").value() * 100] * 2
+        pxsize_mm = [self.parameters.param("Working Resolution").value() * 1000] * 2
         tilesize = [self.parameters.param("Tile Size").value()] * 2
         energy = tiles_processing(
             views[0].to_pixelsize(pxsize_mm).get_region_image(as_gray=True),

@@ -36,6 +36,7 @@ class Scaffan:
 
         import scaffan.texture as satex
         self.glcm_textures = satex.GLCMTextureMeasurement()
+        self.lobulus_processing = scaffan.lobulus.Lobulus()
         params = [
             {
                 "name": "Input",
@@ -93,7 +94,7 @@ class Scaffan:
                         "value": True,
                         # "tip": "Show images",
                     },
-
+                    self.lobulus_processing.parameters,
                     self.glcm_textures.parameters,
                     {"name": "Run", "type": "action"},
                 ],
@@ -205,10 +206,11 @@ class Scaffan:
 
     def _run_lobulus(self, annotation_id):
         show = self.parameters.param("Processing", "Show").value()
-        lobulus = scaffan.lobulus.Lobulus(self.anim, annotation_id, report=self.report)
-        lobulus.find_border(show=show)
+        self.lobulus_processing.set_report(self.report)
+        self.glcm_textures.set_report(self.report)
+        self.lobulus_processing.set_annotated_image_and_id(self.anim, annotation_id)
+        self.lobulus_processing.find_border(show=show)
         if self.parameters.param("Processing", "Run Texture Analysis").value():
-            self.glcm_textures.set_report(self.report)
             # self.glcm_textures.report = self.report
             self.glcm_textures.set_lobulus(self.anim, annotation_id)
             self.glcm_textures.run()

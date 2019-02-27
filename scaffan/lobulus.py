@@ -18,17 +18,55 @@ import morphsnakes as ms
 from matplotlib import pyplot as plt
 from scaffan import image as scim
 from .report import Report
+from pyqtgraph.parametertree import Parameter
 
 
 class Lobulus:
-    def __init__(self, anim: scim.AnnotatedImage, annotation_id, level=3, report=None):
+    def __init__(self):
+        params = [
+            {
+                "name": "Tile Size",
+                "type": "int",
+                "value" : 128
+            },
+            {
+                "name": "Working Resolution",
+                "type": "float",
+                "value": 0.000001,
+                "suffix": "m",
+                "siPrefix": True
+
+            },
+            {
+                "name": "Inner Lobulus Margin",
+                "type": "float",
+                "value": 0.00002,
+                "suffix": "m",
+                "siPrefix": True
+
+            },
+            {
+                'name': 'Central Vein Segmentation', 'type': 'group', 'children': [
+
+
+            ]
+            },
+
+        ]
+
+        self.parameters = Parameter.create(name="Lobulus Processing", type="group", children=params)
+        self.report: Report = None
+
+    def set_annotated_image_and_id(self, anim: scim.AnnotatedImage, annotation_id, level=3):
         self.anim = anim
         self.level = level
-        self.report: Report = report
         self.annotation_id = annotation_id
         self._init_by_annotation_id(annotation_id)
 
         pass
+
+    def set_report(self, report: Report):
+        self.report: Report = report
 
     def _init_by_annotation_id(self, annotation_id):
         self.view = self.anim.get_views(
@@ -39,7 +77,8 @@ class Lobulus:
         pass
 
     def find_border(self, show=True):
-        inner_lobulus_margin_mm = 0.02
+        inner_lobulus_margin_mm = self.parameters.param("Inner Lobulus Margin").value() * 1000
+        # inner_lobulus_margin_mm = 0.02
 
         im_gradient0 = skimage.filters.frangi(self.image)
         im_gradient1 = ms.gborders(self.image, alpha=1000, sigma=2)
