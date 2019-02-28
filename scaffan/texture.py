@@ -176,9 +176,8 @@ class GLCMTextureMeasurement:
         plt.savefig(self.report.outputdir / "glcm_features_color_{}.png".format(self.annotation_id))
 
         e0 = energy[:,:, 0]
-        e1 = energy[:,:, 0]
-        e2 = energy[:,:, 0]
-
+        e1 = energy[:,:, 1]
+        e2 = energy[:,:, 2]
 
         row = {
             "GLCM Energy": np.mean(e0[seg==1]),
