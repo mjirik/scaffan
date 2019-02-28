@@ -27,6 +27,10 @@ _cite = "" +\
 
 class Lobulus:
     def __init__(self):
+        # TODO the segmentation resolution was probably different.
+        #  For segmentation was used different level than 2. Probably 3 or 4
+        #  The level 2 has been used in detail view
+
         params = [
             # {
             #     "name": "Tile Size",
@@ -37,7 +41,11 @@ class Lobulus:
                 "name": "Working Resolution",
                 "type": "float",
                 # "value": 0.000001,
-                "value": 0.00000091, # this is typical resolution on level 2
+                # "value": 0.00000091, # this is typical resolution on level 2
+                # "value": 0.00000182,  # this is typical resolution on level 3
+                # "value": 0.00000364,  # this is typical resolution on level 4
+                "value": 0.00000728,  # this is typical resolution on level 5
+                # "value": 0.00001456,  # this is typical resolution on level 6
                 "suffix": "m",
                 "siPrefix": True
 
@@ -47,8 +55,45 @@ class Lobulus:
                 "type": "float",
                 "value": 0.00002,
                 "suffix": "m",
-                "siPrefix": True
+                "siPrefix": True,
+                "tip": "Area close to the border is ignored in Otsu threshold computation before skeletonization step."
+            },
+            {
+                'name': 'Border Segmentation', 'type': 'group',
+                'tip': "MorphACWE algorithm parameters. " + _cite,
+                'children': [
+                    {
+                        "name": "Smoothing",
+                        "type": "float",
+                        "value": 2,
+                        "suffix": "px",
+                        "siPrefix": False,
+                        "tip": "MorphACWE algorithm parameter: The number of repetitions of the smoothing step (the curv operator) in each iteration. In other terms, this is the strength of the smoothing. This is the parameter µ."
+                    },
+                    {
+                        "name": "Lambda1",
+                        "type": "float",
+                        "value": 1.,
+                        'tip': "MorphGAC algorithm parameter: Relative importance of the inside pixels (lambda1) against the outside pixels (lambda2).",
+                        # "suffix": "px",
+                        # "siPrefix": False
+                    },
+                    {
+                        "name": "Lambda2",
+                        "type": "float",
+                        "value": 2.,
+                        'tip': "MorphGAC algorithm parameter: Relative importance of the inside pixels (lambda1) against the outside pixels (lambda2).",
+                        # "suffix": "px",
+                        # "siPrefix": False
+                    },
+                    {
+                        "name": "Iterations",
+                        "type": "int",
+                        "value": 150
+                    },
 
+
+                ]
             },
             {
                 'name': 'Central Vein Segmentation', 'type': 'group',
@@ -77,6 +122,11 @@ class Lobulus:
                     'tip': "MorphGAC algorithm parameter: The strength of the morphological balloon. This is the parameter ν.",
                     # "suffix": "px",
                     # "siPrefix": False
+                },
+                {
+                    "name": "Iterations",
+                    "type": "int",
+                    "value": 400
                 },
 
 
@@ -147,21 +197,30 @@ class Lobulus:
         param_gac_smoothing = self.parameters.param("Central Vein Segmentation", "Smoothing").value()
         param_gac_threshold = self.parameters.param("Central Vein Segmentation", "Threshold").value()
         param_gac_baloon = self.parameters.param("Central Vein Segmentation", "Ballon").value()
+        param_gac_iterations = self.parameters.param("Central Vein Segmentation", "Iterations").value()
 
+        param_acwe_smoothing = self.parameters.param("Border Segmentation", "Smoothing").value()
+        param_acwe_lambda1 =   self.parameters.param("Border Segmentation", "Lambda1").value()
+        param_acwe_lambda2 =   self.parameters.param("Border Segmentation", "Lambda2").value()
+        param_acwe_iterations =self.parameters.param("Border Segmentation", "Iterations").value()
         # central vein
         mgac = ms.MorphGAC(im_gradient, smoothing=param_gac_smoothing,
                            threshold=param_gac_threshold, balloon=param_gac_baloon)
         # mgac = ms.MorphGAC(im_gradient, smoothing=2, threshold=0.28, balloon=-1.0)
         # mgac = ms.MorphACWE(im_gradient0, smoothing=2, lambda1=.1, lambda2=.05)
         mgac.levelset = circle.copy()
-        mgac.run(iterations=150)
+        mgac.run(iterations=param_gac_iterations)
         inner = mgac.levelset.copy()
         # mgac = ms.MorphGAC(im_gradient, smoothing=2, threshold=0.2, balloon=+1)
         # mgac = ms.MorphACWE(im_gradient0, smoothing=2, lambda1=0.5, lambda2=1.0)
 
-        mgac = ms.MorphACWE(im_gradient0, smoothing=2, lambda1=1.0, lambda2=2.0)
+        mgac = ms.MorphACWE(
+            im_gradient0,
+            smoothing=param_acwe_smoothing,
+            lambda1=param_acwe_lambda1,
+            lambda2=param_acwe_lambda2)
         mgac.levelset = circle.copy()
-        mgac.run(iterations=400)
+        mgac.run(iterations=param_acwe_iterations)
         outer = mgac.levelset.copy()
 
         # circle = circle_level_set(imgr.shape, (200, 200), 75, scalerow=0.75)
@@ -199,6 +258,9 @@ class Lobulus:
             self.view.region_pixelsize
         )
         datarow["Area unit"] = self.view.region_pixelunit
+
+
+        # TODO Split the function here
 
         # eroded image for threshold analysis
         dstmask = scipy.ndimage.morphology.distance_transform_edt(
