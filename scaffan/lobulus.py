@@ -21,6 +21,9 @@ from .report import Report
 from pyqtgraph.parametertree import Parameter
 import imma.image
 
+_cite = "" +\
+    "[1]: A Morphological Approach to Curvature-based Evolution of Curves and Surfaces, Pablo Márquez-Neila, Luis Baumela and Luis Álvarez. In IEEE Transactions on Pattern Analysis and Machine Intelligence (PAMI), 2014, DOI 10.1109/TPAMI.2013.106" +\
+    "[2]: Morphological Snakes. Luis Álvarez, Luis Baumela, Pablo Márquez-Neila. In Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition 2010 (CVPR10)."
 
 class Lobulus:
     def __init__(self):
@@ -49,7 +52,7 @@ class Lobulus:
             },
             {
                 'name': 'Central Vein Segmentation', 'type': 'group',
-                'tip': "MorphGAC algorithm parameters",
+                'tip': "MorphGAC algorithm parameters. " + _cite,
                 'children': [
                 {
                     "name": "Smoothing",
@@ -57,13 +60,13 @@ class Lobulus:
                     "value": 2,
                     "suffix": "px",
                     "siPrefix": False,
-                    'tip': "MorphGAC algorithm parameter",
+                    "tip": "MorphGAC algorithm parameter: The number of repetitions of the smoothing step in each iteration. This is the parameter µ."
                 },
                 {
                     "name": "Threshold",
                     "type": "float",
                     "value": 0.28,
-                    'tip': "MorphGAC algorithm parameter",
+                    'tip': "MorphGAC algorithm parameter: The threshold that determines which areas are affected by the morphological balloon. This is the parameter θ.",
                     # "suffix": "px",
                     # "siPrefix": False
                 },
@@ -71,7 +74,7 @@ class Lobulus:
                     "name": "Ballon",
                     "type": "float",
                     "value": -1,
-                    'tip': "MorphGAC algorithm parameter",
+                    'tip': "MorphGAC algorithm parameter: The strength of the morphological balloon. This is the parameter ν.",
                     # "suffix": "px",
                     # "siPrefix": False
                 },
