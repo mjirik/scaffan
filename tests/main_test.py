@@ -48,7 +48,7 @@ class MainGuiTest(unittest.TestCase):
         mainapp.set_input_file(fn)
         # mainapp.set_annotation_color_selection("#FF00FF")
         mainapp.set_annotation_color_selection("#FF0000")
-        mainapp.start_gui()
+        # mainapp.start_gui()
 
     def test_run_lobuluses(self):
         fn = io3d.datasets.join_path(
