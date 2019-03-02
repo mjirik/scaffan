@@ -274,7 +274,7 @@ class AnnotatedImage:
         """
 
         :param annotation_ids:
-        :param level:
+        :param level: If neither level neither pixelsize_mm is set the level is set to 0
         :param margin: based on "margin_in_pixels" the margin in pixels(accoarding to the requested level) are used or
         margin is proportional to size of annotation object.
         :param margin_in_pixels: bool
@@ -283,6 +283,8 @@ class AnnotatedImage:
         """
         if pixelsize_mm is not None:
             level = self.get_optimal_level_for_fluent_resize(pixelsize_mm, safety_bound=safety_bound)
+        if level is None:
+            level = 0
         views = [None] * len(annotation_ids)
         for i, annotation_id in enumerate(annotation_ids):
             center, size = self.get_annotations_bounds_px(annotation_id)
@@ -376,6 +378,11 @@ class AnnotatedImage:
             self.region_imshow_annotation(i)
 
     def get_annotations_bounds_px(self, i=None):
+        """
+        Bounds are in pixels on level 0.
+        :param i:
+        :return:
+        """
         i = self.get_annotation_id(i)
         if i is not None:
             anns = [self.annotations[i]]
