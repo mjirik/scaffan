@@ -553,8 +553,8 @@ class View:
         # px_factor = self.anim.openslide.level_downsamples[self.region_level]
         px_factor = self.region_pixelsize / self.get_pixelsize_on_level(0)[0]
 
-        x_px = (x_glob_px - self.region_location[0]) / px_factor
-        y_px = (y_glob_px - self.region_location[1]) / px_factor
+        x_px = (x_glob_px - self.region_location[0]) / px_factor[0]
+        y_px = (y_glob_px - self.region_location[1]) / px_factor[1]
 
         return x_px, y_px
 
