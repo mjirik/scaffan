@@ -89,6 +89,12 @@ class Scaffan:
                         "tip": "Show images",
                     },
                     {
+                        "name": "Open output dir",
+                        "type": "bool",
+                        "value": False,
+                        "tip": "Open system window with output dir when processing is finished",
+                    },
+                    {
                         "name": "Run Texture Analysis",
                         "type": "bool",
                         "value": True,
@@ -200,7 +206,10 @@ class Scaffan:
             self._run_lobulus(id)
         self.report.df.to_excel(op.join(self.report.outputdir, "data.xlsx"))
         from . import os_interaction
-        os_interaction.open_path(self.report.outputdir)
+
+        open_dir = self.parameters.param("Processing", "Open output dir").value()
+        if open_dir:
+            os_interaction.open_path(self.report.outputdir)
 
         # print("ann ids", annotation_ids)
 
@@ -247,10 +256,12 @@ class Scaffan:
             self.run_lobuluses
         )
 
+        self.parameters.param("Processing", "Open output dir").setValue(True)
         t = ParameterTree()
         t.setParameters(self.parameters, showTop=False)
         t.setWindowTitle("pyqtgraph example: Parameter Tree")
-        # t.show()
+        # t.co
+        t.show()
 
         # print("run scaffan")
         win = QtGui.QWidget()
