@@ -175,7 +175,6 @@ class Lobulus:
         pass
 
     def find_border(self, show=True):
-        inner_lobulus_margin_mm = self.parameters.param("Inner Lobulus Margin").value() * 1000
         # inner_lobulus_margin_mm = 0.02
 
         im_gradient0 = skimage.filters.frangi(self.image)
@@ -249,6 +248,7 @@ class Lobulus:
             )
         if show:
             plt.show()
+        self.central_vein_mask = inner
         self.lobulus_mask = (inner + outer) == 1
         datarow["Area"] = np.sum(self.lobulus_mask) * np.prod(
             self.view.region_pixelsize
@@ -258,9 +258,16 @@ class Lobulus:
             self.view.region_pixelsize
         )
         datarow["Area unit"] = self.view.region_pixelunit
+        self.report.add_cols_to_actual_row(datarow)
+        self.skeleton_analysis(show=show)
+
+    def skeleton_analysis(self, show=False):
+        datarow = {}
 
 
+        inner = self.central_vein_mask
         # TODO Split the function here
+        inner_lobulus_margin_mm = self.parameters.param("Inner Lobulus Margin").value() * 1000
 
         # eroded image for threshold analysis
         dstmask = scipy.ndimage.morphology.distance_transform_edt(
