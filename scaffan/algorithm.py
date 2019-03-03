@@ -217,17 +217,17 @@ class Scaffan:
         logger.debug("Annotation IDs: {}".format(annotation_ids))
         # if annotation_ids is None:
         #     logger.error("No color selected")
-        saved_params = self.parameters.saveState()
-        io3d.misc.obj_to_file(
-            saved_params,
-            Path(self.report.outputdir) / "parameters.yaml"
-        )
-        with open(Path(self.report.outputdir) / "parameters.json") as outfile:
-            json.dump(saved_params, outfile)
 
         for id in annotation_ids:
             self._run_lobulus(id)
         self.report.df.to_excel(op.join(self.report.outputdir, "data.xlsx"))
+        saved_params = self.parameters.saveState()
+        io3d.misc.obj_to_file(
+            saved_params,
+            str(Path(self.report.outputdir) / "parameters.yaml")
+        )
+        with open(Path(self.report.outputdir) / "parameters.json", "w") as outfile:
+            json.dump(saved_params, outfile)
         from . import os_interaction
 
         open_dir = self.parameters.param("Processing", "Open output dir").value()
