@@ -83,9 +83,11 @@ class Report:
     #     if self.save:
     #         self.imsave
 
-    def add_fig(self, base_fn):
+    def savefig_and_show(self, base_fn, fig):
         filename, ext = op.splitext(base_fn)
         if self.save:
             plt.savefig(op.join(self.outputdir, filename + "" + ext))
         if self.show:
             plt.show()
+        else:
+            plt.close(fig)

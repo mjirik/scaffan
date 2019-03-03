@@ -235,21 +235,17 @@ class Lobulus:
         # circle = circle_level_set(imgr.shape, (200, 200), 75, scalerow=0.75)
 
         if self.report is not None:
-            plt.figure(figsize=(12, 10))
+            fig = plt.figure(figsize=(12, 10))
             plt.imshow(im_gradient_inner)
             plt.colorbar()
             plt.contour(circle + inner)
-            plt.savefig(
-                op.join(
-                    self.report.outputdir, "lobulus_gradient_inner_{}.png".format(self.annotation_id)
-                )
-            )
+            self.report.savefig_and_show("lobulus_gradient_inner_{}.png".format(self.annotation_id), fig)
 
         # plt.figure()
         # plt.imshow(im_gradient)
         # plt.colorbar()
         # plt.contour(circle + inner + outer)
-        plt.figure(figsize=(12, 10))
+        fig = plt.figure(figsize=(12, 10))
         plt.imshow(self.image, cmap="gray")
         plt.colorbar()
         plt.contour(circle + inner + outer)
@@ -258,13 +254,7 @@ class Lobulus:
         datarow = {}
         datarow["Annotation ID"] = self.annotation_id
         if self.report is not None:
-            plt.savefig(
-                op.join(
-                    self.report.outputdir, "lobulus_{}.png".format(self.annotation_id)
-                )
-            )
-        if show:
-            plt.show()
+            self.report.savefig_and_show("lobulus_{}.png".format(self.annotation_id), fig)
         self.central_vein_mask = inner
         self.lobulus_mask = (inner + outer) == 1
         datarow["Area"] = np.sum(self.lobulus_mask) * np.prod(

@@ -71,7 +71,6 @@ class SkeletonAnalysis:
     def skeleton_analysis(self, show=False):
         datarow = {}
 
-
         inner = self.lobulus.central_vein_mask
         # TODO Split the function here
         inner_lobulus_margin_mm = self.parameters.param("Inner Lobulus Margin").value() * 1000
@@ -100,12 +99,16 @@ class SkeletonAnalysis:
 
         detail_view = self.view
         detail_image = detail_view.get_region_image(as_gray=True)
-        plt.figure()
+        fig = plt.figure()
         plt.imshow(detail_image)
         plt.contour(detail_mask + detail_inner_lobulus_mask)
         detail_view.add_ticks()
-        if show:
-            plt.show()
+        if self.report is not None:
+            self.report.savefig_and_show(
+                "skeleton_analysis_detail_image_and_mask_{}.png".format(self.lobulus.annotation_id),
+                fig,
+            )
+
         threshold = skimage.filters.threshold_otsu(
             detail_image[detail_inner_lobulus_mask == 1]
         )
@@ -125,19 +128,13 @@ class SkeletonAnalysis:
         datarow["Output image size 1"] = (
                 detail_view.region_pixelsize[1] * imthr.shape[1]
         )
-        plt.figure(figsize=(12, 10))
+        fig = plt.figure(figsize=(12, 10))
         plt.imshow(skeleton + imthr)
         detail_view.add_ticks()
         if self.report is not None:
-            plt.savefig(
-                op.join(
-                    self.report.outputdir,
-                    "thumb_skeleton_thr_{}.png".format(self.lobulus.annotation_id),
-                )
+            self.report.savefig_and_show(
+                "thumb_skeleton_thr_{}.png".format(self.lobulus.annotation_id), fig
             )
-            # skimage.io.imsave(op.join(self.report.outputdir, "figure_skeleton_thumb_{}.png".format(self.annotation_id)), 50 * skeleton + 50 * imthr)
-        if show:
-            plt.show()
 
         if self.report is not None:
             imall = detail_mask.astype(np.uint8)
@@ -162,15 +159,13 @@ class SkeletonAnalysis:
 
         conv = scipy.signal.convolve2d(skeleton, np.ones([3, 3]), mode="same")
         conv = conv * skeleton
-        plt.figure(figsize=(12, 10))
+        fig = plt.figure(figsize=(12, 10))
         plt.imshow(conv)
         detail_view.add_ticks()
         if self.report is not None:
-            plt.savefig(
-                op.join(
-                    self.report.outputdir,
-                    "figure_skeleton_nodes_{}.png".format(self.lobulus.annotation_id),
-                )
+            self.report.savefig_and_show(
+                "figure_skeleton_nodes_{}.png".format(self.lobulus.annotation_id),
+                fig
             )
 
             with warnings.catch_warnings():
@@ -179,8 +174,6 @@ class SkeletonAnalysis:
                 self.imsave("skeleton_nodes_{}.png", imthr, 20)
             # plt.imsave(op.join(self.report.outputdir, "skeleton_nodes_{}.png".format(self.annotation_id)), conv.astype(np.uint8))
             # skimage.io.imsave(op.join(self.report.outputdir, "raw_skeleton_nodes_{}.png".format(self.annotation_id)), (conv * 20).astype(np.uint8))
-        if show:
-            plt.show()
 
         conv[conv > 3] = 0
         label, num = scipy.ndimage.label(conv)
