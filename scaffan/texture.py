@@ -93,6 +93,7 @@ def nonzero_with_step(data, step):
 
     return nzx * step, nzy * step
 
+
 class GLCMTextureMeasurement:
     def __init__(self):
         params = [
@@ -106,11 +107,16 @@ class GLCMTextureMeasurement:
                 "type": "float",
                 # "value": 0.000001,
                 # "value": 0.0000005,
-                "value": 0.0000002,
+                "value": 0.0000004,
                 "suffix": "m",
                 "siPrefix": True
 
-            }
+            },
+            {
+                "name": "GLCM Levels",
+                "type": "int",
+                "value" : 64
+            },
 
         ]
 
@@ -134,11 +140,13 @@ class GLCMTextureMeasurement:
         # views = self.anim.get_views_by_title(self.annotation_id, level=0)
         pxsize_mm = [self.parameters.param("Working Resolution").value() * 1000] * 2
         tilesize = [self.parameters.param("Tile Size").value()] * 2
+        levels = self.parameters.param("GLCM Levels").value()
         # view = views[0].to_pixelsize(pxsize_mm)
+
         view = self.parent_view.to_pixelsize(pxsize_mm)
         energy = tiles_processing(
             view.get_region_image(as_gray=True),
-            fcn=texture_glcm_features,
+            fcn=lambda img: texture_glcm_features(img, levels),
             tile_size=tilesize,
             fcn_output_n=3,
             dtype=None,
@@ -167,7 +175,7 @@ class GLCMTextureMeasurement:
         # plt.colorbar()
         if self.report is not None:
             self.report.savefig_and_show(
-                self.report.outputdir, "glcm_features_{}.png".format(self.annotation_id), fig
+                "glcm_features_{}.png".format(self.annotation_id), fig
             )
         # plt.savefig("glcm_features_{}.png".format(title))
 
@@ -175,9 +183,8 @@ class GLCMTextureMeasurement:
         plt.imshow(energy)
         if self.report is not None:
             self.report.savefig_and_show(
-                self.report.outputdir / "glcm_features_color_{}.png".format(self.annotation_id), fig
+                "glcm_features_color_{}.png".format(self.annotation_id), fig
             )
-
 
         e0 = energy[:,:, 0]
         e1 = energy[:,:, 1]
@@ -337,14 +344,19 @@ class TextureSegmentation:
         return seg
 
 
-def texture_glcm_features(img):
+def texture_glcm_features(img, levels):
     import skimage.feature.texture
+    # levels =
+    # if distances is None:
+    distances = [1]
+    # if angles is None:
+    angles = [0, np.pi / 2]
 
     P = skimage.feature.greycomatrix(
-        (img * 31).astype(np.uint8),
-        [1],
-        [0, np.pi / 2],
-        levels=32,
+        (img * (levels - 1)).astype(np.uint8),
+        distances,
+        angles,
+        levels=levels,
         symmetric=True,
         normed=True,
     )

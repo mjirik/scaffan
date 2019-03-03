@@ -295,7 +295,7 @@ class TextureTest(unittest.TestCase):
         views = anim.get_views_by_title(title, level=texseg.level)
         energy = satex.tiles_processing(
             views[0].get_region_image(as_gray=True),
-            fcn=satex.texture_glcm_features,
+            fcn=lambda img: satex.texture_glcm_features(img, 32),
             tile_size=texseg.tile_size,
             fcn_output_n=3,
             dtype=None,
