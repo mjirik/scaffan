@@ -144,7 +144,7 @@ class GLCMTextureMeasurement:
             dtype=None,
         )
         # seg = texseg.predict(views[0], show=False, function=texture_energy)
-        plt.figure(figsize=(10, 12))
+        fig = plt.figure(figsize=(10, 12))
         plt.subplot(221)
         img = view.get_region_image()
         plt.imshow(img)
@@ -166,16 +166,18 @@ class GLCMTextureMeasurement:
         logger.debug(mx)
         # plt.colorbar()
         if self.report is not None:
-            plt.savefig(
-                op.join(
-                    self.report.outputdir, "glcm_features_{}.png".format(self.annotation_id)
-                )
+            self.report.savefig_and_show(
+                self.report.outputdir, "glcm_features_{}.png".format(self.annotation_id), fig
             )
         # plt.savefig("glcm_features_{}.png".format(title))
 
-        plt.figure()
+        fig = plt.figure()
         plt.imshow(energy)
-        plt.savefig(self.report.outputdir / "glcm_features_color_{}.png".format(self.annotation_id))
+        if self.report is not None:
+            self.report.savefig_and_show(
+                self.report.outputdir / "glcm_features_color_{}.png".format(self.annotation_id), fig
+            )
+
 
         e0 = energy[:,:, 0]
         e1 = energy[:,:, 1]
