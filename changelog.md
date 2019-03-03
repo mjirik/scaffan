@@ -11,6 +11,8 @@
 * [Added] Open output directory when processing is finished
 * [Added] Open output directory can be controlled from GUI
 * [Changed] Lobulus segmentation pixelsize can be defined
+* [Changed] Lobulus boundary and Central vein segmentation parameters updated
+* [Added] Images from Lobulus boundary and Central vein segmentation
 
 ## 0.4.* 
 
