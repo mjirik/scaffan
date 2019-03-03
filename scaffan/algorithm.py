@@ -215,6 +215,11 @@ class Scaffan:
         logger.debug("Annotation IDs: {}".format(annotation_ids))
         # if annotation_ids is None:
         #     logger.error("No color selected")
+        import io3d.misc
+        io3d.misc.obj_to_file(
+            self.parameters.saveState(),
+            Path(self.report.outputdir) / "parameters.yaml"
+        )
         for id in annotation_ids:
             self._run_lobulus(id)
         self.report.df.to_excel(op.join(self.report.outputdir, "data.xlsx"))
