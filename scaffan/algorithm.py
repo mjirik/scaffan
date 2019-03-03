@@ -11,6 +11,8 @@ import sys
 import os.path as op
 import datetime
 from pathlib import Path
+import io3d.misc
+import json
 
 # import PyQt5.QtWidgets
 # print("start 3")
@@ -215,11 +217,14 @@ class Scaffan:
         logger.debug("Annotation IDs: {}".format(annotation_ids))
         # if annotation_ids is None:
         #     logger.error("No color selected")
-        import io3d.misc
+        saved_params = self.parameters.saveState()
         io3d.misc.obj_to_file(
-            self.parameters.saveState(),
+            saved_params,
             Path(self.report.outputdir) / "parameters.yaml"
         )
+        with open(Path(self.report.outputdir) / "parameters.json") as outfile:
+            json.dump(saved_params, outfile)
+
         for id in annotation_ids:
             self._run_lobulus(id)
         self.report.df.to_excel(op.join(self.report.outputdir, "data.xlsx"))

@@ -13,6 +13,7 @@
 * [Changed] Lobulus segmentation pixelsize can be defined
 * [Changed] Lobulus boundary and Central vein segmentation parameters updated
 * [Added] Images from Lobulus boundary and Central vein segmentation
+* [Added] Processing parameters saved to yaml and json file
 
 ## 0.4.* 
 
