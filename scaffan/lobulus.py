@@ -42,9 +42,9 @@ class Lobulus:
                 "type": "float",
                 # "value": 0.000001,
                 # "value": 0.00000091, # this is typical resolution on level 2
-                # "value": 0.00000182,  # this is typical resolution on level 3
+                "value": 0.00000182,  # this is typical resolution on level 3
                 # "value": 0.00000364,  # this is typical resolution on level 4
-                "value": 0.00000728,  # this is typical resolution on level 5
+                # "value": 0.00000728,  # this is typical resolution on level 5
                 # "value": 0.00001456,  # this is typical resolution on level 6
                 "suffix": "m",
                 "siPrefix": True
