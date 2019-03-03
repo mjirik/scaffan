@@ -41,8 +41,11 @@ class Lobulus:
                 "name": "Working Resolution",
                 "type": "float",
                 # "value": 0.000001,
+                # "value": 0.000001,  # this is typical resolution on level 2-3
+                # "value": 0.000002,  # this is typical resolution on level 3-4
+                "value": 0.0000015,  # this is typical resolution on level 3-4
                 # "value": 0.00000091, # this is typical resolution on level 2
-                "value": 0.00000182,  # this is typical resolution on level 3
+                # "value": 0.00000182,  # this is typical resolution on level 3
                 # "value": 0.00000364,  # this is typical resolution on level 4
                 # "value": 0.00000728,  # this is typical resolution on level 5
                 # "value": 0.00001456,  # this is typical resolution on level 6
@@ -51,12 +54,12 @@ class Lobulus:
 
             },
             {
-                "name": "Inner Lobulus Margin",
+                "name": "Annotation Margin",
                 "type": "float",
-                "value": 0.00002,
-                "suffix": "m",
-                "siPrefix": True,
-                "tip": "Area close to the border is ignored in Otsu threshold computation before skeletonization step."
+                "value": 150,
+                "suffix": "%",
+                "siPrefix": False,
+                "tip": "Margin added to the input annotation where is expected whole lobulus."
             },
             {
                 'name': 'Border Segmentation', 'type': 'group',
@@ -89,7 +92,7 @@ class Lobulus:
                     {
                         "name": "Iterations",
                         "type": "int",
-                        "value": 150
+                        "value": 180
                     },
 
 
@@ -110,7 +113,8 @@ class Lobulus:
                 {
                     "name": "Threshold",
                     "type": "float",
-                    "value": 0.28,
+                    "value": 0.28, # prev version
+                    # "value": 0.35,
                     'tip': "MorphGAC algorithm parameter: The threshold that determines which areas are affected by the morphological balloon. This is the parameter θ.",
                     # "suffix": "px",
                     # "siPrefix": False
@@ -161,8 +165,9 @@ class Lobulus:
             raise ValueError("Annotation ID should be scalar int value for lobulus processing.")
 
         pixelsize_mm = [(self.parameters.param("Working Resolution").value() * 1000)] * 2
+        annotation_margin = (self.parameters.param("Annotation Margin").value() * 0.01)
         self.view = self.anim.get_views(
-            annotation_ids=[annotation_id], level=self.level, margin=1.8,
+            annotation_ids=[annotation_id], level=self.level, margin=annotation_margin,
             pixelsize_mm=pixelsize_mm
         )[0]
         right_shape = imma.image.calculate_new_shape(
@@ -177,9 +182,13 @@ class Lobulus:
     def find_border(self, show=True):
         # inner_lobulus_margin_mm = 0.02
 
-        im_gradient0 = skimage.filters.frangi(self.image)
-        im_gradient1 = ms.gborders(self.image, alpha=1000, sigma=2)
-        im_gradient = im_gradient1 - (im_gradient0 * 10000)
+        im_gradient_outer = skimage.filters.frangi(self.image)
+        im_gradient_base_inner = ms.gborders(self.image, alpha=1000, sigma=2)
+        im_gradient_inner = im_gradient_base_inner - (im_gradient_outer * 10000)
+        if self.report is not None:
+            self.report.imsave_as_fig("gradient_outer.png", im_gradient_inner)
+            self.report.imsave_as_fig("gradient_base_inner.png", im_gradient_base_inner)
+            self.report.imsave_as_fig("gradient_inner.png", im_gradient_inner)
         # circle = circle_level_set(imgr.shape, size2, 75, scalerow=0.75)
         circle = self.mask
         logger.debug("Image size {}".format(self.image.shape))
@@ -203,7 +212,7 @@ class Lobulus:
         param_acwe_lambda2 =   self.parameters.param("Border Segmentation", "Lambda2").value()
         param_acwe_iterations =self.parameters.param("Border Segmentation", "Iterations").value()
         # central vein
-        mgac = ms.MorphGAC(im_gradient, smoothing=param_gac_smoothing,
+        mgac = ms.MorphGAC(im_gradient_inner, smoothing=param_gac_smoothing,
                            threshold=param_gac_threshold, balloon=param_gac_baloon)
         # mgac = ms.MorphGAC(im_gradient, smoothing=2, threshold=0.28, balloon=-1.0)
         # mgac = ms.MorphACWE(im_gradient0, smoothing=2, lambda1=.1, lambda2=.05)
@@ -214,7 +223,7 @@ class Lobulus:
         # mgac = ms.MorphACWE(im_gradient0, smoothing=2, lambda1=0.5, lambda2=1.0)
 
         mgac = ms.MorphACWE(
-            im_gradient0,
+            im_gradient_outer,
             smoothing=param_acwe_smoothing,
             lambda1=param_acwe_lambda1,
             lambda2=param_acwe_lambda2)
@@ -224,10 +233,17 @@ class Lobulus:
 
         # circle = circle_level_set(imgr.shape, (200, 200), 75, scalerow=0.75)
 
-        # plt.figure()
-        # plt.imshow(im_gradient0)
-        # plt.colorbar()
-        # plt.contour(circle + inner + outer)
+        if self.report is not None:
+            plt.figure(figsize=(12, 10))
+            plt.imshow(im_gradient_inner)
+            plt.colorbar()
+            plt.contour(circle + inner)
+            plt.savefig(
+                op.join(
+                    self.report.outputdir, "lobulus_gradient_inner_{}.png".format(self.annotation_id)
+                )
+            )
+
         # plt.figure()
         # plt.imshow(im_gradient)
         # plt.colorbar()
@@ -259,129 +275,8 @@ class Lobulus:
         )
         datarow["Area unit"] = self.view.region_pixelunit
         self.report.add_cols_to_actual_row(datarow)
-        self.skeleton_analysis(show=show)
+        # self.skeleton_analysis(show=show)
 
-    def skeleton_analysis(self, show=False):
-        datarow = {}
-
-
-        inner = self.central_vein_mask
-        # TODO Split the function here
-        inner_lobulus_margin_mm = self.parameters.param("Inner Lobulus Margin").value() * 1000
-
-        # eroded image for threshold analysis
-        dstmask = scipy.ndimage.morphology.distance_transform_edt(
-            self.lobulus_mask, self.view.region_pixelsize
-        )
-        inner_lobulus_mask = dstmask > inner_lobulus_margin_mm
-        # print("inner_lobulus_mask" , np.sum(inner_lobulus_mask==0), np.sum(inner_lobulus_mask==1))
-
-        detail_level = 2
-        new_size = self.view.get_size_on_level(detail_level)
-
-        resize_params = dict(
-            output_shape=[new_size[1], new_size[0]],
-            mode="reflect",
-            order=0,
-            anti_aliasing=False,
-        )
-        detail_mask = skimage.transform.resize(self.lobulus_mask, **resize_params)
-        detail_inner_lobulus_mask = skimage.transform.resize(
-            inner_lobulus_mask, **resize_params
-        )
-        detail_central_vein_mask = skimage.transform.resize(inner == 1, **resize_params)
-
-        detail_view = self.view.to_level(detail_level)
-        detail_image = detail_view.get_region_image(as_gray=True)
-        plt.figure()
-        plt.imshow(detail_image)
-        plt.contour(detail_mask + detail_inner_lobulus_mask)
-        detail_view.add_ticks()
-        if show:
-            plt.show()
-        threshold = skimage.filters.threshold_otsu(
-            detail_image[detail_inner_lobulus_mask == 1]
-        )
-        imthr = detail_image < threshold
-        imthr[detail_mask != 1] = 0
-        # plt.figure()
-        # plt.imshow(imthr)
-        # if show:
-        #     plt.show()
-        skeleton = skeletonize(imthr)
-        datarow["Skeleton lenght"] = np.sum(skeleton) * detail_view.region_pixelsize[0]
-        datarow["Output pixel size 0"] = detail_view.region_pixelsize[0]
-        datarow["Output pixel size 1"] = detail_view.region_pixelsize[1]
-        datarow["Output image size 0"] = (
-            detail_view.region_pixelsize[0] * imthr.shape[0]
-        )
-        datarow["Output image size 1"] = (
-            detail_view.region_pixelsize[1] * imthr.shape[1]
-        )
-        plt.figure(figsize=(12, 10))
-        plt.imshow(skeleton + imthr)
-        detail_view.add_ticks()
-        if self.report is not None:
-            plt.savefig(
-                op.join(
-                    self.report.outputdir,
-                    "thumb_skeleton_thr_{}.png".format(self.annotation_id),
-                )
-            )
-            # skimage.io.imsave(op.join(self.report.outputdir, "figure_skeleton_thumb_{}.png".format(self.annotation_id)), 50 * skeleton + 50 * imthr)
-        if show:
-            plt.show()
-
-        if self.report is not None:
-            imall = detail_mask.astype(np.uint8)
-            imall[detail_central_vein_mask > 0] = 2
-            imall[imthr > 0] = 3
-            imall[skeleton > 0] = 4
-            # imall = (skeleton.astype(np.uint8) + imthr.astype(np.uint8) +  + (detail_central_vein_mask.astype(np.uint8) * 2)).astype(np.uint8)
-            self.imsave("lobulus_central_thr_skeleton_{}.png", imall)
-            self.imsave(
-                "lobulus_thr_skeleton_{}.png",
-                (skeleton.astype(np.uint8) + imthr + detail_mask).astype(np.uint8),
-            )
-            self.imsave("skeleton_{}.png", skeleton)
-            self.imsave("thr_{}.png", imthr)
-            # plt.imsave(op.join(self.report.outputdir, "skeleton_thr_lobulus_{}.png".format(self.annotation_id)), skeleton.astype(np.uint8) + imthr + detail_mask)
-            # plt.imsave(op.join(self.report.outputdir, "skeleton_{}.png".format(self.annotation_id)), skeleton)
-            # plt.imsave(op.join(self.report.outputdir, "thr_{}.png".format(self.annotation_id)), imthr)
-            # skimage.io.imsave(op.join(self.report.outputdir, "raw_skeleton_thr_lobulus_{}.png".format(self.annotation_id)),
-            #                   (50 * skeleton + 50 * imthr + 50 * detail_mask).astype(np.uint8))
-            # skimage.io.imsave(op.join(self.report.outputdir, "raw_skeleton_{}.png".format(self.annotation_id)), 50 * skeleton)
-            # skimage.io.imsave(op.join(self.report.outputdir, "raw_thr_{}.png".format(self.annotation_id)), 50 * imthr)
-
-        conv = scipy.signal.convolve2d(skeleton, np.ones([3, 3]), mode="same")
-        conv = conv * skeleton
-        plt.figure(figsize=(12, 10))
-        plt.imshow(conv)
-        detail_view.add_ticks()
-        if self.report is not None:
-            plt.savefig(
-                op.join(
-                    self.report.outputdir,
-                    "figure_skeleton_nodes_{}.png".format(self.annotation_id),
-                )
-            )
-
-            with warnings.catch_warnings():
-                # warnings.simplefilter("low contrast image")
-                warnings.filterwarnings("ignore", ".*low contrast image.*")
-                self.imsave("skeleton_nodes_{}.png", imthr, 20)
-            # plt.imsave(op.join(self.report.outputdir, "skeleton_nodes_{}.png".format(self.annotation_id)), conv.astype(np.uint8))
-            # skimage.io.imsave(op.join(self.report.outputdir, "raw_skeleton_nodes_{}.png".format(self.annotation_id)), (conv * 20).astype(np.uint8))
-        if show:
-            plt.show()
-
-        conv[conv > 3] = 0
-        label, num = scipy.ndimage.label(conv)
-        datarow["Branch number"] = num
-        label, num = scipy.ndimage.label(conv == 1)
-        datarow["Dead ends number"] = num
-
-        self.report.add_cols_to_actual_row(datarow)
 
     # def imfigsave(self, base_fn, arr):
 
@@ -391,3 +286,4 @@ class Lobulus:
     def imsave(self, base_fn, arr, k=50):
         base_fn = base_fn.format(self.annotation_id)
         self.report.imsave(base_fn, arr, k)
+

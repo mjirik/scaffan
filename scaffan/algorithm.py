@@ -28,6 +28,7 @@ import io3d
 import io3d.datasets
 import scaffan.lobulus
 import scaffan.report
+import scaffan.skeleton_analysis
 from .report import Report
 
 
@@ -37,13 +38,13 @@ class Scaffan:
         import scaffan.texture as satex
         self.glcm_textures = satex.GLCMTextureMeasurement()
         self.lobulus_processing = scaffan.lobulus.Lobulus()
+        self.skeleton_analysis = scaffan.skeleton_analysis.SkeletonAnalysis()
         params = [
             {
                 "name": "Input",
                 "type": "group",
                 "children": [
                     {"name": "File Path", "type": "str"},
-                    {"name": "Data Info", "type": "str"},
                     {"name": "Select", "type": "action"},
                     {
                         "name": "Annotation Color",
@@ -63,6 +64,7 @@ class Scaffan:
                     },
                     # {'name': 'Boolean', 'type': 'bool', 'value': True, 'tip': "This is a checkbox"},
                     # {'name': 'Color', 'type': 'color', 'value': "FF0", 'tip': "This is a color button"},
+                    {"name": "Data Info", "type": "str"},
                 ],
             },
             {
@@ -95,18 +97,29 @@ class Scaffan:
                         "tip": "Open system window with output dir when processing is finished",
                     },
                     {
+                        "name": "Run Skeleton Analysis",
+                        "type": "bool",
+                        "value": True,
+                        # "tip": "Show images",
+                    },
+                    {
                         "name": "Run Texture Analysis",
                         "type": "bool",
                         "value": True,
                         # "tip": "Show images",
                     },
                     self.lobulus_processing.parameters,
+                    self.skeleton_analysis.parameters,
                     self.glcm_textures.parameters,
                     {"name": "Run", "type": "action"},
                 ],
             },
         ]
         self.parameters = Parameter.create(name="params", type="group", children=params)
+        # here is everything what should work with or without GUI
+        self.parameters.param("Input", "File Path").sigValueChanged.connect(
+            self._get_file_info
+        )
         self.anim: image.AnnotatedImage = None
         self.report: Report = None
         pass
@@ -215,10 +228,17 @@ class Scaffan:
 
     def _run_lobulus(self, annotation_id):
         show = self.parameters.param("Processing", "Show").value()
+        self.report.set_show(show)
+        self.report.set_save(True)
         self.lobulus_processing.set_report(self.report)
         self.glcm_textures.set_report(self.report)
+        self.skeleton_analysis.set_report(self.report)
+
         self.lobulus_processing.set_annotated_image_and_id(self.anim, annotation_id)
         self.lobulus_processing.find_border(show=show)
+        self.skeleton_analysis.set_lobulus(lobulus=self.lobulus_processing)
+        if self.parameters.param("Processing", "Run Skeleton Analysis").value():
+            self.skeleton_analysis.skeleton_analysis(show=show)
         if self.parameters.param("Processing", "Run Texture Analysis").value():
             # self.glcm_textures.report = self.report
             self.glcm_textures.set_input_data(self.anim, annotation_id,
@@ -226,13 +246,14 @@ class Scaffan:
                                               lobulus_segmentation=self.lobulus_processing.lobulus_mask
                                               )
             self.glcm_textures.run()
-            self.report.finish_actual_row()
+        self.report.finish_actual_row()
 
     def _get_file_info(self):
         fnparam = Path(self.parameters.param("Input", "File Path").value())
         if fnparam.exists():
             anim = scaffan.image.AnnotatedImage(str(fnparam))
             self.parameters.param("Input", "Data Info").setValue(anim.get_file_info())
+            # self.parameters.param("Input", "Select").setValue(anim.get_file_info())
 
     def start_gui(self, skip_exec=False, qapp=None):
 
@@ -245,9 +266,6 @@ class Scaffan:
 
         self.parameters.param("Input", "Select").sigActivated.connect(
             self.select_file_gui
-        )
-        self.parameters.param("Input", "File Path").sigValueChanged.connect(
-            self._get_file_info
         )
         self.parameters.param("Output", "Select").sigActivated.connect(
             self.select_output_dir_gui
@@ -284,6 +302,7 @@ class Scaffan:
 
         win.show()
         win.resize(800, 800)
+        # win.
         if not skip_exec:
 
             qapp.exec_()

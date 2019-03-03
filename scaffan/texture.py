@@ -104,7 +104,9 @@ class GLCMTextureMeasurement:
             {
                 "name": "Working Resolution",
                 "type": "float",
-                "value": 0.000001,
+                # "value": 0.000001,
+                # "value": 0.0000005,
+                "value": 0.0000002,
                 "suffix": "m",
                 "siPrefix": True
 

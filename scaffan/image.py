@@ -687,6 +687,9 @@ class View:
 
         return new_size
 
+    def get_size_on_pixelsize_mm(self):
+        return self.region_size_on_pixelsize_mm
+
     def to_level(self, new_level):
         size = self.get_size_on_level(new_level)
         newview = View(

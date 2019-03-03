@@ -25,6 +25,14 @@ class Report:
         self.df = pd.DataFrame()
         self.imgs = {}
         self.actual_row = {}
+        self.show = False
+        self.save = False
+
+    def set_show(self, show):
+        self.show = show
+
+    def set_save(self, save):
+        self.save = save
 
     def add_cols_to_actual_row(self, data):
         self.actual_row.update(data)
@@ -48,10 +56,36 @@ class Report:
         :param arr:
         :return:
         """
-        plt.imsave(op.join(self.outputdir, base_fn), arr)
+
+        if self.save:
+            plt.imsave(op.join(self.outputdir, base_fn), arr)
         filename, ext = op.splitext(base_fn)
         with warnings.catch_warnings():
             warnings.filterwarnings("ignore", ".*low contrast image.*")
             # warnings.simplefilter("low contrast image")
-            skimage.io.imsave(op.join(self.outputdir, filename + "_raw" + ext), k * arr)
+            if self.save:
+                skimage.io.imsave(op.join(self.outputdir, filename + "_raw" + ext), k * arr)
         self.imgs[base_fn] = arr
+
+    def imsave_as_fig(self, base_fn, arr):
+        filename, ext = op.splitext(base_fn)
+        fig = plt.figure()
+        plt.imshow(arr)
+        plt.colorbar()
+        if self.save:
+            plt.savefig(op.join(self.outputdir, filename + "" + ext))
+        if self.show:
+            plt.show()
+        else:
+            plt.close(fig)
+
+    # def add_array(self, base_fn, arr, k=50):
+    #     if self.save:
+    #         self.imsave
+
+    def add_fig(self, base_fn):
+        filename, ext = op.splitext(base_fn)
+        if self.save:
+            plt.savefig(op.join(self.outputdir, filename + "" + ext))
+        if self.show:
+            plt.show()
