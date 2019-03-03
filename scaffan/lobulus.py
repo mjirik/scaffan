@@ -42,10 +42,10 @@ class Lobulus:
                 "type": "float",
                 # "value": 0.000001,
                 # "value": 0.000001,  # this is typical resolution on level 2-3
-                # "value": 0.000002,  # this is typical resolution on level 3-4
-                "value": 0.0000015,  # this is typical resolution on level 3-4
+                "value": 0.000002,  # this is typical resolution on level 3-4
+                # "value": 0.0000015,  # this is typical resolution on level 3-4
                 # "value": 0.00000091, # this is typical resolution on level 2
-                # "value": 0.00000182,  # this is typical resolution on level 3
+                # "value": 0.00000182,  # this is typical resolution on level 3 # probably prev stable version
                 # "value": 0.00000364,  # this is typical resolution on level 4
                 # "value": 0.00000728,  # this is typical resolution on level 5
                 # "value": 0.00001456,  # this is typical resolution on level 6
@@ -56,7 +56,7 @@ class Lobulus:
             {
                 "name": "Annotation Margin",
                 "type": "float",
-                "value": 150,
+                "value": 180,
                 "suffix": "%",
                 "siPrefix": False,
                 "tip": "Margin added to the input annotation where is expected whole lobulus."
@@ -113,8 +113,9 @@ class Lobulus:
                 {
                     "name": "Threshold",
                     "type": "float",
-                    "value": 0.28, # prev version
-                    # "value": 0.35,
+                    # "value": 0.28, # prev stable version
+                    "value": 0.35,
+                    # "value": 0.25,
                     'tip': "MorphGAC algorithm parameter: The threshold that determines which areas are affected by the morphological balloon. This is the parameter θ.",
                     # "suffix": "px",
                     # "siPrefix": False
