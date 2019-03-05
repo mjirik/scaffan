@@ -19,26 +19,27 @@ from .report import Report
 import imma.image
 
 
-def tile_centers(image_shape, tile_size):
-    tile_size2 = [int(tile_size[0] / 2), int(tile_size[1] / 2)]
+def tile_centers(image_shape, tile_spacing):
+    tile_size2 = [int(tile_spacing[0] / 2), int(tile_spacing[1] / 2)]
     centers = []
-    for x0 in range(0, image_shape[0], tile_size[0]):
-        for x1 in range(0, image_shape[1], tile_size[1]):
+    for x0 in range(0, image_shape[0], tile_spacing[0]):
+        for x1 in range(0, image_shape[1], tile_spacing[1]):
             centers.append([x0 + tile_size2[0], x1 + tile_size2[1]])
     return centers
 
 
-def tiles_processing(image, fcn, tile_spacing, fcn_output_n=None, dtype=np.int8, tile_margin: List[int] = None):
+def tiles_processing(image, fcn, tile_spacing, fcn_output_n=None, dtype=np.int8, tile_size = None):
     """
     Process image tile by tile. Last tile in every row and avery column may be smaller if modulo of shape of image and
-    shape of tile is different from zero.
+    shape of tile is different from zero. On the border of image tile is smaller according to the edge of the image.
 
-    :param tile_margin:
     :param image: input image
     :param fcn: Function used on each tile. Input of this function is just tile image.
     :param tile_spacing: size of tile in pixels
     :param fcn_output_n: dimension of output of fcn()
     :param dtype: output data type
+    :param tile_size: [int, int]: size of tile in pixels. Tile size can be set to obtain overlap between two
+    neighbour tiles.
     :return:
     """
     # TODO rename inputs
@@ -46,8 +47,11 @@ def tiles_processing(image, fcn, tile_spacing, fcn_output_n=None, dtype=np.int8,
     shape = list(image.shape)
     if fcn_output_n is not None:
         shape.append(fcn_output_n)
-    if tile_margin is None:
+    if tile_size is None:
         tile_margin = [0, 0]
+    else:
+        tile_margin = ((np.asarray(tile_size) - tile_spacing) / 2).astype(np.int)
+
     output = np.zeros(shape, dtype=dtype)
     for x0 in range(0, image.shape[0], tile_spacing[0]):
         for x1 in range(0, image.shape[1], tile_spacing[1]):
@@ -112,12 +116,14 @@ class GLCMTextureMeasurement:
             {
                 "name": "Tile Size",
                 "type": "int",
-                "value": 32
+                "value": 64,
+                "suffix": "px",
             },
             {
-                "name": "Tile Margin",
+                "name": "Tile Spacing",
                 "type": "int",
-                "value": 16
+                "value": 32,
+                "suffix": "px",
             },
             {
                 "name": "Working Resolution",
@@ -156,19 +162,22 @@ class GLCMTextureMeasurement:
         # title = "test1"
         # views = self.anim.get_views_by_title(self.annotation_id, level=0)
         pxsize_mm = [self.parameters.param("Working Resolution").value() * 1000] * 2
-        tilesize = [self.parameters.param("Tile Size").value()] * 2
-        tilemargin = [self.parameters.param("Tile Margin").value()] * 2
+        tile_size = [self.parameters.param("Tile Size").value()] * 2
+        tile_spacing = [self.parameters.param("Tile Spacing").value()] * 2
         levels = self.parameters.param("GLCM Levels").value()
         # view = views[0].to_pixelsize(pxsize_mm)
 
         view = self.parent_view.to_pixelsize(pxsize_mm)
+        texture_image = view.get_region_image(as_gray=True)
+        if self.report is not None:
+            self.report.imsave("texture_input_image_{}.png", (texture_image * 255).astype(np.uint8))
         energy = tiles_processing(
-            view.get_region_image(as_gray=True),
+            texture_image,
             fcn=lambda img: texture_glcm_features(img, levels),
-            tile_spacing=tilesize,
+            tile_spacing=tile_spacing,
             fcn_output_n=3,
             dtype=None,
-            tile_margin=tilemargin
+            tile_size=tile_size
         )
         # seg = texseg.predict(views[0], show=False, function=texture_energy)
         fig = plt.figure(figsize=(10, 12))
@@ -353,7 +362,7 @@ class TextureSegmentation:
         seg = tiles_processing(test_image, tile_fcn, tile_spacing=self.tile_size)
 
         if show:
-            centers = tile_centers(test_image.shape, tile_size=self.tile_size)
+            centers = tile_centers(test_image.shape, tile_spacing=self.tile_size)
             import skimage.color
 
             plt.imshow(skimage.color.label2rgb(seg, test_image))
