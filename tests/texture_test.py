@@ -166,7 +166,7 @@ class TextureTest(unittest.TestCase):
         cls.fit(data, target)
         tile_fnc = lambda tile: satex.get_feature_and_predict(tile, salbp.lbp_fv, cls)
         print("before tile processing")
-        seg = satex.tiles_processing(test_image, tile_fnc, tile_size=size)
+        seg = satex.tiles_processing(test_image, tile_fnc, tile_spacing=size)
         plt.figure()
         plt.imshow(test_image)
         plt.contour(seg)
@@ -265,7 +265,7 @@ class TextureTest(unittest.TestCase):
         energy = satex.tiles_processing(
             views[0].get_region_image(as_gray=True),
             fcn=satex.texture_energy,
-            tile_size=texseg.tile_size,
+            tile_spacing=texseg.tile_size,
         )
         # seg = texseg.predict(views[0], show=False, function=texture_energy)
         plt.figure(figsize=(10, 12))
@@ -296,7 +296,7 @@ class TextureTest(unittest.TestCase):
         energy = satex.tiles_processing(
             views[0].get_region_image(as_gray=True),
             fcn=lambda img: satex.texture_glcm_features(img, 32),
-            tile_size=texseg.tile_size,
+            tile_spacing=texseg.tile_size,
             fcn_output_n=3,
             dtype=None,
         )

@@ -11,6 +11,7 @@ logger = logging.getLogger(__name__)
 import numpy as np
 import scipy.ndimage
 import matplotlib.pyplot as plt
+from typing import List
 import os.path as op
 from pyqtgraph.parametertree import Parameter, ParameterTree
 from . import image
@@ -27,28 +28,39 @@ def tile_centers(image_shape, tile_size):
     return centers
 
 
-def tiles_processing(image, fcn, tile_size, fcn_output_n=None, dtype=np.int8):
+def tiles_processing(image, fcn, tile_spacing, fcn_output_n=None, dtype=np.int8, tile_margin: List[int] = None):
     """
     Process image tile by tile. Last tile in every row and avery column may be smaller if modulo of shape of image and
     shape of tile is different from zero.
 
+    :param tile_margin:
     :param image: input image
     :param fcn: Function used on each tile. Input of this function is just tile image.
-    :param tile_size: size of tile in pixels
+    :param tile_spacing: size of tile in pixels
     :param fcn_output_n: dimension of output of fcn()
     :param dtype: output data type
     :return:
     """
+    # TODO rename inputs
 
     shape = list(image.shape)
     if fcn_output_n is not None:
         shape.append(fcn_output_n)
+    if tile_margin is None:
+        tile_margin = [0, 0]
     output = np.zeros(shape, dtype=dtype)
-    for x0 in range(0, image.shape[0], tile_size[0]):
-        for x1 in range(0, image.shape[1], tile_size[1]):
-            sl = (slice(x0, x0 + tile_size[0]), slice(x1, x1 + tile_size[1]))
-            img = image[sl]
-            output[sl] = fcn(img)
+    for x0 in range(0, image.shape[0], tile_spacing[0]):
+        for x1 in range(0, image.shape[1], tile_spacing[1]):
+            sl_in = (
+                slice(max(x0 - tile_margin[0], 0), x0 + tile_spacing[0] + tile_margin[0]),
+                slice(max(x1 - tile_margin[1], 0), x1 + tile_spacing[1] + tile_margin[1])
+            )
+            sl_out = (
+                slice(x0, x0 + tile_spacing[0]),
+                slice(x1, x1 + tile_spacing[1])
+            )
+            img = image[sl_in]
+            output[sl_out] = fcn(img)
 
     else:
         return output
@@ -60,7 +72,7 @@ def get_feature_and_predict(img, fv_function, classif):
 
 
 def select_texture_patch_centers_from_one_annotation(
-    anim, title, tile_size, level, step=50
+        anim, title, tile_size, level, step=50
 ):
     if not np.isscalar(tile_size):
         if tile_size[0] == tile_size[1]:
@@ -100,7 +112,12 @@ class GLCMTextureMeasurement:
             {
                 "name": "Tile Size",
                 "type": "int",
-                "value" : 64
+                "value": 32
+            },
+            {
+                "name": "Tile Margin",
+                "type": "int",
+                "value": 16
             },
             {
                 "name": "Working Resolution",
@@ -115,7 +132,7 @@ class GLCMTextureMeasurement:
             {
                 "name": "GLCM Levels",
                 "type": "int",
-                "value" : 64
+                "value": 64
             },
 
         ]
@@ -126,7 +143,7 @@ class GLCMTextureMeasurement:
     def set_report(self, report: Report):
         self.report = report
 
-    def set_input_data(self, anim:image.AnnotatedImage, id, view, lobulus_segmentation):
+    def set_input_data(self, anim: image.AnnotatedImage, id, view, lobulus_segmentation):
         self.anim = anim
         self.annotation_id = id
         self.parent_view = view
@@ -140,6 +157,7 @@ class GLCMTextureMeasurement:
         # views = self.anim.get_views_by_title(self.annotation_id, level=0)
         pxsize_mm = [self.parameters.param("Working Resolution").value() * 1000] * 2
         tilesize = [self.parameters.param("Tile Size").value()] * 2
+        tilemargin = [self.parameters.param("Tile Margin").value()] * 2
         levels = self.parameters.param("GLCM Levels").value()
         # view = views[0].to_pixelsize(pxsize_mm)
 
@@ -147,9 +165,10 @@ class GLCMTextureMeasurement:
         energy = tiles_processing(
             view.get_region_image(as_gray=True),
             fcn=lambda img: texture_glcm_features(img, levels),
-            tile_size=tilesize,
+            tile_spacing=tilesize,
             fcn_output_n=3,
             dtype=None,
+            tile_margin=tilemargin
         )
         # seg = texseg.predict(views[0], show=False, function=texture_energy)
         fig = plt.figure(figsize=(10, 12))
@@ -186,14 +205,14 @@ class GLCMTextureMeasurement:
                 "glcm_features_color_{}.png".format(self.annotation_id), fig
             )
 
-        e0 = energy[:,:, 0]
-        e1 = energy[:,:, 1]
-        e2 = energy[:,:, 2]
+        e0 = energy[:, :, 0]
+        e1 = energy[:, :, 1]
+        e2 = energy[:, :, 2]
 
         row = {
-            "GLCM Energy": np.mean(e0[seg==1]),
-            "GLCM Homogenity": np.mean(e1[seg==1]),
-            "GLCM Correlation": np.mean(e2[seg==1]),
+            "GLCM Energy": np.mean(e0[seg == 1]),
+            "GLCM Homogenity": np.mean(e1[seg == 1]),
+            "GLCM Correlation": np.mean(e2[seg == 1]),
         }
         self.report.add_cols_to_actual_row(row)
         # plt.show()
@@ -206,7 +225,7 @@ class TextureSegmentation:
             {
                 "name": "Tile Size",
                 "type": "int",
-                "value" : 256
+                "value": 256
             },
             # {
             #     "name": "Working Resolution",
@@ -331,7 +350,7 @@ class TextureSegmentation:
         tile_fcn = lambda img: get_feature_and_predict(
             img, self.feature_function, self.classifier
         )
-        seg = tiles_processing(test_image, tile_fcn, tile_size=self.tile_size)
+        seg = tiles_processing(test_image, tile_fcn, tile_spacing=self.tile_size)
 
         if show:
             centers = tile_centers(test_image.shape, tile_size=self.tile_size)
@@ -380,4 +399,3 @@ def texture_energy(img):
     )
     en = skimage.feature.texture.greycoprops(P, prop="energy")
     return np.mean(en) * 100
-
