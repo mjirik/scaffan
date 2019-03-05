@@ -143,7 +143,7 @@ class GLCMTextureMeasurement:
 
         ]
 
-        self.parameters = Parameter.create(name="Texture Processing", type="group", children=params)
+        self.parameters = Parameter.create(name="Texture Processing", type="group", children=params, expanded=False)
         self.report: Report = None
 
     def set_report(self, report: Report):

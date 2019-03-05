@@ -140,7 +140,7 @@ class Lobulus:
 
         ]
 
-        self.parameters = Parameter.create(name="Lobulus Processing", type="group", children=params)
+        self.parameters = Parameter.create(name="Lobulus Processing", type="group", children=params, expanded=False)
         self.report: Report = None
 
     def set_annotated_image_and_id(self, anim: scim.AnnotatedImage, annotation_id, level=None):

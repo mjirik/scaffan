@@ -57,7 +57,7 @@ class SkeletonAnalysis:
 
         ]
 
-        self.parameters = Parameter.create(name="Skeleton Analysis", type="group", children=params)
+        self.parameters = Parameter.create(name="Skeleton Analysis", type="group", children=params, expanded=False)
         self.report: Report = None
 
     def set_report(self, report: Report):
