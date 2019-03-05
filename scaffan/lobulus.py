@@ -203,6 +203,7 @@ class Lobulus:
         # mgac.run(iterations=100)
         # inner = mgac.levelset.copy()
 
+
         param_gac_smoothing = self.parameters.param("Central Vein Segmentation", "Smoothing").value()
         param_gac_threshold = self.parameters.param("Central Vein Segmentation", "Threshold").value()
         param_gac_baloon = self.parameters.param("Central Vein Segmentation", "Ballon").value()

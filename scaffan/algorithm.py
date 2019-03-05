@@ -13,6 +13,7 @@ import datetime
 from pathlib import Path
 import io3d.misc
 import json
+import time
 
 # import PyQt5.QtWidgets
 # print("start 3")
@@ -238,6 +239,7 @@ class Scaffan:
 
     def _run_lobulus(self, annotation_id):
         show = self.parameters.param("Processing", "Show").value()
+        t0 = time.time()
         self.report.set_show(show)
         self.report.set_save(True)
         self.lobulus_processing.set_report(self.report)
@@ -256,6 +258,8 @@ class Scaffan:
                                               lobulus_segmentation=self.lobulus_processing.lobulus_mask
                                               )
             self.glcm_textures.run()
+        t1 = time.time()
+        self.report.add_cols_to_actual_row({"Processing time [s]": t1 - t0})
         self.report.finish_actual_row()
 
     def _get_file_info(self):
@@ -288,7 +292,6 @@ class Scaffan:
         t = ParameterTree()
         t.setParameters(self.parameters, showTop=False)
         t.setWindowTitle("pyqtgraph example: Parameter Tree")
-        # t.co
         t.show()
 
         # print("run scaffan")
