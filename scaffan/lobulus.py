@@ -20,6 +20,7 @@ from scaffan import image as scim
 from .report import Report
 from pyqtgraph.parametertree import Parameter
 import imma.image
+import scaffan.texture
 
 _cite = "" +\
     "[1]: A Morphological Approach to Curvature-based Evolution of Curves and Surfaces, Pablo Márquez-Neila, Luis Baumela and Luis Álvarez. In IEEE Transactions on Pattern Analysis and Machine Intelligence (PAMI), 2014, DOI 10.1109/TPAMI.2013.106" +\
@@ -31,6 +32,7 @@ class Lobulus:
         #  For segmentation was used different level than 2. Probably 3 or 4
         #  The level 2 has been used in detail view
 
+        self._inner_texture = scaffan.texture.GLCMTextureMeasurement("central_vein")
         params = [
             # {
             #     "name": "Tile Size",
@@ -133,6 +135,7 @@ class Lobulus:
                     "type": "int",
                     "value": 400
                 },
+                self._inner_texture.parameters,
 
 
             ]
@@ -177,22 +180,40 @@ class Lobulus:
             self.view.region_pixelsize
         )
         self.image = self.view.get_region_image(as_gray=True)
-        self.mask = self.view.get_annotation_region_raster(annotation_id=annotation_id)
+        self.annotation_mask = self.view.get_annotation_region_raster(annotation_id=annotation_id)
         pass
 
-    def find_border(self, show=True):
-        # inner_lobulus_margin_mm = 0.02
 
+    def find_border(self, show=True):
+        self._im_gradient_outer = skimage.filters.frangi(self.image)
+        logger.debug("Image size {}".format(self.image.shape))
+        circle = self.annotation_mask
+        if self.report is not None:
+            self.report.imsave_as_fig("gradient_outer.png", self._im_gradient_outer)
+        param_acwe_smoothing = self.parameters.param("Border Segmentation", "Smoothing").value()
+        param_acwe_lambda1 =   self.parameters.param("Border Segmentation", "Lambda1").value()
+        param_acwe_lambda2 =   self.parameters.param("Border Segmentation", "Lambda2").value()
+        param_acwe_iterations =self.parameters.param("Border Segmentation", "Iterations").value()
+        mgac = ms.MorphACWE(
+            self._im_gradient_outer,
+            smoothing=param_acwe_smoothing,
+            lambda1=param_acwe_lambda1,
+            lambda2=param_acwe_lambda2)
+        mgac.levelset = circle.copy()
+        mgac.run(iterations=param_acwe_iterations)
+        outer = mgac.levelset.copy()
+        self.border_mask = outer
+
+    def find_central_vein(self, show=True):
         im_gradient_outer = skimage.filters.frangi(self.image)
         im_gradient_base_inner = ms.gborders(self.image, alpha=1000, sigma=2)
         im_gradient_inner = im_gradient_base_inner - (im_gradient_outer * 10000)
         if self.report is not None:
-            self.report.imsave_as_fig("gradient_outer.png", im_gradient_inner)
+            self.report.imsave_as_fig("gradient_outer.png", im_gradient_outer)
             self.report.imsave_as_fig("gradient_base_inner.png", im_gradient_base_inner)
             self.report.imsave_as_fig("gradient_inner.png", im_gradient_inner)
         # circle = circle_level_set(imgr.shape, size2, 75, scalerow=0.75)
-        circle = self.mask
-        logger.debug("Image size {}".format(self.image.shape))
+        circle = self.annotation_mask
         # plt.figure()
         # plt.imshow(im_gradient0)
         # plt.colorbar()
@@ -203,16 +224,11 @@ class Lobulus:
         # mgac.run(iterations=100)
         # inner = mgac.levelset.copy()
 
-
         param_gac_smoothing = self.parameters.param("Central Vein Segmentation", "Smoothing").value()
         param_gac_threshold = self.parameters.param("Central Vein Segmentation", "Threshold").value()
         param_gac_baloon = self.parameters.param("Central Vein Segmentation", "Ballon").value()
         param_gac_iterations = self.parameters.param("Central Vein Segmentation", "Iterations").value()
 
-        param_acwe_smoothing = self.parameters.param("Border Segmentation", "Smoothing").value()
-        param_acwe_lambda1 =   self.parameters.param("Border Segmentation", "Lambda1").value()
-        param_acwe_lambda2 =   self.parameters.param("Border Segmentation", "Lambda2").value()
-        param_acwe_iterations =self.parameters.param("Border Segmentation", "Iterations").value()
         # central vein
         mgac = ms.MorphGAC(im_gradient_inner, smoothing=param_gac_smoothing,
                            threshold=param_gac_threshold, balloon=param_gac_baloon)
@@ -221,19 +237,7 @@ class Lobulus:
         mgac.levelset = circle.copy()
         mgac.run(iterations=param_gac_iterations)
         inner = mgac.levelset.copy()
-        # mgac = ms.MorphGAC(im_gradient, smoothing=2, threshold=0.2, balloon=+1)
-        # mgac = ms.MorphACWE(im_gradient0, smoothing=2, lambda1=0.5, lambda2=1.0)
-
-        mgac = ms.MorphACWE(
-            im_gradient_outer,
-            smoothing=param_acwe_smoothing,
-            lambda1=param_acwe_lambda1,
-            lambda2=param_acwe_lambda2)
-        mgac.levelset = circle.copy()
-        mgac.run(iterations=param_acwe_iterations)
-        outer = mgac.levelset.copy()
-
-        # circle = circle_level_set(imgr.shape, (200, 200), 75, scalerow=0.75)
+        self.central_vein_mask = inner
 
         if self.report is not None:
             fig = plt.figure(figsize=(12, 10))
@@ -241,6 +245,17 @@ class Lobulus:
             plt.colorbar()
             plt.contour(circle + inner)
             self.report.savefig_and_show("lobulus_gradient_inner_{}.png".format(self.annotation_id), fig)
+        pass
+
+    def run(self, show=True):
+        self.find_border(show)
+        self.find_central_vein(show)
+        # inner_lobulus_margin_mm = 0.02
+
+        # mgac = ms.MorphGAC(im_gradient, smoothing=2, threshold=0.2, balloon=+1)
+        # mgac = ms.MorphACWE(im_gradient0, smoothing=2, lambda1=0.5, lambda2=1.0)
+
+        # circle = circle_level_set(imgr.shape, (200, 200), 75, scalerow=0.75)
 
         # plt.figure()
         # plt.imshow(im_gradient)
@@ -249,31 +264,24 @@ class Lobulus:
         fig = plt.figure(figsize=(12, 10))
         plt.imshow(self.image, cmap="gray")
         plt.colorbar()
-        plt.contour(circle + inner + outer)
+        plt.contour(self.annotation_mask + self.central_vein_mask + self.border_mask)
         self.view.add_ticks()
 
         datarow = {}
         datarow["Annotation ID"] = self.annotation_id
         if self.report is not None:
             self.report.savefig_and_show("lobulus_{}.png".format(self.annotation_id), fig)
-        self.central_vein_mask = inner
-        self.lobulus_mask = (inner + outer) == 1
+        self.lobulus_mask = (self.central_vein_mask + self.border_mask) == 1
         datarow["Area"] = np.sum(self.lobulus_mask) * np.prod(
             self.view.region_pixelsize
         )
 
-        datarow["Central vein area"] = np.sum(inner > 0) * np.prod(
+        datarow["Central vein area"] = np.sum(self.central_vein_mask > 0) * np.prod(
             self.view.region_pixelsize
         )
         datarow["Area unit"] = self.view.region_pixelunit
         self.report.add_cols_to_actual_row(datarow)
         # self.skeleton_analysis(show=show)
-
-
-    # def imfigsave(self, base_fn, arr):
-
-    def find_cetral_vein(self):
-        pass
 
     def imsave(self, base_fn, arr, k=50):
         base_fn = base_fn.format(self.annotation_id)

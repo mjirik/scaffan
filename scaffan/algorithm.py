@@ -247,7 +247,7 @@ class Scaffan:
         self.skeleton_analysis.set_report(self.report)
 
         self.lobulus_processing.set_annotated_image_and_id(self.anim, annotation_id)
-        self.lobulus_processing.find_border(show=show)
+        self.lobulus_processing.run(show=show)
         self.skeleton_analysis.set_lobulus(lobulus=self.lobulus_processing)
         if self.parameters.param("Processing", "Run Skeleton Analysis").value():
             self.skeleton_analysis.skeleton_analysis(show=show)

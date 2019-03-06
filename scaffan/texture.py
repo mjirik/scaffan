@@ -111,7 +111,7 @@ def nonzero_with_step(data, step):
 
 
 class GLCMTextureMeasurement:
-    def __init__(self):
+    def __init__(self, filename_label=""):
         params = [
             {
                 "name": "Tile Size",
@@ -145,6 +145,7 @@ class GLCMTextureMeasurement:
 
         self.parameters = Parameter.create(name="Texture Processing", type="group", children=params, expanded=False)
         self.report: Report = None
+        self.filename_label = filename_label
 
     def set_report(self, report: Report):
         self.report = report
@@ -170,9 +171,9 @@ class GLCMTextureMeasurement:
         view = self.parent_view.to_pixelsize(pxsize_mm)
         texture_image = view.get_region_image(as_gray=True)
         if self.report is not None:
-            self.report.imsave("texture_input_image_{}.png", (texture_image * 255).astype(np.uint8))
+            self.report.imsave("texture_input_image_{}_{}.png".format(self.filename_label, self.annotation_id), (texture_image * 255).astype(np.uint8))
         energy = tiles_processing(
-            texture_image,
+            1 - texture_image,
             fcn=lambda img: texture_glcm_features(img, levels),
             tile_spacing=tile_spacing,
             fcn_output_n=3,
@@ -203,7 +204,7 @@ class GLCMTextureMeasurement:
         # plt.colorbar()
         if self.report is not None:
             self.report.savefig_and_show(
-                "glcm_features_{}.png".format(self.annotation_id), fig
+                "glcm_features_{}_{}.png".format(self.filename_label, self.annotation_id), fig
             )
         # plt.savefig("glcm_features_{}.png".format(title))
 
@@ -211,7 +212,7 @@ class GLCMTextureMeasurement:
         plt.imshow(energy)
         if self.report is not None:
             self.report.savefig_and_show(
-                "glcm_features_color_{}.png".format(self.annotation_id), fig
+                "glcm_features_color_{}_{}.png".format(self.filename_label, self.annotation_id), fig
             )
 
         e0 = energy[:, :, 0]
