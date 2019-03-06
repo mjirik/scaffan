@@ -140,6 +140,36 @@ class ParseAnnotationTest(unittest.TestCase):
 
         # plt.show()
 
+
+    def test_merge_views(self):
+        fn = io3d.datasets.join_path("medical", "orig", "CMU-1.ndpi", get_root=True)
+        anim = scim.AnnotatedImage(fn)
+        annotation_ids = anim.select_annotations_by_title("obj1")
+        view1 = anim.get_views(annotation_ids, margin=1.0, pixelsize_mm=[0.005, 0.005])[0]
+        image1 = view1.get_region_image()
+        import copy
+        image1_copy = copy.copy(image1)
+        plt.imshow(image1)
+        # plt.show()
+
+        view2 = anim.get_views(annotation_ids, margin=0.1, pixelsize_mm=[0.05, 0.05])[0]
+        image2 = view2.get_region_image()
+        plt.imshow(image2)
+        # plt.show()
+
+        merged = view1.insert_image_from_view(view2, image1, image2)
+
+        # image1[sl] = image2
+
+        plt.imshow(merged)
+        errim = np.mean(np.abs(image1_copy.astype(np.int) - merged), 2)
+        plt.figure()
+        plt.imshow(errim)
+        plt.show()
+        err = np.mean(errim)
+        self.assertless(err, 3, "Mean error in intensity levels per pixel should be low")
+        self.assertless(1, err, "Mean error in intensity levels per pixel should be low but there should be some error.")
+
 if __name__ == "__main__":
     # logging.basicConfig(stream=sys.stderr)
     logger.setLevel(logging.DEBUG)

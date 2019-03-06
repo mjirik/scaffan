@@ -705,6 +705,27 @@ class View:
         )
         return newview
 
+    def insert_image_from_view(self, other_view: "View", img, other_img):
+
+        pixelsize_factor = self.get_pixelsize_on_level(0)[0] / self.region_pixelsize
+        delta_px = ((other_view.region_location - self.region_location) * pixelsize_factor).astype(np.int)
+        # start = (self.region_location + delta_px)[::-1]
+        # delta_size_px = (other_view.get_size_on_pixelsize_mm() * pixelsize_factor).astype(np.int)
+        start=delta_px[::-1]
+        import imma.image
+        pxsz1 = self.region_pixelsize[:2]
+        pxsz2 = other_view.region_pixelsize[:2]
+        resized_other_img = imma.image.resize_to_mm(
+            other_img,
+            voxelsize_mm=pxsz2[::-1],
+            new_voxelsize_mm=pxsz1[::-1]
+        )
+        stop = start + resized_other_img.shape[:2]
+
+
+        img[slice(start[0], stop[0], 1), slice(start[1], stop[1],1)] = resized_other_img
+        return img
+
 
 class ColorError(Exception):
     pass
