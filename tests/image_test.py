@@ -173,6 +173,25 @@ class ParseAnnotationTest(unittest.TestCase):
         self.assertLess(1, err, "Mean error in intensity levels per pixel should be low but there should be some error.")
 
 
+    def test_view_margin_size(self):
+        """
+        Compare two same resolution images with different margin
+        :return:
+        """
+        fn = io3d.datasets.join_path("medical", "orig", "CMU-1.ndpi", get_root=True)
+        anim = scim.AnnotatedImage(fn)
+        annotation_ids = anim.select_annotations_by_title("obj1")
+
+        img1 = anim.get_views(annotation_ids, margin=0.0, pixelsize_mm=[0.005, 0.005])[0].get_region_image(as_gray=True)
+        img2 = anim.get_views(annotation_ids, margin=1.0, pixelsize_mm=[0.005, 0.005])[0].get_region_image(as_gray=True)
+
+        sh1 = np.asarray(img1.shape)
+        sh2 = np.asarray(img2.shape)
+        self.assertTrue(np.all((sh1 * 2.9 ) < sh2), "Boundary adds 2*margin*size of image to the image size")
+        self.assertTrue(np.all(sh2 < (sh1 * 3.1 )), "Boundary adds 2*margin*size of image to the image size")
+
+
+
 if __name__ == "__main__":
     # logging.basicConfig(stream=sys.stderr)
     logger.setLevel(logging.DEBUG)

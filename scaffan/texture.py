@@ -11,6 +11,7 @@ logger = logging.getLogger(__name__)
 import numpy as np
 import scipy.ndimage
 import matplotlib.pyplot as plt
+import copy
 from typing import List
 import os.path as op
 from pyqtgraph.parametertree import Parameter, ParameterTree
@@ -146,12 +147,13 @@ class GLCMTextureMeasurement:
         self.parameters = Parameter.create(name="Texture Processing", type="group", children=params, expanded=False)
         self.report: Report = None
         self.filename_label = filename_label
+        self.add_cols_to_report: bool = True
 
     def set_report(self, report: Report):
         self.report = report
 
-    def set_input_data(self, anim: image.AnnotatedImage, id, view, lobulus_segmentation):
-        self.anim = anim
+    def set_input_data(self, view: image.View, id, lobulus_segmentation):
+        self.anim = view.anim
         self.annotation_id = id
         self.parent_view = view
         self.lobulus_segmentation = lobulus_segmentation
@@ -186,9 +188,10 @@ class GLCMTextureMeasurement:
         img = view.get_region_image()
         plt.imshow(img)
         view.plot_annotations(self.annotation_id)
-        seg = imma.image.resize_to_shape(self.lobulus_segmentation, shape=img.shape[:2], order=0)
-        plt.contour(seg)
-        plt.title("original image")
+        if self.lobulus_segmentation is not None:
+            seg = imma.image.resize_to_shape(self.lobulus_segmentation, shape=img.shape[:2], order=0) == 1
+            plt.contour(seg)
+            plt.title("original image")
         plt.subplot(222)
         plt.title("GLCM energy")
         image.imshow_with_colorbar(energy[:, :, 0])
@@ -199,7 +202,7 @@ class GLCMTextureMeasurement:
         plt.title("GLCM correlation")
         image.imshow_with_colorbar(energy[:, :, 2])
         mx = np.max(energy, axis=(0, 1))
-        mn = np.min(energy, axis=(0, 1))
+        # mn = np.min(energy, axis=(0, 1))
         logger.debug(mx)
         # plt.colorbar()
         if self.report is not None:
@@ -218,13 +221,17 @@ class GLCMTextureMeasurement:
         e0 = energy[:, :, 0]
         e1 = energy[:, :, 1]
         e2 = energy[:, :, 2]
+        self.measured_reatures = energy
 
+        if self.lobulus_segmentation is None:
+            seg = (slice(None), slice(None))
         row = {
-            "GLCM Energy": np.mean(e0[seg == 1]),
-            "GLCM Homogenity": np.mean(e1[seg == 1]),
-            "GLCM Correlation": np.mean(e2[seg == 1]),
+            "GLCM Energy": np.mean(e0[seg]),
+            "GLCM Homogenity": np.mean(e1[seg]),
+            "GLCM Correlation": np.mean(e2[seg]),
         }
-        self.report.add_cols_to_actual_row(row)
+        if self.add_cols_to_report:
+            self.report.add_cols_to_actual_row(row)
         # plt.show()
 
 

@@ -253,10 +253,8 @@ class Scaffan:
             self.skeleton_analysis.skeleton_analysis(show=show)
         if self.parameters.param("Processing", "Run Texture Analysis").value():
             # self.glcm_textures.report = self.report
-            self.glcm_textures.set_input_data(self.anim, annotation_id,
-                                              view=self.lobulus_processing.view,
-                                              lobulus_segmentation=self.lobulus_processing.lobulus_mask
-                                              )
+            self.glcm_textures.set_input_data(view=self.lobulus_processing.view, id=annotation_id,
+                                              lobulus_segmentation=self.lobulus_processing.lobulus_mask)
             self.glcm_textures.run()
         t1 = time.time()
         self.report.add_cols_to_actual_row({"Processing time [s]": t1 - t0})
