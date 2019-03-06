@@ -253,9 +253,9 @@ class AnnotatedImage:
         else:
             return self.get_views(annotation_ids, level=level, **kwargs)
 
-    def select_inner_annotations(self, id, color=None):
+    def select_inner_annotations(self, id, color=None, raise_exception_if_not_found=False):
         if color is not None:
-            an_ids_sel1 = self.select_annotations_by_color(color)
+            an_ids_sel1 = self.select_annotations_by_color(color, raise_exception_if_not_found=raise_exception_if_not_found)
         else:
             an_ids_sel1 = list(self.annotations.keys())
 

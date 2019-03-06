@@ -185,7 +185,8 @@ class GLCMTextureMeasurement:
         # seg = texseg.predict(views[0], show=False, function=texture_energy)
         fig = plt.figure(figsize=(10, 12))
         plt.subplot(221)
-        img = view.get_region_image()
+        # grayscale image is there because of travis memory error
+        img = view.get_region_image(as_gray=True)
         plt.imshow(img)
         view.plot_annotations(self.annotation_id)
         if self.lobulus_segmentation is not None:
