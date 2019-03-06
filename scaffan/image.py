@@ -202,7 +202,6 @@ class AnnotatedImage:
 
         return best_level
 
-
     def get_resize_parameters(self, former_level, former_size, new_level):
         """
         Get scale and size of image after resize to other level
@@ -254,12 +253,33 @@ class AnnotatedImage:
         else:
             return self.get_views(annotation_ids, level=level, **kwargs)
 
+    def select_inner_annotations(self, id, color=None):
+        if color is not None:
+            an_ids_sel1 = self.select_annotations_by_color(color)
+        else:
+            an_ids_sel1 = list(self.annotations.keys())
+
+        x_px = self.annotations[id]["x_px"]
+        y_px = self.annotations[id]["y_px"]
+        ids = []
+        for idi in an_ids_sel1:
+            ann = self.annotations[idi]
+            x_pxi = ann["x_px"]
+            y_pxi = ann["y_px"]
+
+            if (
+                    np.max(x_pxi) < np.max(x_px) and np.max(y_pxi) < np.max(y_px) and
+                    np.min(x_px) < np.min(x_pxi) and np.min(y_px) < np.min(y_pxi)
+            ):
+                ids.append
+
+
+        pass
+
     def select_annotations_by_title(self, title):
         return self.get_annotation_ids(title)
         # return self.get_views(annotation_ids, level=level, **kwargs), annotation_ids
 
-    def get_views_by_annotation_color(self):
-        pass
 
     def get_views(
         self,
@@ -333,7 +353,7 @@ class AnnotatedImage:
             self.openslide, self.annotations, center, level, size
         )
 
-    def select_annotations_by_color(self, id):
+    def select_annotations_by_color(self, id, raise_exception_if_not_found=True):
         if id is None:
             # probably should return all ids for all colors
             raise ColorError()
@@ -341,7 +361,8 @@ class AnnotatedImage:
 
         if type(id) is str:
             if id not in self.colors:
-                raise ColorError()
+                if raise_exception_if_not_found:
+                    raise ColorError()
                 return None
             id = self.colors[id]
         else:

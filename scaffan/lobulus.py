@@ -220,9 +220,6 @@ class Lobulus:
             self.report.imsave_as_fig("gradient_texture_color_{}.png".format(self.annotation_id), tfeatures)
             self.report.imsave_as_fig("gradient_texture_mean_{}.png".format(self.annotation_id), tfeatures)
 
-
-
-
         sl = self.view.get_slices_for_insert_image_from_view(central_vein_view)
 
         image = central_vein_view.get_region_image(as_gray=True)

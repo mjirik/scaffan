@@ -33,6 +33,7 @@ import scaffan.lobulus
 import scaffan.report
 import scaffan.skeleton_analysis
 from .report import Report
+import scaffan.evaluation
 
 
 class Scaffan:
@@ -42,6 +43,7 @@ class Scaffan:
         self.glcm_textures = satex.GLCMTextureMeasurement()
         self.lobulus_processing = scaffan.lobulus.Lobulus()
         self.skeleton_analysis = scaffan.skeleton_analysis.SkeletonAnalysis()
+        self._evaluation = scaffan.evaluation.Evaluation()
         params = [
             {
                 "name": "Input",
@@ -219,8 +221,17 @@ class Scaffan:
         # if annotation_ids is None:
         #     logger.error("No color selected")
 
+        show = self.parameters.param("Processing", "Show").value()
+        self.report.set_show(show)
+        self.report.set_save(True)
+        self.lobulus_processing.set_report(self.report)
+        self.glcm_textures.set_report(self.report)
+        self.skeleton_analysis.set_report(self.report)
+        self._evaluation.report = self.report
         for id in annotation_ids:
             self._run_lobulus(id)
+
+
         self.report.df.to_excel(op.join(self.report.outputdir, "data.xlsx"))
         saved_params = self.parameters.saveState()
         io3d.misc.obj_to_file(
@@ -240,11 +251,6 @@ class Scaffan:
     def _run_lobulus(self, annotation_id):
         show = self.parameters.param("Processing", "Show").value()
         t0 = time.time()
-        self.report.set_show(show)
-        self.report.set_save(True)
-        self.lobulus_processing.set_report(self.report)
-        self.glcm_textures.set_report(self.report)
-        self.skeleton_analysis.set_report(self.report)
 
         self.lobulus_processing.set_annotated_image_and_id(self.anim, annotation_id)
         self.lobulus_processing.run(show=show)
@@ -258,6 +264,9 @@ class Scaffan:
             self.glcm_textures.run()
         t1 = time.time()
         self.report.add_cols_to_actual_row({"Processing time [s]": t1 - t0})
+        # evaluation
+        self._evaluation.set_input_data(self.anim, annotation_id)
+        self._evaluation.run()
         self.report.finish_actual_row()
 
     def _get_file_info(self):

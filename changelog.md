@@ -15,6 +15,7 @@
 * [Added] Images from Lobulus boundary and Central vein segmentation
 * [Added] Processing parameters saved to yaml and json file
 * [Added] Collapsed parameter sub-tree with complex parameters
+* [Added] Algorithm evaluation added
 
 ## 0.4.* 
 
