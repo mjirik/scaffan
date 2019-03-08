@@ -69,9 +69,9 @@ class MainGuiTest(unittest.TestCase):
         self.assertLess(0.6, mainapp.evaluation.evaluation_history[1]["Lobulus Border Dice"],
                         "Lobulus segmentation should have Dice coefficient above some low level")
         self.assertLess(0.6, mainapp.evaluation.evaluation_history[0]["Central Vein Dice"],
-                        "Lobulus segmentation should have Dice coefficient above some low level")
+                        "Central Vein segmentation should have Dice coefficient above some low level")
         self.assertLess(0.6, mainapp.evaluation.evaluation_history[1]["Central Vein Dice"],
-                        "Lobulus segmentation should have Dice coefficient above some low level")
+                        "Central Vein should have Dice coefficient above some low level")
 
     def test_start_gui_no_exec(self):
         # fn = io3d.datasets.join_path("medical", "orig", "CMU-1.ndpi", get_root=True)
