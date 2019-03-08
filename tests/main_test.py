@@ -64,7 +64,7 @@ class MainGuiTest(unittest.TestCase):
         # mainapp.init_run()
         mainapp.set_annotation_color_selection("#FF00FF")
         mainapp.run_lobuluses()
-        self.assertLess(0.2, mainapp.evaluation.evaluation_history[0]["Lobulus Border Dice"],
+        self.assertLess(0.6, mainapp.evaluation.evaluation_history[0]["Lobulus Border Dice"],
                         "Lobulus segmentation should have Dice coefficient above some low level")
 
     def test_start_gui_no_exec(self):
