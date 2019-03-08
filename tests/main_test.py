@@ -60,11 +60,17 @@ class MainGuiTest(unittest.TestCase):
         # scan.annotations_to_px(imsl, annotations)
         mainapp = scaffan.algorithm.Scaffan()
         mainapp.set_input_file(fn)
-        mainapp.set_output_dir("test_output_dir")
+        mainapp.set_output_dir("test_run_lobuluses_output_dir")
         # mainapp.init_run()
         mainapp.set_annotation_color_selection("#FF00FF")
         mainapp.run_lobuluses()
         self.assertLess(0.6, mainapp.evaluation.evaluation_history[0]["Lobulus Border Dice"],
+                        "Lobulus segmentation should have Dice coefficient above some low level")
+        self.assertLess(0.6, mainapp.evaluation.evaluation_history[1]["Lobulus Border Dice"],
+                        "Lobulus segmentation should have Dice coefficient above some low level")
+        self.assertLess(0.6, mainapp.evaluation.evaluation_history[0]["Central Vein Dice"],
+                        "Lobulus segmentation should have Dice coefficient above some low level")
+        self.assertLess(0.6, mainapp.evaluation.evaluation_history[1]["Central Vein Dice"],
                         "Lobulus segmentation should have Dice coefficient above some low level")
 
     def test_start_gui_no_exec(self):
