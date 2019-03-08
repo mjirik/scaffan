@@ -175,11 +175,11 @@ class Lobulus:
             annotation_ids=[annotation_id], level=self.level, margin=annotation_margin,
             pixelsize_mm=pixelsize_mm
         )[0]
-        right_shape = imma.image.calculate_new_shape(
-            self.view.region_size_on_level,
-            self.view.get_pixelsize_on_level(self.view.region_level)[0],
-            self.view.region_pixelsize
-        )
+        # right_shape = imma.image.calculate_new_shape(
+        #     self.view.region_size_on_level,
+        #     self.view.get_pixelsize_on_level(self.view.region_level)[0],
+        #     self.view.region_pixelsize
+        # )
         self.image = self.view.get_region_image(as_gray=True)
         self.annotation_mask = self.view.get_annotation_region_raster(annotation_id=annotation_id)
         pass

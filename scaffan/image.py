@@ -271,10 +271,29 @@ class AnnotatedImage:
                     np.max(x_pxi) < np.max(x_px) and np.max(y_pxi) < np.max(y_px) and
                     np.min(x_px) < np.min(x_pxi) and np.min(y_px) < np.min(y_pxi)
             ):
-                ids.append
+                ids.append(idi)
+        return ids
 
+    def select_outer_annotations(self, id, color=None, raise_exception_if_not_found=False):
+        if color is not None:
+            an_ids_sel1 = self.select_annotations_by_color(color, raise_exception_if_not_found=raise_exception_if_not_found)
+        else:
+            an_ids_sel1 = list(self.annotations.keys())
 
-        pass
+        x_px = self.annotations[id]["x_px"]
+        y_px = self.annotations[id]["y_px"]
+        ids = []
+        for idi in an_ids_sel1:
+            ann = self.annotations[idi]
+            x_pxi = ann["x_px"]
+            y_pxi = ann["y_px"]
+
+            if (
+                    np.max(x_px) < np.max(x_pxi) and np.max(y_px) < np.max(y_pxi) and
+                    np.min(x_pxi) < np.min(x_px) and np.min(y_pxi) < np.min(y_px)
+            ):
+                ids.append(idi)
+        return ids
 
     def select_annotations_by_title(self, title):
         return self.get_annotation_ids(title)

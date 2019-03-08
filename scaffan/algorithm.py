@@ -43,7 +43,7 @@ class Scaffan:
         self.glcm_textures = satex.GLCMTextureMeasurement()
         self.lobulus_processing = scaffan.lobulus.Lobulus()
         self.skeleton_analysis = scaffan.skeleton_analysis.SkeletonAnalysis()
-        self._evaluation = scaffan.evaluation.Evaluation()
+        self.evaluation = scaffan.evaluation.Evaluation()
         params = [
             {
                 "name": "Input",
@@ -227,7 +227,7 @@ class Scaffan:
         self.lobulus_processing.set_report(self.report)
         self.glcm_textures.set_report(self.report)
         self.skeleton_analysis.set_report(self.report)
-        self._evaluation.report = self.report
+        self.evaluation.report = self.report
         for id in annotation_ids:
             self._run_lobulus(id)
 
@@ -265,8 +265,8 @@ class Scaffan:
         t1 = time.time()
         self.report.add_cols_to_actual_row({"Processing time [s]": t1 - t0})
         # evaluation
-        self._evaluation.set_input_data(self.anim, annotation_id)
-        self._evaluation.run()
+        self.evaluation.set_input_data(self.anim, annotation_id, self.lobulus_processing)
+        self.evaluation.run()
         self.report.finish_actual_row()
 
     def _get_file_info(self):
