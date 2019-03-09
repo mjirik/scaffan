@@ -144,7 +144,7 @@ class GLCMTextureMeasurement:
 
         ]
 
-        self.parameters = Parameter.create(name="Texture Processing", type="group", children=params, expanded=False)
+        self.parameters = Parameter.create(name="Texture Analysis", type="group", children=params, expanded=False)
         self.report: Report = None
         self.filename_label = filename_label
         self.add_cols_to_report: bool = True

@@ -40,6 +40,7 @@ class Scaffan:
     def __init__(self):
 
         self.report: Report = scaffan.report.Report()
+        self.report.level = 10
         import scaffan.texture as satex
         self.glcm_textures = satex.GLCMTextureMeasurement()
         self.lobulus_processing = scaffan.lobulus.Lobulus()

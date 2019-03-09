@@ -13,6 +13,7 @@ import matplotlib.pyplot as plt
 import skimage.io
 import warnings
 from pathlib import Path
+import numpy as np
 
 
 class Report:
@@ -26,6 +27,7 @@ class Report:
         self.show = False
         self.save = False
         self.debug = False
+        self.level = 50
 
         if outputdir is not None:
             self.set_output_dir(outputdir)
@@ -102,3 +104,10 @@ class Report:
             plt.show()
         else:
             plt.close(fig)
+
+    def save_np_data(self, base_fn, data, format_args=None, level=60):
+        if format_args is None:
+            format_args = []
+        fn = op.join(self.outputdir, base_fn.format(format_args))
+        if self.level < level:
+            np.save(data, fn)

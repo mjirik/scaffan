@@ -118,7 +118,8 @@ class Lobulus:
                     "type": "float",
                     # "value": 0.28, # prev stable version
                     # "value": 0.35,
-                    "value": 0.45,
+                    # "value": 0.25,
+                    "value": 0.22,
                     # "value": 0.25,
                     'tip': "MorphGAC algorithm parameter: The threshold that determines which areas are affected by the morphological balloon. This is the parameter θ.",
                     # "suffix": "px",
@@ -145,7 +146,7 @@ class Lobulus:
 
         ]
 
-        self.parameters = Parameter.create(name="Lobulus Processing", type="group", children=params, expanded=False)
+        self.parameters = Parameter.create(name="Lobulus Segmentation", type="group", children=params, expanded=False)
         self.report: Report = None
 
     def set_annotated_image_and_id(self, anim: scim.AnnotatedImage, annotation_id, level=None):
