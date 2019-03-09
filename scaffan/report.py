@@ -16,8 +16,21 @@ from pathlib import Path
 
 
 class Report:
-    def __init__(self, outputdir):
+    def __init__(self, outputdir=None):
         # self.outputdir = op.expanduser(outputdir)
+
+
+        self.df: pd.DataFrame = None
+        self.imgs = {}
+        self.actual_row = {}
+        self.show = False
+        self.save = False
+        self.debug = False
+
+        if outputdir is not None:
+            self.set_output_dir(outputdir)
+
+    def set_output_dir(self, outputdir):
         self.outputdir = Path(outputdir).expanduser()
         if not op.exists(self.outputdir):
             os.makedirs(self.outputdir)
@@ -25,8 +38,6 @@ class Report:
         self.df = pd.DataFrame()
         self.imgs = {}
         self.actual_row = {}
-        self.show = False
-        self.save = False
 
     def set_show(self, show):
         self.show = show

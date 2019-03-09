@@ -39,11 +39,17 @@ import scaffan.evaluation
 class Scaffan:
     def __init__(self):
 
+        self.report: Report = scaffan.report.Report()
         import scaffan.texture as satex
         self.glcm_textures = satex.GLCMTextureMeasurement()
         self.lobulus_processing = scaffan.lobulus.Lobulus()
         self.skeleton_analysis = scaffan.skeleton_analysis.SkeletonAnalysis()
         self.evaluation = scaffan.evaluation.Evaluation()
+
+        self.lobulus_processing.set_report(self.report)
+        self.glcm_textures.set_report(self.report)
+        self.skeleton_analysis.set_report(self.report)
+        self.evaluation.report = self.report
         params = [
             {
                 "name": "Input",
@@ -126,7 +132,6 @@ class Scaffan:
             self._get_file_info
         )
         self.anim: image.AnnotatedImage = None
-        self.report: Report = None
         pass
 
     def select_file_gui(self):
@@ -189,7 +194,7 @@ class Scaffan:
         path = fnparam.value()
         self.anim = image.AnnotatedImage(path)
         fnparam = self.parameters.param("Output", "Directory Path")
-        self.report: Report = scaffan.report.Report(fnparam.value())
+        self.report.set_output_dir(fnparam.value())
 
     def set_annotation_color_selection(self, color):
         pcolor = self.parameters.param("Input", "Annotation Color")
@@ -224,10 +229,6 @@ class Scaffan:
         show = self.parameters.param("Processing", "Show").value()
         self.report.set_show(show)
         self.report.set_save(True)
-        self.lobulus_processing.set_report(self.report)
-        self.glcm_textures.set_report(self.report)
-        self.skeleton_analysis.set_report(self.report)
-        self.evaluation.report = self.report
         for id in annotation_ids:
             self._run_lobulus(id)
 

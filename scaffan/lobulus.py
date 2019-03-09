@@ -80,7 +80,7 @@ class Lobulus:
                         "name": "Lambda1",
                         "type": "float",
                         "value": 1.,
-                        'tip': "MorphGAC algorithm parameter: Relative importance of the inside pixels (lambda1) against the outside pixels (lambda2).",
+                        'tip': "MorphACWE algorithm parameter: Relative importance of the inside pixels (lambda1) against the outside pixels (lambda2).",
                         # "suffix": "px",
                         # "siPrefix": False
                     },
@@ -88,7 +88,7 @@ class Lobulus:
                         "name": "Lambda2",
                         "type": "float",
                         "value": 2.,
-                        'tip': "MorphGAC algorithm parameter: Relative importance of the inside pixels (lambda1) against the outside pixels (lambda2).",
+                        'tip': "MorphACWE algorithm parameter: Relative importance of the inside pixels (lambda1) against the outside pixels (lambda2).",
                         # "suffix": "px",
                         # "siPrefix": False
                     },
@@ -117,7 +117,8 @@ class Lobulus:
                     "name": "Threshold",
                     "type": "float",
                     # "value": 0.28, # prev stable version
-                    "value": 0.35,
+                    # "value": 0.35,
+                    "value": 0.45,
                     # "value": 0.25,
                     'tip': "MorphGAC algorithm parameter: The threshold that determines which areas are affected by the morphological balloon. This is the parameter θ.",
                     # "suffix": "px",
@@ -206,6 +207,7 @@ class Lobulus:
         self.border_mask = outer
 
     def find_central_vein(self, show=True):
+        use_texture_features = True
         pixelsize_mm = [(self.parameters.param("Working Resolution").value() * 1000)] * 2
         central_vein_view = self.view.anim.get_views([self.annotation_id], pixelsize_mm=pixelsize_mm, margin=0.1)[0]
 
@@ -218,7 +220,7 @@ class Lobulus:
         tfeatures0 = np.mean(tfeatures, 2)
         if self.report is not None:
             self.report.imsave_as_fig("gradient_texture_color_{}.png".format(self.annotation_id), tfeatures)
-            self.report.imsave_as_fig("gradient_texture_mean_{}.png".format(self.annotation_id), tfeatures)
+            self.report.imsave_as_fig("gradient_texture_mean_{}.png".format(self.annotation_id), tfeatures0)
 
         sl = self.view.get_slices_for_insert_image_from_view(central_vein_view)
 
@@ -226,6 +228,8 @@ class Lobulus:
         im_gradient_border_frangi = self._im_gradient_border_frangi[sl]  # skimage.filters.frangi(image)
         im_gradient_base_inner = ms.gborders(image, alpha=1000, sigma=2)
         im_gradient_inner = im_gradient_base_inner - (im_gradient_border_frangi * 10000)
+        if use_texture_features:
+            im_gradient_inner *= (1 - imma.image.resize_to_shape(tfeatures0, im_gradient_inner.shape))
         if self.report is not None:
             self.report.imsave_as_fig("gradient_inner_frangi_{}.png".format(self.annotation_id), im_gradient_border_frangi)
             self.report.imsave_as_fig("gradient_base_inner_{}.png".format(self.annotation_id), im_gradient_base_inner)
