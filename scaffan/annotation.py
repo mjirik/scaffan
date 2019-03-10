@@ -85,9 +85,14 @@ def read_annotations(pth):
         # print(output)
 
         cwd = op.dirname(op.dirname(__file__))
-        output = subprocess.check_output(
-            [sys.executable, "-m", "scaffan.ann_to_json", pth], cwd=cwd
-        )
+        try:
+            output = subprocess.check_output(
+                [sys.executable, "-m", "scaffan.ann_to_json", pth], cwd=cwd, stderr=subprocess.STDOUT
+
+            )
+        except subprocess.CalledProcessError as e:
+            raise RuntimeError("command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))
+
         logger.debug("windows annotation output:" + str(output))
         # print(output)
     else:
