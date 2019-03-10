@@ -273,7 +273,7 @@ class Scaffan:
 
     def _get_file_info(self):
         fnparam = Path(self.parameters.param("Input", "File Path").value())
-        if fnparam.exists():
+        if fnparam.exists() and fnparam.is_file():
             anim = scaffan.image.AnnotatedImage(str(fnparam))
             self.parameters.param("Input", "Data Info").setValue(anim.get_file_info())
             # self.parameters.param("Input", "Select").setValue(anim.get_file_info())
