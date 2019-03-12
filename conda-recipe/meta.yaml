@@ -56,12 +56,17 @@ requirements:
     - {{ pin_compatible('io3d', max_pin='x') }}
     - {{ pin_compatible('imma', max_pin='x') }}
     - lxml
-    - pandas
-    - openpyxl
+    - lxml=4.3.0 # [win]
+#    - pandas
+    - {{ pin_compatible('pandas', max_pin='x.x') }}
+#    - openpyxl
+    - {{ pin_compatible('openpyxl', max_pin='x.x') }}
     - morphsnakes
     - pyqt=5.9.2 # tested
     - pyqtgraph
-    - click
+    - {{ pin_compatible('pyqtgraph', max_pin='x.x') }}
+#    - click
+    - {{ pin_compatible('click', max_pin='x.x') }}
     - pywin32 # [win]
     # - numpy
     # - pyqt 4.11.*

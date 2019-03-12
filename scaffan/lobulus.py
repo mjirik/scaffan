@@ -45,10 +45,13 @@ class Lobulus:
                 "type": "float",
                 # "value": 0.000001,
                 # "value": 0.000001,  # this is typical resolution on level 2-3
-                "value": 0.000002,  # this is typical resolution on level 3-4
+                # "value": 0.000002,  # this is typical resolution on level 3-4
                 # "value": 0.0000015,  # this is typical resolution on level 3-4
+                # "value": 0.000000227 # level 0
+                # "value": 0.000000454 # level 1
+                # "value": 0.000000908 # level 2
                 # "value": 0.00000091, # this is typical resolution on level 2
-                # "value": 0.00000182,  # this is typical resolution on level 3 # probably prev stable version
+                "value": 0.00000182,  # this is typical resolution on level 3 # probably prev stable version
                 # "value": 0.00000364,  # this is typical resolution on level 4
                 # "value": 0.00000728,  # this is typical resolution on level 5
                 # "value": 0.00001456,  # this is typical resolution on level 6
@@ -95,7 +98,8 @@ class Lobulus:
                     {
                         "name": "Iterations",
                         "type": "int",
-                        "value": 180
+                        # "value": 180
+                        "value": 400
                     },
 
 
@@ -136,7 +140,8 @@ class Lobulus:
                 {
                     "name": "Iterations",
                     "type": "int",
-                    "value": 400
+                    # "value": 400
+                    "value": 150
                 },
                 self._inner_texture.parameters,
 
