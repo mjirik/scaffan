@@ -7,6 +7,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+from scaffan import image
 import sys
 import os.path as op
 import datetime
@@ -26,7 +27,6 @@ from pyqtgraph.parametertree import Parameter, ParameterTree
 
 # print("start 6")
 
-from scaffan import image
 import io3d
 import io3d.datasets
 import scaffan.lobulus

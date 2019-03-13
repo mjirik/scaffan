@@ -118,6 +118,7 @@ class Lobulus:
                     "tip": "MorphGAC algorithm parameter: The number of repetitions of the smoothing step in each iteration. This is the parameter µ."
                 },
                 {
+
                     "name": "Threshold",
                     "type": "float",
                     # "value": 0.28, # prev stable version

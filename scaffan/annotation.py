@@ -8,6 +8,7 @@ import logging
 logger = logging.getLogger(__name__)
 # problem is loading lxml together with openslide
 # from lxml import etree
+import os
 import json
 import os.path as op
 import glob
@@ -52,6 +53,7 @@ def ndpa_to_json(path):
     """
     :param path: path to file or dir contaning .ndpa files
     """
+    print(os.getenv("PATH"))
     if op.isfile(path):
         fn, ext = op.splitext(path)
         if ext == ".ndpi":
