@@ -51,8 +51,8 @@ requirements:
     - pywin32 # [win]
 
   run:
-    - python
-    - python=3.6.6 # [win]
+    - python=3.6.6
+#    - python=3.6.6 # [win] # dont work with -convert option
 #    - io3d>=1.21
     - {{ pin_compatible('io3d', max_pin='x') }}
     - {{ pin_compatible('imma', max_pin='x') }}
