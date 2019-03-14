@@ -68,9 +68,9 @@ class MainGuiTest(unittest.TestCase):
                         "Lobulus segmentation should have Dice coefficient above some low level")
         self.assertLess(0.6, mainapp.evaluation.evaluation_history[1]["Lobulus Border Dice"],
                         "Lobulus segmentation should have Dice coefficient above some low level")
-        self.assertLess(0.6, mainapp.evaluation.evaluation_history[0]["Central Vein Dice"],
+        self.assertLess(0.5, mainapp.evaluation.evaluation_history[0]["Central Vein Dice"],
                         "Central Vein segmentation should have Dice coefficient above some low level")
-        self.assertLess(0.6, mainapp.evaluation.evaluation_history[1]["Central Vein Dice"],
+        self.assertLess(0.5, mainapp.evaluation.evaluation_history[1]["Central Vein Dice"],
                         "Central Vein should have Dice coefficient above some low level")
 
     def test_start_gui_no_exec(self):
