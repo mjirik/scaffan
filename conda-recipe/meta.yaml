@@ -51,7 +51,7 @@ requirements:
     - pywin32 # [win]
 
   run:
-    - python=3.6.6
+    - python=3,<3.6.7
     #     # maybe dont work with -convert option
 #    - python=3 # [not win]
 #    - python=3.6.6 # [win]
