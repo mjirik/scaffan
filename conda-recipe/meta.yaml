@@ -52,6 +52,7 @@ requirements:
 
   run:
     - python
+    - python=3.6.6 # [win]
 #    - io3d>=1.21
     - {{ pin_compatible('io3d', max_pin='x') }}
     - {{ pin_compatible('imma', max_pin='x') }}

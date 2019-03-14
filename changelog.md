@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-## 0.5.*
+## 0.6.*
 
 * [Added] Data file info in GUI
 * [Added] GLCM texture features analysis independent on input data pixelsize
