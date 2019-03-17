@@ -36,7 +36,7 @@ build:
 
 requirements:
   build:
-    - python
+    - python=3
     - setuptools
 #    - io3d
     - {{ pin_compatible('io3d', max_pin='x') }}
