@@ -74,7 +74,7 @@ requirements:
     # - numpy
     # - pyqt 4.11.*
 #    - xlwings
-#    - xlrd
+    - xlrd
 
 test:
   # Python imports
