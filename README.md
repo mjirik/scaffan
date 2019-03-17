@@ -27,7 +27,7 @@ conda install -c mjirik -c bioconda -c conda-forge openslides-python lxml imma i
 Run in terminal:
 ```commandline
 
-conda create -n scaffan -c mjirik -c bioconda -c conda-forge python=3.6 pip scaffan
+conda create -n scaffan -c mjirik -c bioconda -c conda-forge pip scaffan
 activate scaffan
 pip install openslide-python keras tensorflow
 ```
