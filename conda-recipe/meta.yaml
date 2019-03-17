@@ -73,6 +73,8 @@ requirements:
     - pywin32 # [win]
     # - numpy
     # - pyqt 4.11.*
+#    - xlwings
+#    - xlrd
 
 test:
   # Python imports

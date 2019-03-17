@@ -54,6 +54,7 @@ class Scaffan:
         self.glcm_textures.set_report(self.report)
         self.skeleton_analysis.set_report(self.report)
         self.evaluation.report = self.report
+        self.win:QtGui.QWidget = None
         params = [
             {
                 "name": "Input",
@@ -284,7 +285,20 @@ class Scaffan:
 
 
         # self.report.df.to_excel(op.join(self.report.outputdir, "data.xlsx"))
-        self.report.write()
+        dumped = False
+        while not dumped:
+            try:
+                self.report.dump()
+                dumped = True
+            except PermissionError as e:
+                if self.win is not None:
+                    ret = QtGui.QMessageBox.warning(
+                        self.win,
+                        "XLSX file opened in external application",
+                        "Close opened spreadsheet files before continue")
+
+                else:
+                    raise e
         saved_params = self.parameters.saveState()
         io3d.misc.obj_to_file(
             saved_params,
@@ -377,6 +391,7 @@ class Scaffan:
 
         win.show()
         win.resize(800, 800)
+        self.win = win
         # win.
         if not skip_exec:
 

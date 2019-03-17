@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 0.7.*
+
+* [Added] Save all data also into common .xlsx file
+
 ## 0.6.*
 
 * [Added] Data file info in GUI
