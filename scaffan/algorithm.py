@@ -24,6 +24,8 @@ from PyQt5 import QtGui
 
 # print("start 5")
 from pyqtgraph.parametertree import Parameter, ParameterTree
+import pyqtgraph.widgets
+import pyqtgraph.widgets
 
 # print("start 6")
 
@@ -34,6 +36,7 @@ import scaffan.report
 import scaffan.skeleton_analysis
 from .report import Report
 import scaffan.evaluation
+from scaffan.pyqt_widgets import BatchFileProcessingParameter
 
 
 class Scaffan:
@@ -76,7 +79,10 @@ class Scaffan:
                     },
                     # {'name': 'Boolean', 'type': 'bool', 'value': True, 'tip': "This is a checkbox"},
                     # {'name': 'Color', 'type': 'color', 'value': "FF0", 'tip': "This is a color button"},
-                    {"name": "Data Info", "type": "str"},
+                    {"name": "Data Info", "type": "str", "readonly": True},
+                    # BatchFileProcessingParameter(
+                    #     name="Batch processing", children=[]
+                    # ),
                 ],
             },
             {
@@ -89,6 +95,14 @@ class Scaffan:
                         "value": self._prepare_default_output_dir(),
                     },
                     {"name": "Select", "type": "action"},
+                    {
+                        "name": "Common Spreadsheet File",
+                        "type": "str",
+                        "value": self._prepare_default_output_common_spreadsheet_file(),
+                    },
+                    {"name": "Select Common Spreadsheet File", "type": "action",
+                     "tip": "All measurements are appended to this file in addition to data stored in Output Directory Path."
+                     },
                 ],
             },
             {
@@ -161,6 +175,10 @@ class Scaffan:
         fnparam = self.parameters.param("Output", "Directory Path")
         fnparam.setValue(path)
 
+    def set_common_spreadsheet_file(self, path):
+        fnparam = self.parameters.param("Output", "Common Spreadsheet File")
+        fnparam.setValue(path)
+
     def select_output_dir_gui(self):
         from PyQt5 import QtWidgets
 
@@ -179,6 +197,35 @@ class Scaffan:
         # print (fn)
         self.set_output_dir(fn)
 
+    def select_output_spreadsheet_gui(self):
+        from PyQt5 import QtWidgets
+
+        default_dir = self._prepare_default_output_dir()
+        if op.exists(default_dir):
+            start_dir = default_dir
+        else:
+            start_dir = op.dirname(default_dir)
+
+        fn = QtWidgets.QFileDialog.getSaveFileName(
+            None,
+            "Select Common Spreadsheet File",
+            directory=start_dir,
+            filter="Excel File (*.xlsx)"
+        )[0]
+        # print (fn)
+        self.set_common_spreadsheet_file(fn)
+
+    def _prepare_default_output_common_spreadsheet_file(self):
+        default_dir = io3d.datasets.join_path(get_root=True)
+        # default_dir = op.expanduser("~/data")
+        if not op.exists(default_dir):
+            default_dir = op.expanduser("~")
+
+        # timestamp = datetime.datetime.now().strftime("SA_%Y-%m-%d_%H:%M:%S")
+        timestamp = datetime.datetime.now().strftime("SA_%Y%m%d_%H%M%S")
+        default_dir = op.join(default_dir, "SA_data.xlsx")
+        return default_dir
+
     def _prepare_default_output_dir(self):
         default_dir = io3d.datasets.join_path(get_root=True)
         # default_dir = op.expanduser("~/data")
@@ -196,6 +243,8 @@ class Scaffan:
         self.anim = image.AnnotatedImage(path)
         fnparam = self.parameters.param("Output", "Directory Path")
         self.report.set_output_dir(fnparam.value())
+        fn_spreadsheet = self.parameters.param("Output", "Common Spreadsheet File")
+        self.report.additional_spreadsheet_fn = str(fn_spreadsheet.value())
 
     def set_annotation_color_selection(self, color):
         pcolor = self.parameters.param("Input", "Annotation Color")
@@ -234,7 +283,8 @@ class Scaffan:
             self._run_lobulus(id)
 
 
-        self.report.df.to_excel(op.join(self.report.outputdir, "data.xlsx"))
+        # self.report.df.to_excel(op.join(self.report.outputdir, "data.xlsx"))
+        self.report.write()
         saved_params = self.parameters.saveState()
         io3d.misc.obj_to_file(
             saved_params,
@@ -292,6 +342,9 @@ class Scaffan:
         )
         self.parameters.param("Output", "Select").sigActivated.connect(
             self.select_output_dir_gui
+        )
+        self.parameters.param("Output", "Select Common Spreadsheet File").sigActivated.connect(
+            self.select_output_spreadsheet_gui
         )
         self.parameters.param("Processing", "Run").sigActivated.connect(
             self.run_lobuluses
