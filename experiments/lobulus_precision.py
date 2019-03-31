@@ -27,10 +27,20 @@ fn = io3d.datasets.join_path(
 # annotations = scan.read_annotations(fn)
 # scan.annotations_to_px(imsl, annotations)
 mainapp = scaffan.algorithm.Scaffan()
-mainapp.set_input_file(fn)
 mainapp.set_output_dir("test_run_lobuluses_output_dir")
 # mainapp.init_run()
 # mainapp.set_annotation_color_selection("#FF00FF")
+fn = io3d.datasets.join_path(
+    "medical/orig/Scaffan-analysis/PIG-004_BBJ-004-4_HE_parenchyme.ndpi", get_root=True
+)
+mainapp.set_input_file(fn)
 mainapp.set_annotation_color_selection("#0000FF")
+mainapp.run_lobuluses(None)
+
+fn = io3d.datasets.join_path(
+    "medical/orig/Scaffan-analysis/PIG-001_J-17-0571_LM central_HE.ndpi", get_root=True
+)
+mainapp.set_input_file(fn)
+mainapp.set_annotation_color_selection("#00FF00")
 mainapp.run_lobuluses(None)
 
