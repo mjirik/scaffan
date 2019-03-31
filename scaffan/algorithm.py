@@ -317,6 +317,13 @@ class Scaffan:
     def _run_lobulus(self, annotation_id):
         show = self.parameters.param("Processing", "Show").value()
         t0 = time.time()
+        inpath = Path(self.parameters.param("Input", "File Path").value())
+        fn = inpath.parts[-1]
+        self.report.add_cols_to_actual_row(
+            {
+                "File Name": str(fn),
+                "Annotation ID": annotation_id,
+            })
 
         self.lobulus_processing.set_annotated_image_and_id(self.anim, annotation_id)
         self.lobulus_processing.run(show=show)
@@ -333,10 +340,8 @@ class Scaffan:
         fn = inpath.parts[-1]
         self.report.add_cols_to_actual_row(
             {
-                "Annotation ID": annotation_id,
-                "Color": self.parameters.param("Input", "Annotation Color"),
-                "File Name": str(fn),
                 "File Path": str(inpath),
+                "Annotation Color": self.parameters.param("Input", "Annotation Color"),
                 "Processing time [s]": t1 - t0
             })
         # evaluation
