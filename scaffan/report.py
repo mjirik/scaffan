@@ -31,16 +31,14 @@ class Report:
         self.additional_spreadsheet_fn = additional_spreadsheet_fn
 
         if outputdir is not None:
-            self.set_output_dir(outputdir)
+            self.init_with_output_dir(outputdir)
 
-    def set_output_dir(self, outputdir):
+    def init_with_output_dir(self, outputdir):
         self.outputdir = Path(outputdir).expanduser()
         if not op.exists(self.outputdir):
             os.makedirs(self.outputdir)
 
-        self.df = pd.DataFrame()
-        self.imgs = {}
-        self.actual_row = {}
+        self.init()
 
     def set_show(self, show):
         self.show = show
@@ -71,6 +69,11 @@ class Report:
     def add_table(self):
         pass
 
+    def init(self):
+        self.df = pd.DataFrame()
+        self.imgs = {}
+        self.actual_row = {}
+
     def dump(self):
         self.df.to_excel(op.join(self.outputdir, "data.xlsx"))
 
@@ -80,9 +83,6 @@ class Report:
             filename = str(excel_path)
             append_df_to_excel(filename, self.df)
             # append_df_to_excel_no_head_processing(filename, self.df)
-        self.df = pd.DataFrame()
-        self.imgs = {}
-        self.actual_row = {}
 
     def imsave(self, base_fn, arr, k=50):
         """

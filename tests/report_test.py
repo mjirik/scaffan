@@ -40,6 +40,7 @@ class ReportTest(unittest.TestCase):
         report.dump()
 
         # new write to common excel
+        report.init()
         report.add_cols_to_actual_row({"Col1": 28, "Col2": "new line to common", "Col7": 77})
         report.finish_actual_row()
         report.dump()
