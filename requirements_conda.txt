@@ -6,3 +6,4 @@ pyqtgraph
 morphsnakes
 pandas
 openpyxl
+xlrd
