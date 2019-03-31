@@ -9,10 +9,12 @@ import os
 import io3d
 from pathlib import Path
 import shutil
+import pandas as pd
 
 
 # import openslide
 import scaffan.report
+
 
 
 class ReportTest(unittest.TestCase):
@@ -25,8 +27,8 @@ class ReportTest(unittest.TestCase):
         # if outputdir.exists():
         #     shutil.rmtree(outputdir)
         commonsheet = Path("./test_report_common_spreadsheet.xlsx")
-        # if commonsheet.exists():
-        #     os.remove(commonsheet)
+        if commonsheet.exists():
+            os.remove(commonsheet)
 
         report = scaffan.report.Report(outputdir=outputdir, additional_spreadsheet_fn=commonsheet)
         report.add_cols_to_actual_row({"Col1": 25, "Col2": "test string", "Col5": 5})
@@ -41,5 +43,8 @@ class ReportTest(unittest.TestCase):
         report.add_cols_to_actual_row({"Col1": 28, "Col2": "new line to common", "Col7": 77})
         report.finish_actual_row()
         report.dump()
+
+        df = pd.read_excel(commonsheet)
+        self.assertEqual(len(df), 3, "3 lines expected in the excel file")
 
 

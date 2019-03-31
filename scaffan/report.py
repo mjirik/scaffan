@@ -79,7 +79,7 @@ class Report:
             # print("we will write to excel", excel_path)
             filename = str(excel_path)
             append_df_to_excel(filename, self.df)
-            append_df_to_excel_no_head_processing(filename, self.df)
+            # append_df_to_excel_no_head_processing(filename, self.df)
         self.df = pd.DataFrame()
         self.imgs = {}
         self.actual_row = {}
@@ -168,8 +168,9 @@ def append_df_to_excel(filename, df, sheet_name='Sheet1', startrow=None,
 
 
         dfold = pd.read_excel(str(filename), sheet_name=sheet_name)
-        dfcombine = dfold.append(df, ignore_index=True)
-        dfcombine.to_excel(str(filename), sheet_name=sheet_name)
+        # dfout = pd.concat([dfin, df], axis=0, ignore_index=True)
+        dfcombine = dfold.append(df, ignore_index=True, sort=True)
+        dfcombine.to_excel(str(filename), sheet_name=sheet_name, index=False)
         # try:
         #     dfold = pd.read_excel(str(filename), sheet_name=sheet_name)
         #     dfcombine = dfold.append(df, ignore_index=True)
@@ -183,7 +184,7 @@ def append_df_to_excel(filename, df, sheet_name='Sheet1', startrow=None,
 
     else:
         # pd.read_excel(filename, sheet_name=)
-        df.to_excel(str(filename), sheet_name=sheet_name)
+        df.to_excel(str(filename), sheet_name=sheet_name, index=False)
         pass
 
     # # ignore [engine] parameter if it was passed
