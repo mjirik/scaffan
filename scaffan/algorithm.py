@@ -15,6 +15,7 @@ from pathlib import Path
 import io3d.misc
 import json
 import time
+import platform
 
 # import PyQt5.QtWidgets
 # print("start 3")
@@ -243,7 +244,7 @@ class Scaffan:
         path = fnparam.value()
         self.anim = image.AnnotatedImage(path)
         fnparam = self.parameters.param("Output", "Directory Path")
-        self.report.set_output_dir(fnparam.value())
+        self.report.init_with_output_dir(fnparam.value())
         fn_spreadsheet = self.parameters.param("Output", "Common Spreadsheet File")
         self.report.additional_spreadsheet_fn = str(fn_spreadsheet.value())
 
@@ -342,7 +343,13 @@ class Scaffan:
             {
                 "File Path": str(inpath),
                 "Annotation Color": self.parameters.param("Input", "Annotation Color"),
-                "Processing time [s]": t1 - t0
+                "Processing Time [s]": t1 - t0,
+                "Datetime": datetime.datetime.now().isoformat(' ', 'seconds'),
+                "platform.system": platform.uname().system,
+                "platform.node": platform.uname().node,
+                "platform.processor": platform.uname().processor,
+                "Scaffan Version": scaffan.__version__,
+
             })
         # evaluation
         self.evaluation.set_input_data(self.anim, annotation_id, self.lobulus_processing)
