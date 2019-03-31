@@ -25,7 +25,7 @@ class Evaluation:
         # lobulus.view
         inner_ids = anim.select_inner_annotations(annotation_id, color="#000000")
         if len(inner_ids) > 1:
-            logger.warn("More than one inner annotation find to annotation with ID %i", annotation_id)
+            logger.warning("More than one inner annotation find to annotation with ID %i", annotation_id)
         elif len(inner_ids) > 0:
             inner_id = inner_ids[0]
             seg_true = lobulus.view.get_annotation_region_raster(annotation_id=inner_id) > 0
@@ -42,7 +42,7 @@ class Evaluation:
 
         outer_ids = anim.select_outer_annotations(annotation_id, color="#000000")
         if len(outer_ids) > 1:
-            logger.warn("More than one outer annotation find to annotation with ID %i", annotation_id)
+            logger.warning("More than one outer annotation find to annotation with ID %i", annotation_id)
         elif len(outer_ids) > 0:
             outer_id = outer_ids[0]
             seg_true = lobulus.view.get_annotation_region_raster(annotation_id=outer_id) > 0
