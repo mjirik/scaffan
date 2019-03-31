@@ -33,7 +33,7 @@ class LobulusTest(unittest.TestCase):
         # mainapp.parameters.param("Processing", "Show").setValue(True)
         mainapp.run_lobuluses()
 
-        img = mainapp.report.imgs["lobulus_central_thr_skeleton_15.png"]
+        img = mainapp.report.imgs["lobulus_central_thr_skeleton_13.png"]
         imsz = np.prod(img.shape)
         lobulus_size = np.sum(img == 1) / imsz
         central_vein_size = np.sum(img == 2) / imsz
