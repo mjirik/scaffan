@@ -342,7 +342,7 @@ class Scaffan:
         self.report.add_cols_to_actual_row(
             {
                 "File Path": str(inpath),
-                "Annotation Color": self.parameters.param("Input", "Annotation Color"),
+                "Annotation Color": self.parameters.param("Input", "Annotation Color").value(),
                 "Processing Time [s]": t1 - t0,
                 "Datetime": datetime.datetime.now().isoformat(' ', 'seconds'),
                 "platform.system": platform.uname().system,

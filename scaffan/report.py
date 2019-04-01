@@ -84,54 +84,97 @@ class Report:
             append_df_to_excel(filename, self.df)
             # append_df_to_excel_no_head_processing(filename, self.df)
 
-    def imsave(self, base_fn, arr, k=50):
+    def imsave(self, base_fn, arr:np.ndarray, k=50):
         """
         :param base_fn: with a format slot for annotation id like "skeleton_{}.png"
         :param arr:
         :return:
         """
 
-        if self.save:
-            plt.imsave(op.join(self.outputdir, base_fn), arr)
         filename, ext = op.splitext(base_fn)
-        with warnings.catch_warnings():
-            warnings.filterwarnings("ignore", ".*low contrast image.*")
-            # warnings.simplefilter("low contrast image")
-            if self.save:
-                skimage.io.imsave(op.join(self.outputdir, filename + "_raw" + ext), k * arr)
-        self.imgs[base_fn] = arr
+        if self.save:
+            fn = op.join(self.outputdir, filename + "_fig" + ext)
+            plt.imsave(fn, arr)
 
-    def imsave_as_fig(self, base_fn, arr):
-        filename, ext = op.splitext(base_fn)
-        fig = plt.figure()
-        plt.imshow(arr)
-        plt.colorbar()
-        if self.save:
-            plt.savefig(op.join(self.outputdir, filename + "" + ext))
-        if self.show:
-            plt.show()
-        else:
-            plt.close(fig)
+            with warnings.catch_warnings():
+                warnings.filterwarnings("ignore", ".*low contrast image.*")
+                # warnings.simplefilter("low contrast image")
+                fn = op.join(self.outputdir, filename + ext)
+                skimage.io.imsave(fn, k * arr)
+
+            self._save_arr(base_fn, arr)
+
+    def _save_arr(self, base_fn, arr:np.ndarray):
+        """
+        Save ndarray to file and store file path to list
+        :param base_fn:
+        :param arr:
+        :return:
+        """
+        fn = op.join(self.outputdir, base_fn + ".npz")
+        np.savez_compressed(fn, arr=arr)
+        self.imgs[base_fn] = fn
+
+    def load_array(self, base_fn) -> np.ndarray:
+        """
+
+        :param base_fn: read image source array from file based on base file name
+        :return:
+        """
+        arr = np.load(self.imgs[base_fn])["arr"]
+        # logger.debug(arr)
+
+        return arr
+
+    def imsave_as_fig(self, base_fn, arr, level=60):
+        if self._is_under_level(level):
+            filename, ext = op.splitext(base_fn)
+            fig = plt.figure()
+            plt.imshow(arr)
+            plt.colorbar()
+            if self.save:
+                fn = op.join(self.outputdir, filename + "" + ext)
+                plt.savefig(fn)
+            if self.show:
+                plt.show()
+            else:
+                plt.close(fig)
+            self._save_arr(base_fn, arr)
 
     # def add_array(self, base_fn, arr, k=50):
     #     if self.save:
     #         self.imsave
 
-    def savefig_and_show(self, base_fn, fig):
-        filename, ext = op.splitext(base_fn)
-        if self.save:
-            plt.savefig(op.join(self.outputdir, filename + "" + ext))
-        if self.show:
-            plt.show()
-        else:
-            plt.close(fig)
+    def savefig_and_show(self, base_fn, fig, level=60):
+        if self._is_under_level(level):
+            filename, ext = op.splitext(base_fn)
+            if self.save:
+                fn = op.join(self.outputdir, filename + "" + ext)
+                plt.savefig(fn)
+                # self.imgs[base_fn] = [fn]
+            if self.show:
+                plt.show()
+            else:
+                plt.close(fig)
 
-    def save_np_data(self, base_fn, data, format_args=None, level=60):
-        if format_args is None:
-            format_args = []
-        fn = op.join(self.outputdir, base_fn.format(format_args))
-        if self.level < level:
-            np.save(data, fn)
+    # def save_np_data(self, base_fn, data, format_args=None, level=60):
+    #     if self._is_under_level(level):
+    #         if format_args is None:
+    #             format_args = []
+    #         fn = op.join(self.outputdir, base_fn.format(format_args))
+    #         np.save(data, fn)
+    #         self.imgs[base_fn] = fn
+
+    def _is_under_level(self, level):
+        if level is "debug":
+            level = 10
+        elif level is "info":
+            level = 30
+        elif level is "warning":
+            level = 50
+        return self.level < level
+
+
 
 def append_df_to_excel(filename, df, sheet_name='Sheet1', startrow=None,
                        truncate_sheet=False,
