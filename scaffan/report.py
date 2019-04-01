@@ -111,7 +111,8 @@ class Report:
         :param arr:
         :return:
         """
-        fn = op.join(self.outputdir, base_fn + ".npz")
+        filename, ext = op.splitext(base_fn)
+        fn = op.join(self.outputdir, filename + ".npz")
         np.savez_compressed(fn, arr=arr)
         self.imgs[base_fn] = fn
 
