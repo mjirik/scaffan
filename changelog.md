@@ -6,6 +6,7 @@
 
 * [Added] Save all data also into common .xlsx file
 * [Added] Computer info saved into spreadsheet
+* [Added] Image raw input stored to .npz files
 
 ## 0.6.*
 
