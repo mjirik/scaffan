@@ -55,7 +55,12 @@ class LobulusTest(unittest.TestCase):
 
         self.assertTrue(
             op.exists(
-                op.join("test_output_dir", "lobulus_central_thr_skeleton_15_raw.png")
+                op.join("test_output_dir", "lobulus_central_thr_skeleton_15.png")
+            )
+        )
+        self.assertTrue(
+            op.exists(
+                op.join("test_output_dir", "lobulus_central_thr_skeleton_15_fig.png")
             )
         )
         self.assertTrue(op.exists(op.join("test_output_dir", "data.xlsx")))
