@@ -7,3 +7,4 @@ morphsnakes
 pandas
 openpyxl
 xlrd
+loguru
