@@ -3,9 +3,9 @@
 """
 Process lobulus analysis.
 """
-import logging
-
-logger = logging.getLogger(__name__)
+# import logging
+# logger = logging.getLogger(__name__)
+from loguru import logger
 import pandas as pd
 import os.path as op
 import os

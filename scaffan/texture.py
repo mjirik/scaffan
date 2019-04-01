@@ -3,9 +3,8 @@
 """
 Modul is used for texrure analysis.
 """
-import logging
 
-logger = logging.getLogger(__name__)
+from loguru import logger
 
 # import warnings
 import numpy as np

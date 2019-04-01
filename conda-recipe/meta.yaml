@@ -49,6 +49,7 @@ requirements:
     - pyqtgraph
     - click
     - pywin32 # [win]
+    - loguru
 
   run:
     - python=3,<3.6.7
@@ -75,6 +76,7 @@ requirements:
     # - pyqt 4.11.*
 #    - xlwings
     - xlrd
+    - loguru
 
 test:
   # Python imports

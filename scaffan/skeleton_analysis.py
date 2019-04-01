@@ -3,9 +3,8 @@
 """
 Process lobulus analysis.
 """
-import logging
 
-logger = logging.getLogger(__name__)
+from loguru import logger
 import skimage.filters
 from skimage.morphology import skeletonize
 import skimage.io

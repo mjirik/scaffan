@@ -3,9 +3,7 @@
 """
 Modul is used for GUI of Lisa
 """
-import logging
-
-logger = logging.getLogger(__name__)
+from loguru import logger
 # problem is loading lxml together with openslide
 # from lxml import etree
 import os

@@ -5,8 +5,7 @@ Used to support algorithm evaluation. For every inserted annotation it looks for
 and lobulus central vein. The segmentation is compared then and evaluated.
 """
 
-import logging
-logger = logging.getLogger(__name__)
+from loguru import logger
 
 import scaffan.image
 import scaffan.lobulus

@@ -4,9 +4,7 @@
 Modul is used for GUI of Lisa
 """
 
-import logging
-
-logger = logging.getLogger(__name__)
+from loguru import logger
 import sys
 import click
 from pathlib import Path

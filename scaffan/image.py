@@ -5,9 +5,8 @@ Modul is used for slice image and view processing. It cooperates with openslide.
 Some of coordinates are swapped. It is due to openslide. With request subimage with size=[A, B] it will
 return subimage with shape [B, A]. It is probably because of visualization.
 """
-import logging
 
-logger = logging.getLogger(__name__)
+from loguru import logger
 # problem is loading lxml together with openslide
 # from lxml import etree
 from typing import List

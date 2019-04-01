@@ -3,11 +3,8 @@
 """
 Modul is used for texrure analysis.
 """
-import logging
 
-logger = logging.getLogger(__name__)
-
-
+from loguru import logger
 import numpy as np
 import skimage.feature
 import matplotlib.pyplot as plt

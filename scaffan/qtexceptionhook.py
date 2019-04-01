@@ -1,6 +1,7 @@
 # thanks to
 # http://timlehr.com/python-exception-hooks-with-qt-message-box/
 import logging
+from loguru import logger
 import sys
 import traceback
 
