@@ -53,15 +53,7 @@ class LobulusTest(unittest.TestCase):
         self.assertGreater(skeleton_size, 0.001, "Skeleton size 0.1%")
         self.assertGreater(thr_size, skeleton_size, "More threshold than Skeleton")
 
-        self.assertTrue(
-            op.exists(
-                op.join("test_output_dir", "lobulus_central_thr_skeleton_15.png")
-            )
-        )
-        self.assertTrue(
-            op.exists(
-                op.join("test_output_dir", "lobulus_central_thr_skeleton_15_fig.png")
-            )
-        )
-        self.assertTrue(op.exists(op.join("test_output_dir", "data.xlsx")))
+        self.assertTrue((output_dir/"lobulus_central_thr_skeleton_15.png").exists())
+        self.assertTrue((output_dir/"lobulus_central_thr_skeleton_15_fig.png").exists())
+        self.assertTrue((output_dir/"data.xlsx").exists())
         # mainapp.start_gui()
