@@ -48,7 +48,8 @@ class MainGuiTest(unittest.TestCase):
         mainapp = scaffan.algorithm.Scaffan()
         mainapp.set_input_file(fn)
         # mainapp.set_annotation_color_selection("#FF00FF")
-        mainapp.set_annotation_color_selection("#FF0000")
+        # mainapp.set_annotation_color_selection("#FF0000")
+        mainapp.set_annotation_color_selection("red")
         # mainapp.start_gui()
 
     def test_run_lobuluses(self):

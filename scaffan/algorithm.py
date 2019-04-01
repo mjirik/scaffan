@@ -247,9 +247,16 @@ class Scaffan:
         fn_spreadsheet = self.parameters.param("Output", "Common Spreadsheet File")
         self.report.additional_spreadsheet_fn = str(fn_spreadsheet.value())
 
-    def set_annotation_color_selection(self, color):
+    def set_annotation_color_selection(self, color:str):
         pcolor = self.parameters.param("Input", "Annotation Color")
         color = color.upper()
+        color_name = color.lower()
+        color_name = color_name.capitalize()
+        color_names = dict(zip(*pcolor.reverse[::-1]))
+        if color_name in color_names:
+            color = color_names[color_name]
+
+        # rewrite name to code
         if color in pcolor.reverse[0]:
             # val = pcolor.reverse[0].index(color)
             # pcolor.setValue(val)
