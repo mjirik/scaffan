@@ -17,7 +17,6 @@ __version__ = "0.7.0"
 
 
 def get_one_annotation(viewstate):
-    print("==== annotations 1")
     titles_list = viewstate.xpath(".//title/text()")
     if len(titles_list) == 0:
         an_title = ""
@@ -25,7 +24,6 @@ def get_one_annotation(viewstate):
         an_title = titles_list[0]
     else:
         raise ValueError("More than one title in viewstate")
-    print("==== annotations 2")
     details_list = viewstate.xpath(".//details/text()")
     if len(details_list) == 0:
         an_details = ""
@@ -34,7 +32,6 @@ def get_one_annotation(viewstate):
     else:
         raise ValueError("More than one details in viewstate")
 
-    print("==== annotations 3")
     annotations = viewstate.xpath(".//annotation")
     if len(annotations) > 1:
         raise ValueError("More than one annotation found")
@@ -189,7 +186,7 @@ def annotation_titles(annotations):
 
 
 def annotation_colors(annotations):
-    titles = {}
+    # titles = {}
     colors = {}
     for i, an in enumerate(annotations):
         title = an["color"]

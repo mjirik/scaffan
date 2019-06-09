@@ -304,6 +304,8 @@ class Lobulus:
         datarow = {}
         datarow["Annotation ID"] = self.annotation_id
         numeric_id = self.anim.get_annotation_id(self.annotation_id)
+        print("self.annotations_id: ", type(self.annotation_id), self.annotation_id)
+        print("numeric_id: ", type(numeric_id), numeric_id)
 
         # self.anim.annotations.
         datarow["Annotation Title"] = self.anim.annotations["title"][numeric_id] #[self.annotation_id]
