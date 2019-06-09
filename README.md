@@ -17,7 +17,7 @@ You may want to use it with [Hamamatsu NDP Viewer](https://www.hamamatsu.com/eu/
 # Linux
 
 ```commandline
-conda install -c mjirik -c bioconda -c conda-forge openslides-python lxml imma io3d
+conda install -c mjirik -c bioconda -c conda-forge openslide-python lxml imma io3d
 ```
 
 # Windows
