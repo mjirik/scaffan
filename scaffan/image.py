@@ -234,6 +234,7 @@ class AnnotatedImage:
         self.annotations = scan.annotations_to_px(self.openslide, self.annotations)
         self.titles = scan.annotation_titles(self.annotations)
         self.colors = scan.annotation_colors(self.annotations)
+        self.details = scan.annotation_details(self.annotations)
         return self.annotations
 
     def get_view(

@@ -22,6 +22,13 @@ def get_one_annotation(viewstate):
         an_title = titles_list[0]
     else:
         raise ValueError("More than one title in viewstate")
+    details_list = viewstate.xpath(".//details/text()")
+    if len(details_list) == 0:
+        an_details = ""
+    elif len(details_list) == 1:
+        an_details = details_list[0]
+    else:
+        raise ValueError("More than one details in viewstate")
 
     annotations = viewstate.xpath(".//annotation")
     if len(annotations) > 1:
@@ -31,7 +38,7 @@ def get_one_annotation(viewstate):
     #     display(len(annotation))
     an_x = list(map(int, annot.xpath(".//pointlist/point/x/text()")))
     an_y = list(map(int, annot.xpath(".//pointlist/point/y/text()")))
-    return dict(title=an_title, color=an_color, x=an_x, y=an_y)
+    return dict(title=an_title, color=an_color, x=an_x, y=an_y, details=an_details)
 
 
 def _ndpa_file_to_json(pth):
@@ -165,21 +172,41 @@ def annotations_to_px(imsl, annotations):
 
 
 def annotation_titles(annotations):
-    titles = {}
-    for i, an in enumerate(annotations):
-        title = an["title"]
-        if title in titles:
-            titles[title].append(i)
-        else:
-            titles[title] = [i]
-
-    return titles
+    return _get_annotation_elements(annotations, "title")
+    # titles = {}
+    # for i, an in enumerate(annotations):
+    #     title = an["title"]
+    #     if title in titles:
+    #         titles[title].append(i)
+    #     else:
+    #         titles[title] = [i]
+    #
+    # return titles
 
 
 def annotation_colors(annotations):
+    return _get_annotation_elements(annotations, "color")
+    # titles = {}
+    # colors = {}
+    # for i, an in enumerate(annotations):
+    #     title = an["color"]
+    #     title = title.upper()
+    #     if title in colors:
+    #
+    #         colors[title].append(i)
+    #     else:
+    #         colors[title] = [i]
+    #
+    # return colors
+
+def annotation_details(annotations):
+    return _get_annotation_elements(annotations, "details")
+
+
+def _get_annotation_elements(annotations, element_keyword):
     colors = {}
     for i, an in enumerate(annotations):
-        title = an["color"]
+        title = an[element_keyword]
         title = title.upper()
         if title in colors:
 

@@ -189,6 +189,8 @@ class Lobulus:
         # )
         self.image = self.view.get_region_image(as_gray=True)
         self.annotation_mask = self.view.get_annotation_region_raster(annotation_id=annotation_id)
+        # self.anim.titles
+        # self.anim.details
         pass
 
 
@@ -301,6 +303,8 @@ class Lobulus:
 
         datarow = {}
         datarow["Annotation ID"] = self.annotation_id
+        datarow["title"] = self.anim.titles[self.annotation_id]
+        datarow["details"] = self.anim.details[self.annotation_id]
         if self.report is not None:
             self.report.savefig_and_show("lobulus_{}.png".format(self.annotation_id), fig)
         self.lobulus_mask = (self.central_vein_mask + self.border_mask) == 1

@@ -7,6 +7,7 @@
 * [Added] Save all data also into common .xlsx file
 * [Added] Computer info saved into spreadsheet
 * [Added] Image raw input stored to .npz files
+* [Added] Annotation title and details are stored to .xls file
 
 ## 0.6.*
 
