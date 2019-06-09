@@ -173,7 +173,6 @@ class AnnotatedImage:
             get_pixelsize(self.openslide, i, requested_unit=self.pixelunit)[0]
             for i in range(0, self.openslide.level_count)
         ]
-        print("=== annotated image 1")
         if not skip_read_annotations:
             self.read_annotations()
 

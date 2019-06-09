@@ -306,10 +306,11 @@ class Lobulus:
         numeric_id = self.anim.get_annotation_id(self.annotation_id)
         print("self.annotations_id: ", type(self.annotation_id), self.annotation_id)
         print("numeric_id: ", type(numeric_id), numeric_id)
+        print("self.anim.annotations: ", type(self.anim.annotations), self.anim.annotations)
 
         # self.anim.annotations.
-        datarow["Annotation Title"] = self.anim.annotations["title"][numeric_id] #[self.annotation_id]
-        datarow["Annotation Details"] = self.anim.annotations["title"][numeric_id] #[self.annotation_id]
+        datarow["Annotation Title"] = self.anim.annotations[numeric_id]["title"] #[self.annotation_id]
+        datarow["Annotation Details"] = self.anim.annotations[numeric_id]["details"] #[self.annotation_id]
         # datarow["Annotation Details"] = self.anim.details[self.annotation_id]
         if self.report is not None:
             self.report.savefig_and_show("lobulus_{}.png".format(self.annotation_id), fig)
