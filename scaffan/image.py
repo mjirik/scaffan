@@ -173,7 +173,7 @@ class AnnotatedImage:
             get_pixelsize(self.openslide, i, requested_unit=self.pixelunit)[0]
             for i in range(0, self.openslide.level_count)
         ]
-
+        print("=== annotated image 1")
         if not skip_read_annotations:
             self.read_annotations()
 
@@ -181,7 +181,7 @@ class AnnotatedImage:
         pxsz, unit = self.get_pixel_size(0)
         # self.titles
         # self.colors
-        return "Pixelsize: {}x{} [{}], {} annotations".format(pxsz[0], pxsz[1], unit, len(self.colors))
+        return "Pixelsize: {}x{} [{}], {} annotations".format(pxsz[0], pxsz[1], unit, len(self.id_by_colors))
 
     def get_optimal_level_for_fluent_resize(self, pixelsize_mm, safety_bound=2):
         if np.isscalar(pixelsize_mm):
@@ -232,9 +232,9 @@ class AnnotatedImage:
     def read_annotations(self):
         self.annotations = scan.read_annotations(self.path)
         self.annotations = scan.annotations_to_px(self.openslide, self.annotations)
-        self.titles = scan.annotation_titles(self.annotations)
-        self.colors = scan.annotation_colors(self.annotations)
-        self.details = scan.annotation_details(self.annotations)
+        self.id_by_titles = scan.annotation_titles(self.annotations)
+        self.id_by_colors = scan.annotation_colors(self.annotations)
+        # self.details = scan.annotation_details(self.annotations)
         return self.annotations
 
     def get_view(
@@ -379,25 +379,25 @@ class AnnotatedImage:
             return None
 
         if type(id) is str:
-            if id not in self.colors:
+            if id not in self.id_by_colors:
                 if raise_exception_if_not_found:
                     raise ColorError()
                 return None
-            id = self.colors[id]
+            id = self.id_by_colors[id]
         else:
             id = [id]
         return id
 
     def get_annotation_ids(self, id):
         if type(id) is str:
-            id = self.titles[id]
+            id = self.id_by_titles[id]
         else:
             id = [id]
         return id
 
     def get_annotation_id(self, i):
         if type(i) is str:
-            i = self.titles[i][0]
+            i = self.id_by_titles[i][0]
         return i
 
     def set_region_on_annotations(self, i=None, level=2, boundary_px=10, show=False):

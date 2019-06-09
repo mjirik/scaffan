@@ -303,8 +303,12 @@ class Lobulus:
 
         datarow = {}
         datarow["Annotation ID"] = self.annotation_id
-        datarow["Annotation Title"] = self.anim.titles[self.annotation_id]
-        datarow["Annotation Details"] = self.anim.details[self.annotation_id]
+        numeric_id = self.anim.get_annotation_id(self.annotation_id)
+
+        # self.anim.annotations.
+        datarow["Annotation Title"] = self.anim.annotations["title"][numeric_id] #[self.annotation_id]
+        datarow["Annotation Details"] = self.anim.annotations["title"][numeric_id] #[self.annotation_id]
+        # datarow["Annotation Details"] = self.anim.details[self.annotation_id]
         if self.report is not None:
             self.report.savefig_and_show("lobulus_{}.png".format(self.annotation_id), fig)
         self.lobulus_mask = (self.central_vein_mask + self.border_mask) == 1

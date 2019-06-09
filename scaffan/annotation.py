@@ -13,8 +13,11 @@ import glob
 import matplotlib.pyplot as plt
 import numpy as np
 
+__version__ = "0.6.3"
+
 
 def get_one_annotation(viewstate):
+    print("==== annotations 1")
     titles_list = viewstate.xpath(".//title/text()")
     if len(titles_list) == 0:
         an_title = ""
@@ -22,6 +25,7 @@ def get_one_annotation(viewstate):
         an_title = titles_list[0]
     else:
         raise ValueError("More than one title in viewstate")
+    print("==== annotations 2")
     details_list = viewstate.xpath(".//details/text()")
     if len(details_list) == 0:
         an_details = ""
@@ -30,6 +34,7 @@ def get_one_annotation(viewstate):
     else:
         raise ValueError("More than one details in viewstate")
 
+    print("==== annotations 3")
     annotations = viewstate.xpath(".//annotation")
     if len(annotations) > 1:
         raise ValueError("More than one annotation found")
@@ -172,32 +177,30 @@ def annotations_to_px(imsl, annotations):
 
 
 def annotation_titles(annotations):
-    return _get_annotation_elements(annotations, "title")
-    # titles = {}
-    # for i, an in enumerate(annotations):
-    #     title = an["title"]
-    #     if title in titles:
-    #         titles[title].append(i)
-    #     else:
-    #         titles[title] = [i]
-    #
-    # return titles
+    titles = {}
+    for i, an in enumerate(annotations):
+        title = an["title"]
+        if title in titles:
+            titles[title].append(i)
+        else:
+            titles[title] = [i]
+
+    return titles
 
 
 def annotation_colors(annotations):
-    return _get_annotation_elements(annotations, "color")
-    # titles = {}
-    # colors = {}
-    # for i, an in enumerate(annotations):
-    #     title = an["color"]
-    #     title = title.upper()
-    #     if title in colors:
-    #
-    #         colors[title].append(i)
-    #     else:
-    #         colors[title] = [i]
-    #
-    # return colors
+    titles = {}
+    colors = {}
+    for i, an in enumerate(annotations):
+        title = an["color"]
+        title = title.upper()
+        if title in colors:
+
+            colors[title].append(i)
+        else:
+            colors[title] = [i]
+
+    return colors
 
 def annotation_details(annotations):
     return _get_annotation_elements(annotations, "details")
