@@ -1,7 +1,8 @@
 #!/bin/bash
 
 # nastaveni domovskeho adresare, v promenne $LOGNAME je ulozeno vase prihlasovaci jmeno
-DATADIR="/storage/brno2/home/$LOGNAME/"
+DATADIR="/storage/plzen1/home/$LOGNAME/"
+# nebo snad "/storage/plzen4-ntis/home/$LOGNAME/"  ?
 
 # nacteni aplikacniho modulu, ktery zpristupni aplikaci Gaussian verze 3
 # module add g03
@@ -18,7 +19,7 @@ cp $DATADIR/gaussian_test.com $SCRATCHDIR
 # spusteni aplikace - samotny vypocet
 export PATH=/storage/plzen1/home/$LOGNAME/miniconda3/bin:$PATH
 source activate scaffan
-julia /storage/plzen1/home/$LOGNAME/projects/scaffan/experiments/lobulus_precision.py
+julia /storage/plzen1/home/$LOGNAME/projects/scaffan/experiments/lobulus_precision.py > results.out
 
 
 # kopirovani vystupnich dat z vypocetnicho uzlu do domovskeho adresare,
