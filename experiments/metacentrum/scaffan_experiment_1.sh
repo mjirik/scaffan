@@ -14,7 +14,7 @@ trap 'clean_scratch' TERM EXIT
 cd $SCRATCHDIR || exit 1
 
 # priprava vstupnich dat (kopirovani dat na vypocetni uzel)
-cp $DATADIR/gaussian_test.com $SCRATCHDIR
+# cp $DATADIR/gaussian_test.com $SCRATCHDIR
 
 # spusteni aplikace - samotny vypocet
 export PATH=/storage/plzen1/home/$LOGNAME/miniconda3/bin:$PATH
