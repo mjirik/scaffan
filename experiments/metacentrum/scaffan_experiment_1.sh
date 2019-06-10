@@ -17,7 +17,7 @@ cp $DATADIR/gaussian_test.com $SCRATCHDIR
 
 # spusteni aplikace - samotny vypocet
 export PATH=/storage/plzen1/home/$LOGNAME/miniconda3/bin:$PATH
-source activate julia 
+source activate scaffan
 julia /storage/plzen1/home/$LOGNAME/projects/scaffan/experiments/lobulus_precision.py
 
 
