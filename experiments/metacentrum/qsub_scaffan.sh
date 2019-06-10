@@ -1,0 +1,1 @@
+qsub -l select=1:ncpus=2:mem=4gb:scratch_local=10gb -l walltime=03:00:00 scaffan_experiment_1.sh
