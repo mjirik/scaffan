@@ -19,7 +19,7 @@ cd $SCRATCHDIR || exit 1
 # spusteni aplikace - samotny vypocet
 export PATH=/storage/plzen1/home/$LOGNAME/miniconda3/bin:$PATH
 source activate scaffan
-julia /storage/plzen1/home/$LOGNAME/projects/scaffan/experiments/lobulus_precision.py > results.out
+python /storage/plzen1/home/$LOGNAME/projects/scaffan/experiments/lobulus_precision.py > results.out
 
 
 # kopirovani vystupnich dat z vypocetnicho uzlu do domovskeho adresare,
