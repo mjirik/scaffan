@@ -22,6 +22,7 @@ source activate scaffan
 python /storage/plzen1/home/$LOGNAME/projects/scaffan/experiments/lobulus_precision.py > results.out
 
 
+ls
 # kopirovani vystupnich dat z vypocetnicho uzlu do domovskeho adresare,
 # pokud by pri kopirovani doslo k chybe, nebude adresar SCRATCH vymazan pro moznost rucniho vyzvednuti dat
 cp results.out $DATADIR || export CLEAN_SCRATCH=false
