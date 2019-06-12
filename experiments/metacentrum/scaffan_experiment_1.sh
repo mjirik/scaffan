@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # nastaveni domovskeho adresare, v promenne $LOGNAME je ulozeno vase prihlasovaci jmeno
-DATADIR="/storage/plzen1/home/$LOGNAME/"
+DATADIR="/storage/plzen1/home/$LOGNAME/projects/scaffan/experiments/metacentrum/"
 # nebo snad "/storage/plzen4-ntis/home/$LOGNAME/"  ?
 
 # nacteni aplikacniho modulu, ktery zpristupni aplikaci Gaussian verze 3
@@ -34,5 +34,5 @@ echo "$DIR"
 ls
 # kopirovani vystupnich dat z vypocetnicho uzlu do domovskeho adresare,
 # pokud by pri kopirovani doslo k chybe, nebude adresar SCRATCH vymazan pro moznost rucniho vyzvednuti dat
-cp results.out $DIR || cp scaffan.log $DIR || export CLEAN_SCRATCH=false
+cp results.out $DATADIR && cp scaffan.log $DATADIR || export CLEAN_SCRATCH=false
 #cp results.out $DATADIR || export CLEAN_SCRATCH=false
