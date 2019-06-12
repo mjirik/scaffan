@@ -9,8 +9,10 @@ import os.path as op
 import sys
 from pathlib import Path
 
-logger.add(sys.stderr, format="{time} {level} {message}", filter="my_module", level="DEBUG")
-logger.add("scaffan.log", format="{time} {level} {message}", filter="my_module", level="DEBUG")
+# logger.add(sys.stderr, format="{time} {level} {message}", filter="my_module", level="DEBUG")
+# logger.add(sys.stderr, format="{time} {level} {message}", level="DEBUG")
+logger.add("scaffan.log", format="{time} {level} {message}",  level="DEBUG")
+logger.debug("logging init")
 
 path_to_script = os.path.dirname(os.path.abspath(__file__))
 path_to_scaffan = os.path.join(path_to_script, "..")
@@ -25,7 +27,7 @@ fn = io3d.datasets.join_path(
 fn = io3d.datasets.join_path(
     "medical/orig/Scaffan-analysis/PIG-004_BBJ-004-4_HE_parenchyme.ndpi", get_root=True
 )
-logger.debug("fn: ", fn, Path(fn).exists())
+logger.debug(f"fn exists {Path(fn).exists()}, fn: {fn}")
 # imsl = openslide.OpenSlide(fn)
 # annotations = scan.read_annotations(fn)
 # scan.annotations_to_px(imsl, annotations)
