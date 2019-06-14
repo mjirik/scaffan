@@ -2,13 +2,17 @@
 
 ## Unreleased
 
-## 0.7.*
+
+## 0.8.*
 
 * [Added] Previous location of Common spreadsheet file is used if available
+* [Added] Annotation title and details are stored to .xls file
+
+## 0.7.*
 * [Added] Save all data also into common .xlsx file
 * [Added] Computer info saved into spreadsheet
 * [Added] Image raw input stored to .npz files
-* [Added] Annotation title and details are stored to .xls file
+
 
 ## 0.6.*
 
