@@ -169,6 +169,7 @@ class Scaffan:
     def set_input_file(self, fn):
         fnparam = self.parameters.param("Input", "File Path")
         fnparam.setValue(fn)
+        logger.debug("Set Input File Path to : {}".format(fn))
         # import pdb; pdb.set_trace()
         # print("ahoj")
 
@@ -239,6 +240,7 @@ class Scaffan:
         return default_dir
 
     def init_run(self):
+        logger.debug("Init Run")
         fnparam = self.parameters.param("Input", "File Path")
         path = fnparam.value()
         self.anim = image.AnnotatedImage(path)

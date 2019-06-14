@@ -16,7 +16,7 @@ logger.debug("logging init")
 
 path_to_script = os.path.dirname(os.path.abspath(__file__))
 path_to_scaffan = os.path.join(path_to_script, "..")
-print("insert path: ", path_to_scaffan)
+# print("insert path: ", path_to_scaffan)
 
 sys.path.insert(0, path_to_scaffan)
 import scaffan
@@ -39,6 +39,7 @@ mainapp.set_output_dir("test_run_lobuluses_output_dir")
 fn = io3d.datasets.join_path(
     "medical/orig/Scaffan-analysis/PIG-001_J-17-0571_LM central_HE.ndpi", get_root=True
 )
+logger.debug(f"fn exists {Path(fn).exists()}, fn: {fn}")
 mainapp.set_input_file(fn)
 mainapp.set_annotation_color_selection("#00FF00")
 mainapp.run_lobuluses(None)
@@ -47,6 +48,7 @@ mainapp.run_lobuluses(None)
 fn = io3d.datasets.join_path(
     "medical/orig/Scaffan-analysis/PIG-003_J-18-0165_HE.ndpi", get_root=True
 )
+logger.debug(f"fn exists {Path(fn).exists()}, fn: {fn}")
 mainapp.set_input_file(fn)
 mainapp.set_annotation_color_selection("#0000FF")
 mainapp.run_lobuluses(None)
@@ -58,6 +60,7 @@ mainapp.run_lobuluses(None)
 fn = io3d.datasets.join_path(
     "medical/orig/Scaffan-analysis/PIG-004_BBJ-004-4_HE_parenchyme.ndpi", get_root=True
 )
+logger.debug(f"fn exists {Path(fn).exists()}, fn: {fn}")
 mainapp.set_input_file(fn)
 mainapp.set_annotation_color_selection("#00FF00")
 mainapp.run_lobuluses(None)

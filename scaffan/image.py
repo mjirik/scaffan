@@ -161,6 +161,7 @@ def get_resize_parameters(imsl, former_level, former_size, new_level):
 
 class AnnotatedImage:
     def __init__(self, path, skip_read_annotations=False):
+        logger.debug("Reading file {}".format(path))
         self.path = path
         self.openslide = openslide.OpenSlide(path)
         self.region_location = None
@@ -174,6 +175,7 @@ class AnnotatedImage:
             for i in range(0, self.openslide.level_count)
         ]
         if not skip_read_annotations:
+            logger.debug("Reading the annotation")
             self.read_annotations()
 
     def get_file_info(self):

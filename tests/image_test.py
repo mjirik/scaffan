@@ -189,7 +189,6 @@ class ParseAnnotationTest(unittest.TestCase):
         self.assertTrue(np.all(sh2 < (sh1 * 3.1 )), "Boundary adds 2*margin*size of image to the image size")
 
 
-
 if __name__ == "__main__":
     # logging.basicConfig(stream=sys.stderr)
     logger.setLevel(logging.DEBUG)
