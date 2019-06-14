@@ -39,6 +39,13 @@ def run(ctx):
     pass
 
 @run.command(context_settings=CONTEXT_SETTINGS)
+@click.option("--common-spreadsheet-file")
+def set(common_spreadsheet_file=None):
+    mainapp = algorithm.Scaffan()
+    if common_spreadsheet_file is not None:
+        mainapp.set_common_spreadsheet_file(path=common_spreadsheet_file)
+
+@run.command(context_settings=CONTEXT_SETTINGS)
 def gui():
     mainapp = algorithm.Scaffan()
     mainapp.start_gui()
