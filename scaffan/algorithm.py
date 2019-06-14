@@ -56,9 +56,11 @@ class Scaffan:
         self.skeleton_analysis.set_report(self.report)
         self.evaluation.report = self.report
         self.win:QtGui.QWidget = None
-        self.cache = cachefile.CacheFile("~/.scaffan")
+        self.cache = cachefile.CacheFile("~/.scaffan_cache.yaml")
+        # self.cache.update('', path)
         common_spreadsheet_file = self.cache.get_or_save_default(
             "common_spreadsheet_file", self._prepare_default_output_common_spreadsheet_file())
+        logger.debug("common_spreadsheet_file loaded as: {}".format(common_spreadsheet_file))
         params = [
             {
                 "name": "Input",
@@ -185,6 +187,8 @@ class Scaffan:
         fnparam = self.parameters.param("Output", "Common Spreadsheet File")
         fnparam.setValue(path)
         self.cache.update('common_spreadsheet_file', path)
+        logger.debug("common_spreadsheet_file set to {}".format(path))
+        print("common_spreadsheet_file set to {}".format(path))
 
     def select_output_dir_gui(self):
         from PyQt5 import QtWidgets
