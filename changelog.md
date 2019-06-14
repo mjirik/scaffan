@@ -4,6 +4,7 @@
 
 ## 0.7.*
 
+* [Added] Previous location of Common spreadsheet file is used if available
 * [Added] Save all data also into common .xlsx file
 * [Added] Computer info saved into spreadsheet
 * [Added] Image raw input stored to .npz files

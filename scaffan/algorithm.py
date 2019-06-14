@@ -12,6 +12,7 @@ import os.path as op
 import datetime
 from pathlib import Path
 import io3d.misc
+from io3d import cachefile
 import json
 import time
 import platform
@@ -55,6 +56,9 @@ class Scaffan:
         self.skeleton_analysis.set_report(self.report)
         self.evaluation.report = self.report
         self.win:QtGui.QWidget = None
+        self.cache = cachefile.CacheFile("~/.scaffan")
+        common_spreadsheet_file = self.cache.get_or_save_default(
+            "common_spreadsheet_file", self._prepare_default_output_common_spreadsheet_file())
         params = [
             {
                 "name": "Input",
@@ -99,7 +103,7 @@ class Scaffan:
                     {
                         "name": "Common Spreadsheet File",
                         "type": "str",
-                        "value": self._prepare_default_output_common_spreadsheet_file(),
+                        "value": common_spreadsheet_file,
                     },
                     {"name": "Select Common Spreadsheet File", "type": "action",
                      "tip": "All measurements are appended to this file in addition to data stored in Output Directory Path."
@@ -180,6 +184,7 @@ class Scaffan:
     def set_common_spreadsheet_file(self, path):
         fnparam = self.parameters.param("Output", "Common Spreadsheet File")
         fnparam.setValue(path)
+        self.cache.update('common_spreadsheet_file', path)
 
     def select_output_dir_gui(self):
         from PyQt5 import QtWidgets
@@ -224,7 +229,7 @@ class Scaffan:
             default_dir = op.expanduser("~")
 
         # timestamp = datetime.datetime.now().strftime("SA_%Y-%m-%d_%H:%M:%S")
-        timestamp = datetime.datetime.now().strftime("SA_%Y%m%d_%H%M%S")
+        # timestamp = datetime.datetime.now().strftime("SA_%Y%m%d_%H%M%S")
         default_dir = op.join(default_dir, "SA_data.xlsx")
         return default_dir
 
