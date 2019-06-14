@@ -1,4 +1,13 @@
 #!/bin/bash
+#PBS -l select=1:ncpus=2:mem=8gb:scratch_local=10gb
+#PBS -l walltime=04:00:00
+# modify/delete the above given guidelines according to your job's needs
+# Please note that only one select= argument is allowed at a time.
+
+# # PBS -l select=1:ncpus=2:mem=1gb:scratch_local=4gb
+
+# add to qsub with:
+# qsub scaffan_experiment_1.sh
 
 # nastaveni domovskeho adresare, v promenne $LOGNAME je ulozeno vase prihlasovaci jmeno
 DATADIR="/storage/plzen1/home/$LOGNAME/projects/scaffan/experiments/metacentrum/"
@@ -37,5 +46,5 @@ echo "$DIR"
 ls
 # kopirovani vystupnich dat z vypocetnicho uzlu do domovskeho adresare,
 # pokud by pri kopirovani doslo k chybe, nebude adresar SCRATCH vymazan pro moznost rucniho vyzvednuti dat
-cp results.out $DATADIR && cp scaffan.log $DATADIR || export CLEAN_SCRATCH=false
+cp results.out $DATADIR && cp scaffan.log $DATADIR && cp test_run_lobuluses_output_dir $DATADIR || export CLEAN_SCRATCH=false
 #cp results.out $DATADIR || export CLEAN_SCRATCH=false
