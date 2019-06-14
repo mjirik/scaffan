@@ -11,7 +11,7 @@ from pathlib import Path
 
 # logger.add(sys.stderr, format="{time} {level} {message}", filter="my_module", level="DEBUG")
 # logger.add(sys.stderr, format="{time} {level} {message}", level="DEBUG")
-logger.add("scaffan.log", format="{time} {level} {message}",  level="DEBUG")
+logger.add("scaffan.log", format="{time} {level} {message}",  level="DEBUG", backtrace=True)
 logger.debug("logging init")
 
 path_to_script = os.path.dirname(os.path.abspath(__file__))
