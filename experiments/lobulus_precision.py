@@ -40,6 +40,7 @@ fn = io3d.datasets.join_path(
     "medical/orig/Scaffan-analysis/PIG-001_J-17-0571_LM central_HE.ndpi", get_root=True
 )
 logger.debug(f"fn exists {Path(fn).exists()}, fn: {fn}")
+mainapp.set_persistent_cols({"experiment": "first debug"})
 mainapp.set_input_file(fn)
 mainapp.set_annotation_color_selection("#00FF00")
 mainapp.run_lobuluses(None)
