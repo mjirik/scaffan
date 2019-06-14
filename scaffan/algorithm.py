@@ -45,6 +45,7 @@ class Scaffan:
 
         self.report: Report = scaffan.report.Report()
         self.report.level = 10
+
         import scaffan.texture as satex
         self.glcm_textures = satex.GLCMTextureMeasurement()
         self.lobulus_processing = scaffan.lobulus.Lobulus()
@@ -372,6 +373,16 @@ class Scaffan:
         self.evaluation.set_input_data(self.anim, annotation_id, self.lobulus_processing)
         self.evaluation.run()
         self.report.finish_actual_row()
+
+
+    def set_persistent_cols(self, dct:dict):
+        """
+        Set data which will be appended to all rows.
+        :param dct: dictionary with column name and value
+        :return:
+        """
+        self.report.set_persistent_cols(dct)
+
 
     def _get_file_info(self):
         fnparam = Path(self.parameters.param("Input", "File Path").value())

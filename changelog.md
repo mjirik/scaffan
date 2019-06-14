@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+## 0.9.*
+
+* [Added] Persistent columns added to all rows for description of an experiment
 
 ## 0.8.*
 

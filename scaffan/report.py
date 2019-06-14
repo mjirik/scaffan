@@ -29,9 +29,18 @@ class Report:
         self.debug = False
         self.level = 50
         self.additional_spreadsheet_fn = additional_spreadsheet_fn
+        self.persistent_cols:dict = {}
 
         if outputdir is not None:
             self.init_with_output_dir(outputdir)
+
+    def set_persistent_cols(self, dct:dict):
+        """
+        Set data which will be appended to all rows.
+        :param dct: dictionary with column name and value
+        :return:
+        """
+        self.persistent_cols = dct
 
     def init_with_output_dir(self, outputdir):
         self.outputdir = Path(outputdir).expanduser()
@@ -52,6 +61,7 @@ class Report:
     # def write_table(self, filename):
     def finish_actual_row(self):
         data = self.actual_row
+        data.update(self.persistent_cols)
         df = pd.DataFrame([list(data.values())], columns=list(data.keys()))
         self.df = self.df.append(df, ignore_index=True)
 
