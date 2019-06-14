@@ -36,7 +36,6 @@ def run(ctx):
     else:
         pass
         # click.echo('I am about to invoke %s' % ctx.invoked_subcommand)
-
     pass
 
 @run.command(context_settings=CONTEXT_SETTINGS)
@@ -70,6 +69,7 @@ def install():
         shortcut.IconLocation = "{},0".format(logo_fn)
         shortcut.Save()
     pass
+
 
 @run.command(context_settings=CONTEXT_SETTINGS)
 def nogui():
