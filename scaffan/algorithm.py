@@ -391,6 +391,8 @@ class Scaffan:
         # evaluation
         self.evaluation.set_input_data(self.anim, annotation_id, self.lobulus_processing)
         self.evaluation.run()
+        # Copy all parameters to table
+        self.report.add_cols_to_actual_row(self.parameters_to_dict())
         self.report.finish_actual_row()
 
 
