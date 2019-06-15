@@ -8,6 +8,7 @@ from loguru import logger
 import sys
 import click
 from pathlib import Path
+import ast
 # print("start")
 # from . import image
 
@@ -28,30 +29,43 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 #               )
 @click.group(context_settings=CONTEXT_SETTINGS, invoke_without_command=True)
 @click.pass_context
-def run(ctx):
+def run(ctx, *args, **kwargs):
     if ctx.invoked_subcommand is None:
         # click.echo('I was invoked without subcommand')
-        ctx.invoke(gui)
+        ctx.invoke(gui, *args, **kwargs)
         # a.main()
     else:
         pass
-        # click.echo('I am about to invoke %s' % ctx.invoked_subcommand)
+        click.echo('I am about to invoke %s' % ctx.invoked_subcommand)
     pass
 
-@run.command(context_settings=CONTEXT_SETTINGS)
-@click.option("--common-spreadsheet-file")
+@run.command(context_settings=CONTEXT_SETTINGS, help="Set persistent values")
+@click.option("--common-spreadsheet-file",  help="Set path for common spreadsheet file.", type=click.Path())
 def set(common_spreadsheet_file=None):
     mainapp = algorithm.Scaffan()
     if common_spreadsheet_file is not None:
         mainapp.set_common_spreadsheet_file(path=common_spreadsheet_file)
 
+# def print_params(params):
+#     algorithm.Scaffan().parameters.
+#     params.
+
 @run.command(context_settings=CONTEXT_SETTINGS)
-def gui():
+@click.option('--params', '-p', multiple=True, default='', nargs=2,
+              help='Set parameter. First argument is path to parameter separated by ",". Second is the value.'
+                   'python -m scaffan gui -p Processing,Show True')
+@click.option('--print-params', '-pp', is_flag=True, help='Print parameters')
+def gui(params, print_params):
     mainapp = algorithm.Scaffan()
+    if print_params:
+        print(mainapp.parameters.saveState())
+        exit()
+    for param in params:
+        mainapp.parameters.param(*param[0].split(",")).setValue(ast.literal_eval(param[1]))
     mainapp.start_gui()
 
 
-@run.command(context_settings=CONTEXT_SETTINGS)
+@run.command(context_settings=CONTEXT_SETTINGS, help="Create an icon on Windows platform")
 def install():
     import platform
     print(platform.system)
@@ -79,8 +93,15 @@ def install():
 
 
 @run.command(context_settings=CONTEXT_SETTINGS)
-def nogui():
-    pass
+@click.option('--params', '-p', multiple=True, default='', nargs=2,
+              help='Set parameter. First argument is path to parameter separated by ",". Second is the value.'
+                   'python -m scaffan gui -p Processing,Show True')
+def nogui(params):
+    mainapp = algorithm.Scaffan()
+    for param in params:
+        mainapp.parameters.param(*param[0].split(",")).setValue(ast.literal_eval(param[1]))
+    mainapp.start_gui()
+    mainapp.run_lobuluses()
 # def install():
 
 run()

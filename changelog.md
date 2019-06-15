@@ -5,6 +5,7 @@
 ## 0.9.*
 
 * [Added] Persistent columns added to all rows for description of an experiment
+* [Added] Control parameters from command line
 
 ## 0.8.*
 
