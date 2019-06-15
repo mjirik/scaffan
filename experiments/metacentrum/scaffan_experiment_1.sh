@@ -39,7 +39,6 @@ export PATH=/storage/plzen1/home/$LOGNAME/miniconda3/bin:$PATH
 source activate scaffan
 python -m scaffan set --common_spreadsheet_file /storage/plzen1/home/$LOGNAME/projects/scaffan/experiments/SA_experiments.xlsx
 python -m io3d.datasets -sdp  /storage/plzen4-ntis/projects/queetech/
-python -m io3d.datasets -sdp  /storage/plzen4-ntis/projects/queetech/
 #python /storage/plzen1/home/$LOGNAME/projects/scaffan/experiments/lobulus_precision.py > results.out
 
 echo "$DIR"
