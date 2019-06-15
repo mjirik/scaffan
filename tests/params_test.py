@@ -30,7 +30,7 @@ class ParameterTest(unittest.TestCase):
         p = mainapp.parameters
         # mainapp = scaffan.Scaffan()
         dct = scaffan.dilipg.params_and_values(p)
+        self.assertEqual(type(dct), dict)
 
-        print(dct)
-        print(p)
-        pass
+        self.assertIn(';Input;Output;Directory Path', dct)
+
