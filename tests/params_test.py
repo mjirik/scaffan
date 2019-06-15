@@ -32,5 +32,5 @@ class ParameterTest(unittest.TestCase):
         dct = scaffan.dilipg.params_and_values(p)
         self.assertEqual(type(dct), dict)
 
-        self.assertIn(';Input;Output;Directory Path', dct)
+        self.assertIn('Output;Directory Path', dct)
 
