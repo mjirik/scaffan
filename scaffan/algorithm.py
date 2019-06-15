@@ -341,8 +341,13 @@ class Scaffan:
             saved_params,
             str(Path(self.report.outputdir) / "parameters.yaml")
         )
-        with open(Path(self.report.outputdir) / "parameters.json", "w") as outfile:
-            json.dump(saved_params, outfile)
+        try:
+            with open(Path(self.report.outputdir) / "parameters.json", "w") as outfile:
+                json.dump(saved_params, outfile)
+        except:
+            import traceback
+            logger.debug("saved_params: " + str(saved_params))
+            logger.warning(f"Problem with dump file to json: {traceback.format_exc()}")
         from . import os_interaction
 
         open_dir = self.parameters.param("Processing", "Open output dir").value()
