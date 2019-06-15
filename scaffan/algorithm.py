@@ -191,6 +191,20 @@ class Scaffan:
         logger.debug("common_spreadsheet_file set to {}".format(path))
         print("common_spreadsheet_file set to {}".format(path))
 
+    def set_parameter(self, param_path, value, parse_path=True):
+        """
+        Set value to parameter.
+        :param param_path: Path to parameter can be separated by ";"
+        :param value:
+        :param parse_path: Turn on separation of path by ";"
+        :return:
+        """
+        logger.debug(f"Set {param_path} to {value}")
+        if parse_path:
+            param_path = param_path.split(";")
+        fnparam = self.parameters.param(param_path)
+        fnparam.setValue(value)
+
     def select_output_dir_gui(self):
         from PyQt5 import QtWidgets
 
