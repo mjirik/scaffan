@@ -54,7 +54,7 @@ def set(common_spreadsheet_file=None):
 
 @run.command(context_settings=CONTEXT_SETTINGS)
 @click.option('--params', '-p', multiple=True, default='', nargs=2,
-              help='Set parameter. First argument is path to parameter separated by ",". Second is the value.'
+              help='Set parameter. First argument is path to parameter separated by ";". Second is the value.'
                    'python -m scaffan gui -p Processing,Show True')
 @click.option('--print-params', '-pp', is_flag=True, help='Print parameters')
 def gui(params, print_params):
@@ -64,7 +64,8 @@ def gui(params, print_params):
         pprint.pprint(mainapp.parameters_to_dict())
         exit()
     for param in params:
-        mainapp.parameters.param(*param[0].split(",")).setValue(ast.literal_eval(param[1]))
+        mainapp.set_parameter(param[0], value=ast.literal_eval(param[1]))
+        # mainapp.parameters.param(*param[0].split(";")).setValue(ast.literal_eval(param[1]))
     mainapp.start_gui()
 
 
