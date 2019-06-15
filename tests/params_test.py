@@ -25,7 +25,7 @@ class ParameterTest(unittest.TestCase):
     skip_on_local = False
     # skip_on_local = True
     # @unittest.skipIf(os.environ.get("TRAVIS", skip_on_local), "Skip on Travis-CI")
-    def test_save_report_excel(self):
+    def test_export_to_dict(self):
         mainapp = scaffan.algorithm.Scaffan()
         p = mainapp.parameters
         # mainapp = scaffan.Scaffan()
