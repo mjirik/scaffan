@@ -10,9 +10,14 @@ import sys
 from pathlib import Path
 import datetime
 
+experiment_datetime = datetime.datetime.now()
+experiment_datetime_fn = experiment_datetime.strftime("%Y%m%d-%H%M%S")
+experiment_dir = Path(f"test_run_lobuluses_output_dir_{experiment_datetime_fn}")
+
+experiment_dir.mkdir()
 # logger.add(sys.stderr, format="{time} {level} {message}", filter="my_module", level="DEBUG")
 # logger.add(sys.stderr, format="{time} {level} {message}", level="DEBUG")
-logger.add("scaffan.log", format="{time} {level} {message}",  level="DEBUG", backtrace=True)
+logger.add(experiment_dir/"scaffan.log", format="{time} {level} {message}",  level="DEBUG", backtrace=True)
 logger.debug("logging init")
 
 path_to_script = os.path.dirname(os.path.abspath(__file__))
@@ -29,9 +34,6 @@ fn = io3d.datasets.join_path(
     "medical/orig/Scaffan-analysis/PIG-004_BBJ-004-4_HE_parenchyme.ndpi", get_root=True
 )
 logger.debug(f"fn exists {Path(fn).exists()}, fn: {fn}")
-experiment_datetime = datetime.datetime.now()
-experiment_datetime_fn = experiment_datetime.strftime("%Y%m%d-%H%M%S")
-experiment_dir = Path(f"test_run_lobuluses_output_dir_{experiment_datetime_fn}")
     # .isoformat(' ', 'seconds')
 # datetime.datetime.now().
 experiment_title = "first debug"
