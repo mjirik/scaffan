@@ -45,6 +45,8 @@ def set(common_spreadsheet_file=None):
     mainapp = algorithm.Scaffan()
     if common_spreadsheet_file is not None:
         mainapp.set_common_spreadsheet_file(path=common_spreadsheet_file)
+        logger.info(f"Common spreadsheet file path is : {common_spreadsheet_file}")
+        print(f"Common spreadsheet file path is : {common_spreadsheet_file}")
 
 # def print_params(params):
 #     algorithm.Scaffan().parameters.
