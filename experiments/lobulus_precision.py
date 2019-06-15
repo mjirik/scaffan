@@ -59,7 +59,7 @@ mainapp.set_persistent_cols({
 })
 mainapp.set_input_file(fn)
 mainapp.set_annotation_color_selection("#00FF00")
-mainapp.parameters.param("")
+mainapp.parameters.param("Processing", "Lobulus Segmentation", "Central Vein Segmentation", "Threshold").setValue(0.20)
 mainapp.run_lobuluses(None)
 
 # #############
