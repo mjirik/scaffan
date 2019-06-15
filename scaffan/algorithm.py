@@ -202,7 +202,7 @@ class Scaffan:
         logger.debug(f"Set {param_path} to {value}")
         if parse_path:
             param_path = param_path.split(";")
-        fnparam = self.parameters.param(param_path)
+        fnparam = self.parameters.param(*param_path)
         fnparam.setValue(value)
 
     def select_output_dir_gui(self):
