@@ -343,6 +343,7 @@ class Scaffan:
                 "File Name": str(fn),
                 "Annotation ID": annotation_id,
             })
+        logger.info(f"Processing file: {fn} with Annotation ID: {annotation_id}")
 
         self.lobulus_processing.set_annotated_image_and_id(self.anim, annotation_id)
         self.lobulus_processing.run(show=show)

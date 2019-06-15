@@ -8,6 +8,7 @@ import io3d
 import os.path as op
 import sys
 from pathlib import Path
+import datetime
 
 # logger.add(sys.stderr, format="{time} {level} {message}", filter="my_module", level="DEBUG")
 # logger.add(sys.stderr, format="{time} {level} {message}", level="DEBUG")
@@ -28,40 +29,56 @@ fn = io3d.datasets.join_path(
     "medical/orig/Scaffan-analysis/PIG-004_BBJ-004-4_HE_parenchyme.ndpi", get_root=True
 )
 logger.debug(f"fn exists {Path(fn).exists()}, fn: {fn}")
+experiment_datetime = datetime.datetime.now()
+experiment_datetime_fn = experiment_datetime.strftime("%Y%m%d-%H%M%S")
+experiment_dir = Path(f"test_run_lobuluses_output_dir_{experiment_datetime_fn}")
+    # .isoformat(' ', 'seconds')
+# datetime.datetime.now().
+experiment_title = "first debug"
+logger.info(f"running experiment: {experiment_title} started at: {experiment_datetime}")
 # imsl = openslide.OpenSlide(fn)
 # annotations = scan.read_annotations(fn)
 # scan.annotations_to_px(imsl, annotations)
 mainapp = scaffan.algorithm.Scaffan()
-mainapp.set_output_dir("test_run_lobuluses_output_dir")
 # mainapp.init_run()
 # mainapp.set_annotation_color_selection("#FF00FF")
+
+
+#############
+mainapp.set_output_dir(experiment_dir/"PIG-001")
 
 fn = io3d.datasets.join_path(
     "medical/orig/Scaffan-analysis/PIG-001_J-17-0571_LM central_HE.ndpi", get_root=True
 )
 logger.debug(f"fn exists {Path(fn).exists()}, fn: {fn}")
-mainapp.set_persistent_cols({"experiment": "first debug"})
+mainapp.set_persistent_cols({
+    "Experiment Title": experiment_title,
+    "Experiment Datetime": experiment_datetime.isoformat(" ", "seconds"),
+})
 mainapp.set_input_file(fn)
 mainapp.set_annotation_color_selection("#00FF00")
 mainapp.run_lobuluses(None)
 
+#############
 
-# fn = io3d.datasets.join_path(
-#     "medical/orig/Scaffan-analysis/PIG-003_J-18-0165_HE.ndpi", get_root=True
-# )
-# logger.debug(f"fn exists {Path(fn).exists()}, fn: {fn}")
-# mainapp.set_input_file(fn)
-# mainapp.set_annotation_color_selection("#0000FF")
-# mainapp.run_lobuluses(None)
-#
-#
-#
-#
-#
-# fn = io3d.datasets.join_path(
-#     "medical/orig/Scaffan-analysis/PIG-004_BBJ-004-4_HE_parenchyme.ndpi", get_root=True
-# )
-# logger.debug(f"fn exists {Path(fn).exists()}, fn: {fn}")
-# mainapp.set_input_file(fn)
-# mainapp.set_annotation_color_selection("#00FF00")
-# mainapp.run_lobuluses(None)
+mainapp.set_output_dir(experiment_dir/"PIG-003")
+fn = io3d.datasets.join_path(
+    "medical/orig/Scaffan-analysis/PIG-003_J-18-0165_HE.ndpi", get_root=True
+)
+logger.debug(f"fn exists {Path(fn).exists()}, fn: {fn}")
+mainapp.set_input_file(fn)
+mainapp.set_annotation_color_selection("#0000FF")
+mainapp.run_lobuluses(None)
+
+#############
+
+
+
+mainapp.set_output_dir(experiment_dir/"PIG-003")
+fn = io3d.datasets.join_path(
+    "medical/orig/Scaffan-analysis/PIG-004_BBJ-004-4_HE_parenchyme.ndpi", get_root=True
+)
+logger.debug(f"fn exists {Path(fn).exists()}, fn: {fn}")
+mainapp.set_input_file(fn)
+mainapp.set_annotation_color_selection("#00FF00")
+mainapp.run_lobuluses(None)
