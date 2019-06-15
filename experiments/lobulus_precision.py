@@ -36,7 +36,7 @@ fn = io3d.datasets.join_path(
 logger.debug(f"fn exists {Path(fn).exists()}, fn: {fn}")
     # .isoformat(' ', 'seconds')
 # datetime.datetime.now().
-experiment_title = "first debug"
+experiment_title = "first debug changed params"
 logger.info(f"running experiment: {experiment_title} started at: {experiment_datetime}")
 # imsl = openslide.OpenSlide(fn)
 # annotations = scan.read_annotations(fn)
@@ -71,14 +71,15 @@ mainapp.run_lobuluses(None)
 # )
 # logger.debug(f"fn exists {Path(fn).exists()}, fn: {fn}")
 # mainapp.set_input_file(fn)
-# mainapp.set_annotation_color_selection("#0000FF")
+# mainapp.set_annotation_color_selection("#0000FF") # Blue is used for unlabeled
+# mainapp.set_annotation_color_selection("#00FF00")
 # mainapp.run_lobuluses(None)
 #
 # #############
 #
 #
 #
-# mainapp.set_output_dir(experiment_dir/"PIG-003")
+# mainapp.set_output_dir(experiment_dir/"PIG-004")
 # fn = io3d.datasets.join_path(
 #     "medical/orig/Scaffan-analysis/PIG-004_BBJ-004-4_HE_parenchyme.ndpi", get_root=True
 # )
