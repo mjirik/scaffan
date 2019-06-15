@@ -60,7 +60,8 @@ def set(common_spreadsheet_file=None):
 def gui(params, print_params):
     mainapp = algorithm.Scaffan()
     if print_params:
-        print(mainapp.parameters.saveState())
+        import pprint
+        pprint.pprint(mainapp.parameters_to_dict())
         exit()
     for param in params:
         mainapp.parameters.param(*param[0].split(",")).setValue(ast.literal_eval(param[1]))

@@ -249,6 +249,10 @@ class Scaffan:
         default_dir = op.join(default_dir, timestamp)
         return default_dir
 
+    def parameters_to_dict(self):
+        from .import dilipg
+        return dilipg.params_and_values(self.parameters)
+
     def init_run(self):
         logger.debug("Init Run")
         fnparam = self.parameters.param("Input", "File Path")
