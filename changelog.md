@@ -6,6 +6,7 @@
 
 * [Added] Persistent columns added to all rows for description of an experiment
 * [Added] Control parameters from command line
+* [Added] Jaccard index calculation added to lobulus segmentation evaluation
 
 ## 0.8.*
 

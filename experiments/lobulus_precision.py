@@ -59,6 +59,7 @@ mainapp.set_persistent_cols({
 })
 mainapp.set_input_file(fn)
 mainapp.set_annotation_color_selection("#00FF00")
+mainapp.parameters.param("")
 mainapp.run_lobuluses(None)
 
 # #############

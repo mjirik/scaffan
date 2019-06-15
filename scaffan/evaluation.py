@@ -34,6 +34,10 @@ class Evaluation:
             dice1 = np.sum(seg) + np.sum(seg_true)
             dice = dice0 / dice1
             data["Central Vein Dice"] = dice
+            jaccard0 = np.sum((seg & seg_true))
+            jaccard1 = np.sum((seg | seg_true))
+            jaccard = jaccard0 / jaccard1
+            data["Central Vein Jaccard"] = jaccard
             if self.report is not None:
                 fig = plt.figure()
                 plt.imshow(seg_true.astype(np.int8) + seg.astype(np.int8))
@@ -55,6 +59,10 @@ class Evaluation:
             dice1 = np.sum(seg) + np.sum(seg_true)
             dice = dice0 / dice1
             data["Lobulus Border Dice"] = dice
+            jaccard0 = np.sum((seg & seg_true))
+            jaccard1 = np.sum((seg | seg_true))
+            jaccard = jaccard0 / jaccard1
+            data["Lobulus Border Jaccard"] = jaccard
         # inner_ids = anim.select_inner_annotations(annotaion_id, color="#000000")
         self.report.add_cols_to_actual_row(data)
         self.evaluation_history.append(data)
