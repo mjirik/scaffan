@@ -46,5 +46,5 @@ echo "$DIR"
 ls
 # kopirovani vystupnich dat z vypocetnicho uzlu do domovskeho adresare,
 # pokud by pri kopirovani doslo k chybe, nebude adresar SCRATCH vymazan pro moznost rucniho vyzvednuti dat
-cp results.out $DATADIR && cp scaffan.log $DATADIR && cp test_run_lobuluses_output_dir $DATADIR || export CLEAN_SCRATCH=false
+cp results.out $DATADIR && cp scaffan.log $DATADIR && cp -r test_run_lobuluses_output_dir $DATADIR || export CLEAN_SCRATCH=false
 #cp results.out $DATADIR || export CLEAN_SCRATCH=false
