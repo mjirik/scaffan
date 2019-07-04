@@ -145,8 +145,14 @@ class Lobulus:
                 },
                 self._inner_texture.parameters,
 
-
             ]
+            },
+
+            {
+                "name": "Manual Segmentation",
+                "type": "bool",
+                "value": False,
+                "tip": "Use manual inner and outer segmentation with black color instead of computed segmentation. Computation is skipped."
             },
 
         ]
@@ -193,8 +199,17 @@ class Lobulus:
         # self.anim.details
         pass
 
-
     def find_border(self, show=True):
+        inner_ids = self.anim.select_inner_annotations(self.annotation_id, color="#000000")
+        if len(inner_ids) > 1:
+            logger.warning("More than one inner annotation find to annotation with ID %i", self.annotation_id)
+        elif len(inner_ids) > 0:
+            inner_id = inner_ids[0]
+            seg_true = self.view.get_annotation_region_raster(annotation_id=inner_id) > 0
+            use_manual = self.parameters.param("Processing", "Lobulus Segmentation", "Manual Segmentation").value()
+            if use_manual:
+                self.border_mask = seg_true.astype(np.uint8)
+                return
         self._im_gradient_border_frangi = skimage.filters.frangi(self.image)
         logger.debug("Image size {}".format(self.image.shape))
         circle = self.annotation_mask
@@ -215,6 +230,16 @@ class Lobulus:
         self.border_mask = outer
 
     def find_central_vein(self, show=True):
+        inner_ids = self.anim.select_inner_annotations(self.annotation_id, color="#000000")
+        if len(inner_ids) > 1:
+            logger.warning("More than one inner annotation find to annotation with ID %i", self.annotation_id)
+        elif len(inner_ids) > 0:
+            inner_id = inner_ids[0]
+            seg_true = self.view.get_annotation_region_raster(annotation_id=inner_id) > 0
+            use_manual = self.parameters.param("Processing", "Lobulus Segmentation", "Manual Segmentation").value()
+            if use_manual:
+                self.central_vein_mask = seg_true.astype(np.uint8)
+                return
         use_texture_features = True
         pixelsize_mm = [(self.parameters.param("Working Resolution").value() * 1000)] * 2
         central_vein_view = self.view.anim.get_views([self.annotation_id], pixelsize_mm=pixelsize_mm, margin=0.1)[0]
@@ -282,6 +307,7 @@ class Lobulus:
         self.central_vein_mask = cvmask
 
     def run(self, show=True):
+
         self.find_border(show)
         self.find_central_vein(show)
         # inner_lobulus_margin_mm = 0.02

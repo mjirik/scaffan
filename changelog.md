@@ -5,6 +5,7 @@
 ## 0.10.*
 
 
+* [Added] Use manual lobulus segmentation with black color
 
 ## 0.9.*
 

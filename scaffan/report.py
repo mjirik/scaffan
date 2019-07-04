@@ -21,7 +21,7 @@ class Report:
         # self.outputdir = op.expanduser(outputdir)
 
 
-        self.df: pd.DataFrame = None
+        self.df:pd.DataFrame = None
         self.imgs = {}
         self.actual_row = {}
         self.show = False
