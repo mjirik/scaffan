@@ -71,6 +71,10 @@ class SkeletonAnalysis:
         datarow = {}
 
         inner = self.lobulus.central_vein_mask
+        logger.debug(f"dtype of lobulus.central_vein_mask {self.lobulus.central_vein_mask.dtype}")
+        logger.debug(f"shape of lobulus.central_vein_mask {self.lobulus.central_vein_mask.shape} {np.max(self.lobulus.central_vein_mask)}")
+        logger.debug(f"unique of shape of lobulus.central_vein_mask {np.unique(self.lobulus.central_vein_mask)}")
+        # import pdb; pdb.set_trace()
         # TODO Split the function here
         inner_lobulus_margin_mm = self.parameters.param("Inner Lobulus Margin").value() * 1000
 
@@ -90,11 +94,11 @@ class SkeletonAnalysis:
             order=0,
             anti_aliasing=False,
         )
-        detail_mask = skimage.transform.resize(self.lobulus.lobulus_mask, **resize_params)
+        detail_mask = skimage.transform.resize(self.lobulus.lobulus_mask, **resize_params).astype(np.int8)
         detail_inner_lobulus_mask = skimage.transform.resize(
             inner_lobulus_mask, **resize_params
         )
-        detail_central_vein_mask = skimage.transform.resize(inner == 1, **resize_params)
+        detail_central_vein_mask = skimage.transform.resize(inner == 1, **resize_params).astype(np.int8)
 
         detail_view = self.view
         detail_image = detail_view.get_region_image(as_gray=True)
@@ -108,6 +112,16 @@ class SkeletonAnalysis:
                 fig,
             )
 
+        # from PyQt5.QtCore import pyqtRemoveInputHook
+        # pyqtRemoveInputHook()
+
+        # Or for Qt5
+        # from PyQt5.QtCore import pyqtRemoveInputHook
+
+        # from pdb import set_trace
+        # set_trace()
+        logger.debug(f"detail_inner_lobulus_mask {detail_central_vein_mask.shape} {detail_central_vein_mask.dtype} "
+                     f"{np.min(detail_central_vein_mask)} {np.max(detail_central_vein_mask)}")
         threshold = skimage.filters.threshold_otsu(
             detail_image[detail_inner_lobulus_mask == 1]
         )

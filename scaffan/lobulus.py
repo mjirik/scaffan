@@ -200,13 +200,15 @@ class Lobulus:
         pass
 
     def find_border(self, show=True):
-        inner_ids = self.anim.select_inner_annotations(self.annotation_id, color="#000000")
-        if len(inner_ids) > 1:
-            logger.warning("More than one inner annotation find to annotation with ID %i", self.annotation_id)
-        elif len(inner_ids) > 0:
-            inner_id = inner_ids[0]
-            seg_true = self.view.get_annotation_region_raster(annotation_id=inner_id) > 0
-            use_manual = self.parameters.param("Processing", "Lobulus Segmentation", "Manual Segmentation").value()
+        outer_ids = self.anim.select_outer_annotations(self.annotation_id, color="#000000")
+        if len(outer_ids) > 1:
+            logger.warning("More than one outer annotation find to annotation with ID %i", self.annotation_id)
+        elif len(outer_ids) > 0:
+            outer_id = outer_ids[0]
+            seg_true = self.view.get_annotation_region_raster(annotation_id=outer_id) > 0
+            use_manual = self.parameters.param(
+                # "Processing", "Lobulus Segmentation",
+                "Manual Segmentation").value()
             if use_manual:
                 self.border_mask = seg_true.astype(np.uint8)
                 return
@@ -236,8 +238,11 @@ class Lobulus:
         elif len(inner_ids) > 0:
             inner_id = inner_ids[0]
             seg_true = self.view.get_annotation_region_raster(annotation_id=inner_id) > 0
-            use_manual = self.parameters.param("Processing", "Lobulus Segmentation", "Manual Segmentation").value()
+            use_manual = self.parameters.param(
+                # "Processing", "Lobulus Segmentation",
+                "Manual Segmentation").value()
             if use_manual:
+                # self.central_vein_mask = seg_true.astype(np.float64)
                 self.central_vein_mask = seg_true.astype(np.uint8)
                 return
         use_texture_features = True
