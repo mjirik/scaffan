@@ -44,6 +44,8 @@ before_install:
 #    - ./miniconda.sh -b
     - bash miniconda.sh -b -p $HOME/miniconda
     - export PATH="$HOME/miniconda/bin:$PATH"
+#    - wget http://home.zcu.cz/~mjirik/lisa/install/install_conda.sh && source install_conda.sh
+
     - hash -r
     - conda config --set always_yes yes --set changeps1 no
     - conda update -q conda
@@ -58,24 +60,14 @@ install:
 
 #    - sudo apt-get install -qq $(< apt_requirements.txt)
 
-    - conda update --yes conda
-    - conda install --yes pip nose coveralls
 #    - pip install python-coveralls
 
 #    - Install dependencies
     - conda install --yes --file requirements_conda.txt
-#    - pip install -r requirements_pip.txt
-#    - "echo $LD_LIBRARY_PATH"
-#    - "pip install -r requirements.txt"
-#    - 'mkdir build'
-#    - "cd build"
-#    - "cmake .."
-#    - "cmake --build ."
-#    - "sudo make install"
-#    - pip install .
-#    - "cd .."
-#    - 'echo "include /usr/local/lib" | sudo tee -a /etc/ld.so.conf'
-#    - 'sudo ldconfig -v'
+    - conda create -n travis --yes --file requirements_conda.txt
+    - source activate travis
+    - conda update --yes conda
+    - conda install --yes pip nose coveralls
 #    - conda list -e
     - python -m io3d.datasets -v -gdp
     - python -m io3d.datasets -v -l CMU-1 CMU-1-annotation SCP003
