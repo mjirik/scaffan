@@ -34,7 +34,7 @@ import scaffan
 import scaffan.image as scim
 
 
-class ParseAnnotationTest(unittest.TestCase):
+class ImageAnnotationTest(unittest.TestCase):
 
     def test_get_pixelsize_on_different_levels(self):
         fn = io3d.datasets.join_path("medical", "orig", "CMU-1.ndpi", get_root=True)
@@ -152,6 +152,7 @@ class ParseAnnotationTest(unittest.TestCase):
         import copy
         image1_copy = copy.copy(image1)
         # plt.imshow(image1)
+        # plt.colorbar()
         # plt.show()
 
         view2 = anim.get_views(annotation_ids, margin=0.1, pixelsize_mm=[0.05, 0.05])[0]
@@ -159,12 +160,14 @@ class ParseAnnotationTest(unittest.TestCase):
         # plt.imshow(image2)
         # plt.show()
 
-        logger.debug(f"image1 dtype: {image1.dtype}, min max: [{np.min(image1)}, {np.max(image1)}], mean: {np.mean(image1)}")
-        logger.debug(f"image2 dtype: {image2.dtype}, min max: [{np.min(image2)}, {np.max(image2)}], mean: {np.mean(image2)}")
         merged = view1.insert_image_from_view(view2, image1, image2)
+        logger.debug(f"image1 dtype: {image1.dtype}, shape: {image1.shape}, min max: [{np.min(image1)}, {np.max(image1)}], mean: {np.mean(image1)}")
+        logger.debug(f"image2 dtype: {image2.dtype}, shape: {image2.shape}, min max: [{np.min(image2)}, {np.max(image2)}], mean: {np.mean(image2)}")
+        logger.debug(f"merged dtype: {merged.dtype}, shape: {merged.shape}, min max: [{np.min(merged)}, {np.max(merged)}], mean: {np.mean(merged)}")
 
-        plt.imshow(merged)
-        errim = np.mean(np.abs(image1_copy.astype(np.int) - merged), 2)
+        # plt.imshow(merged)
+        # plt.show()
+        errim = np.mean(np.abs(image1_copy.astype(np.int) - merged.astype(np.int)), 2)
         logger.debug(f"errim dtype: {errim.dtype}, min max: [{np.min(errim)}, {np.max(errim)}], mean: {np.mean(errim)}")
         # plt.figure()
         # plt.imshow(errim)
