@@ -100,7 +100,12 @@ def read_annotations(pth):
 
             )
         except subprocess.CalledProcessError as e:
-            raise RuntimeError("command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))
+            import traceback
+            logger.error(traceback.format_exc())
+            logger.debug(f"Command '{e.cmd}' returned with code {e.returncode}")
+            logger.debug(f"Output of command: \n{e.output}")
+            exit(e.returncode)
+            # raise RuntimeError("command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))
 
         logger.debug("windows annotation output:" + str(output))
         # print(output)

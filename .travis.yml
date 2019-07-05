@@ -60,8 +60,8 @@ install:
 #    - pip install python-coveralls
 
 #    - Install dependencies
-    - conda install --yes --file requirements_conda.txt
-    - conda create -n travis --yes --file requirements_conda.txt
+#    - conda install --yes --file requirements_conda.txt
+    - conda create -n travis --yes --file requirements_conda.txt python=3.6
     - source activate travis
     - conda update --yes conda
     - conda install --yes pip nose coveralls
