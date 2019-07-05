@@ -94,14 +94,15 @@ def read_annotations(pth):
         # print(output)
 
         cwd = op.dirname(op.dirname(__file__))
+        command = [sys.executable, "-m", "scaffan.ann_to_json", pth]
         try:
-            output = subprocess.check_output(
-                [sys.executable, "-m", "scaffan.ann_to_json", pth], cwd=cwd, stderr=subprocess.STDOUT
+            output = subprocess.check_output(command, cwd=cwd, stderr=subprocess.STDOUT
 
             )
         except subprocess.CalledProcessError as e:
             import traceback
             logger.error(traceback.format_exc())
+            logger.debug(f"Command {' '.join(command)}")
             logger.debug(f"Command '{e.cmd}' returned with code {e.returncode}")
             logger.debug(f"Output of command: \n{e.output}")
             exit(e.returncode)

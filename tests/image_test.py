@@ -159,10 +159,13 @@ class ParseAnnotationTest(unittest.TestCase):
         # plt.imshow(image2)
         # plt.show()
 
+        logger.debug(f"image1 dtype: {image1.dtype}, min max: [{np.min(image1)}, {np.max(image1)}], mean: {np.mean(image1)}")
+        logger.debug(f"image2 dtype: {image2.dtype}, min max: [{np.min(image2)}, {np.max(image2)}], mean: {np.mean(image2)}")
         merged = view1.insert_image_from_view(view2, image1, image2)
 
         plt.imshow(merged)
         errim = np.mean(np.abs(image1_copy.astype(np.int) - merged), 2)
+        logger.debug(f"errim dtype: {errim.dtype}, min max: [{np.min(errim)}, {np.max(errim)}], mean: {np.mean(errim)}")
         # plt.figure()
         # plt.imshow(errim)
         # plt.show()
