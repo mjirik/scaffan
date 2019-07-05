@@ -63,7 +63,6 @@ install:
 #    - conda install --yes --file requirements_conda.txt
     - conda create -n travis --yes --file requirements_conda.txt python=3.6
     - source activate travis
-    - conda update --yes conda
     - conda install --yes pip nose coveralls
 #    - conda list -e
     - python -m io3d.datasets -v -gdp
