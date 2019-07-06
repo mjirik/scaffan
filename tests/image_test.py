@@ -147,7 +147,6 @@ class ImageAnnotationTest(unittest.TestCase):
         fn = io3d.datasets.join_path("medical", "orig", "CMU-1.ndpi", get_root=True)
         anim = scim.AnnotatedImage(fn)
         annotation_ids = anim.select_annotations_by_title("obj1")
-        logger.debug(f"Annotation ID: {annotation_ids}")
         view1 = anim.get_views(annotation_ids, margin=1.0, pixelsize_mm=[0.005, 0.005])[0]
         image1 = view1.get_region_image()
         import copy
@@ -160,6 +159,7 @@ class ImageAnnotationTest(unittest.TestCase):
         image2 = view2.get_region_image()
         # plt.imshow(image2)
         # plt.show()
+        logger.debug(f"Annotation ID: {annotation_ids}, location view1 {view1.region_location}, view2 {view2.region_location}")
 
         merged = view1.insert_image_from_view(view2, image1, image2)
         logger.debug(f"image1 dtype: {image1.dtype}, shape: {image1.shape}, min max: [{np.min(image1[:,:,:3])}, {np.max(image1[:,:,:3])}], mean: {np.mean(image1[:,:,:3])}, min max alpha: [{np.min(image1[:,:,3])}, {np.max(image1[:,:,3])}], mean: {np.mean(image1[:,:,3])}")
