@@ -64,7 +64,7 @@ install:
     - conda create -n travis --yes --file requirements_conda.txt python=3.6
     - source activate travis
     - conda install --yes pip nose coveralls
-#    - conda list -e
+    - conda list -e
     - python -m io3d.datasets -v -gdp
     - python -m io3d.datasets -v -l CMU-1 CMU-1-annotation SCP003
     - pwd
