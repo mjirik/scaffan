@@ -793,7 +793,7 @@ class View:
         sl = self.get_slices_for_insert_image_from_view(other_view)
 
         img_copy[sl] = resized_other_img
-        return img
+        return img_copy
 
 
 class ColorError(Exception):
