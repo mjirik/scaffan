@@ -779,6 +779,8 @@ class View:
         :param other_img:
         :return:
         """
+        import copy
+        img_copy = copy.copy(img)
 
         pxsz1 = self.region_pixelsize[:2]
         pxsz2 = other_view.region_pixelsize[:2]
@@ -790,7 +792,7 @@ class View:
 
         sl = self.get_slices_for_insert_image_from_view(other_view)
 
-        img[sl] = resized_other_img
+        img_copy[sl] = resized_other_img
         return img
 
 

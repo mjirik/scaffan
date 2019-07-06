@@ -149,8 +149,6 @@ class ImageAnnotationTest(unittest.TestCase):
         annotation_ids = anim.select_annotations_by_title("obj1")
         view1 = anim.get_views(annotation_ids, margin=1.0, pixelsize_mm=[0.005, 0.005])[0]
         image1 = view1.get_region_image()
-        import copy
-        image1_copy = copy.copy(image1)
         # plt.imshow(image1)
         # plt.colorbar()
         # plt.show()
@@ -164,7 +162,7 @@ class ImageAnnotationTest(unittest.TestCase):
         merged = view1.insert_image_from_view(view2, image1, image2)
         # plt.imshow(merged)
         # plt.show()
-        diffim = image1_copy[:, :, :3].astype(np.int16) - merged[:, :, :3].astype(np.int16)
+        diffim = image1[:, :, :3].astype(np.int16) - merged[:, :, :3].astype(np.int16)
         errimg = np.mean(np.abs(diffim), 2)
         def logim(image1, text):
             if len(image1.shape) == 3 and image1.shape[2] == 4:
@@ -172,9 +170,10 @@ class ImageAnnotationTest(unittest.TestCase):
             else:
                 logger.debug(f"{text} dtype: {image1.dtype}, shape: {image1.shape}, min max: [{np.min(image1[:,:])}, {np.max(image1[:,:])}], mean: {np.mean(image1[:,:])}")
 
-        logim(image1_copy, "image1_copy")
+        # logim(image1_copy, "image1_copy")
         logim(image1, "image1")
         logim(image2, "image2")
+        logim(merged, "merged")
         logim(diffim, "diffim")
         logim(errimg, "errimg")
 
