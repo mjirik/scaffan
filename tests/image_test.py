@@ -162,13 +162,13 @@ class ImageAnnotationTest(unittest.TestCase):
         # plt.show()
 
         merged = view1.insert_image_from_view(view2, image1, image2)
-        logger.debug(f"image1 dtype: {image1.dtype}, shape: {image1.shape}, min max: [{np.min(image1[:,:,:3])}, {np.max(image1[:,:,:3])}], mean: {np.mean(image1[:,:,:3])}, min max alpha: [{np.min(image1[:,:,:3])}, {np.max(image1[:,:,:3])}], mean: {np.mean(image1[:,:,:3])}")
-        logger.debug(f"image2 dtype: {image2.dtype}, shape: {image2.shape}, min max: [{np.min(image2[:,:,:3])}, {np.max(image2[:,:,:3])}], mean: {np.mean(image2[:,:,:3])}, min max alpha: [{np.min(image2[:,:,:3])}, {np.max(image2[:,:,:3])}], mean: {np.mean(image2[:,:,:3])}")
-        logger.debug(f"merged dtype: {merged.dtype}, shape: {merged.shape}, min max: [{np.min(merged[:,:,:3])}, {np.max(merged[:,:,:3])}], mean: {np.mean(merged[:,:,:3])}, min max alpha: [{np.min(merged[:,:,:3])}, {np.max(merged[:,:,:3])}], mean: {np.mean(merged[:,:,:3])}")
+        logger.debug(f"image1 dtype: {image1.dtype}, shape: {image1.shape}, min max: [{np.min(image1[:,:,:3])}, {np.max(image1[:,:,:3])}], mean: {np.mean(image1[:,:,:3])}, min max alpha: [{np.min(image1[:,:,3])}, {np.max(image1[:,:,3])}], mean: {np.mean(image1[:,:,3])}")
+        logger.debug(f"image2 dtype: {image2.dtype}, shape: {image2.shape}, min max: [{np.min(image2[:,:,:3])}, {np.max(image2[:,:,:3])}], mean: {np.mean(image2[:,:,:3])}, min max alpha: [{np.min(image2[:,:,3])}, {np.max(image2[:,:,3])}], mean: {np.mean(image2[:,:,3])}")
+        logger.debug(f"merged dtype: {merged.dtype}, shape: {merged.shape}, min max: [{np.min(merged[:,:,:3])}, {np.max(merged[:,:,:3])}], mean: {np.mean(merged[:,:,:3])}, min max alpha: [{np.min(merged[:,:,3])}, {np.max(merged[:,:,3])}], mean: {np.mean(merged[:,:,3])}")
 
         # plt.imshow(merged)
         # plt.show()
-        errim = np.mean(np.abs(image1_copy.astype(np.int) - merged.astype(np.int)), 2)
+        errim = np.mean(np.abs(image1_copy[:, :, :3].astype(np.int) - merged[:, :, :3].astype(np.int)), 2)
         logger.debug(f"errim dtype: {errim.dtype}, shape: {errim.shape}, min max: [{np.min(errim)}, {np.max(errim)}], mean: {np.mean(errim)}")
         # plt.figure()
         # plt.imshow(errim)
