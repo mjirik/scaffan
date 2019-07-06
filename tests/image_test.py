@@ -167,7 +167,10 @@ class ImageAnnotationTest(unittest.TestCase):
         diffim = image1_copy[:, :, :3].astype(np.int) - merged[:, :, :3].astype(np.int)
         errimg = np.mean(np.abs(diffim), 2)
         def logim(image1, text):
-            logger.debug(f"{text} dtype: {image1.dtype}, shape: {image1.shape}, min max: [{np.min(image1[:,:,:3])}, {np.max(image1[:,:,:3])}], mean: {np.mean(image1[:,:,:3])}, min max alpha: [{np.min(image1[:,:,3])}, {np.max(image1[:,:,3])}], mean: {np.mean(image1[:,:,3])}")
+            if image1.shape[2] == 4:
+                logger.debug(f"{text} dtype: {image1.dtype}, shape: {image1.shape}, min max: [{np.min(image1[:,:,:3])}, {np.max(image1[:,:,:3])}], mean: {np.mean(image1[:,:,:3])}, min max alpha: [{np.min(image1[:,:,3])}, {np.max(image1[:,:,3])}], mean: {np.mean(image1[:,:,3])}")
+            else:
+                logger.debug(f"{text} dtype: {image1.dtype}, shape: {image1.shape}, min max: [{np.min(image1[:,:,:3])}, {np.max(image1[:,:,:3])}], mean: {np.mean(image1[:,:,:3])}")
 
         logim(image1, "image1")
         logim(image2, "image2")
