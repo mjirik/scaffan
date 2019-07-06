@@ -164,7 +164,7 @@ class ImageAnnotationTest(unittest.TestCase):
         merged = view1.insert_image_from_view(view2, image1, image2)
         # plt.imshow(merged)
         # plt.show()
-        diffim = image1_copy[:, :, :3].astype(np.int) - merged[:, :, :3].astype(np.int)
+        diffim = image1_copy[:, :, :3].astype(np.int16) - merged[:, :, :3].astype(np.int16)
         errimg = np.mean(np.abs(diffim), 2)
         def logim(image1, text):
             if len(image1.shape) == 3 and image1.shape[2] == 4:
@@ -172,6 +172,7 @@ class ImageAnnotationTest(unittest.TestCase):
             else:
                 logger.debug(f"{text} dtype: {image1.dtype}, shape: {image1.shape}, min max: [{np.min(image1[:,:])}, {np.max(image1[:,:])}], mean: {np.mean(image1[:,:])}")
 
+        logim(image1_copy, "image1_copy")
         logim(image1, "image1")
         logim(image2, "image2")
         logim(diffim, "diffim")
