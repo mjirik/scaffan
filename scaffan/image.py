@@ -705,7 +705,7 @@ class View:
         #     level = self.region_level
         #     size = self.region_size_on_level
 
-        location = fix_location(self.openslide, self.region_location, self.region_level)
+        location = fix_location(self.anim.openslide, self.region_location, self.region_level)
         imcr = self.anim.openslide.read_region(
             location, level=self.region_level, size=self.region_size_on_level
         )
