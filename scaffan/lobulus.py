@@ -229,7 +229,7 @@ class Lobulus:
         mgac.levelset = circle.copy()
         mgac.run(iterations=param_acwe_iterations)
         outer = mgac.levelset.copy()
-        self.border_mask = outer
+        self.border_mask = outer.astype(np.uint8)
 
     def find_central_vein(self, show=True):
         inner_ids = self.anim.select_inner_annotations(self.annotation_id, color="#000000")
