@@ -180,9 +180,23 @@ class ImageAnnotationTest(unittest.TestCase):
         # logger.debug(f"image2 dtype: {image2.dtype}, shape: {image2.shape}, min max: [{np.min(image2[:,:,:3])}, {np.max(image2[:,:,:3])}], mean: {np.mean(image2[:,:,:3])}, min max alpha: [{np.min(image2[:,:,3])}, {np.max(image2[:,:,3])}], mean: {np.mean(image2[:,:,3])}")
         # logger.debug(f"merged dtype: {merged.dtype}, shape: {merged.shape}, min max: [{np.min(merged[:,:,:3])}, {np.max(merged[:,:,:3])}], mean: {np.mean(merged[:,:,:3])}, min max alpha: [{np.min(merged[:,:,3])}, {np.max(merged[:,:,3])}], mean: {np.mean(merged[:,:,3])}")
         # logger.debug(f"errimg dtype: {errimg.dtype}, shape: {errimg.shape}, min max: [{np.min(errimg)}, {np.max(errim)}], mean: {np.mean(errim)}")
-        # plt.figure()
-        # plt.imshow(errim)
-        # plt.show()
+        plt.figure()
+        plt.imshow(errimg)
+        plt.colorbar()
+        plt.savefig("errimg.png")
+
+        plt.figure()
+        plt.imshow(image1)
+        plt.savefig("image1.png")
+
+        plt.figure()
+        plt.imshow(image2)
+        plt.savefig("image2.png")
+
+        plt.figure()
+        plt.imshow(merged)
+        plt.savefig("merged.png")
+
         err = np.mean(errimg)
         self.assertLess(err, 3, "Mean error in intensity levels per pixel should be low")
         self.assertLess(1, err, "Mean error in intensity levels per pixel should be low but there should be some error.")
