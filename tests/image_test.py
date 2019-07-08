@@ -164,38 +164,35 @@ class ImageAnnotationTest(unittest.TestCase):
         # plt.show()
         diffim = image1[:, :, :3].astype(np.int16) - merged[:, :, :3].astype(np.int16)
         errimg = np.mean(np.abs(diffim), 2)
-        def logim(image1, text):
-            if len(image1.shape) == 3 and image1.shape[2] == 4:
-                logger.debug(f"{text} dtype: {image1.dtype}, shape: {image1.shape}, min max: [{np.min(image1[:,:,:3])}, {np.max(image1[:,:,:3])}], mean: {np.mean(image1[:,:,:3])}, min max alpha: [{np.min(image1[:,:,3])}, {np.max(image1[:,:,3])}], mean: {np.mean(image1[:,:,3])}")
-            else:
-                logger.debug(f"{text} dtype: {image1.dtype}, shape: {image1.shape}, min max: [{np.min(image1[:,:])}, {np.max(image1[:,:])}], mean: {np.mean(image1[:,:])}")
+        # def logim(image1, text):
+        #     if len(image1.shape) == 3 and image1.shape[2] == 4:
+        #         logger.debug(f"{text} dtype: {image1.dtype}, shape: {image1.shape}, min max: [{np.min(image1[:,:,:3])}, {np.max(image1[:,:,:3])}], mean: {np.mean(image1[:,:,:3])}, min max alpha: [{np.min(image1[:,:,3])}, {np.max(image1[:,:,3])}], mean: {np.mean(image1[:,:,3])}")
+        #     else:
+        #         logger.debug(f"{text} dtype: {image1.dtype}, shape: {image1.shape}, min max: [{np.min(image1[:,:])}, {np.max(image1[:,:])}], mean: {np.mean(image1[:,:])}")
 
         # logim(image1_copy, "image1_copy")
-        logim(image1, "image1")
-        logim(image2, "image2")
-        logim(merged, "merged")
-        logim(diffim, "diffim")
-        logim(errimg, "errimg")
+        # logim(image1, "image1")
+        # logim(image2, "image2")
+        # logim(merged, "merged")
+        # logim(diffim, "diffim")
+        # logim(errimg, "errimg")
 
-        # logger.debug(f"image2 dtype: {image2.dtype}, shape: {image2.shape}, min max: [{np.min(image2[:,:,:3])}, {np.max(image2[:,:,:3])}], mean: {np.mean(image2[:,:,:3])}, min max alpha: [{np.min(image2[:,:,3])}, {np.max(image2[:,:,3])}], mean: {np.mean(image2[:,:,3])}")
-        # logger.debug(f"merged dtype: {merged.dtype}, shape: {merged.shape}, min max: [{np.min(merged[:,:,:3])}, {np.max(merged[:,:,:3])}], mean: {np.mean(merged[:,:,:3])}, min max alpha: [{np.min(merged[:,:,3])}, {np.max(merged[:,:,3])}], mean: {np.mean(merged[:,:,3])}")
-        # logger.debug(f"errimg dtype: {errimg.dtype}, shape: {errimg.shape}, min max: [{np.min(errimg)}, {np.max(errim)}], mean: {np.mean(errim)}")
-        plt.figure()
-        plt.imshow(errimg)
-        plt.colorbar()
-        plt.savefig("errimg.png")
-
-        plt.figure()
-        plt.imshow(image1)
-        plt.savefig("image1.png")
-
-        plt.figure()
-        plt.imshow(image2)
-        plt.savefig("image2.png")
-
-        plt.figure()
-        plt.imshow(merged)
-        plt.savefig("merged.png")
+        # plt.figure()
+        # plt.imshow(errimg)
+        # plt.colorbar()
+        # plt.savefig("errimg.png")
+        #
+        # plt.figure()
+        # plt.imshow(image1)
+        # plt.savefig("image1.png")
+        #
+        # plt.figure()
+        # plt.imshow(image2)
+        # plt.savefig("image2.png")
+        #
+        # plt.figure()
+        # plt.imshow(merged)
+        # plt.savefig("merged.png")
 
         err = np.mean(errimg)
         self.assertLess(err, 3, "Mean error in intensity levels per pixel should be low")
