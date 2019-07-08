@@ -37,11 +37,12 @@ cd $SCRATCHDIR || exit 1
 # spusteni aplikace - samotny vypocet
 export PATH=/storage/plzen1/home/$LOGNAME/miniconda3/bin:$PATH
 source activate scaffan
-echo /storage/plzen1/home/$LOGNAME/projects/scaffan/experiments/metacentrum/SA_experiments.
+echo /storage/plzen1/home/$LOGNAME/projects/scaffan/experiments/metacentrum/SA_experiments.xlsx
 # this is because of python click
 export LC_ALL=C.UTF-8
 export LANG=C.UTF-8
-python -m scaffan set --common-spreadsheet-file /storage/plzen1/home/$LOGNAME/projects/scaffan/experiments/metacentrum/SA_experiments.xlsx
+
+# python -m scaffan set --common-spreadsheet-file /storage/plzen1/home/$LOGNAME/projects/scaffan/experiments/metacentrum/SA_experiments.xlsx
 python -m io3d.datasets -sdp  /storage/plzen4-ntis/projects/queetech/
 python /storage/plzen1/home/$LOGNAME/projects/scaffan/experiments/lobulus_precision.py > results.out
 
