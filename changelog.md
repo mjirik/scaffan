@@ -6,6 +6,7 @@
 
 
 * [Added] Use manual lobulus segmentation with black color
+* [Fixed] Fixed problem in openslide with location idivisible by level scale
 
 ## 0.9.*
 

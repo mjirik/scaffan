@@ -49,13 +49,15 @@ import_openslide()
 import openslide
 
 
+def fix_location(imsl, location, level):
+    return list((location - np.mod(location, imsl.level_downsamples[level])).astype(np.int))
 # def
 def get_image_by_center(imsl, center, level=3, size=None, as_gray=True):
     if size is None:
         size = np.array([800, 800])
 
     location = get_region_location_by_center(imsl, center, level, size)
-
+    location = fix_location(imsl, location, level)
     imcr = imsl.read_region(location, level=level, size=size)
     im = np.asarray(imcr)
     if as_gray:
@@ -231,6 +233,10 @@ class AnnotatedImage:
         return get_region_center_by_location(self.openslide, location, level, size)
 
     def read_annotations(self):
+        """
+        Read all annotations of the file and save extracted information.
+        :return:
+        """
         self.annotations = scan.read_annotations(self.path)
         self.annotations = scan.annotations_to_px(self.openslide, self.annotations)
         self.id_by_titles = scan.annotation_titles(self.annotations)
@@ -443,8 +449,10 @@ class AnnotatedImage:
         return center, size
 
     def get_region_image(self, as_gray=False, as_unit8=False):
+
+        location = fix_location(self.openslide, self.region_location, self.region_level)
         imcr = self.openslide.read_region(
-            self.region_location, level=self.region_level, size=self.region_size
+            location, level=self.region_level, size=self.region_size
         )
         im = np.asarray(imcr)
         if as_gray:
@@ -697,8 +705,9 @@ class View:
         #     level = self.region_level
         #     size = self.region_size_on_level
 
+        location = fix_location(self.openslide, self.region_location, self.region_level)
         imcr = self.anim.openslide.read_region(
-            self.region_location, level=self.region_level, size=self.region_size_on_level
+            location, level=self.region_level, size=self.region_size_on_level
         )
         im = np.asarray(imcr)
         image1 = im
