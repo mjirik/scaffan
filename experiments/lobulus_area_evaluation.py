@@ -12,7 +12,7 @@ import datetime
 
 experiment_datetime = datetime.datetime.now()
 experiment_datetime_fn = experiment_datetime.strftime("%Y%m%d-%H%M%S")
-experiment_dir = Path(f"SA_{experiment_datetime_fn}")
+experiment_dir = Path(f"SA_area_{experiment_datetime_fn}")
 
 experiment_dir.mkdir()
 # logger.add(sys.stderr, format="{time} {level} {message}", filter="my_module", level="DEBUG")
