@@ -14,7 +14,7 @@ experiment_title = "first segmentation params"
 
 experiment_datetime = datetime.datetime.now()
 experiment_datetime_fn = experiment_datetime.strftime("%Y%m%d-%H%M%S")
-experiment_dir = Path(f"lobulus_precision_{experiment_datetime_fn}")
+experiment_dir = Path(f"SA_{experiment_datetime_fn}")
 
 experiment_dir.mkdir()
 # logger.add(sys.stderr, format="{time} {level} {message}", filter="my_module", level="DEBUG")
@@ -29,13 +29,13 @@ path_to_scaffan = os.path.join(path_to_script, "..")
 sys.path.insert(0, path_to_scaffan)
 import scaffan
 import scaffan.algorithm
-fn = io3d.datasets.join_path(
-    "medical", "orig", "sample_data", "SCP003", "SCP003.ndpi", get_root=True
-)
-fn = io3d.datasets.join_path(
-    "medical/orig/Scaffan-analysis/PIG-004_BBJ-004-4_HE_parenchyme.ndpi", get_root=True
-)
-logger.debug(f"fn exists {Path(fn).exists()}, fn: {fn}")
+# fn = io3d.datasets.join_path(
+#     "medical", "orig", "sample_data", "SCP003", "SCP003.ndpi", get_root=True
+# )
+# fn = io3d.datasets.join_path(
+#     "medical/orig/Scaffan-analysis/PIG-004_BBJ-004-4_HE_parenchyme.ndpi", get_root=True
+# )
+# logger.debug(f"fn exists {Path(fn).exists()}, fn: {fn}")
     # .isoformat(' ', 'seconds')
 # datetime.datetime.now().
 logger.info(f"running experiment: {experiment_title} started at: {experiment_datetime}")
