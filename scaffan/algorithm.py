@@ -342,7 +342,7 @@ class Scaffan:
             str(Path(self.report.outputdir) / "parameters.yaml")
         )
         try:
-            with open(Path(self.report.outputdir) / "parameters.json", "w") as outfile:
+            with open(str(Path(self.report.outputdir) / "parameters.json"), "w") as outfile:
                 json.dump(saved_params, outfile)
         except:
             import traceback
