@@ -61,6 +61,7 @@ class Report:
     # def write_table(self, filename):
     def finish_actual_row(self):
         data = self.actual_row
+        logger.debug(f"Adding persistent cols: {list(self.persistent_cols.keys())}")
         data.update(self.persistent_cols)
         df = pd.DataFrame([list(data.values())], columns=list(data.keys()))
         self.df = self.df.append(df, ignore_index=True)
