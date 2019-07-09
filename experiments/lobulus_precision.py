@@ -10,6 +10,8 @@ import sys
 from pathlib import Path
 import datetime
 
+experiment_title = "first segmentation params"
+
 experiment_datetime = datetime.datetime.now()
 experiment_datetime_fn = experiment_datetime.strftime("%Y%m%d-%H%M%S")
 experiment_dir = Path(f"lobulus_precision_{experiment_datetime_fn}")
@@ -36,7 +38,6 @@ fn = io3d.datasets.join_path(
 logger.debug(f"fn exists {Path(fn).exists()}, fn: {fn}")
     # .isoformat(' ', 'seconds')
 # datetime.datetime.now().
-experiment_title = "first segmentation params"
 logger.info(f"running experiment: {experiment_title} started at: {experiment_datetime}")
 # imsl = openslide.OpenSlide(fn)
 # annotations = scan.read_annotations(fn)
