@@ -214,6 +214,7 @@ def append_df_to_excel(filename, df, sheet_name='Sheet1', startrow=None,
 
     Returns: None
     """
+    logger.debug(f"Writing XLSX to: {str(filename)}")
     from openpyxl import load_workbook
 
     import pandas as pd
@@ -238,6 +239,7 @@ def append_df_to_excel(filename, df, sheet_name='Sheet1', startrow=None,
 
 
     else:
+        filename.parent.mkdir(parents=True, exist_ok=True)
         # pd.read_excel(filename, sheet_name=)
         df.to_excel(str(filename), sheet_name=sheet_name, index=False)
         pass
