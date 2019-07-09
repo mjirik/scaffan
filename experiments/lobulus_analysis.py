@@ -36,7 +36,7 @@ fn = io3d.datasets.join_path(
 logger.debug(f"fn exists {Path(fn).exists()}, fn: {fn}")
     # .isoformat(' ', 'seconds')
 # datetime.datetime.now().
-experiment_title = "first debug changed params"
+experiment_title = "first lobulus analysis"
 logger.info(f"running experiment: {experiment_title} started at: {experiment_datetime}")
 # imsl = openslide.OpenSlide(fn)
 # annotations = scan.read_annotations(fn)
@@ -55,10 +55,10 @@ mainapp.set_persistent_cols({
 mainapp.set_parameter("Processing;Lobulus Segmentation;Central Vein Segmentation;Threshold", 0.18)
 mainapp.set_parameter("Processing;Run Skeleton Analysis", True)
 mainapp.set_parameter("Processing;Run Texture Analysis", True)
-mainapp.set_parameter("Processing;Lobulus Segmentation;Manual Segmentation", False)
+# mainapp.set_parameter("Processing;Lobulus Segmentation;Manual Segmentation", False)
 
-mainapp.set_parameter("Processing;Run Skeleton Analysis", False)
-mainapp.set_parameter("Processing;Run Texture Analysis", False)
+# mainapp.set_parameter("Processing;Run Skeleton Analysis", False)
+# mainapp.set_parameter("Processing;Run Texture Analysis", False)
 mainapp.set_parameter("Processing;Lobulus Segmentation;Manual Segmentation", True)
 
 def set_same(mainapp, fn):
