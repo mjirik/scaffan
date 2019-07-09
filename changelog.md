@@ -4,6 +4,7 @@
 
 ## 0.11.*
 
+* [Added] If more control annotations for central vein are given, use them all.
 * [Added] Testing for manual segmentation
 * [Fixed] Manual segmentation for lobulus border only
 

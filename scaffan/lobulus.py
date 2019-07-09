@@ -239,10 +239,15 @@ class Lobulus:
     def find_central_vein(self, show=True):
         inner_ids = self.anim.select_inner_annotations(self.annotation_id, color="#000000")
         if len(inner_ids) > 1:
-            logger.warning("More than one inner annotation find to annotation with ID %i", self.annotation_id)
-        elif len(inner_ids) > 0:
+            logger.warning("More than one inner annotation find to annotation with ID %i. Combination will be used.", self.annotation_id)
+        if len(inner_ids) > 0:
+            # get first
             inner_id = inner_ids[0]
             seg_true = self.view.get_annotation_region_raster(annotation_id=inner_id) > 0
+            for inner_id in inner_ids:
+                seg_true += self.view.get_annotation_region_raster(annotation_id=inner_id) > 0
+            seg_true = (seg_true > 0).astype(np.uint8)
+
             use_manual = self.parameters.param(
                 # "Processing", "Lobulus Segmentation",
                 "Manual Segmentation").value()
