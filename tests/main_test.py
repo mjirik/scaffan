@@ -74,6 +74,29 @@ class MainGuiTest(unittest.TestCase):
         self.assertLess(0.5, mainapp.evaluation.evaluation_history[1]["Central Vein Dice"],
                         "Central Vein should have Dice coefficient above some low level")
 
+    def test_run_lobuluses_manual_segmentation(self):
+        fn = io3d.datasets.join_path(
+            "medical", "orig", "sample_data", "SCP003", "SCP003.ndpi", get_root=True
+        )
+        # imsl = openslide.OpenSlide(fn)
+        # annotations = scan.read_annotations(fn)
+        # scan.annotations_to_px(imsl, annotations)
+        mainapp = scaffan.algorithm.Scaffan()
+        mainapp.set_input_file(fn)
+        mainapp.set_output_dir("test_run_lobuluses_output_dir")
+        # mainapp.init_run()
+        mainapp.set_annotation_color_selection("#FF00FF")
+        mainapp.set_parameter("Processing;Lobulus Segmentation;Manual Segmentation", True)
+        mainapp.run_lobuluses()
+        self.assertLess(0.9, mainapp.evaluation.evaluation_history[0]["Lobulus Border Dice"],
+                        "Lobulus segmentation should have Dice coefficient above some low level")
+        self.assertLess(0.9, mainapp.evaluation.evaluation_history[1]["Lobulus Border Dice"],
+                        "Lobulus segmentation should have Dice coefficient above some low level")
+        self.assertLess(0.9, mainapp.evaluation.evaluation_history[0]["Central Vein Dice"],
+                        "Central Vein segmentation should have Dice coefficient above some low level")
+        self.assertLess(0.9, mainapp.evaluation.evaluation_history[1]["Central Vein Dice"],
+                        "Central Vein should have Dice coefficient above some low level")
+
     def test_start_gui_no_exec(self):
         # fn = io3d.datasets.join_path("medical", "orig", "CMU-1.ndpi", get_root=True)
         # fn = io3d.datasets.join_path("medical", "orig", "CMU-1.ndpi", get_root=True)

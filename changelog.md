@@ -2,8 +2,12 @@
 
 ## Unreleased
 
-## 0.10.*
+## 0.11.*
 
+* [Added] Testing for manual segmentation
+* [Fixed] Manual segmentation for lobulus border only
+
+## 0.10.*
 
 * [Added] Use manual lobulus segmentation with black color
 * [Fixed] Fixed problem in openslide with location idivisible by level scale

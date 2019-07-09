@@ -195,6 +195,7 @@ class Lobulus:
         # )
         self.image = self.view.get_region_image(as_gray=True)
         self.annotation_mask = self.view.get_annotation_region_raster(annotation_id=annotation_id)
+        self._im_gradient_border_frangi = None
         # self.anim.titles
         # self.anim.details
         pass
@@ -209,8 +210,12 @@ class Lobulus:
             use_manual = self.parameters.param(
                 # "Processing", "Lobulus Segmentation",
                 "Manual Segmentation").value()
+            # import pdb
+            # pdb.set_trace()
             if use_manual:
+
                 self.border_mask = seg_true.astype(np.uint8)
+                logger.debug("Manual segmentation ")
                 return
         self._im_gradient_border_frangi = skimage.filters.frangi(self.image)
         logger.debug("Image size {}".format(self.image.shape))
@@ -263,6 +268,8 @@ class Lobulus:
         sl = self.view.get_slices_for_insert_image_from_view(central_vein_view)
 
         image = central_vein_view.get_region_image(as_gray=True)
+        if self._im_gradient_border_frangi is None:
+            self._im_gradient_border_frangi = skimage.filters.frangi(self.image)
         im_gradient_border_frangi = self._im_gradient_border_frangi[sl]  # skimage.filters.frangi(image)
         im_gradient_base_inner = ms.gborders(image, alpha=1000, sigma=2)
         im_gradient_inner = im_gradient_base_inner - (im_gradient_border_frangi * 10000)
