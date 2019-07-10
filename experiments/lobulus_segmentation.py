@@ -54,7 +54,7 @@ mainapp.set_persistent_cols({
 })
 
 # mainapp.set_parameter("Processing;Lobulus Segmentation;Central Vein Segmentation;Threshold", 0.18)
-mainapp.set_parameter("Processing;Lobulus Segmentation;Central Vein Segmentation;Threshold", 0.17)
+mainapp.set_parameter("Processing;Lobulus Segmentation;Central Vein Segmentation;Threshold", 0.19)
 # mainapp.parameters.param("Processing", "Lobulus Segmentation", "Central Vein Segmentation", "Threshold").setValue(0.20)
 # mainapp.set_parameter("Processing;Run Skeleton Analysis", True)
 # mainapp.set_parameter("Processing;Run Texture Analysis", True)
