@@ -53,7 +53,8 @@ mainapp.set_persistent_cols({
     "Experiment Datetime": experiment_datetime.isoformat(" ", "seconds"),
 })
 
-mainapp.set_parameter("Processing;Lobulus Segmentation;Central Vein Segmentation;Threshold", 0.18)
+# mainapp.set_parameter("Processing;Lobulus Segmentation;Central Vein Segmentation;Threshold", 0.18)
+mainapp.set_parameter("Processing;Lobulus Segmentation;Central Vein Segmentation;Threshold", 0.16)
 # mainapp.set_parameter("Processing;Run Skeleton Analysis", True)
 # mainapp.set_parameter("Processing;Run Texture Analysis", True)
 mainapp.set_parameter("Processing;Lobulus Segmentation;Manual Segmentation", False)
