@@ -54,7 +54,8 @@ mainapp.set_persistent_cols({
 })
 
 # mainapp.set_parameter("Processing;Lobulus Segmentation;Central Vein Segmentation;Threshold", 0.18)
-mainapp.set_parameter("Processing;Lobulus Segmentation;Central Vein Segmentation;Threshold", 0.16)
+mainapp.set_parameter("Processing;Lobulus Segmentation;Central Vein Segmentation;Threshold", 0.17)
+# mainapp.parameters.param("Processing", "Lobulus Segmentation", "Central Vein Segmentation", "Threshold").setValue(0.20)
 # mainapp.set_parameter("Processing;Run Skeleton Analysis", True)
 # mainapp.set_parameter("Processing;Run Texture Analysis", True)
 mainapp.set_parameter("Processing;Lobulus Segmentation;Manual Segmentation", False)
@@ -71,7 +72,6 @@ def set_same(mainapp, fn):
     logger.debug(f"output dir: {str(odir)}")
     # mainapp.set_annotation_color_selection("#0000FF") # Blue is used for unlabeled
     mainapp.set_annotation_color_selection("#00FF00")
-    # mainapp.parameters.param("Processing", "Lobulus Segmentation", "Central Vein Segmentation", "Threshold").setValue(0.20)
     # mainapp.set_parameter("Processing;Lobulus Segmentation;Manual Segmentation", True)
 
 fns = [
@@ -85,58 +85,7 @@ fns = [
 
 ]
 
-# P001
 for fn in fns:
     set_same(mainapp, io3d.datasets.join_path(fn, get_root=True))
     mainapp.run_lobuluses(None)
 
-# # P002
-# fn = io3d.datasets.join_path(
-#     , get_root=True
-# )
-# set_same(mainapp, fn)
-# mainapp.run_lobuluses(None)
-#
-# fn = io3d.datasets.join_path(
-#     , get_root=True
-# )
-# set_same(mainapp, fn)
-# mainapp.run_lobuluses(None)
-#
-#
-# #############
-#
-# # mainapp.set_output_dir(experiment_dir/"PIG-003")
-# fn = io3d.datasets.join_path(
-#     , get_root=True
-# )
-# set_same(mainapp, fn)
-# # logger.debug(f"fn exists {Path(fn).exists()}, fn: {fn}")
-# # mainapp.set_input_file(fn)
-# # mainapp.set_annotation_color_selection("#00FF00")
-# mainapp.run_lobuluses(None)
-#
-# fn = io3d.datasets.join_path(
-#     , get_root=True
-# )
-# set_same(mainapp, fn)
-# mainapp.run_lobuluses(None)
-# #############
-#
-#
-#
-# # mainapp.set_output_dir(experiment_dir/"PIG-004")
-# fn = io3d.datasets.join_path(
-#     , get_root=True
-# )
-# # set_same(mainapp, fn)
-# # logger.debug(f"fn exists {Path(fn).exists()}, fn: {fn}")
-# # mainapp.set_input_file(fn)
-# # mainapp.set_annotation_color_selection("#00FF00")
-# mainapp.run_lobuluses(None)
-#
-# fn = io3d.datasets.join_path(
-#     , get_root=True
-# )
-# set_same(mainapp, fn)
-# mainapp.run_lobuluses(None)
