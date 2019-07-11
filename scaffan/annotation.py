@@ -61,11 +61,11 @@ def ndpa_to_json(path):
     :param path: path to file or dir contaning .ndpa files
     """
     # print(os.getenv("PATH"))
-    syspth =  os.getenv("PATH")
+    syspth = str(os.getenv("PATH"))
     ind = syspth.find("openslide")
     st = max(0, ind - 20)
     sp = min(len(syspth), ind + 20)
-    if 0 < ind:
+    if ind < 0:
         logger.debug(f"Not found 'openslide' in PATH: {syspth}")
     else:
         logger.debug(f'PATH: ...{syspth[st:sp]}...')
