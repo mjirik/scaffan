@@ -65,8 +65,10 @@ def ndpa_to_json(path):
     ind = syspth.find("openslide")
     st = max(0, ind - 20)
     sp = min(len(syspth), ind + 20)
-
-    logger.debug(f'PATH: ...{syspth[st:sp]}...')
+    if 0 < ind:
+        logger.debug(f"Not found 'openslide' in PATH: {syspth}")
+    else:
+        logger.debug(f'PATH: ...{syspth[st:sp]}...')
     if op.isfile(path):
         fn, ext = op.splitext(path)
         if ext == ".ndpi":
