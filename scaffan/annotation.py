@@ -61,7 +61,12 @@ def ndpa_to_json(path):
     :param path: path to file or dir contaning .ndpa files
     """
     # print(os.getenv("PATH"))
-    logger.debug(f'PATH: {os.getenv("PATH")}')
+    syspth =  os.getenv("PATH")
+    ind = syspth.find("openslide")
+    st = max(0, ind - 20)
+    sp = min(len(syspth), ind + 20)
+
+    logger.debug(f'PATH: ...{syspth[st:sp]}...')
     if op.isfile(path):
         fn, ext = op.splitext(path)
         if ext == ".ndpi":
