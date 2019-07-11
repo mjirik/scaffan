@@ -63,8 +63,8 @@ def ndpa_to_json(path):
     # print(os.getenv("PATH"))
     syspth = str(os.getenv("PATH"))
     ind = syspth.find("openslide")
-    st = max(0, ind - 20)
-    sp = min(len(syspth), ind + 20)
+    st = max(0, ind - 30)
+    sp = min(len(syspth), ind + 30)
     if ind < 0:
         logger.debug(f"Not found 'openslide' in PATH: {syspth}")
     else:
