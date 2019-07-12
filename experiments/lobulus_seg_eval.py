@@ -102,9 +102,9 @@ for fn in fns_green_blue:
     set_same(mainapp, io3d.datasets.join_path(fn, get_root=True), color="#0000FF")
     mainapp.run_lobuluses(None)
 
-for fn in fns_blue:
-    # set_same(mainapp, io3d.datasets.join_path(fn, get_root=True), color="#00FF00")
-    # mainapp.run_lobuluses(None)
-    set_same(mainapp, io3d.datasets.join_path(fn, get_root=True), color="#0000FF")
-    mainapp.run_lobuluses(None)
+# for fn in fns_blue:
+#     # set_same(mainapp, io3d.datasets.join_path(fn, get_root=True), color="#00FF00")
+#     # mainapp.run_lobuluses(None)
+#     set_same(mainapp, io3d.datasets.join_path(fn, get_root=True), color="#0000FF")
+#     mainapp.run_lobuluses(None)
 
