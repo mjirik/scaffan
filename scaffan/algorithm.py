@@ -46,6 +46,8 @@ class Scaffan:
         self.report: Report = scaffan.report.Report()
         self.report.level = 10
 
+        self.raise_exception_if_color_not_found = True
+
         import scaffan.texture as satex
         self.glcm_textures = satex.GLCMTextureMeasurement()
         self.lobulus_processing = scaffan.lobulus.Lobulus()
@@ -91,6 +93,14 @@ class Scaffan:
                     # BatchFileProcessingParameter(
                     #     name="Batch processing", children=[]
                     # ),
+                    # {
+                    #     "name": "Advanced",
+                    #     "type": "group",
+                    #     "children": [
+                    #         dict(name="Ignore not found color",type="bool", value=False,
+                    #              tip="No exception thrown if color not found in the data"),
+                    #     ]
+                    # }
                 ],
             },
             {
@@ -309,7 +319,9 @@ class Scaffan:
         # if color is None:
         #     color = list(self.anim.colors.keys())[0]
         # print(self.anim.colors)
-        annotation_ids = self.anim.select_annotations_by_color(color)
+        annotation_ids = self.anim.select_annotations_by_color(
+            color,
+            raise_exception_if_not_found=self.raise_exception_if_color_not_found)
         logger.debug("Annotation IDs: {}".format(annotation_ids))
         # if annotation_ids is None:
         #     logger.error("No color selected")
