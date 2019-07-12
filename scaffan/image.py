@@ -389,7 +389,8 @@ class AnnotatedImage:
             if id not in self.id_by_colors:
                 if raise_exception_if_not_found:
                     raise ColorError()
-                return None
+                # return None
+                return []
             id = self.id_by_colors[id]
         else:
             id = [id]
