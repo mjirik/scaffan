@@ -11,6 +11,7 @@
 
 # nastaveni domovskeho adresare, v promenne $LOGNAME je ulozeno vase prihlasovaci jmeno
 DATADIR="/storage/plzen1/home/$LOGNAME/projects/scaffan/experiments/metacentrum/"
+DATADIR="/storage/plzen4-ntis/projects/queetech/medical/processed/scaffan2019/metacentrum"
 # nebo snad "/storage/plzen4-ntis/home/$LOGNAME/"  ?
 
 # nacteni aplikacniho modulu, ktery zpristupni aplikaci Gaussian verze 3
@@ -37,13 +38,13 @@ cd $SCRATCHDIR || exit 1
 # spusteni aplikace - samotny vypocet
 export PATH=/storage/plzen1/home/$LOGNAME/miniconda3/bin:$PATH
 source activate scaffan
-echo /storage/plzen1/home/$LOGNAME/projects/scaffan/experiments/metacentrum/SA_experiments.xlsx
+#echo /storage/plzen1/home/$LOGNAME/projects/scaffan/experiments/metacentrum/SA_experiments.xlsx
 # this is because of python click
 export LC_ALL=C.UTF-8
 export LANG=C.UTF-8
 
 # python -m scaffan set --common-spreadsheet-file /storage/plzen1/home/$LOGNAME/projects/scaffan/experiments/metacentrum/SA_experiments.xlsx
- python -m scaffan set --common-spreadsheet-file /storage/plzen4-ntis/projects/queetech/medical/processed/scaffan2019/SA_experiments.xlsx
+python -m scaffan set --common-spreadsheet-file /storage/plzen4-ntis/projects/queetech/medical/processed/scaffan2019/metacentrum/SA_experiments.xlsx
 python -m io3d.datasets -sdp  /storage/plzen4-ntis/projects/queetech/
 python /storage/plzen1/home/$LOGNAME/projects/scaffan/experiments/lobulus_area_evaluation.py > results.out
 
