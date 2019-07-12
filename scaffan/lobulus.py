@@ -201,7 +201,8 @@ class Lobulus:
         pass
 
     def find_border(self, show=True):
-        outer_ids = self.anim.select_outer_annotations(self.annotation_id, color="#000000")
+        outer_ids = self.anim.select_outer_annotations(self.annotation_id, color="#000000",
+                                                       raise_exception_if_not_found=False)
         if len(outer_ids) > 1:
             logger.warning("More than one outer annotation find to annotation with ID %i", self.annotation_id)
         elif len(outer_ids) > 0:
@@ -276,6 +277,7 @@ class Lobulus:
         if self._im_gradient_border_frangi is None:
             self._im_gradient_border_frangi = skimage.filters.frangi(self.image)
         im_gradient_border_frangi = self._im_gradient_border_frangi[sl]  # skimage.filters.frangi(image)
+        # gborders us internally: scipy.ndimage.filters.gaussian_gradient_magnitude
         im_gradient_base_inner = ms.gborders(image, alpha=1000, sigma=2)
         im_gradient_inner = im_gradient_base_inner - (im_gradient_border_frangi * 10000)
         if use_texture_features:
