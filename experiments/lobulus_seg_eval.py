@@ -54,7 +54,7 @@ mainapp.set_persistent_cols({
 })
 
 # mainapp.set_parameter("Processing;Lobulus Segmentation;Central Vein Segmentation;Threshold", 0.18)
-mainapp.set_parameter("Processing;Lobulus Segmentation;Central Vein Segmentation;Threshold", 0.20)
+# mainapp.set_parameter("Processing;Lobulus Segmentation;Central Vein Segmentation;Threshold", 0.20)
 # mainapp.parameters.param("Processing", "Lobulus Segmentation", "Central Vein Segmentation", "Threshold").setValue(0.20)
 # mainapp.set_parameter("Processing;Run Skeleton Analysis", True)
 # mainapp.set_parameter("Processing;Run Texture Analysis", True)
@@ -62,6 +62,8 @@ mainapp.set_parameter("Processing;Lobulus Segmentation;Manual Segmentation", Fal
 
 mainapp.set_parameter("Processing;Run Skeleton Analysis", False)
 mainapp.set_parameter("Processing;Run Texture Analysis", False)
+mainapp.raise_exception_if_color_not_found = False
+
 # mainapp.set_parameter("Processing;Lobulus Segmentation;Manual Segmentation", True)
 
 def set_same(mainapp, fn, color="#00FF00"):
@@ -74,20 +76,35 @@ def set_same(mainapp, fn, color="#00FF00"):
     mainapp.set_annotation_color_selection(color)
     # mainapp.set_parameter("Processing;Lobulus Segmentation;Manual Segmentation", True)
 
-fns = [
+fns_green_blue = [
+    "medical/orig/Scaffan-analysis/PIG-001_J-17-0569_LM_HE.ndpi",
     "medical/orig/Scaffan-analysis/PIG-001_J-17-0571_LM central_HE.ndpi",
     "medical/orig/Scaffan-analysis/PIG-002_J-18-0091_HE.ndpi",
     "medical/orig/Scaffan-analysis/PIG-002_J-18-0092_HE.ndpi",
+    # "medical/orig/Scaffan-analysis/PIG-002_J-18-0094_HE_rescan.ndpi", # bad focus
     "medical/orig/Scaffan-analysis/PIG-003_J-18-0165_HE.ndpi",
     "medical/orig/Scaffan-analysis/PIG-003_J-18-0166_HE.ndpi",
+    "medical/orig/Scaffan-analysis/PIG-003_J-18-0167_HE.ndpi",
+    "medical/orig/Scaffan-analysis/PIG-003_J-18-0168_HE.ndpi",
+    "medical/orig/Scaffan-analysis/PIG-003_J-18-0169_HE.ndpi",
+    "medical/orig/Scaffan-analysis/PIG-003_J-18-0170_HE.ndpi",
+    "medical/orig/Scaffan-analysis/PIG-004_BBJ-004-2 _HE_parenchyme.ndpi",
+    # "medical/orig/Scaffan-analysis/PIG-004_BBJ-004-3 _HE_parenchyme.ndpi",
     "medical/orig/Scaffan-analysis/PIG-004_BBJ-004-4_HE_parenchyme.ndpi",
-    "medical/orig/Scaffan-analysis/PIG-004_BBJ-004-2 _HE_parenchyme.ndpi"
+    # "medical/orig/Scaffan-analysis/PIG-005_J-18-0633_HE_PRML per decell.ndpi",
+
 
 ]
 
-for fn in fns:
+for fn in fns_green_blue:
     set_same(mainapp, io3d.datasets.join_path(fn, get_root=True), color="#00FF00")
     mainapp.run_lobuluses(None)
+    set_same(mainapp, io3d.datasets.join_path(fn, get_root=True), color="#0000FF")
+    mainapp.run_lobuluses(None)
+
+for fn in fns_blue:
+    # set_same(mainapp, io3d.datasets.join_path(fn, get_root=True), color="#00FF00")
+    # mainapp.run_lobuluses(None)
     set_same(mainapp, io3d.datasets.join_path(fn, get_root=True), color="#0000FF")
     mainapp.run_lobuluses(None)
 
