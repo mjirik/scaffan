@@ -26,13 +26,39 @@ The resolution of image is changed to 1.82um. It is enough to keep all important
 structures visible and also keep the computation time low. 
 
 The preprocessing step of lobulus segmentation is to use Hessian based Frangi 
-filter [Frangi, Kroon] to make the 
+filter [Frangi](#frangi), [Kroon](#kroon) to supress the high-frequency signal 
+in lobulus area and to make the lobulus border more dominant. Then a method 
+Morphological Active Contours without Edges described in (Casselles)[#casselles], 
+(Neila)[#neila] and (Avarez)[#avarez] is used to extract outer boundary of liver
+lobulus. 
+
+Due to lower contrast the segmentation of Central Vein is more complex task. 
+We use the texture analysis to detect roughly the area of Central Vein. 
+Gradient magnitude filtration using Gaussian derivatives combined with the 
+Frangi filter is used to have more details of the shape of Central Vein.
 
 
 
-References:
-[Frangi]
+
+
+
+# References:
+
+## Frangi
 A. Frangi, W. Niessen, K. Vincken, and M. Viergever. “Multiscale vessel enhancement filtering,” In LNCS, vol. 1496, pages 130-137, Germany, 1998. Springer-Verlag
 
-[Kroon]
+## Kroon
 Kroon, D.J.: Hessian based Frangi vesselness filter.
+
+
+## Neila
+A Morphological Approach to Curvature-based Evolution of Curves and Surfaces, Pablo Márquez-Neila, Luis Baumela and Luis Álvarez. In IEEE Transactions on Pattern Analysis and Machine Intelligence (PAMI), 2014, DOI 10.1109/TPAMI.2013.106
+
+## Alvarez
+Morphological Snakes. Luis Álvarez, Luis Baumela, Pablo Márquez-Neila. In Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition 2010 (CVPR10).
+
+## Casselles
+Geodesic Active Contours, Vicent Caselles, Ron Kimmel and Guillermo Sapiro. In International Journal of Computer Vision (IJCV), 1997, DOI:10.1023/A:1007979827043
+
+## Chan
+Active Contours without Edges, Tony Chan and Luminita Vese. In IEEE Transactions on Image Processing, 2001, DOI:10.1109/83.902291
