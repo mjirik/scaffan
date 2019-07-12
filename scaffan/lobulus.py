@@ -7,11 +7,13 @@ Process lobulus analysis.
 from loguru import logger
 import skimage.filters
 from skimage.morphology import skeletonize
+import skimage.measure
 import skimage.io
 import copy
 import scipy.signal
 import scipy.ndimage
 import os.path as op
+
 import numpy as np
 import warnings
 import morphsnakes as ms
@@ -357,9 +359,17 @@ class Lobulus:
         if self.report is not None:
             self.report.savefig_and_show("lobulus_{}.png".format(self.annotation_id), fig)
         self.lobulus_mask = (self.central_vein_mask + self.border_mask) == 1
-        datarow["Area"] = np.sum(self.lobulus_mask) * np.prod(
+        area_px = np.sum(self.lobulus_mask)
+        datarow["Area"] = area_px * np.prod(
             self.view.region_pixelsize
         )
+        rprops = skimage.measure.regionprops(self.lobulus_mask)
+        perimeter_px = skimage.measure.perimeter(self.lobulus_mask,neighbourhood=8)
+        logger.debug(f"len rprops: {len(rprops)}")
+        datarow["Lobulus Perimeter"] = perimeter_px * self.view.region_pixelsize[0]
+        datarow["Lobulus Boundary Noncompactness"] = perimeter_px**2 / area_px
+        datarow["Lobulus Equivalent Diameter"] = datarow["Lobulus Perimeter"] / np.pi
+        datarow["Lobulus Equivalent Surface"] = np.pi * datarow["Lobulus Equivalent Diameter"]**2 / 4.0
 
         datarow["Central vein area"] = np.sum(self.central_vein_mask > 0) * np.prod(
             self.view.region_pixelsize
