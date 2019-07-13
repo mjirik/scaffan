@@ -270,8 +270,8 @@ class Lobulus:
         tfeatures[:, :, 2] = 1 - tfeatures[:, :, 2]
         tfeatures0 = np.mean(tfeatures, 2)
         if self.report is not None:
-            self.report.imsave_as_fig("gradient_texture_color_{}.png".format(self.annotation_id), tfeatures)
-            self.report.imsave_as_fig("gradient_texture_mean_{}.png".format(self.annotation_id), tfeatures0)
+            self.report.imsave_as_fig("gradient_texture_color_{}.png".format(self.annotation_id), tfeatures, level=35)
+            self.report.imsave_as_fig("gradient_texture_mean_{}.png".format(self.annotation_id), tfeatures0, level=35)
 
         sl = self.view.get_slices_for_insert_image_from_view(central_vein_view)
 
@@ -285,9 +285,9 @@ class Lobulus:
         if use_texture_features:
             im_gradient_inner *= (1 - imma.image.resize_to_shape(tfeatures0, im_gradient_inner.shape))
         if self.report is not None:
-            self.report.imsave_as_fig("gradient_inner_frangi_{}.png".format(self.annotation_id), im_gradient_border_frangi)
-            self.report.imsave_as_fig("gradient_base_inner_{}.png".format(self.annotation_id), im_gradient_base_inner)
-            self.report.imsave_as_fig("gradient_inner_{}.png".format(self.annotation_id), im_gradient_inner)
+            self.report.imsave_as_fig("gradient_inner_frangi_{}.png".format(self.annotation_id), im_gradient_border_frangi, level=35)
+            self.report.imsave_as_fig("gradient_base_inner_{}.png".format(self.annotation_id), im_gradient_base_inner, level=35)
+            self.report.imsave_as_fig("gradient_inner_{}.png".format(self.annotation_id), im_gradient_inner, level=35)
         # circle = circle_level_set(imgr.shape, size2, 75, scalerow=0.75)
         circle = self.annotation_mask[sl]
         # plt.figure()
@@ -357,7 +357,7 @@ class Lobulus:
         datarow["Annotation Details"] = self.anim.annotations[numeric_id]["details"] #[self.annotation_id]
         # datarow["Annotation Details"] = self.anim.details[self.annotation_id]
         if self.report is not None:
-            self.report.savefig_and_show("lobulus_{}.png".format(self.annotation_id), fig)
+            self.report.savefig_and_show("lobulus_{}.png".format(self.annotation_id), fig, level=80)
         self.lobulus_mask = (self.central_vein_mask + self.border_mask) == 1
         area_px = np.sum(self.lobulus_mask)
         datarow["Area"] = area_px * np.prod(
