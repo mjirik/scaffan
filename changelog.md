@@ -5,6 +5,7 @@
 ## 0.12
 
 * [Added] Ability to supress exception if no color found (usefull for batch processing)
+* [Added] Calculate perimeter of lobulus
 
 
 ## 0.11
