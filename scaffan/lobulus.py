@@ -224,7 +224,7 @@ class Lobulus:
         logger.debug("Image size {}".format(self.image.shape))
         circle = self.annotation_mask
         if self.report is not None:
-            self.report.imsave_as_fig("gradient_outer.png", self._im_gradient_border_frangi)
+            self.report.imsave_as_fig("gradient_outer_{}.png", self._im_gradient_border_frangi, level=30)
         param_acwe_smoothing = self.parameters.param("Border Segmentation", "Smoothing").value()
         param_acwe_lambda1 =   self.parameters.param("Border Segmentation", "Lambda1").value()
         param_acwe_lambda2 =   self.parameters.param("Border Segmentation", "Lambda2").value()
