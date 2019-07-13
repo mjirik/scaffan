@@ -63,6 +63,7 @@ mainapp.set_parameter("Processing;Lobulus Segmentation;Manual Segmentation", Fal
 mainapp.set_parameter("Processing;Run Skeleton Analysis", False)
 mainapp.set_parameter("Processing;Run Texture Analysis", False)
 mainapp.raise_exception_if_color_not_found = False
+mainapp.set_report_level(10)
 
 # mainapp.set_parameter("Processing;Lobulus Segmentation;Manual Segmentation", True)
 
