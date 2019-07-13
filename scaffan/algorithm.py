@@ -44,7 +44,7 @@ class Scaffan:
     def __init__(self):
 
         self.report: Report = scaffan.report.Report()
-        self.report.level = 50
+        # self.report.level = 50
 
         self.raise_exception_if_color_not_found = True
 
