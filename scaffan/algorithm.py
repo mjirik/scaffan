@@ -184,6 +184,7 @@ class Scaffan:
         self.set_input_file(fn)
 
     def set_input_file(self, fn):
+        fn = str(fn)
         fnparam = self.parameters.param("Input", "File Path")
         fnparam.setValue(fn)
         logger.debug("Set Input File Path to : {}".format(fn))
@@ -192,7 +193,7 @@ class Scaffan:
 
     def set_output_dir(self, path):
         fnparam = self.parameters.param("Output", "Directory Path")
-        fnparam.setValue(path)
+        fnparam.setValue(str(path))
 
     def set_common_spreadsheet_file(self, path):
         fnparam = self.parameters.param("Output", "Common Spreadsheet File")
