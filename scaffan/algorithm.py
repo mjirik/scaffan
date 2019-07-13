@@ -323,7 +323,7 @@ class Scaffan:
         # print("color ", pcolor.value())
         # color = pcolor.reverse[0][pcolor.value()]
         color = pcolor.value()
-        self.report.level = self.parameters.param("Processing", "Report Level")
+        self.report.level = self.parameters.param("Processing", "Report Level").value()
         # print("Color ", color)
         # fnparam = self.parameters.param("Input", "File Path")
         # from .image import AnnotatedImage
