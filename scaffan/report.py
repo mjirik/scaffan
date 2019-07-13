@@ -95,7 +95,7 @@ class Report:
             append_df_to_excel(filename, self.df)
             # append_df_to_excel_no_head_processing(filename, self.df)
 
-    def imsave(self, base_fn, arr:np.ndarray, k=50):
+    def imsave(self, base_fn, arr:np.ndarray, k=50, level=50, npz_level=40):
         """
         :param base_fn: with a format slot for annotation id like "skeleton_{}.png"
         :param arr:
@@ -107,13 +107,14 @@ class Report:
             fn = op.join(self.outputdir, filename + "_fig" + ext)
             plt.imsave(fn, arr)
 
-            with warnings.catch_warnings():
-                warnings.filterwarnings("ignore", ".*low contrast image.*")
-                # warnings.simplefilter("low contrast image")
-                fn = op.join(self.outputdir, filename + ext)
-                skimage.io.imsave(fn, k * arr)
-
-            self._save_arr(base_fn, arr)
+            if self._is_under_level(level):
+                with warnings.catch_warnings():
+                    warnings.filterwarnings("ignore", ".*low contrast image.*")
+                    # warnings.simplefilter("low contrast image")
+                    fn = op.join(self.outputdir, filename + ext)
+                    skimage.io.imsave(fn, k * arr)
+            if self._is_under_level(npz_level):
+                self._save_arr(base_fn, arr)
 
     def _save_arr(self, base_fn, arr:np.ndarray):
         """
@@ -138,9 +139,16 @@ class Report:
 
         return arr
 
-    def imsave_as_fig(self, base_fn, arr, level=60):
+    def imsave_as_fig(self, base_fn, arr, level=60, npz_level=30):
+        """
+        Save given array as figure and save array as npy as well.
+        :param base_fn:
+        :param arr:
+        :param level:
+        :return:
+        """
+        filename, ext = op.splitext(base_fn)
         if self._is_under_level(level):
-            filename, ext = op.splitext(base_fn)
             fig = plt.figure()
             plt.imshow(arr)
             plt.colorbar()
@@ -151,6 +159,7 @@ class Report:
                 plt.show()
             else:
                 plt.close(fig)
+        if self._is_under_level(npz_level):
             self._save_arr(base_fn, arr)
 
     # def add_array(self, base_fn, arr, k=50):

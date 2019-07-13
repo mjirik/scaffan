@@ -358,7 +358,9 @@ class Lobulus:
         # datarow["Annotation Details"] = self.anim.details[self.annotation_id]
         if self.report is not None:
             self.report.savefig_and_show("lobulus_{}.png".format(self.annotation_id), fig, level=80)
+
         self.lobulus_mask = (self.central_vein_mask + self.border_mask) == 1
+        self.report.imsave_as_fig(f"lobulus_mask_{self.annotation_id}.png", self.lobulus_mask, level=70, npz_level=55)
         area_px = np.sum(self.lobulus_mask)
         datarow["Area"] = area_px * np.prod(
             self.view.region_pixelsize

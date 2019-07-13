@@ -6,6 +6,8 @@
 
 * [Added] Ability to supress exception if no color found (usefull for batch processing)
 * [Added] Calculate perimeter of lobulus
+* [Added] Set report level from GUI
+* [Changed] Report levels for various output images
 
 
 ## 0.11

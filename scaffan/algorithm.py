@@ -44,7 +44,7 @@ class Scaffan:
     def __init__(self):
 
         self.report: Report = scaffan.report.Report()
-        self.report.level = 10
+        self.report.level = 50
 
         self.raise_exception_if_color_not_found = True
 
@@ -155,6 +155,13 @@ class Scaffan:
                     self.lobulus_processing.parameters,
                     self.skeleton_analysis.parameters,
                     self.glcm_textures.parameters,
+                    {
+                        "name": "Report Level",
+                        "type": "int",
+                        "value": 50,
+                        "tip": "Control ammount of stored images. 0 - all debug imagess will be stored. "
+                               "100 - just important images will be saved.",
+                    },
                     {"name": "Run", "type": "action"},
                 ],
             },
@@ -194,6 +201,10 @@ class Scaffan:
     def set_output_dir(self, path):
         fnparam = self.parameters.param("Output", "Directory Path")
         fnparam.setValue(str(path))
+
+    def set_report_level(self, level:int):
+        fnparam = self.parameters.param("Processing", "Report Level")
+        fnparam.setValue(level)
 
     def set_common_spreadsheet_file(self, path):
         fnparam = self.parameters.param("Output", "Common Spreadsheet File")
@@ -312,6 +323,7 @@ class Scaffan:
         # print("color ", pcolor.value())
         # color = pcolor.reverse[0][pcolor.value()]
         color = pcolor.value()
+        self.report.level = self.parameters.param("Processing", "Report Level")
         # print("Color ", color)
         # fnparam = self.parameters.param("Input", "File Path")
         # from .image import AnnotatedImage
