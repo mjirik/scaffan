@@ -13,12 +13,20 @@ Second step is lobulus description. Input of this process is the lobulus area.
 Texture in this area is described with several methods. 
 These methods were corelated with manual annotation.
 
+Application Scaffan is open-source software hosted on GitHub and written in (Python)[#python]. 
+The packages (Numpy)[#numpy], (Scipy)[#scipy], (Scikit-image)[#scikit-image] are used for 
+general image processing. The morphsnakes package ((Neila)[#neila] and (Avarez)[#avares]) 
+are used for segmentation tasks.
+
+
 
 ## Lobulus segmentation
 
 Initial step of lobulus segmentation is user interactivity over the image slice.
 User is expected to draw closed curve around the central vein of examined lobulus.
-This curve is used in several moments of processing. At first, the input image is 
+This curve is used in several moments of processing. 
+
+At first, the input image is 
 cropped around input curve with margin size defined by Annotation Margin parameter 
 (default vaule is 180%).
 The image area should be big enough to cover whole area of lobulus. 
@@ -37,6 +45,15 @@ We use the texture analysis to detect roughly the area of Central Vein.
 Gradient magnitude filtration using Gaussian derivatives combined with the 
 Frangi filter is used to have more details of the shape of Central Vein.
 
+## Lobulus analysis
+
+TODO
+
+
+## User interface
+
+Scaffan work with image data in `.ndpi` format and `.ndpa` annotation . This annotation can be prepared in Hamamatsu 
+NDP.view 2 application. Scaffan require to annotate each lobulus by closed curve around central vein.
 
 
 
@@ -62,3 +79,41 @@ Geodesic Active Contours, Vicent Caselles, Ron Kimmel and Guillermo Sapiro. In I
 
 ## Chan
 Active Contours without Edges, Tony Chan and Luminita Vese. In IEEE Transactions on Image Processing, 2001, DOI:10.1109/83.902291
+
+## Python
+
+@book{van1995python, 
+  title={Python tutorial}, 
+  author={Van Rossum, Guido and Drake Jr, Fred L}, 
+  year={1995}, 
+  publisher={Centrum voor Wiskunde en Informatica Amsterdam, The Netherlands} 
+}
+
+## Numpy
+@book{book,
+author = {Oliphant, Travis},
+year = {2006},
+month = {01},
+pages = {},
+title = {Guide to NumPy}
+}
+
+## Scipy
+@Misc{, 
+  author =    {Eric Jones and Travis Oliphant and Pearu Peterson and others}, 
+  title =     {{SciPy}: Open source scientific tools for {Python}}, 
+  year =      {2001--}, 
+  url = "http://www.scipy.org/", 
+  note = {[Online; accessed ]} 
+}
+
+## Scikit-image
+@article{van2014scikit, 
+  title={scikit-image: image processing in Python}, 
+  author={Van der Walt, Stefan and Sch{\"o}nberger, Johannes L and Nunez-Iglesias, Juan and Boulogne, Fran{\c{c}}ois and Warner, Joshua D and Yager, Neil and Gouillart, Emmanuelle and Yu, Tony}, 
+  journal={PeerJ}, 
+  volume={2}, 
+  pages={e453}, 
+  year={2014}, 
+  publisher={PeerJ Inc.} 
+}
