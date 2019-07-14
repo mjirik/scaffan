@@ -225,14 +225,32 @@ class GLCMTextureMeasurement:
 
         if self.lobulus_segmentation is None:
             seg = (slice(None), slice(None))
-        row = {
-            "GLCM Energy": np.mean(e0[seg]),
-            "GLCM Homogenity": np.mean(e1[seg]),
-            "GLCM Correlation": np.mean(e2[seg]),
-        }
+        row = {}
+        row = make_stats("GLCM Energy", e0[seg], row)
+        row = make_stats("GLCM Homogenity", e1[seg], row)
+        row = make_stats("GLCM Correlation", e2[seg], row)
+        # row = {
+        #     "GLCM Energy": np.mean(e0[seg]),
+        #     "GLCM Homogenity": np.mean(e1[seg]),
+        #     "GLCM Correlation": np.mean(e2[seg]),
+        # }
         if self.add_cols_to_report:
             self.report.add_cols_to_actual_row(row)
         # plt.show()
+
+def make_stats(data, prefix:str, dct=None):
+    if dct is None:
+        dct = {}
+
+    dct[prefix] = np.mean(data)
+    dct[f"{prefix} var"] = np.var(data)
+    dct[f"{prefix} p10"] = np.percentile(data, 10)
+    dct[f"{prefix} p25"] = np.percentile(data, 25)
+    dct[f"{prefix} p50"] = np.percentile(data, 50)
+    dct[f"{prefix} p75"] = np.percentile(data, 75)
+    dct[f"{prefix} p90"] = np.percentile(data, 90)
+    return dct
+
 
 
 class TextureSegmentation:

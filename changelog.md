@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 0.13
+
+* [Added] GLCM texture feature percentile added
+
 ## 0.12
 
 * [Added] Ability to supress exception if no color found (usefull for batch processing)
