@@ -112,7 +112,7 @@ def read_annotations(pth):
             logger.error(traceback.format_exc())
             logger.debug(f"Command {' '.join(command)}")
             logger.debug(f"Command '{e.cmd}' returned with code {e.returncode}")
-            logger.debug(f"Output of command: \n{e.output}")
+            logger.debug(f"Output of command: \n{e.output.decode()}")
             exit(e.returncode)
             # raise RuntimeError("command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))
 

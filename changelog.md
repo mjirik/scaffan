@@ -6,6 +6,7 @@
 
 * [Changed] Compacntess definition
 * [Fixed] Problem with percentile evaluation
+* [Fixed] Debug print on annotation read fail
 
 ## 0.13
 
