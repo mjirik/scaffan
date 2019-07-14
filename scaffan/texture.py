@@ -238,7 +238,16 @@ class GLCMTextureMeasurement:
             self.report.add_cols_to_actual_row(row)
         # plt.show()
 
-def make_stats(data, prefix:str, dct=None):
+
+def make_stats(prefix:str, data, dct=None):
+    """
+    Calculate mean, variance and 10, 25, 75 and 90 percentiles. Output
+    is stored to dict with key starting with `prefix`
+    :param prefix: prefix of output dict key
+    :param data: numeric data to analyze
+    :param dct: input dict. Empty dict is created if None is given.
+    :return:
+    """
     if dct is None:
         dct = {}
 
