@@ -369,7 +369,7 @@ class Lobulus:
         # logger.debug(f"len rprops: {len(rprops)}")
         perimeter_px = skimage.measure.perimeter(self.lobulus_mask,neighbourhood=8)
         datarow["Lobulus Perimeter"] = perimeter_px * self.view.region_pixelsize[0]
-        datarow["Lobulus Boundary Noncompactness"] = perimeter_px**2 / area_px
+        datarow["Lobulus Boundary Compactness"] = 4* np.pi * area_px / perimeter_px**2
         datarow["Lobulus Equivalent Diameter"] = datarow["Lobulus Perimeter"] / np.pi
         datarow["Lobulus Equivalent Surface"] = np.pi * datarow["Lobulus Equivalent Diameter"]**2 / 4.0
 

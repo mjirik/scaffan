@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+## 0.14
+
+* [Changed] Compacntess definition
+* [Fixed] Problem with percentile evaluation
+
 ## 0.13
 
 * [Added] GLCM texture feature percentile added
