@@ -35,6 +35,7 @@ class LobulusTest(unittest.TestCase):
         mainapp.set_input_file(fn)
         mainapp.set_output_dir(str(output_dir))
         mainapp.init_run()
+        mainapp.set_report_level(10)
         # Yellow
         mainapp.set_annotation_color_selection("#FFFF00")
         # mainapp.parameters.param("Processing", "Show").setValue(True)
