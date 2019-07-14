@@ -14,9 +14,9 @@ Texture in this area is described with several methods.
 These methods were corelated with manual annotation.
 
 Application Scaffan is open-source software hosted on GitHub and written in (Python)[#python]. 
-The packages (Numpy)[#numpy], (Scipy)[#scipy], (Scikit-image)[#scikit-image] are used for 
+The packages (Numpy)[#numpy], (Scipy)[#scipy], (Scikit-image)[#sciklimage] are used for 
 general image processing. The morphsnakes package ((Neila)[#neila] and (Avarez)[#avares]) 
-are used for segmentation tasks.
+are used for segmentation tasks. For machine learning the (Scikit-learn)[#sklean] is used.
 
 
 
@@ -107,7 +107,7 @@ title = {Guide to NumPy}
   note = {[Online; accessed ]} 
 }
 
-## Scikit-image
+## Scikimage
 @article{van2014scikit, 
   title={scikit-image: image processing in Python}, 
   author={Van der Walt, Stefan and Sch{\"o}nberger, Johannes L and Nunez-Iglesias, Juan and Boulogne, Fran{\c{c}}ois and Warner, Joshua D and Yager, Neil and Gouillart, Emmanuelle and Yu, Tony}, 
@@ -116,4 +116,33 @@ title = {Guide to NumPy}
   pages={e453}, 
   year={2014}, 
   publisher={PeerJ Inc.} 
+}
+
+## Sciklearn
+
+@article{scikit-learn,
+ title={Scikit-learn: Machine Learning in {P}ython},
+ author={Pedregosa, F. and Varoquaux, G. and Gramfort, A. and Michel, V.
+         and Thirion, B. and Grisel, O. and Blondel, M. and Prettenhofer, P.
+         and Weiss, R. and Dubourg, V. and Vanderplas, J. and Passos, A. and
+         Cournapeau, D. and Brucher, M. and Perrot, M. and Duchesnay, E.},
+ journal={Journal of Machine Learning Research},
+ volume={12},
+ pages={2825--2830},
+ year={2011}
+}
+
+## Sklearn API
+
+@inproceedings{sklearn_api,
+  author    = {Lars Buitinck and Gilles Louppe and Mathieu Blondel and
+               Fabian Pedregosa and Andreas Mueller and Olivier Grisel and
+               Vlad Niculae and Peter Prettenhofer and Alexandre Gramfort
+               and Jaques Grobler and Robert Layton and Jake VanderPlas and
+               Arnaud Joly and Brian Holt and Ga{\"{e}}l Varoquaux},
+  title     = {{API} design for machine learning software: experiences from the scikit-learn
+               project},
+  booktitle = {ECML PKDD Workshop: Languages for Data Mining and Machine Learning},
+  year      = {2013},
+  pages = {108--122},
 }
