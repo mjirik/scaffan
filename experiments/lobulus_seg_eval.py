@@ -60,8 +60,8 @@ mainapp.set_persistent_cols({
 # mainapp.set_parameter("Processing;Run Texture Analysis", True)
 mainapp.set_parameter("Processing;Lobulus Segmentation;Manual Segmentation", False)
 
-mainapp.set_parameter("Processing;Run Skeleton Analysis", False)
-mainapp.set_parameter("Processing;Run Texture Analysis", False)
+mainapp.set_parameter("Processing;Run Skeleton Analysis", True)
+mainapp.set_parameter("Processing;Run Texture Analysis", True)
 mainapp.raise_exception_if_color_not_found = False
 mainapp.set_report_level(10)
 
