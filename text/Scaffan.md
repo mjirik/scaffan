@@ -57,7 +57,15 @@ NDP.view 2 application. Scaffan require to annotate each lobulus by closed curve
 
 
 
+## Annotation 
 
+`SNI`: Sinusoid Integrity <0,2>
+`CMP`: Compactness <0,1>
+`IFE`: Image Focus Error <0,1>
+`AIS`: Anisotropy <0,1> 0 for random orientation, 1 for big directionality
+`SQZ`: Squeeze (maybe different types? anisotropic(getting suqeezed), isotropic (getting small))
+
+texture problem - local / global
 
 # References:
 
