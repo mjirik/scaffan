@@ -78,6 +78,7 @@ def set_same(mainapp, fn, color="#00FF00"):
     # mainapp.set_parameter("Processing;Lobulus Segmentation;Manual Segmentation", True)
 
 fns_green_blue = [
+    "medical/orig/Scaffan-analysis/PIG-001_J-17-0567_edge RM_HE.ndpi",  # neu
     "medical/orig/Scaffan-analysis/PIG-001_J-17-0569_LM_HE.ndpi",
     "medical/orig/Scaffan-analysis/PIG-001_J-17-0571_LM central_HE.ndpi",
     "medical/orig/Scaffan-analysis/PIG-002_J-18-0091_HE.ndpi",
@@ -93,6 +94,9 @@ fns_green_blue = [
     # "medical/orig/Scaffan-analysis/PIG-004_BBJ-004-3 _HE_parenchyme.ndpi",
     "medical/orig/Scaffan-analysis/PIG-004_BBJ-004-4_HE_parenchyme.ndpi",
     # "medical/orig/Scaffan-analysis/PIG-005_J-18-0633_HE_PRML per decell.ndpi",
+
+    "medical/orig/Scaffan-analysis/PIG-008_P008 LL-C_HE_parenchyme centr..ndpi",
+    "medical/orig/Scaffan-analysis/PIG-008_P008 LL-P_HE_parenchyme perif..ndpi",
 
 
 ]
