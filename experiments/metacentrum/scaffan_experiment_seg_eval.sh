@@ -1,6 +1,6 @@
 #!/bin/bash
 #PBS -l select=1:ncpus=2:mem=16gb:scratch_local=10gb
-#PBS -l walltime=08:00:00
+#PBS -l walltime=016:00:00
 # modify/delete the above given guidelines according to your job's needs
 # Please note that only one select= argument is allowed at a time.
 
