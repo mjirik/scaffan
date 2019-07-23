@@ -78,7 +78,7 @@ def set_same(mainapp, fn, color="#00FF00"):
     # mainapp.set_parameter("Processing;Lobulus Segmentation;Manual Segmentation", True)
 
 fns_green_blue = [
-    "medical/orig/Scaffan-analysis/PIG-001_J-17-0567_edge RM_HE.ndpi",  # neu
+    # "medical/orig/Scaffan-analysis/PIG-001_J-17-0567_edge RM_HE.ndpi",  # no annotation
     "medical/orig/Scaffan-analysis/PIG-001_J-17-0569_LM_HE.ndpi",
     "medical/orig/Scaffan-analysis/PIG-001_J-17-0571_LM central_HE.ndpi",
     "medical/orig/Scaffan-analysis/PIG-002_J-18-0091_HE.ndpi",
