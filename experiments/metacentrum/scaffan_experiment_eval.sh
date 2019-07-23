@@ -17,6 +17,7 @@ DATADIR="/storage/plzen4-ntis/projects/queetech/medical/processed/scaffan2019/me
 # nacteni aplikacniho modulu, ktery zpristupni aplikaci Gaussian verze 3
 # module add g03
 
+echo "job: $PBS_JOBID running on: `uname -n`" >result # just an example computation
 
 SOURCE="${BASH_SOURCE[0]}"
 while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink

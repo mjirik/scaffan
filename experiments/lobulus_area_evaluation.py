@@ -9,6 +9,7 @@ import os.path as op
 import sys
 from pathlib import Path
 import datetime
+import time
 
 experiment_datetime = datetime.datetime.now()
 experiment_datetime_fn = experiment_datetime.strftime("%Y%m%d-%H%M%S")
@@ -50,6 +51,7 @@ mainapp = scaffan.algorithm.Scaffan()
 mainapp.set_persistent_cols({
     "Experiment Title": experiment_title,
     "Experiment Datetime": experiment_datetime.isoformat(" ", "seconds"),
+    "Job ID": os.environ['PBS_JOBID'] if "PBS_JOBID" in os.environ.keys() else f"{time.time()}"
 })
 
 mainapp.set_parameter("Processing;Lobulus Segmentation;Central Vein Segmentation;Threshold", 0.18)
