@@ -4,7 +4,7 @@
 # modify/delete the above given guidelines according to your job's needs
 # Please note that only one select= argument is allowed at a time.
 
-# # PBS -l select=1:ncpus=2:mem=1gb:scratch_local=4gb
+# # PBS -l select=1:ncpus=1:mem=1gb:scratch_local=4gb
 
 # add to qsub with:
 # qsub scaffan_experiment_1.sh
