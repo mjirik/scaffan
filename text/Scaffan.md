@@ -9,7 +9,7 @@ localization of examined lobulus is known. This information is used as initial
 step for iterative segmentation algortihm. Output of this process is delineation
 lobulus boundary and central vein. 
 
-Second step is lobulus description. Input of this process is the lobulus area. 
+Second step is lobulus area description. Input of this process is the lobulus area. 
 Texture in this area is described with several methods. 
 These methods were corelated with manual annotation.
 
@@ -47,18 +47,41 @@ Frangi filter is used to have more details of the shape of Central Vein.
 
 ## Lobulus analysis
 
-TODO
+To describe texture properties in the Gray Level Cooccurence Matrix texture features 
+described in (Haralick)[#haralick] and (Texture Analysis)[#texture-analysis] 
+Additionally the manually crafted features were used. 
+
+![texture features](SNI_features.png)
 
 
-## User interface
+## Segmentation evaluation
 
-Scaffan work with image data in `.ndpi` format and `.ndpa` annotation . This annotation can be prepared in Hamamatsu 
-NDP.view 2 application. Scaffan require to annotate each lobulus by closed curve around central vein.
+To evaluate lobulus area segmentation the manual annotation of data was performed.
+Our semi-automatic segmentation method was compared with manual segmentation of lobulus border and central vein. 
+The Jaccard simmilarity coefficient (also known as Intersection over Union) 
+( (Jaccard1912)[#jaccard1912] and (Levandowsky)[#levandowsky] ) was used to measure similarity between samples. 
+
+![jaccard](segmentation_jaccard.png)
+
+Lobulus border and central vein segmentation evaluation by Jaccard Index.
+Whiskers proportionaly extends low and high quartiles by 1.5 of the interquartile range (IQR). Points outside this range are be identified as outliers.
+
+
+## Sinusoid ingegrity evaluation
+
+
+
+Reference-style: 
+![alt text](SNI_prediction.png)
+
+
+
 
 
 
 ## Annotation 
 
+`SWP`:
 `SNI`: Sinusoid Integrity <0,2>
 `CMP`: Compactness <0,1>
 `IFE`: Image Focus Error <0,1>
@@ -69,6 +92,11 @@ NDP.view 2 application. Scaffan require to annotate each lobulus by closed curve
 `SCE`: Slice Contamination Error <0,1> 
 
 texture problem - local / global
+
+## User interface
+
+Scaffan work with image data in `.ndpi` format and `.ndpa` annotation . This annotation can be prepared in Hamamatsu 
+NDP.view 2 application. Scaffan require to annotate each lobulus by closed curve around central vein.
 
 # References:
 
@@ -157,3 +185,21 @@ title = {Guide to NumPy}
   year      = {2013},
   pages = {108--122},
 }
+
+## Jaccard1912
+
+https://nph.onlinelibrary.wiley.com/doi/abs/10.1111/j.1469-8137.1912.tb05611.x
+
+## Levandowsky
+
+Levandowsky, Michael; Winter, David (1971), "Distance between sets", Nature, 234 (5): 34–35
+
+https://www.nature.com/articles/234034a0
+
+## Texture Analysis
+
+Tuceryan, M., & Jain, A. K. (1998). Texture Analysis. In The Handbook of Pattern Recognition and Computer Vision (2nd Edition). Retrieved from http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.38.5980
+
+## Haralick
+
+Haralick, R.M., “Statistical and Structural Approaches to Texture,” Proceedings ofthe IEEE, 67, pp. 786-804, 1979.
