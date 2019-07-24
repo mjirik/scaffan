@@ -15,6 +15,8 @@ Texture in this area is described with several methods. The Gray Level Cooccuren
 described in [Haralick](#haralick) were used as main texture features. 
 Based on this texture features the Sinusoid Integrity can be estimated.
 
+![scheme](scaffan_scheme.png)
+
 
 ## Application
 
