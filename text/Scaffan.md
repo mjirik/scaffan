@@ -1,22 +1,27 @@
 # Scaffan
 
 Main goal of application Scaffan is quantitative description of scaffold based on
-image slice. # TODO
+image slice.
 
 The algorithm can be separated into two steps. First step is lobulus segmentation. 
 In this step the region of segmentation. Based on user interactivity the rough 
 localization of examined lobulus is known. This information is used as initial 
-step for iterative segmentation algortihm. Output of this process is delineation
+step for iterative segmentation algortihm based on Active Contours without Edges 
+described in [Casselles](#casselles) and [Neila](#neila). Output of this process is delineation
 lobulus boundary and central vein. 
 
 Second step is lobulus area description. Input of this process is the lobulus area. 
-Texture in this area is described with several methods. 
-These methods were corelated with manual annotation.
+Texture in this area is described with several methods. The Gray Level Cooccurence Matrix texture features 
+described in [Haralick](#haralick) were used as main texture features. 
+Based on this texture features the Sinusoid Integrity can be estimated.
+
+
+## Application
 
 Application Scaffan is open-source software hosted on GitHub and written in (Python)[#python]. 
-The packages (Numpy)[#numpy], (Scipy)[#scipy], (Scikit-image)[#sciklimage] are used for 
-general image processing. The morphsnakes package ((Neila)[#neila] and (Avarez)[#avares]) 
-are used for segmentation tasks. For machine learning the (Scikit-learn)[#sklean] is used.
+The packages [Numpy](#numpy), [Scipy](#scipy), [Scikit-image](#sciklimage) are used for 
+general image processing. The morphsnakes package ([Neila](#neila) and [Avarez](#avares)) 
+are used for segmentation tasks. For machine learning the [Scikit-learn](#sklean) is used.
 
 
 
@@ -36,8 +41,8 @@ structures visible and also keep the computation time low.
 The preprocessing step of lobulus segmentation is to use Hessian based Frangi 
 filter [Frangi](#frangi), [Kroon](#kroon) to supress the high-frequency signal 
 in lobulus area and to make the lobulus border more dominant. Then a method 
-Morphological Active Contours without Edges described in (Casselles)[#casselles], 
-(Neila)[#neila] and (Avarez)[#avarez] is used to extract outer boundary of liver
+Morphological Active Contours without Edges described in [Casselles](#casselles), 
+[Neila](#neila) and [Avarez](#avarez) is used to extract outer boundary of liver
 lobulus. 
 
 Due to lower contrast the segmentation of Central Vein is more complex task. 
@@ -48,7 +53,7 @@ Frangi filter is used to have more details of the shape of Central Vein.
 ## Lobulus analysis
 
 To describe texture properties in the Gray Level Cooccurence Matrix texture features 
-described in (Haralick)[#haralick] and (Texture Analysis)[#texture-analysis] 
+described in [Haralick](#haralick) and [Texture Analysis](#texture-analysis) 
 Additionally the manually crafted features were used. 
 
 ![texture features](SNI_features.png)
@@ -59,7 +64,7 @@ Additionally the manually crafted features were used.
 To evaluate lobulus area segmentation the manual annotation of data was performed.
 Our semi-automatic segmentation method was compared with manual segmentation of lobulus border and central vein. 
 The Jaccard simmilarity coefficient (also known as Intersection over Union) 
-( (Jaccard1912)[#jaccard1912] and (Levandowsky)[#levandowsky] ) was used to measure similarity between samples. 
+( [Jaccard1912](#jaccard1912) and [Levandowsky](#levandowsky) ) was used to measure similarity between samples. 
 
 ![jaccard](segmentation_jaccard.png)
 
