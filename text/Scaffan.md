@@ -7,7 +7,7 @@ The algorithm can be separated into two steps. First step is lobulus segmentatio
 In this step the region of segmentation. Based on user interactivity the rough 
 localization of examined lobulus is known. This information is used as initial 
 step for iterative segmentation algortihm based on Active Contours without Edges 
-described in [Casselles](#casselles) and [Neila](#neila). Output of this process is delineation
+described in [Snakes](#snakes) and [Neila](#neila). Output of this process is delineation
 lobulus boundary and central vein. 
 
 Second step is lobulus area description. Input of this process is the lobulus area. 
@@ -64,7 +64,7 @@ Additionally the manually crafted features were used.
 To evaluate lobulus area segmentation the manual annotation of data was performed.
 Our semi-automatic segmentation method was compared with manual segmentation of lobulus border and central vein. 
 The Jaccard simmilarity coefficient (also known as Intersection over Union) 
-( [Jaccard1912](#jaccard1912) and [Levandowsky](#levandowsky) ) was used to measure similarity between samples. 
+( [Jaccard](#jaccard) and [Levandowsky](#levandowsky) ) was used to measure similarity between samples. 
 
 ![jaccard](segmentation_jaccard.png)
 
@@ -191,7 +191,7 @@ title = {Guide to NumPy}
   pages = {108--122},
 }
 
-## Jaccard1912
+## Jaccard
 
 https://nph.onlinelibrary.wiley.com/doi/abs/10.1111/j.1469-8137.1912.tb05611.x
 
@@ -208,3 +208,13 @@ Tuceryan, M., & Jain, A. K. (1998). Texture Analysis. In The Handbook of Pattern
 ## Haralick
 
 Haralick, R.M., “Statistical and Structural Approaches to Texture,” Proceedings ofthe IEEE, 67, pp. 786-804, 1979.
+
+
+## Snakes
+
+Snakes: Active contour models (1988)
+by Michael Kass , Andrew Witkin , Demetri Terzopoulos
+Venue:	INTERNATIONAL JOURNAL OF COMPUTER VISION
+Citations:	3874 - 17 self
+
+https://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.124.5318
