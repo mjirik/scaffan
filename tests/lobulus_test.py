@@ -42,7 +42,7 @@ class LobulusTest(unittest.TestCase):
         mainapp.run_lobuluses()
         logger.debug("imgs: ", mainapp.report.imgs)
 
-        img = mainapp.report.load_array("lobulus_central_thr_skeleton_15.png")
+        img = mainapp.report.load_array("lobulus_central_thr_skeleton_7.png")
         imsz = np.prod(img.shape)
         lobulus_size = np.sum(img == 1) / imsz
         central_vein_size = np.sum(img == 2) / imsz
@@ -54,7 +54,7 @@ class LobulusTest(unittest.TestCase):
         self.assertGreater(skeleton_size, 0.001, "Skeleton size 0.1%")
         self.assertGreater(thr_size, skeleton_size, "More threshold than Skeleton")
 
-        self.assertTrue((output_dir/"lobulus_central_thr_skeleton_15.png").exists())
-        self.assertTrue((output_dir/"lobulus_central_thr_skeleton_15_fig.png").exists())
+        self.assertTrue((output_dir/"lobulus_central_thr_skeleton_7.png").exists())
+        self.assertTrue((output_dir/"lobulus_central_thr_skeleton_7_fig.png").exists())
         self.assertTrue((output_dir/"data.xlsx").exists())
         # mainapp.start_gui()
