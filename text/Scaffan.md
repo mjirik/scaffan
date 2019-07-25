@@ -1,22 +1,29 @@
 # Scaffan
 
 Main goal of application Scaffan is quantitative description of scaffold based on
-image slice. # TODO
+image slice.
 
 The algorithm can be separated into two steps. First step is lobulus segmentation. 
 In this step the region of segmentation. Based on user interactivity the rough 
 localization of examined lobulus is known. This information is used as initial 
-step for iterative segmentation algortihm. Output of this process is delineation
+step for iterative segmentation algortihm based on Active Contours without Edges 
+described in [Snakes](#snakes) and [Neila](#neila). Output of this process is delineation
 lobulus boundary and central vein. 
 
-Second step is lobulus description. Input of this process is the lobulus area. 
-Texture in this area is described with several methods. 
-These methods were corelated with manual annotation.
+Second step is lobulus area description. Input of this process is the lobulus area. 
+Texture in this area is described with several methods. The Gray Level Cooccurence Matrix texture features 
+described in [Haralick](#haralick) were used as main texture features. 
+Based on this texture features the Sinusoid Integrity can be estimated.
+
+![scheme](scaffan_scheme.png)
+
+
+## Application
 
 Application Scaffan is open-source software hosted on GitHub and written in (Python)[#python]. 
-The packages (Numpy)[#numpy], (Scipy)[#scipy], (Scikit-image)[#sciklimage] are used for 
-general image processing. The morphsnakes package ((Neila)[#neila] and (Avarez)[#avares]) 
-are used for segmentation tasks. For machine learning the (Scikit-learn)[#sklean] is used.
+The packages [Numpy](#numpy), [Scipy](#scipy), [Scikit-image](#sciklimage) are used for 
+general image processing. The morphsnakes package ([Neila](#neila) and [Avarez](#avares)) 
+are used for segmentation tasks. For machine learning the [Scikit-learn](#sklean) is used.
 
 
 
@@ -36,8 +43,8 @@ structures visible and also keep the computation time low.
 The preprocessing step of lobulus segmentation is to use Hessian based Frangi 
 filter [Frangi](#frangi), [Kroon](#kroon) to supress the high-frequency signal 
 in lobulus area and to make the lobulus border more dominant. Then a method 
-Morphological Active Contours without Edges described in (Casselles)[#casselles], 
-(Neila)[#neila] and (Avarez)[#avarez] is used to extract outer boundary of liver
+Morphological Active Contours without Edges described in [Casselles](#casselles), 
+[Neila](#neila) and [Avarez](#avarez) is used to extract outer boundary of liver
 lobulus. 
 
 Due to lower contrast the segmentation of Central Vein is more complex task. 
@@ -47,25 +54,55 @@ Frangi filter is used to have more details of the shape of Central Vein.
 
 ## Lobulus analysis
 
-TODO
+To describe texture properties in the Gray Level Cooccurence Matrix texture features 
+described in [Haralick](#haralick) and [Texture Analysis](#texture-analysis) 
+Additionally the manually crafted features were used. 
+
+![texture features](SNI_features.png)
 
 
-## User interface
+## Segmentation evaluation
 
-Scaffan work with image data in `.ndpi` format and `.ndpa` annotation . This annotation can be prepared in Hamamatsu 
-NDP.view 2 application. Scaffan require to annotate each lobulus by closed curve around central vein.
+To evaluate lobulus area segmentation the manual annotation of data was performed.
+Our semi-automatic segmentation method was compared with manual segmentation of lobulus border and central vein. 
+The Jaccard simmilarity coefficient (also known as Intersection over Union) 
+( [Jaccard](#jaccard) and [Levandowsky](#levandowsky) ) was used to measure similarity between samples. 
+
+![jaccard](segmentation_jaccard.png)
+
+Lobulus border and central vein segmentation evaluation by Jaccard Index.
+Whiskers proportionaly extends low and high quartiles by 1.5 of the interquartile range (IQR). Points outside this range are be identified as outliers.
+
+
+## Sinusoid ingegrity evaluation
+
+
+
+Reference-style: 
+![alt text](SNI_prediction.png)
+
+
+
 
 
 
 ## Annotation 
 
-`SNI`: Sinusoid Integrity <0,2>
-`CMP`: Compactness <0,1>
-`IFE`: Image Focus Error <0,1>
-`AIS`: Anisotropy <0,1> 0 for random orientation, 1 for big directionality
-`SQZ`: Squeeze (maybe different types? anisotropic(getting suqeezed), isotropic (getting small))
+* `SNI`: Sinusoidal Integrity <0,2>
+* `SQZ`: Squeeze 0-no squeeze, 1-squeezed (maybe different types? anisotropic(getting suqeezed), isotropic (getting small))
+* `CMP`: Compactness <0,1>
+* `IFE`: Image Focus Error <0,1>
+* `AIS`: Anisotropy <0,1> 0 for random orientation, 1 for big directionality
+* `CVM`: Central Vein Missing, 0 Central Vein is in the image, 1 - Central Vein is not in the image
+* `ICE`: Image Contrast Error <0,1>, 0 - image contrast is ok, 1 - image contrast is low
+* `SCE`: Slice Contamination Error <0,1> 
 
 texture problem - local / global
+
+## User interface
+
+Scaffan work with image data in `.ndpi` format and `.ndpa` annotation . This annotation can be prepared in Hamamatsu 
+NDP.view 2 application. Scaffan require to annotate each lobulus by closed curve around central vein.
 
 # References:
 
@@ -154,3 +191,31 @@ title = {Guide to NumPy}
   year      = {2013},
   pages = {108--122},
 }
+
+## Jaccard
+
+https://nph.onlinelibrary.wiley.com/doi/abs/10.1111/j.1469-8137.1912.tb05611.x
+
+## Levandowsky
+
+Levandowsky, Michael; Winter, David (1971), "Distance between sets", Nature, 234 (5): 34–35
+
+https://www.nature.com/articles/234034a0
+
+## Texture Analysis
+
+Tuceryan, M., & Jain, A. K. (1998). Texture Analysis. In The Handbook of Pattern Recognition and Computer Vision (2nd Edition). Retrieved from http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.38.5980
+
+## Haralick
+
+Haralick, R.M., “Statistical and Structural Approaches to Texture,” Proceedings ofthe IEEE, 67, pp. 786-804, 1979.
+
+
+## Snakes
+
+Snakes: Active contour models (1988)
+by Michael Kass , Andrew Witkin , Demetri Terzopoulos
+Venue:	INTERNATIONAL JOURNAL OF COMPUTER VISION
+Citations:	3874 - 17 self
+
+https://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.124.5318

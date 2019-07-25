@@ -1,5 +1,5 @@
 #!/bin/bash
-#PBS -l select=1:ncpus=2:mem=16gb:scratch_local=10gb
+#PBS -l select=1:ncpus=1:mem=16gb:scratch_local=10gb
 #PBS -l walltime=04:00:00
 # modify/delete the above given guidelines according to your job's needs
 # Please note that only one select= argument is allowed at a time.
@@ -17,6 +17,7 @@ DATADIR="/storage/plzen4-ntis/projects/queetech/medical/processed/scaffan2019/me
 # nacteni aplikacniho modulu, ktery zpristupni aplikaci Gaussian verze 3
 # module add g03
 
+echo "job: $PBS_JOBID running on: `uname -n`" >result # just an example computation
 
 SOURCE="${BASH_SOURCE[0]}"
 while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink

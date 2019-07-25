@@ -1,10 +1,10 @@
 #!/bin/bash
-#PBS -l select=1:ncpus=2:mem=16gb:scratch_local=10gb
-#PBS -l walltime=04:00:00
+#PBS -l select=1:ncpus=1:mem=16gb:scratch_local=10gb
+#PBS -l walltime=016:00:00
 # modify/delete the above given guidelines according to your job's needs
 # Please note that only one select= argument is allowed at a time.
 
-# # PBS -l select=1:ncpus=1:mem=1gb:scratch_local=4gb
+# # PBS -l select=1:ncpus=2:mem=1gb:scratch_local=4gb
 
 # add to qsub with:
 # qsub scaffan_experiment_1.sh
@@ -17,7 +17,6 @@ DATADIR="/storage/plzen4-ntis/projects/queetech/medical/processed/scaffan2019/me
 # nacteni aplikacniho modulu, ktery zpristupni aplikaci Gaussian verze 3
 # module add g03
 
-echo "job: $PBS_JOBID running on: `uname -n`" >result # just an example computation
 
 SOURCE="${BASH_SOURCE[0]}"
 while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
@@ -47,7 +46,7 @@ export LANG=C.UTF-8
 # python -m scaffan set --common-spreadsheet-file /storage/plzen1/home/$LOGNAME/projects/scaffan/experiments/metacentrum/SA_experiments.xlsx
 python -m scaffan set --common-spreadsheet-file /storage/plzen4-ntis/projects/queetech/medical/processed/scaffan2019/metacentrum/SA_experiments.xlsx
 python -m io3d.datasets -sdp  /storage/plzen4-ntis/projects/queetech/
-python /storage/plzen1/home/$LOGNAME/projects/scaffan/experiments/lobulus_segmentation.py > results.out
+python /storage/plzen1/home/$LOGNAME/projects/scaffan/experiments/lobulus_seg_eval_2.py > results.out
 
 echo "$DIR"
 ls

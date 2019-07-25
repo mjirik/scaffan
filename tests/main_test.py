@@ -49,7 +49,8 @@ class MainGuiTest(unittest.TestCase):
         mainapp.set_input_file(fn)
         # mainapp.set_annotation_color_selection("#FF00FF")
         # mainapp.set_annotation_color_selection("#FF0000")
-        mainapp.set_annotation_color_selection("red")
+        # mainapp.set_annotation_color_selection("red")
+        mainapp.set_annotation_color_selection("yellow")
         # mainapp.start_gui()
 
     def test_run_lobuluses(self):
@@ -63,7 +64,8 @@ class MainGuiTest(unittest.TestCase):
         mainapp.set_input_file(fn)
         mainapp.set_output_dir("test_run_lobuluses_output_dir")
         # mainapp.init_run()
-        mainapp.set_annotation_color_selection("#FF00FF")
+        # mainapp.set_annotation_color_selection("#FF00FF") # magenta -> cyan
+        mainapp.set_annotation_color_selection("#00FFFF")
         mainapp.run_lobuluses()
         self.assertLess(0.6, mainapp.evaluation.evaluation_history[0]["Lobulus Border Dice"],
                         "Lobulus segmentation should have Dice coefficient above some low level")
@@ -85,7 +87,7 @@ class MainGuiTest(unittest.TestCase):
         mainapp.set_input_file(fn)
         mainapp.set_output_dir("test_run_lobuluses_output_dir")
         # mainapp.init_run()
-        mainapp.set_annotation_color_selection("#FF00FF")
+        mainapp.set_annotation_color_selection("#00FFFF")
         mainapp.set_parameter("Processing;Lobulus Segmentation;Manual Segmentation", True)
         mainapp.run_lobuluses()
         self.assertLess(0.9, mainapp.evaluation.evaluation_history[0]["Lobulus Border Dice"],
