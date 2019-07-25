@@ -88,15 +88,14 @@ Reference-style:
 
 ## Annotation 
 
-`SWP`:
-`SNI`: Sinusoid Integrity <0,2>
-`CMP`: Compactness <0,1>
-`IFE`: Image Focus Error <0,1>
-`AIS`: Anisotropy <0,1> 0 for random orientation, 1 for big directionality
-`SQZ`: Squeeze 0-no squeeze, 1-squeezed (maybe different types? anisotropic(getting suqeezed), isotropic (getting small))
-`CVM`: Central Vein Missing, 0 Central Vein is in the image, 1 - Central Vein is not in the image
-`ICE`: Image Contrast Error <0,1>, 0 - image contrast is ok, 1 - image contrast is low
-`SCE`: Slice Contamination Error <0,1> 
+* `SNI`: Sinusoidal Integrity <0,2>
+* `SQZ`: Squeeze 0-no squeeze, 1-squeezed (maybe different types? anisotropic(getting suqeezed), isotropic (getting small))
+* `CMP`: Compactness <0,1>
+* `IFE`: Image Focus Error <0,1>
+* `AIS`: Anisotropy <0,1> 0 for random orientation, 1 for big directionality
+* `CVM`: Central Vein Missing, 0 Central Vein is in the image, 1 - Central Vein is not in the image
+* `ICE`: Image Contrast Error <0,1>, 0 - image contrast is ok, 1 - image contrast is low
+* `SCE`: Slice Contamination Error <0,1> 
 
 texture problem - local / global
 
