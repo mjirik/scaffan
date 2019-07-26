@@ -53,6 +53,8 @@ class MainGuiTest(unittest.TestCase):
         mainapp.set_annotation_color_selection("yellow")
         # mainapp.start_gui()
 
+    skip_on_local = False
+    @unittest.skipIf(os.environ.get("TRAVIS", skip_on_local), "Skip on Travis-CI")
     def test_run_lobuluses(self):
         fn = io3d.datasets.join_path(
             "medical", "orig", "sample_data", "SCP003", "SCP003.ndpi", get_root=True
@@ -73,11 +75,13 @@ class MainGuiTest(unittest.TestCase):
                         "Lobulus segmentation should have Dice coefficient above some low level")
         # self.assertLess(0.6, mainapp.evaluation.evaluation_history[1]["Lobulus Border Dice"],
         #                 "Lobulus segmentation should have Dice coefficient above some low level")
-        self.assertLess(0.5, mainapp.evaluation.evaluation_history[0]["Central Vein Dice"],
+        self.assertLess(0.5, mainapp.evluation.evaluation_history[0]["Central Vein Dice"],
                         "Central Vein segmentation should have Dice coefficient above some low level")
         # self.assertLess(0.5, mainapp.evaluation.evaluation_history[1]["Central Vein Dice"],
         #                 "Central Vein should have Dice coefficient above some low level")
 
+    skip_on_local = False
+    @unittest.skipIf(os.environ.get("TRAVIS", skip_on_local), "Skip on Travis-CI")
     def test_run_lobuluses_manual_segmentation(self):
         fn = io3d.datasets.join_path(
             "medical", "orig", "sample_data", "SCP003", "SCP003.ndpi", get_root=True
