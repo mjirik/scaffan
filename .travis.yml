@@ -74,6 +74,8 @@ install:
 
 
 # command to run tests
-script: nosetests -v --with-coverage -s --cover-package=scaffan
+#script: nosetests -v --with-coverage -s --cover-package=scaffan
+script:
+  - pytest --cov=scaffan/
 after_success:
     - coveralls
