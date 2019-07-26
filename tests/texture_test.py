@@ -120,22 +120,22 @@ class TextureTest(unittest.TestCase):
             center=[patch_centers3[0][0], patch_centers3[1][0]], level=level, size_on_level=size
         )
 
-        print("before imshow 1")
+        # print("before imshow 1")
         # import pdb; pdb.set_trace()
         imrgb = view1.get_region_image(as_gray=False)
         # import pdb; pdb.set_trace()
         plt.imshow(imrgb)
-        print("before first figure")
+        # print("before first figure")
         # import pdb; pdb.set_trace()
         # plt.show()
         plt.figure()
-        print("before imshow 2")
+        # print("before imshow 2")
         plt.imshow(view2.get_region_image(as_gray=False))
         plt.figure()
-        print("before imshow 3")
+        # print("before imshow 3")
         plt.imshow(view3.get_region_image(as_gray=False))
         # plt.show()
-        print("before get image")
+        # print("before get image")
         im0 = view0.get_region_image(as_gray=True)
         im1 = view1.get_region_image(as_gray=True)
         im2 = view2.get_region_image(as_gray=True)
@@ -149,23 +149,23 @@ class TextureTest(unittest.TestCase):
         #     2: local_binary_pattern(im2, n_points, radius, METHOD),
         #     3: local_binary_pattern(im3, n_points, radius, METHOD)
         # }
-        print("before lbp")
+        # print("before lbp")
         refs = [
             [0, salbp.lbp_fv(im0)],  # n_points, radius, METHOD)],
             [1, salbp.lbp_fv(im1)],  # n_points, radius, METHOD)],
             [2, salbp.lbp_fv(im2)],  # n_points, radius, METHOD)],
             [3, salbp.lbp_fv(im3)],  # n_points, radius, METHOD)]
         ]
-        print("before annotation")
+        # print("before annotation")
         annotation_ids = anim.select_annotations_by_title("test2")
         view_test = anim.get_views(annotation_ids, level=level)[0]
         test_image = view_test.get_region_image(as_gray=True)
         target, data = list(zip(*refs))
-        print("before fit")
+        # print("before fit")
         cls = salbp.KLDClassifier()
         cls.fit(data, target)
         tile_fnc = lambda tile: satex.get_feature_and_predict(tile, salbp.lbp_fv, cls)
-        print("before tile processing")
+        # print("before tile processing")
         seg = satex.tiles_processing(test_image, tile_fnc, tile_spacing=size)
         plt.figure()
         plt.imshow(test_image)
