@@ -65,7 +65,9 @@ class MainGuiTest(unittest.TestCase):
         mainapp.set_output_dir("test_run_lobuluses_output_dir")
         # mainapp.init_run()
         # mainapp.set_annotation_color_selection("#FF00FF") # magenta -> cyan
-        mainapp.set_annotation_color_selection("#00FFFF")
+        # mainapp.set_annotation_color_selection("#00FFFF")
+        # cyan causes memory fail
+        mainapp.set_annotation_color_selection("#FFFF00")
         mainapp.run_lobuluses()
         self.assertLess(0.6, mainapp.evaluation.evaluation_history[0]["Lobulus Border Dice"],
                         "Lobulus segmentation should have Dice coefficient above some low level")
