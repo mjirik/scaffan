@@ -79,6 +79,7 @@ requirements:
 #    - xlwings
     - xlrd
     - loguru
+    - openslide-python  # [linux]
 
 test:
   # Python imports
