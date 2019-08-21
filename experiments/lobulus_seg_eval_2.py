@@ -89,18 +89,24 @@ fns_green_blue = [
     # "medical/orig/Scaffan-analysis/PIG-003_J-18-0165_HE.ndpi",
     # "medical/orig/Scaffan-analysis/PIG-003_J-18-0166_HE.ndpi",
     # "medical/orig/Scaffan-analysis/PIG-003_J-18-0167_HE.ndpi",
-    "medical/orig/Scaffan-analysis/PIG-003_J-18-0168_HE.ndpi",
-    "medical/orig/Scaffan-analysis/PIG-003_J-18-0169_HE.ndpi",
-    "medical/orig/Scaffan-analysis/PIG-003_J-18-0170_HE.ndpi",
-    "medical/orig/Scaffan-analysis/PIG-004_BBJ-004-2 _HE_parenchyme.ndpi",
-    # "medical/orig/Scaffan-analysis/PIG-004_BBJ-004-3 _HE_parenchyme.ndpi",
-    "medical/orig/Scaffan-analysis/PIG-004_BBJ-004-4_HE_parenchyme.ndpi",
-    # "medical/orig/Scaffan-analysis/PIG-005_J-18-0633_HE_PRML per decell.ndpi",
+    # 2nd run
+    # "medical/orig/Scaffan-analysis/PIG-003_J-18-0168_HE.ndpi",
+    # "medical/orig/Scaffan-analysis/PIG-003_J-18-0169_HE.ndpi",
+    # "medical/orig/Scaffan-analysis/PIG-003_J-18-0170_HE.ndpi",
+    # "medical/orig/Scaffan-analysis/PIG-004_BBJ-004-2 _HE_parenchyme.ndpi",
+    # "medical/orig/Scaffan-analysis/PIG-004_BBJ-004-4_HE_parenchyme.ndpi",
+    # dont need
     # "medical/orig/Scaffan-analysis/PIG-008_P008 LL-C_HE_parenchyme centr..ndpi", # dont need
     # "medical/orig/Scaffan-analysis/PIG-008_P008 LL-P_HE_parenchyme perif..ndpi", # dont need
-    "medical/orig/Scaffan-analysis/PIG-012_Pilsen_HE_LLC.ndpi",
-    "medical/orig/Scaffan-analysis/PIG-012_Pilsen_HE_LLP.ndpi",
-    "medical/orig/Scaffan-analysis/PIG-012_Pilsen_HE_LMC.ndpi",
+    # 3rd run
+    # "medical/orig/Scaffan-analysis/PIG-012_Pilsen_HE_LLC.ndpi",
+    # "medical/orig/Scaffan-analysis/PIG-012_Pilsen_HE_LLP.ndpi",
+    # "medical/orig/Scaffan-analysis/PIG-012_Pilsen_HE_LMC.ndpi",
+    # 4th run
+    "medical/orig/Scaffan-analysis/PIG-004_BBJ-004-3 _HE_parenchyme.ndpi",
+    "medical/orig/Scaffan-analysis/PIG-005_J-18-0630_HE_LLL per decell.ndpi",
+    "medical/orig/Scaffan-analysis/PIG-005_J-18-0631_HE_LML per decell.ndpi",
+    "medical/orig/Scaffan-analysis/PIG-005_J-18-0633_HE_PRML per decell.ndpi",
 
 ]
 
