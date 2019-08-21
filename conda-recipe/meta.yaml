@@ -45,7 +45,7 @@ requirements:
     - pandas
     - openpyxl
     - morphsnakes
-    - pyqt=5.9.2 # tested
+    - pyqt  # =5.9.2 # tested
     - pyqtgraph
     - click
     - pywin32 # [win]
@@ -62,15 +62,17 @@ requirements:
     - lxml
     - lxml=4.3.0 # [win]
 #    - pandas
-    - {{ pin_compatible('pandas', max_pin='x.x') }}
+    - {{ pin_compatible('pandas', max_pin='x') }}
 #    - openpyxl
-    - {{ pin_compatible('openpyxl', max_pin='x.x') }}
+    - {{ pin_compatible('openpyxl', max_pin='x') }}
     - morphsnakes
-    - pyqt=5.9.2 # tested
+    - {{ pin_compatible('pyqt', max_pin='x') }}
+#    - pyqt=5.9.2 # tested
     - pyqtgraph
-    - {{ pin_compatible('pyqtgraph', max_pin='x.x') }}
+    - {{ pin_compatible('pyqtgraph', max_pin='x') }}
+#    - {{ pin_compatible('pyqtgraph', max_pin='x.x') }}
 #    - click
-    - {{ pin_compatible('click', max_pin='x.x') }}
+    - {{ pin_compatible('click', max_pin='x') }}
     - pywin32 # [win]
     # - numpy
     # - pyqt 4.11.*
