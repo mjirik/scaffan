@@ -88,6 +88,16 @@ Reference-style:
 
 ## Annotation 
 
+Geometric annotation is done with Freehand Region tool. We use fallowing color code:
+
+* blue - PV selection
+* green - PV selection with additional black annotation of portal vein and lobulus
+* black - Additional annotation of portal vein and lobulus border
+* magenta - training data for empty space
+* red - training area for septum
+
+Written in Annotation Details field
+
 * `SNI`: Sinusoidal Integrity <0,2>
 * `SQZ`: Squeeze 0-no squeeze, 1-squeezed (maybe different types? anisotropic(getting suqeezed), isotropic (getting small))
 * `CMP`: Compactness <0,1>
