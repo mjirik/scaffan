@@ -57,19 +57,20 @@ requirements:
 #    - python=3 # [not win]
 #    - python=3.6.6 # [win]
 #    - io3d>=1.21
-    - {{ pin_compatible('io3d', max_pin='x') }}
-    - {{ pin_compatible('imma', max_pin='x') }}
+    - {{ pin_compatible('io3d', max_pin='x', min_pin="x.x") }}
+    - {{ pin_compatible('imma', max_pin='x', min_pin="x.x") }}
     - lxml
     - lxml=4.3.0 # [win]
 #    - pandas
-    - {{ pin_compatible('pandas', max_pin='x') }}
+    - {{ pin_compatible('pandas', max_pin='x', min_pin="x.x") }}
 #    - openpyxl
-    - {{ pin_compatible('openpyxl', max_pin='x') }}
+    - {{ pin_compatible('openpyxl', max_pin='x', min_pin="x.x") }}
     - morphsnakes
-    - {{ pin_compatible('pyqt', max_pin='x') }}
+#    - pyqt>=5.0
+    - {{ pin_compatible('pyqt', max_pin='x', min_pin="x.x") }}
 #    - pyqt=5.9.2 # tested
     - pyqtgraph
-    - {{ pin_compatible('pyqtgraph', max_pin='x') }}
+    - {{ pin_compatible('pyqtgraph', max_pin='x', min_pin="x.x") }}
 #    - {{ pin_compatible('pyqtgraph', max_pin='x.x') }}
 #    - click
     - {{ pin_compatible('click', max_pin='x') }}
@@ -79,7 +80,7 @@ requirements:
 #    - xlwings
     - xlrd
     - loguru
-    - openslide-python  # [linux]
+    - openslide-python # [not win]
 
 test:
   # Python imports
