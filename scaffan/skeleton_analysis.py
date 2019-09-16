@@ -184,7 +184,7 @@ class SkeletonAnalysis:
             with warnings.catch_warnings():
                 # warnings.simplefilter("low contrast image")
                 warnings.filterwarnings("ignore", ".*low contrast image.*")
-                self.imsave("skeleton_nodes_{}.png", imthr, 20)
+                self.imsave("skeleton_nodes_raw_{}.png", conv, 20)
             # plt.imsave(op.join(self.report.outputdir, "skeleton_nodes_{}.png".format(self.annotation_id)), conv.astype(np.uint8))
             # skimage.io.imsave(op.join(self.report.outputdir, "raw_skeleton_nodes_{}.png".format(self.annotation_id)), (conv * 20).astype(np.uint8))
 
