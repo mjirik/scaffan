@@ -2,8 +2,12 @@
 # -*- coding: utf-8 -*-
 """
 Modul is used for slice image and view processing. It cooperates with openslide.
-Some of coordinates are swapped. It is due to openslide. With request subimage with size=[A, B] it will
-return subimage with shape [B, A]. It is probably because of visualization.
+There is
+
+
+Be careful because some of coordinates are swapped. It is due to openslide.
+With request subimage with size=[A, B] it will return subimage with shape [B, A]. It is because of visualization.
+
 """
 
 from loguru import logger
@@ -162,6 +166,9 @@ def get_resize_parameters(imsl, former_level, former_size, new_level):
 
 
 class AnnotatedImage:
+    """
+    Read the image and the annotation. The
+    """
     def __init__(self, path, skip_read_annotations=False):
         logger.debug("Reading file {}".format(path))
         self.path = path
@@ -521,7 +528,16 @@ class AnnotatedImage:
 
 
 class View:
-    def __init__(self, anim: AnnotatedImage, center=None, level=0, size_on_level=None, location=None, size_mm=None, pixelsize_mm=None, safety_bound=2):
+    def __init__(
+            self,
+            anim: AnnotatedImage,
+            center=None, level=0,
+            size_on_level=None,
+            location=None,
+            size_mm=None,
+            pixelsize_mm=None,
+            safety_bound=2
+    ):
         self.anim: AnnotatedImage = anim
         self.set_region(center=center, level=level, size_on_level=size_on_level, location=location, size_mm=size_mm, pixelsize_mm=pixelsize_mm, safety_bound=safety_bound)
 
