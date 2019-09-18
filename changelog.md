@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+# 0.15
+
+* [Added] Get view by center in mm
+
 ## 0.14
 
 * [Changed] Compacntess definition

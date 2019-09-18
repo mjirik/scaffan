@@ -210,3 +210,43 @@ class ImageAnnotationTest(unittest.TestCase):
         assert img2[0, 0] == pytest.approx(0.765724, 0.001)
 
 
+    def test_select_view_by_center_mm(self):
+        fn = io3d.datasets.join_path("medical", "orig", "CMU-1.ndpi", get_root=True)
+        anim = scim.AnnotatedImage(fn)
+        view = anim.get_view(center_mm=[10, 11],
+                             size_on_level=[100, 100],
+                             # level=5,
+                             # size_mm=[0.1, 0.1]
+                             )
+        image = view.get_region_image()
+        logger.debug(f"location: {view.region_location}")
+        logger.debug(f"pixelsize: {view.region_pixelsize}")
+        plt.imshow(image)
+        # view.plot_annotations("obj1")
+        # plt.show()
+
+        assert image.shape[0] > 20
+        assert image.shape[1] > 20
+
+    def test_select_view_by_loc_mm(self):
+        fn = io3d.datasets.join_path("medical", "orig", "CMU-1.ndpi", get_root=True)
+        anim = scim.AnnotatedImage(fn)
+        view = anim.get_view(location_mm=[10, 11],
+                             size_on_level=[100, 100],
+                             # level=5,
+                             # size_mm=[0.1, 0.1]
+                             )
+        image = view.get_region_image()
+        logger.debug(f"location: {view.region_location}")
+        logger.debug(f"pixelsize: {view.region_pixelsize}")
+        plt.imshow(image)
+        # view.plot_annotations("obj1")
+        # plt.show()
+
+        assert image.shape[0] > 20
+        assert image.shape[1] > 20
+        # self.assertGreater(image.shape[0], 100)
+        # mask = view.get_annotation_region_raster("obj1")
+        # self.assertTrue(np.array_equal(mask.shape[:2], image.shape[:2]),
+        #                 "shape of mask should be the same as shape of image")
+        # assert image[0, 0, 0] == 202

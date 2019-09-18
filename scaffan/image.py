@@ -253,10 +253,11 @@ class AnnotatedImage:
 
     def get_view(
             self, center=None, level=0, size_on_level=None,
-            location=None, size_mm=None, pixelsize_mm=None, safety_bound=2) -> "View":
+            location=None, size_mm=None, pixelsize_mm=None, center_mm=None, location_mm=None, safety_bound=2) -> "View":
         view = View(
             anim=self, center=center, level=level, size_on_level=size_on_level,
-            location=location, size_mm=size_mm, pixelsize_mm=pixelsize_mm, safety_bound=safety_bound
+            location=location, size_mm=size_mm, pixelsize_mm=pixelsize_mm, center_mm=center_mm, location_mm=location_mm,
+            safety_bound=safety_bound
             )
         return view
 
@@ -536,12 +537,34 @@ class View:
             location=None,
             size_mm=None,
             pixelsize_mm=None,
+            center_mm=None,
+            location_mm=None,
             safety_bound=2
     ):
         self.anim: AnnotatedImage = anim
-        self.set_region(center=center, level=level, size_on_level=size_on_level, location=location, size_mm=size_mm, pixelsize_mm=pixelsize_mm, safety_bound=safety_bound)
+        self.set_region(
+            center=center,
+            level=level,
+            size_on_level=size_on_level,
+            location=location,
+            size_mm=size_mm,
+            pixelsize_mm=pixelsize_mm,
+            center_mm=center_mm,
+            location_mm=location_mm,
+            safety_bound=safety_bound)
 
-    def set_region(self, center=None, level=None, size_on_level=None, location=None, size_mm=None, pixelsize_mm=None, safety_bound=2):
+    def set_region(
+            self,
+            center=None,
+            level=None,
+            size_on_level=None,
+            location=None,
+            size_mm=None,
+            pixelsize_mm=None,
+            center_mm=None,
+            location_mm=None,
+            safety_bound=2
+    ):
         if (level is None) and (size_on_level is not None):
                 raise ValueError("Parameter 'size_on_level' cannot be used if 'level' is not defined")
         if pixelsize_mm is not None:
@@ -585,9 +608,17 @@ class View:
             self.region_size_on_pixelsize_mm = size_on_level
             self.zoom = np.array([1, 1])
 
+        if location_mm is not None:
+            location = (location_mm / self.get_pixelsize_on_level(0)[0]).astype(np.int)
+        if center_mm is not None:
+            center = (np.asarray(center_mm) / self.get_pixelsize_on_level(0)[0]).astype(np.int)
+
         if location is None:
             location = self.get_region_location_by_center(center, level, size_on_level)
         else:
+            if center is not None:
+                logger.error("Can take location or center. Not both of them.")
+                return
             center = self.get_region_center_by_location(location, level, size_on_level)
 
         self.region_location = location
