@@ -221,7 +221,7 @@ class GLCMTextureMeasurement:
         e0 = energy[:, :, 0]
         e1 = energy[:, :, 1]
         e2 = energy[:, :, 2]
-        self.measured_reatures = energy
+        self.measured_features = energy
 
         if self.lobulus_segmentation is None:
             seg = (slice(None), slice(None))
@@ -234,7 +234,7 @@ class GLCMTextureMeasurement:
         #     "GLCM Homogenity": np.mean(e1[seg]),
         #     "GLCM Correlation": np.mean(e2[seg]),
         # }
-        if self.add_cols_to_report:
+        if self.report is not None and self.add_cols_to_report:
             self.report.add_cols_to_actual_row(row)
         # plt.show()
 
