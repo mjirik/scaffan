@@ -209,7 +209,6 @@ class ImageAnnotationTest(unittest.TestCase):
         assert img1[0, 0] == pytest.approx(0.47553590, 0.001)  # expected intensity is 0.76
         assert img2[0, 0] == pytest.approx(0.765724, 0.001)
 
-
     def test_select_view_by_center_mm(self):
         fn = io3d.datasets.join_path("medical", "orig", "CMU-1.ndpi", get_root=True)
         anim = scim.AnnotatedImage(fn)
@@ -250,3 +249,34 @@ class ImageAnnotationTest(unittest.TestCase):
         # self.assertTrue(np.array_equal(mask.shape[:2], image.shape[:2]),
         #                 "shape of mask should be the same as shape of image")
         # assert image[0, 0, 0] == 202
+
+    def test_outer_annotation(self):
+        fn = io3d.datasets.join_path(
+            "medical", "orig", "sample_data", "SCP003", "SCP003.ndpi", get_root=True
+        )
+        anim = scim.AnnotatedImage(fn)
+        ann_ids = anim.select_annotations_by_color("#00FFFF")
+        assert len(ann_ids) > 0
+        assert len(ann_ids) == 2
+
+        # find outer annotation from 0th cyan object
+        outer_id = anim.select_outer_annotations(ann_ids[0])
+        assert len(outer_id) == 1
+
+        # find inner annotations to outer annotation of 0th object
+        inner_ids = anim.select_inner_annotations(outer_id[0])
+        assert len(inner_ids) == 2
+
+        # find black inner annotations to outer annotation of 0th object
+        inner_ids = anim.select_inner_annotations(outer_id[0], color="#000000")
+        assert len(inner_ids) == 1
+
+        cyan_inner_ids = anim.select_inner_annotations(outer_id[0], color="#00FFFF")
+        assert len(cyan_inner_ids) == 1
+        assert ann_ids[0] == cyan_inner_ids[0]
+
+
+        black_ann_ids = anim.select_annotations_by_color("#000000")
+        # find black inner annotations to outer annotation of 0th object
+        inner_ids = anim.select_inner_annotations(outer_id[0], ann_ids=black_ann_ids)
+        assert len(inner_ids) == 1

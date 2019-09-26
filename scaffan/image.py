@@ -268,11 +268,24 @@ class AnnotatedImage:
         else:
             return self.get_views(annotation_ids, level=level, **kwargs)
 
-    def select_inner_annotations(self, id, color=None, raise_exception_if_not_found=False):
+    def select_inner_annotations(self, id, color=None, raise_exception_if_not_found=False, ann_ids:List=None):
+        """
+
+        :param id:
+        :param color:
+        :param raise_exception_if_not_found:
+        :param ann_ids: preselected annotation ids. If None is given (default) all the annotations are considered.
+        :return:
+        """
         if color is not None:
-            an_ids_sel1 = self.select_annotations_by_color(color, raise_exception_if_not_found=raise_exception_if_not_found)
+            an_ids_sel1 = self.select_annotations_by_color(
+                color, raise_exception_if_not_found=raise_exception_if_not_found, ann_ids=ann_ids)
         else:
-            an_ids_sel1 = list(self.annotations.keys())
+            if ann_ids is None:
+                # an_ids_sel1 = list(self.annotations.keys())
+                an_ids_sel1 = list(range(0, len(self.annotations)))
+            else:
+                an_ids_sel1 = ann_ids
 
         x_px = self.annotations[id]["x_px"]
         y_px = self.annotations[id]["y_px"]
@@ -289,11 +302,23 @@ class AnnotatedImage:
                 ids.append(idi)
         return ids
 
-    def select_outer_annotations(self, id, color=None, raise_exception_if_not_found=False):
+    def select_outer_annotations(self, id, color=None, raise_exception_if_not_found=False, ann_ids:List=None):
+        """
+
+        :param id:
+        :param color:
+        :param raise_exception_if_not_found:
+        :param ann_ids: preselected annotation ids. If None is given (default) all the annotations are considered.
+        :return:
+        """
         if color is not None:
-            an_ids_sel1 = self.select_annotations_by_color(color, raise_exception_if_not_found=raise_exception_if_not_found)
+            an_ids_sel1 = self.select_annotations_by_color(
+                color, raise_exception_if_not_found=raise_exception_if_not_found, ann_ids=ann_ids)
         else:
-            an_ids_sel1 = list(self.annotations.keys())
+            if ann_ids is None:
+                an_ids_sel1 = list(range(0, len(self.annotations)))
+            else:
+                an_ids_sel1 = ann_ids
 
         x_px = self.annotations[id]["x_px"]
         y_px = self.annotations[id]["y_px"]
@@ -387,14 +412,21 @@ class AnnotatedImage:
             self.openslide, self.annotations, center, level, size
         )
 
-    def select_annotations_by_color(self, id, raise_exception_if_not_found=True):
+    def select_annotations_by_color(self, id, raise_exception_if_not_found=True, ann_ids=None):
+        """
+
+        :param id: number or color '#00FF00
+        :param raise_exception_if_not_found:
+        :param ann_ids:
+        :return:
+        """
         if id is None:
             # probably should return all ids for all colors
             raise ColorError()
             return None
 
         if type(id) is str:
-            if id not in self.id_by_colors:
+            if id.upper() not in self.id_by_colors:
                 if raise_exception_if_not_found:
                     raise ColorError()
                 # return None
@@ -402,6 +434,8 @@ class AnnotatedImage:
             id = self.id_by_colors[id]
         else:
             id = [id]
+        if ann_ids is not None:
+            id = [idi for idi in id if id in ann_ids]
         return id
 
     def get_annotation_ids(self, id):
@@ -552,6 +586,8 @@ class View:
             center_mm=center_mm,
             location_mm=location_mm,
             safety_bound=safety_bound)
+        self.select_outer_annotations = self.anim.select_outer_annotations
+        self.select_inner_annotations = self.anim.select_inner_annotations
 
     def set_region(
             self,
@@ -639,7 +675,6 @@ class View:
     def mm_to_px(self, mm):
         pxsz, unit = self.get_pixelsize_on_level()
         return mm / pxsz
-
 
     def region_imshow_annotation(self, i):
         region = self.get_region_image()

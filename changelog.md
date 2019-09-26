@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+# 0.16 
+
+* [Fixed] Get inner and outer annotation. Fixed call without color.
+
 # 0.15
 
 * [Added] Get view by center in mm
