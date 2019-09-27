@@ -253,7 +253,18 @@ class AnnotatedImage:
 
     def get_view(
             self, center=None, level=0, size_on_level=None,
-            location=None, size_mm=None, pixelsize_mm=None, center_mm=None, location_mm=None, safety_bound=2) -> "View":
+            location=None, size_mm=None, pixelsize_mm=None, center_mm=None, location_mm=None, safety_bound=2,
+            annotation_id=None, margin=0.5, margin_in_pixels=False) -> "View":
+        if annotation_id is not None:
+            center, size = self.get_annotations_bounds_px(annotation_id)
+            if margin_in_pixels:
+                margin_px = int(margin)
+            else:
+                margin_px = (size * margin).astype(
+                    np.int ) / self.openslide.level_downsamples[level]
+            size_on_level = (
+                    (size / self.openslide.level_downsamples[level]) + 2 * margin_px
+            ).astype(int)
         view = View(
             anim=self, center=center, level=level, size_on_level=size_on_level,
             location=location, size_mm=size_mm, pixelsize_mm=pixelsize_mm, center_mm=center_mm, location_mm=location_mm,
@@ -335,6 +346,23 @@ class AnnotatedImage:
                 ids.append(idi)
         return ids
 
+    def select_just_outer_annotations(self, color, return_holes=True, ann_ids: List[int] = None) -> List:
+        """
+        Select outer annotation and skip all inner annotations with same color. Put inner annotations to list of holes.
+        :param color: set the required annotation color
+        :param return_holes: list of inner holes of outer annotations.
+        :param ann_ids: put inside pre-filtered list of annotations
+        :return:
+        """
+        ann_ids = self.select_annotations_by_color(color, ann_ids=ann_ids)
+        ann_pairs = [[aid, self.select_inner_annotations(aid, ann_ids=ann_ids)] for aid in ann_ids if
+                     len(self.select_outer_annotations(aid, ann_ids=ann_ids)) == 0]
+        outer_inds, holes = zip(*ann_pairs)
+        if return_holes:
+            return list(outer_inds), list(holes)
+        else:
+            return list(outer_inds)
+
     def select_annotations_by_title(self, title):
         return self.get_annotation_ids(title)
         # return self.get_views(annotation_ids, level=level, **kwargs), annotation_ids
@@ -366,17 +394,8 @@ class AnnotatedImage:
             level = 0
         views = [None] * len(annotation_ids)
         for i, annotation_id in enumerate(annotation_ids):
-            center, size = self.get_annotations_bounds_px(annotation_id)
-            if margin_in_pixels:
-                margin_px = int(margin)
-            else:
-                margin_px = (size * margin).astype(
-                    np.int
-                ) / self.openslide.level_downsamples[level]
-            region_size = (
-                (size / self.openslide.level_downsamples[level]) + 2 * margin_px
-            ).astype(int)
-            view = self.get_view(center=center, level=level, size_on_level=region_size,
+            view = self.get_view(annotation_id=annotation_id, level=level, margin=margin,
+                                 margin_in_pixels=margin_in_pixels,
                                  pixelsize_mm=pixelsize_mm)
             if show:
                 view.region_imshow_annotation(annotation_id)
@@ -588,6 +607,8 @@ class View:
             safety_bound=safety_bound)
         self.select_outer_annotations = self.anim.select_outer_annotations
         self.select_inner_annotations = self.anim.select_inner_annotations
+        self.get_raster_image = self.get_region_image
+        self.get_annotation_raster = self.get_annotation_region_raster
 
     def set_region(
             self,

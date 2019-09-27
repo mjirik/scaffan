@@ -250,7 +250,7 @@ class ImageAnnotationTest(unittest.TestCase):
         #                 "shape of mask should be the same as shape of image")
         # assert image[0, 0, 0] == 202
 
-    def test_outer_annotation(self):
+    def test_outer_and_inner_annotation(self):
         fn = io3d.datasets.join_path(
             "medical", "orig", "sample_data", "SCP003", "SCP003.ndpi", get_root=True
         )
@@ -280,3 +280,17 @@ class ImageAnnotationTest(unittest.TestCase):
         # find black inner annotations to outer annotation of 0th object
         inner_ids = anim.select_inner_annotations(outer_id[0], ann_ids=black_ann_ids)
         assert len(inner_ids) == 1
+
+    def test_get_outer_ann(self):
+        fn = io3d.datasets.join_path(
+            "medical", "orig", "sample_data", "SCP003", "SCP003.ndpi", get_root=True
+        )
+        anim = scim.AnnotatedImage(fn)
+        color = "#000000"
+        outer_ids, holes_ids = anim.select_just_outer_annotations(color, return_holes=True)
+        logger.debug(f"outer ids {outer_ids}")
+        logger.debug(f"holes ids {holes_ids}")
+        assert len(outer_ids) > 0
+        assert len(holes_ids) > 0
+        assert len(holes_ids[0]) > 0
+        assert anim.select_inner_annotations(outer_ids[0], color=color)[0] == holes_ids[0][0]

@@ -5,6 +5,7 @@
 # 0.16 
 
 * [Fixed] Get inner and outer annotation. Fixed call without color.
+* [Added] Get just outer annotation and find the holes.
 
 # 0.15
 
