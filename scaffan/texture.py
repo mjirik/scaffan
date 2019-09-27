@@ -88,7 +88,7 @@ def select_texture_patch_centers_from_one_annotation(
             )
     annotation_ids = anim.select_annotations_by_title(title)
     view = anim.get_views(annotation_ids, level=level)[0]
-    mask = view.get_annotation_region_raster(title)
+    mask = view.get_annotation_raster(title)
 
     # with warnings.catch_warnings():
     #     warnings.filterwarnings("ignore", "low contrast image")

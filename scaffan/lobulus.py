@@ -196,7 +196,7 @@ class Lobulus:
         #     self.view.region_pixelsize
         # )
         self.image = self.view.get_region_image(as_gray=True)
-        self.annotation_mask = self.view.get_annotation_region_raster(annotation_id=annotation_id)
+        self.annotation_mask = self.view.get_annotation_raster(annotation_id=annotation_id)
         self._im_gradient_border_frangi = None
         # self.anim.titles
         # self.anim.details
@@ -209,7 +209,7 @@ class Lobulus:
             logger.warning("More than one outer annotation find to annotation with ID %i", self.annotation_id)
         elif len(outer_ids) > 0:
             outer_id = outer_ids[0]
-            seg_true = self.view.get_annotation_region_raster(annotation_id=outer_id) > 0
+            seg_true = self.view.get_annotation_raster(annotation_id=outer_id) > 0
             use_manual = self.parameters.param(
                 # "Processing", "Lobulus Segmentation",
                 "Manual Segmentation").value()
@@ -246,9 +246,9 @@ class Lobulus:
         if len(inner_ids) > 0:
             # get first
             inner_id = inner_ids[0]
-            seg_true = self.view.get_annotation_region_raster(annotation_id=inner_id) > 0
+            seg_true = self.view.get_annotation_raster(annotation_id=inner_id) > 0
             for inner_id in inner_ids:
-                seg_true += self.view.get_annotation_region_raster(annotation_id=inner_id) > 0
+                seg_true += self.view.get_annotation_raster(annotation_id=inner_id) > 0
             seg_true = (seg_true > 0).astype(np.uint8)
 
             use_manual = self.parameters.param(

@@ -120,7 +120,7 @@ class ImageAnnotationTest(unittest.TestCase):
         view.plot_annotations("obj1")
         # plt.show()
         self.assertGreater(image.shape[0], 100)
-        mask = view.get_annotation_region_raster("obj1")
+        mask = view.get_annotation_raster("obj1")
         self.assertTrue(np.array_equal(mask.shape[:2], image.shape[:2]),
                         "shape of mask should be the same as shape of image")
         assert image[0, 0, 0] == 202
@@ -138,7 +138,7 @@ class ImageAnnotationTest(unittest.TestCase):
         plt.suptitle("{} x {} [{}]".format(pxsize[0], pxsize[1], pxunit))
 
         self.assertGreater(image.shape[0], 100)
-        mask = view.get_annotation_region_raster("obj1")
+        mask = view.get_annotation_raster("obj1")
         self.assertTrue(np.array_equal(mask.shape[:2], image.shape[:2]), "shape of mask should be the same as shape of image")
         plt.subplot(222)
         plt.imshow(mask)
@@ -149,7 +149,7 @@ class ImageAnnotationTest(unittest.TestCase):
         plt.subplot(223)
         plt.imshow(image2)
         view2.plot_annotations("obj1")
-        mask = view2.get_annotation_region_raster("obj1")
+        mask = view2.get_annotation_raster("obj1")
         plt.subplot(224)
         plt.imshow(mask)
         self.assertTrue(np.array_equal(mask.shape[:2], image2.shape[:2]), "shape of mask should be the same as shape of image")

@@ -608,7 +608,7 @@ class View:
         self.select_outer_annotations = self.anim.select_outer_annotations
         self.select_inner_annotations = self.anim.select_inner_annotations
         self.get_raster_image = self.get_region_image
-        self.get_annotation_raster = self.get_annotation_region_raster
+        self.get_annotation_region_raster = self.get_annotation_raster
 
     def set_region(
             self,
@@ -729,7 +729,20 @@ class View:
         x_view_px, y_view_px = self.coords_glob_px_to_view_px(x_glob_px, y_glob_px)
         plt.plot(x_view_px, y_view_px, "oy")
 
-    def get_annotation_region_raster(self, annotation_id):
+    def get_annotation_raster(self, annotation_id:int, holes_ids:List[int]=None) -> np.ndarray:
+        if holes_ids is None:
+            holes_ids = []
+        ann_raster = self._get_single_annotation_region_raster(annotation_id)
+        # if len(holes_ids) == 0:
+        #     # ann_raster = ann_raster1
+        # else:
+        for hole_id in holes_ids:
+
+            ann_raster2 = self.get_annotation_raster(hole_id)
+            ann_raster = ann_raster ^ ann_raster2
+        return ann_raster
+
+    def _get_single_annotation_region_raster(self, annotation_id):
         annotation_id = self.anim.get_annotation_id(annotation_id)
         # Coordinates swap
         # coordinates are swapped here. Probably it is because Path uses different order from Image

@@ -27,7 +27,7 @@ class Evaluation:
             logger.warning("More than one inner annotation find to annotation with ID %i", annotation_id)
         elif len(inner_ids) > 0:
             inner_id = inner_ids[0]
-            seg_true = lobulus.view.get_annotation_region_raster(annotation_id=inner_id) > 0
+            seg_true = lobulus.view.get_annotation_raster(annotation_id=inner_id) > 0
             seg = lobulus.central_vein_mask > 0
 
             dice0 = np.sum((seg & seg_true)) * 2
@@ -48,7 +48,7 @@ class Evaluation:
             logger.warning("More than one outer annotation find to annotation with ID %i", annotation_id)
         elif len(outer_ids) > 0:
             outer_id = outer_ids[0]
-            seg_true = lobulus.view.get_annotation_region_raster(annotation_id=outer_id) > 0
+            seg_true = lobulus.view.get_annotation_raster(annotation_id=outer_id) > 0
             seg = (lobulus.lobulus_mask + lobulus.central_vein_mask) > 0
             if self.report is not None:
                 fig = plt.figure()
