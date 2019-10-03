@@ -266,7 +266,7 @@ class Lobulus:
         self._inner_texture.set_report(self.report)
         self._inner_texture.add_cols_to_report = False
         self._inner_texture.run()
-        tfeatures = copy.copy(self._inner_texture.measured_reatures)
+        tfeatures = copy.copy(self._inner_texture.measured_features)
         tfeatures[:, :, 2] = 1 - tfeatures[:, :, 2]
         tfeatures0 = np.mean(tfeatures, 2)
         if self.report is not None:
