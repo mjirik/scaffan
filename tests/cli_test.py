@@ -14,7 +14,6 @@ def test_clit():
     )
 
     logger.debug(f"pth={pth}")
-    expected_pth = Path(io3d.datasets.join_path("animals", "processed", "anwa", "arina_cut.mp4", get_root=True))
     expected_pth = Path(".test_output/data.xlsx")
     logger.debug(f"expected_pth={expected_pth}")
     if expected_pth.exists():
