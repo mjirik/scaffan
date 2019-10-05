@@ -17,9 +17,9 @@ import scaffan.algorithm
 class MainGuiTest(unittest.TestCase):
 
     # skip_on_local = False
-    # skip_on_local = True
-    # @unittest.skipIf(os.environ.get("TRAVIS", skip_on_local), "Skip on Travis-CI")
-    def test_just_start_app_interactive(self):
+    skip_on_local = True
+    @unittest.skipIf(os.environ.get("TRAVIS", skip_on_local), "Skip on Travis-CI")
+    def test_just_start_app_interactive_with_predefined_params(self):
         # fn = io3d.datasets.join_path("medical", "orig", "CMU-1.ndpi", get_root=True)
         # fn = io3d.datasets.join_path("medical", "orig", "CMU-1.ndpi", get_root=True)
         # fn = io3d.datasets.join_path("scaffold", "Hamamatsu", "PIG-003_J-18-0165_HE.ndpi", get_root=True)
@@ -51,7 +51,7 @@ class MainGuiTest(unittest.TestCase):
         # mainapp.set_annotation_color_selection("#FF0000")
         # mainapp.set_annotation_color_selection("red")
         mainapp.set_annotation_color_selection("yellow")
-        # mainapp.start_gui()
+        mainapp.start_gui(skip_exec=True)
 
     skip_on_local = False
     @unittest.skipIf(os.environ.get("TRAVIS", skip_on_local), "Skip on Travis-CI")
