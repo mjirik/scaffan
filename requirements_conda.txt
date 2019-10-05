@@ -10,3 +10,4 @@ xlrd
 loguru
 # higer version work in different way with alpha
 scipy=1.2
+click
