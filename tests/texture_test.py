@@ -206,7 +206,7 @@ class TextureTest(unittest.TestCase):
 
     skip_on_local = True
 
-    @unittest.skipIf(os.environ.get("TRAVIS", False), "Skip on Travis-CI")
+    @unittest.skipIf(os.environ.get("TRAVIS", True), "Skip on Travis-CI")
     def test_texture_segmentation_object_lobulus_data(self):
         fn = io3d.datasets.join_path(
             "scaffold",
@@ -326,8 +326,3 @@ class TextureTest(unittest.TestCase):
         plt.savefig("glcm_features_color_{}.png".format(title))
         # plt.show()
 
-
-if __name__ == "__main__":
-    # logging.basicConfig(stream=sys.stderr)
-    logger.setLevel(logging.DEBUG)
-    unittest.main()
