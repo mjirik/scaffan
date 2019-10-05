@@ -300,6 +300,7 @@ class Scaffan:
         self.report.additional_spreadsheet_fn = str(fn_spreadsheet.value())
 
     def set_annotation_color_selection(self, color:str):
+        logger.debug(f"color={color}")
         pcolor = self.parameters.param("Input", "Annotation Color")
         color = color.upper()
         color_name = color.lower()
@@ -312,6 +313,7 @@ class Scaffan:
         if color in pcolor.reverse[0]:
             # val = pcolor.reverse[0].index(color)
             # pcolor.setValue(val)
+            logger.debug(f"setting color parameter to {color}")
             pcolor.setValue(color)
         else:
             raise ValueError("Color '{}' not found in allowed colors.".format(color))

@@ -131,6 +131,7 @@ def nogui(input_path, color, output_path, params):
     if output_path is not None:
         mainapp.set_output_dir(output_path.parent)
     if color is not None:
+        logger.debug(f"color={color}")
         mainapp.set_annotation_color_selection(color)
     mainapp.run_lobuluses()
 # def install():

@@ -8,7 +8,8 @@ import scaffan.main_cli
 import io3d
 from pathlib import Path
 
-def test_clit():
+
+def test_cli():
     pth = io3d.datasets.join_path(
         "medical", "orig", "sample_data", "SCP003", "SCP003.ndpi", get_root=True
     )
@@ -22,6 +23,6 @@ def test_clit():
     runner = click.testing.CliRunner()
     # runner.invoke(anwa.main_click.nogui, ["-i", str(pth)])
     runner.invoke(scaffan.main_cli.run,
-                  ["nogui", "-i", pth, "-o", expected_pth, "-c", "#0000FF"])
+                  ["nogui", "-i", pth, "-o", expected_pth, "-c", "#FFFF00"])
 
     assert expected_pth.exists()

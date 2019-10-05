@@ -57,4 +57,11 @@ class LobulusTest(unittest.TestCase):
         self.assertTrue((output_dir/"lobulus_central_thr_skeleton_7.png").exists())
         self.assertTrue((output_dir/"lobulus_central_thr_skeleton_7_fig.png").exists())
         self.assertTrue((output_dir/"data.xlsx").exists())
+
+        self.assertLess(0.6, mainapp.evaluation.evaluation_history[0]["Lobulus Border Dice"],
+                        "Lobulus segmentation should have Dice coefficient above some low level")
+        # self.assertLess(0.6, mainapp.evaluation.evaluation_history[1]["Lobulus Border Dice"],
+        #                 "Lobulus segmentation should have Dice coefficient above some low level")
+        self.assertLess(0.2, mainapp.evaluation.evaluation_history[0]["Central Vein Dice"],
+                        "Central Vein segmentation should have Dice coefficient above some low level")
         # mainapp.start_gui()
