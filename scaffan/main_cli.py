@@ -97,15 +97,41 @@ def install():
 
 
 @run.command(context_settings=CONTEXT_SETTINGS)
+@click.option(
+    "--input-path",
+    "-i",
+    type=click.Path(exists=True),
+    help='Path to input directory with video files.',
+    default=None,
+)
+@click.option(
+    "--color",
+    "-c",
+    type=str,
+    help='Annotation collor in hexa (#0000FF)',
+    default=None,
+)
+@click.option(
+    "--output-path",
+    "-o",
+    type=click.Path(),
+    help='Path to output directory with video files.',
+    default=None,
+)
 @click.option('--params', '-p', multiple=True, default='', nargs=2,
               help='Set parameter. First argument is path to parameter separated by ",". Second is the value.'
                    'python -m scaffan gui -p Processing,Show True')
-def nogui(params):
+def nogui(input_path, color, output_path, params):
     mainapp = algorithm.Scaffan()
     for param in params:
         mainapp.parameters.param(*param[0].split(",")).setValue(ast.literal_eval(param[1]))
-    mainapp.start_gui()
+
+    if input_path is not None:
+        mainapp.set_input_file(input_path)
+    if output_path is not None:
+        mainapp.set_output_dir(output_path.parent)
+    if color is not None:
+        mainapp.set_annotation_color_selection(color)
     mainapp.run_lobuluses()
 # def install():
 
-run()

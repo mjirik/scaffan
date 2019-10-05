@@ -25,6 +25,8 @@ env:
     - CONDA_PYTHON_VERSION=3.6
 virtualenv:
   system_site_packages: true
+services:
+  - xvfb
 before_script:
     # GUI
     - "export DISPLAY=:99.0"
