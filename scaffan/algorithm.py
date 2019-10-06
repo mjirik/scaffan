@@ -352,7 +352,7 @@ class Scaffan:
         show = self.parameters.param("Processing", "Show").value()
         self.report.set_show(show)
         self.report.set_save(True)
-        run_slide_segmentation = self.parameters.param("Processing", "Run Texture Analysis").value()
+        run_slide_segmentation = self.parameters.param("Processing", "Run Slide Segmentation").value()
         if run_slide_segmentation:
             fn_input = self.parameters.param("Input", "File Path").value()
             self.slide_segmentation.init(Path(fn_input))
