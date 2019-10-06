@@ -42,7 +42,7 @@ from scaffan.pyqt_widgets import BatchFileProcessingParameter
 class Scaffan:
     def __init__(self):
 
-        self.report: Report = exsu.report.Report()
+        self.report: Report = Report()
         # self.report.level = 50
 
         self.raise_exception_if_color_not_found = True
