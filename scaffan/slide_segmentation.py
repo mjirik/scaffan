@@ -36,7 +36,7 @@ class SlideSegmentation():
             {
                 "name": "Working Resolution",
                 "type": "float",
-                "value": 0.000001, # 0.01 mm
+                "value": 0.00001, # 0.01 mm
                 "suffix": "m",
                 "siPrefix": True,
                 "tip": "Resolution used for segmentation processing. " +
@@ -88,7 +88,7 @@ class SlideSegmentation():
         pass
 
     def init(self, fn: Path):
-        self.anim = scim.AnnotatedImage(fn)
+        self.anim = scim.AnnotatedImage(str(fn))
         self.level = self._find_best_level()
         self.tiles = None
         self.tile_size = None
@@ -185,7 +185,8 @@ class SlideSegmentation():
         return imgout
 
     def _find_best_level(self):
-        pixelsize_mm = np.array([float(self.parameters.param("Working Resolution").value()) * 100] * 2)
+        pixelsize_mm = np.array([float(self.parameters.param("Working Resolution").value()) * 1000] * 2)
+        logger.debug(f"wanted pixelsize mm={pixelsize_mm}")
         error = None
         closest_i = None
         best_pxsz = None
@@ -201,6 +202,7 @@ class SlideSegmentation():
                     closest_i = i
                     best_pxsz = pxsz
         self.real_pixelsize_mm = best_pxsz
+        logger.debug(f"real pixelsize mm={best_pxsz}")
 
         return closest_i
 

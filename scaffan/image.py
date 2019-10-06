@@ -169,7 +169,7 @@ class AnnotatedImage:
     """
     Read the image and the annotation. The
     """
-    def __init__(self, path, skip_read_annotations=False):
+    def __init__(self, path:str, skip_read_annotations=False):
         logger.debug("Reading file {}".format(path))
         self.path = path
         self.openslide = openslide.OpenSlide(path)
