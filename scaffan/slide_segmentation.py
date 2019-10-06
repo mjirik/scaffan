@@ -63,7 +63,7 @@ class SlideSegmentation():
 
         ]
 
-        self.parameters = Parameter.create(name="Skeleton Analysis", type="group", children=params, expanded=False)
+        self.parameters = Parameter.create(name="Slide Segmentation", type="group", children=params, expanded=False)
         self.report: Report = None
         self.anim = None
         self.tile_size = None
@@ -71,8 +71,11 @@ class SlideSegmentation():
         self.tiles: List["View"] = None
         #         self.clf = sklearn.svm.SVC(gamma='scale')
         self.clf = GaussianNB()
-        self.clf_fn = Path(__file__).parent / "segmentation_model.pkl"
-        self.clf = joblib.load(self.clf_fn)
+        self.clf_fn = Path(Path(__file__).parent / "segmentation_model.pkl")
+        if self.clf_fn.exists():
+            self.clf = joblib.load(self.clf_fn)
+        else:
+            self.clf = None
         self.predicted_tiles = None
         # self.output_label_fn = "label.png"
         # self.output_raster_fn = "image.png"
