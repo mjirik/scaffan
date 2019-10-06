@@ -172,7 +172,8 @@ class GLCMTextureMeasurement:
         view = self.parent_view.to_pixelsize(pxsize_mm)
         texture_image = view.get_region_image(as_gray=True)
         if self.report is not None:
-            self.report.imsave("texture_input_image_{}_{}.png".format(self.filename_label, self.annotation_id), (texture_image * 255).astype(np.uint8))
+            self.report.imsave("texture_input_image_{}_{}.png".format(self.filename_label, self.annotation_id),
+                               (texture_image * 255).astype(np.uint8))
         energy = tiles_processing(
             1 - texture_image,
             fcn=lambda img: texture_glcm_features(img, levels),

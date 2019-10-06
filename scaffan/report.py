@@ -95,7 +95,7 @@ class Report:
             append_df_to_excel(filename, self.df)
             # append_df_to_excel_no_head_processing(filename, self.df)
 
-    def imsave(self, base_fn, arr:np.ndarray, k=50, level=50, npz_level=40):
+    def imsave(self, base_fn, arr: np.ndarray, k=50, level=50, level_npz=40):
         """
         :param base_fn: with a format slot for annotation id like "skeleton_{}.png"
         :param arr:
@@ -111,9 +111,10 @@ class Report:
                 with warnings.catch_warnings():
                     warnings.filterwarnings("ignore", ".*low contrast image.*")
                     # warnings.simplefilter("low contrast image")
-                    fn = op.join(self.outputdir, filename + ext)
+                    join = op.join(self.outputdir, filename + ext)
+                    fn = join
                     skimage.io.imsave(fn, k * arr)
-            if self._is_under_level(npz_level):
+            if self._is_under_level(level_npz):
                 self._save_arr(base_fn, arr)
 
     def _save_arr(self, base_fn, arr:np.ndarray):
