@@ -36,6 +36,7 @@ import scaffan.lobulus
 import scaffan.skeleton_analysis
 from exsu.report import Report
 import scaffan.evaluation
+import scaffan.slide_segmentation
 from scaffan.pyqt_widgets import BatchFileProcessingParameter
 
 
@@ -52,6 +53,7 @@ class Scaffan:
         self.lobulus_processing = scaffan.lobulus.Lobulus()
         self.skeleton_analysis = scaffan.skeleton_analysis.SkeletonAnalysis()
         self.evaluation = scaffan.evaluation.Evaluation()
+        self.slide_segmentation = scaffan.slide_segmentation.SlideSegmentation()
 
         self.lobulus_processing.set_report(self.report)
         self.glcm_textures.set_report(self.report)
@@ -140,6 +142,12 @@ class Scaffan:
                         "tip": "Open system window with output dir when processing is finished",
                     },
                     {
+                        "name": "Run Slide Segmentation",
+                        "type": "bool",
+                        "value": True,
+                        "tip": "Run analysis of whole slide before all other processing is perfomed",
+                    },
+                    {
                         "name": "Run Skeleton Analysis",
                         "type": "bool",
                         "value": True,
@@ -151,6 +159,7 @@ class Scaffan:
                         "value": True,
                         # "tip": "Show images",
                     },
+                    self.slide_segmentation.parameters,
                     self.lobulus_processing.parameters,
                     self.skeleton_analysis.parameters,
                     self.glcm_textures.parameters,
@@ -343,8 +352,19 @@ class Scaffan:
         show = self.parameters.param("Processing", "Show").value()
         self.report.set_show(show)
         self.report.set_save(True)
+        run_slide_segmentation = self.parameters.param("Processing", "Run Texture Analysis").value()
+        if run_slide_segmentation:
+            fn_input = self.parameters.param("Input", "File Path").value()
+            self.slide_segmentation.init(Path(fn_input))
+            self.slide_segmentation.run()
         for id in annotation_ids:
             self._run_lobulus(id)
+
+        # in the case no lobulus has been measured the segmentation measurement is stored to table
+        if run_slide_segmentation and len(annotation_ids) == 0:
+            self.report.finish_actual_row()
+
+
 
 
         # self.report.df.to_excel(op.join(self.report.outputdir, "data.xlsx"))
@@ -397,9 +417,12 @@ class Scaffan:
         self.lobulus_processing.set_annotated_image_and_id(self.anim, annotation_id)
         self.lobulus_processing.run(show=show)
         self.skeleton_analysis.set_lobulus(lobulus=self.lobulus_processing)
-        if self.parameters.param("Processing", "Run Skeleton Analysis").value():
+        run_slide_segmentation = self.parameters.param("Processing", "Run Texture Analysis").value()
+        run_skeleton_analysis = self.parameters.param("Processing", "Run Skeleton Analysis").value()
+        run_texture_analysis = self.parameters.param("Processing", "Run Texture Analysis").value()
+        if run_skeleton_analysis:
             self.skeleton_analysis.skeleton_analysis(show=show)
-        if self.parameters.param("Processing", "Run Texture Analysis").value():
+        if run_texture_analysis:
             # self.glcm_textures.report = self.report
             self.glcm_textures.set_input_data(view=self.lobulus_processing.view, id=annotation_id,
                                               lobulus_segmentation=self.lobulus_processing.lobulus_mask)

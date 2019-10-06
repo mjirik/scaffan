@@ -44,12 +44,21 @@ class SlideSegmentation():
 
             },
             {
-                "name": "Inner Lobulus Margin",
-                "type": "float",
-                "value": 0.00002,
-                "suffix": "m",
-                "siPrefix": True,
-                "tip": "Area close to the border is ignored in Otsu threshold computation before skeletonization step."
+                "name": "Working Tile Size",
+                "type": "int",
+                "value": 256,
+                "suffix": "px",
+                "siPrefix": False,
+                "tip": "Image is processed tile by tile. This value defines size of the tile"
+            },
+            {
+                "name": "Run Training",
+                "type": "bool",
+                "value": False,
+                "tip": "Use annotated image to train classifier." +
+                    "Red area is extra-lobular tissue." +
+                    "Black area is intra-lobular tissue." +
+                    "Magenta area is empty part of the image.",
             },
 
         ]
@@ -57,20 +66,21 @@ class SlideSegmentation():
         self.parameters = Parameter.create(name="Skeleton Analysis", type="group", children=params, expanded=False)
         self.report: Report = None
         self.anim = None
-        self.tile_size = [256, 256]
+        self.tile_size = None
         self.level = None
         self.tiles: List["View"] = None
         #         self.clf = sklearn.svm.SVC(gamma='scale')
         self.clf = GaussianNB()
-        self.clf_fn = "standard_svm_model.pkl"
+        self.clf_fn = Path(__file__).parent / "segmentation_model.pkl"
         self.clf = joblib.load(self.clf_fn)
         self.predicted_tiles = None
-        self.output_label_fn = "label.png"
-        self.output_raster_fn = "image.png"
+        # self.output_label_fn = "label.png"
+        # self.output_raster_fn = "image.png"
         self.devel_imcrop = None
         #         self.devel_imcrop = np.array([20000, 15000])
         self.full_output_image = None
         self.full_raster_image = None
+        self.real_pixelsize_mm = None
 
         pass
 
@@ -78,8 +88,9 @@ class SlideSegmentation():
         self.anim = scim.AnnotatedImage(fn)
         self.level = self._find_best_level()
         self.tiles = None
+        self.tile_size = None
         #         self.predicted_tiles = None
-        self.make_tiles()
+        # self.make_tiles()
 
     def train_svm_classifier(self, pixels=None, y=None):
         if pixels is None:
@@ -174,15 +185,19 @@ class SlideSegmentation():
         pixelsize_mm = np.array([float(self.parameters.param("Working Resolution").value()) * 100] * 2)
         error = None
         closest_i = None
+        best_pxsz = None
         for i, pxsz in enumerate(self.anim.level_pixelsize):
             err = np.linalg.norm(pixelsize_mm - pxsz)
             if error is None:
                 error = err
                 closest_i = i
+                best_pxsz = pxsz
             else:
                 if err < error:
                     error = err
                     closest_i = i
+                    best_pxsz = pxsz
+        self.real_pixelsize_mm = best_pxsz
 
         return closest_i
 
@@ -201,6 +216,8 @@ class SlideSegmentation():
         return imsize.astype(np.int), tile_size_on_level0.astype(np.int), tile_size_on_level, imsize_on_level
 
     def make_tiles(self):
+        sz = int(self.parameters.param("Working Tile Size").value())
+        self.tile_size = [sz, sz]
         imsize, size_on_level0, size_on_level, imsize_on_level = self._get_tiles_parameters()
         self.tiles = []
 
@@ -311,12 +328,18 @@ class SlideSegmentation():
         self.intralobular_ratio = count[1] / (count[1] + count[2])
         #         plt.figure(figsize=(10, 10))
         #         plt.imshow(self.full_output_image)
+        self.report.imsave("slice_label.png", self.full_output_image)
         plt.imsave(self.output_label_fn, self.full_output_image)
 
         #         plt.figure(figsize=(10, 10))
         img = self.get_raster_image(as_gray=False)
         #         plt.imshow(img)
-        plt.imsave(self.output_raster_fn, img.astype(np.uint8))
+        plt.imsave("slice_raster.png", img.astype(np.uint8))
+        self.report.set_persistent_cols({
+            "Slice Empty Area [mm^2]": (self.real_pixelsize_mm**2) * count[0],
+            "Slice Septum Area [mm^2]": (self.real_pixelsize_mm**2) * count[1],
+            "Slice Sinusoidal Area [mm^2]": (self.real_pixelsize_mm**2) * count[2],
+        })
 
     def find_biggest_lobuli(self, n_max: int = 5):
         """
@@ -348,6 +371,9 @@ class SlideSegmentation():
         return max_points
 
     def run(self):
+        if bool(self.parameters.param("Run Training").value()):
+            self.train_svm_classifier()
+            self.save_classifier()
         self.predict()
         self.evaluate()
 

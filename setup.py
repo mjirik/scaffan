@@ -61,6 +61,7 @@ setup(
         "sample1": ["scaffan_icon256.png"],
         "": ["*.png", "*.ico"],
         "sample2": ["scaffan/scaffan_icon256.png"],
+        "segmentation_model": ["scaffan/segmentation_model.pkl"],
     },
     # Although 'package_data' is the preferred approach, in some case you may
     # need to place data files outside of your packages.
