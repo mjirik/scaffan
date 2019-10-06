@@ -50,6 +50,7 @@ requirements:
     - click
     - pywin32 # [win]
     - loguru
+    - exsu
 
   run:
     - python=3,<3.6.7
@@ -68,6 +69,7 @@ requirements:
     - morphsnakes
 #    - pyqt>=5.0
     - {{ pin_compatible('pyqt', max_pin='x', min_pin="x.x") }}
+    - {{ pin_compatible('exsu', max_pin='x', min_pin="x.x") }}
 #    - pyqt=5.9.2 # tested
     - pyqtgraph
     - {{ pin_compatible('pyqtgraph', max_pin='x', min_pin="x.x") }}

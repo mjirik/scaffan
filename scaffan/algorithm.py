@@ -33,9 +33,8 @@ import pyqtgraph.widgets
 import io3d
 import io3d.datasets
 import scaffan.lobulus
-import scaffan.report
 import scaffan.skeleton_analysis
-from .report import Report
+from exsu.report import Report
 import scaffan.evaluation
 from scaffan.pyqt_widgets import BatchFileProcessingParameter
 
@@ -43,7 +42,7 @@ from scaffan.pyqt_widgets import BatchFileProcessingParameter
 class Scaffan:
     def __init__(self):
 
-        self.report: Report = scaffan.report.Report()
+        self.report: Report = exsu.report.Report()
         # self.report.level = 50
 
         self.raise_exception_if_color_not_found = True

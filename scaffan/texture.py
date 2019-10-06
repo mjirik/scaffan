@@ -15,7 +15,7 @@ from typing import List
 import os.path as op
 from pyqtgraph.parametertree import Parameter, ParameterTree
 from . import image
-from .report import Report
+from exsu.report import Report
 import imma.image
 
 

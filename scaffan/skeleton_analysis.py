@@ -18,7 +18,7 @@ from matplotlib import pyplot as plt
 from scaffan import image as scim
 import scaffan
 import scaffan.lobulus
-from .report import Report
+from exsu.report import Report
 from pyqtgraph.parametertree import Parameter
 import imma.image
 

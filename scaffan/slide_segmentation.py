@@ -20,12 +20,43 @@ import skimage.filters
 from skimage.morphology import disk
 import scipy.ndimage
 import matplotlib.pyplot as plt
+from pyqtgraph.parametertree import Parameter, ParameterTree
+import exsu
+from exsu.report import Report
 
 
 class SlideSegmentation():
     def __init__(self):
+        params = [
+            # {
+            #     "name": "Tile Size",
+            #     "type": "int",
+            #     "value" : 128
+            # },
+            {
+                "name": "Working Resolution",
+                "type": "float",
+                "value": 0.000001, # 0.01 mm
+                "suffix": "m",
+                "siPrefix": True,
+                "tip": "Resolution used for segmentation processing. " +
+                       "Real working resolution will be selected according to image levels."
+
+            },
+            {
+                "name": "Inner Lobulus Margin",
+                "type": "float",
+                "value": 0.00002,
+                "suffix": "m",
+                "siPrefix": True,
+                "tip": "Area close to the border is ignored in Otsu threshold computation before skeletonization step."
+            },
+
+        ]
+
+        self.parameters = Parameter.create(name="Skeleton Analysis", type="group", children=params, expanded=False)
+        self.report: Report = None
         self.anim = None
-        self.pixelsize_mm = [0.01, 0.01]
         self.tile_size = [256, 256]
         self.level = None
         self.tiles: List["View"] = None
@@ -140,10 +171,11 @@ class SlideSegmentation():
         return imgout
 
     def _find_best_level(self):
+        pixelsize_mm = np.array([float(self.parameters.param("Working Resolution").value()) * 100] * 2)
         error = None
         closest_i = None
         for i, pxsz in enumerate(self.anim.level_pixelsize):
-            err = np.linalg.norm(self.pixelsize_mm - pxsz)
+            err = np.linalg.norm(pixelsize_mm - pxsz)
             if error is None:
                 error = err
                 closest_i = i

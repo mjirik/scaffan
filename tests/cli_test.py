@@ -14,7 +14,7 @@ def test_cli():
         "medical", "orig", "sample_data", "SCP003", "SCP003.ndpi", get_root=True
     )
 
-    logger.debug(f"pth={pth}")
+    logger.debug(f"pth={pth}, exists={Path(pth).exists()}")
     expected_pth = Path(".test_output/data.xlsx")
     logger.debug(f"expected_pth={expected_pth}")
     if expected_pth.exists():
@@ -23,6 +23,6 @@ def test_cli():
     runner = click.testing.CliRunner()
     # runner.invoke(anwa.main_click.nogui, ["-i", str(pth)])
     runner.invoke(scaffan.main_cli.run,
-                  ["nogui", "-i", pth, "-o", expected_pth, "-c", "#FFFF00"])
+                  ["nogui", "-i", pth, "-o", expected_pth.parent, "-c", "#FFFF00"])
 
     assert expected_pth.exists()

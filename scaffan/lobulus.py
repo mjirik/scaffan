@@ -19,7 +19,7 @@ import warnings
 import morphsnakes as ms
 from matplotlib import pyplot as plt
 from scaffan import image as scim
-from .report import Report
+from exsu.report import Report
 from pyqtgraph.parametertree import Parameter
 import imma.image
 import scaffan.texture
