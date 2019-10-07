@@ -149,6 +149,12 @@ class Scaffan:
                         "tip": "Run analysis of whole slide before all other processing is perfomed",
                     },
                     {
+                        "name": "Automatic Lobulus Selection",
+                        "type": "bool",
+                        "value": True,
+                        "tip": "Select lobulus based on Slide Segmentation. ",
+                    },
+                    {
                         "name": "Run Skeleton Analysis",
                         "type": "bool",
                         "value": True,
@@ -344,10 +350,6 @@ class Scaffan:
         # if color is None:
         #     color = list(self.anim.colors.keys())[0]
         # print(self.anim.colors)
-        annotation_ids = self.anim.select_annotations_by_color(
-            color,
-            raise_exception_if_not_found=self.raise_exception_if_color_not_found)
-        logger.debug("Annotation IDs: {}".format(annotation_ids))
         # if annotation_ids is None:
         #     logger.error("No color selected")
 
@@ -359,6 +361,18 @@ class Scaffan:
             fn_input = self.parameters.param("Input", "File Path").value()
             self.slide_segmentation.init(Path(fn_input))
             self.slide_segmentation.run()
+        automatic_lobulus_selection = self.parameters.param("Processing","Automatic Lobulus Selection").value()
+        if automatic_lobulus_selection:
+            if run_slide_segmentation:
+                self.slide_segmentation.add_biggest_to_annotations()
+                annotation_ids = self.slide_segmentation.ann_biggest_ids
+            else:
+                raise NoLobulusSelectionUsedError
+        else:
+            annotation_ids = self.anim.select_annotations_by_color(
+                color,
+                raise_exception_if_not_found=self.raise_exception_if_color_not_found)
+        logger.debug("Annotation IDs: {}".format(annotation_ids))
         for id in annotation_ids:
             self._run_lobulus(id)
 
@@ -522,3 +536,6 @@ class Scaffan:
         if not skip_exec:
 
             qapp.exec_()
+
+class NoLobulusSelectionUsedError(Exception):
+    pass

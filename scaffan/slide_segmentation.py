@@ -60,6 +60,24 @@ class SlideSegmentation():
                     "Black area is intra-lobular tissue." +
                     "Magenta area is empty part of the image.",
             },
+            {
+                "name": "Lobulus Number",
+                "type": "int",
+                "value": 5,
+                # "suffix": "px",
+                "siPrefix": False,
+                "tip": "Number of lobuluses automatically selected."
+                       ""
+            },
+            {
+                "name": "Annotation Radius",
+                "type": "float",
+                "value": 0.0001,  # 0.1 mm
+                "suffix": "m",
+                "siPrefix": True,
+                "tip": "Automatic annotation radius used when the automatic lobulus selection is prefered "
+
+            },
 
         ]
 
@@ -82,6 +100,7 @@ class SlideSegmentation():
         self.full_output_image = None
         self.full_raster_image = None
         self.real_pixelsize_mm = None
+        self.ann_biggest_ids = []
 
         pass
 
@@ -90,6 +109,7 @@ class SlideSegmentation():
         self.level = self._find_best_level()
         self.tiles = None
         self.tile_size = None
+        self.ann_biggest_ids = []
         #         self.predicted_tiles = None
         # self.make_tiles()
 
@@ -344,10 +364,11 @@ class SlideSegmentation():
             "Slice Sinusoidal Area [mm^2]": np.prod(self.real_pixelsize_mm) * count[2],
         })
 
-    def find_biggest_lobuli(self, n_max: int = 5):
+    def _find_biggest_lobuli(self):
         """
         :param n_max: Number of points. All points are returned if set to 0.
         """
+        n_max = int(self.parameters.param("Lobulus Number").value())
         mask = self.full_output_image == 1
         dist = scipy.ndimage.morphology.distance_transform_edt(mask)
         self.dist = dist
@@ -372,6 +393,35 @@ class SlideSegmentation():
         plt.axis('off')
 
         return max_points
+
+    def add_biggest_to_annotations(self, n_max:int=5):
+        points_px = self._find_biggest_lobuli()
+        view_corner = self.tiles[0][0]
+        pts_glob_px = view_corner.coords_view_px_to_glob_px(points_px[:, 1], points_px[:, 0])
+        centers_px = list(zip(*pts_glob_px))
+        r_mm = float(self.parameters.param("Annotation Radius").value()) * 1000
+        # r_mm = 0.1
+        t = np.linspace(0, 2 * np.pi, 30)
+
+
+        for center_px in centers_px:
+            r_px = view_corner.mm_to_px(r_mm)
+            #     print(f"r_px={r_px}")
+            r_px_glob = view_corner.coords_view_px_to_glob_px(np.array([r_px[0]]), np.array([r_px[1]]))
+            x_px = r_px_glob[0] * np.sin(t) + center_px[0]
+            y_px = r_px_glob[1] * np.cos(t) + center_px[1]
+
+            ann = {
+                "title": "",
+                "x_px": x_px,
+                "y_px": y_px,
+                "color": "#00FF88"
+
+            }
+            newid = len(self.anim.annotations)
+            self.anim.annotations.append(ann)
+            self.ann_biggest_ids.append(newid)
+        # self.ann_biggest_ids = new_ann_ids
 
     def run(self):
         if bool(self.parameters.param("Run Training").value()):
