@@ -136,7 +136,7 @@ def nogui(input_path, color, output_path, params):
     if input_path is not None:
         mainapp.set_input_file(input_path)
     if output_path is not None:
-        mainapp.set_output_dir(output_path.parent)
+        mainapp.set_output_dir(output_path)
     if color is not None:
         logger.debug(f"color={color}")
         mainapp.set_annotation_color_selection(color)

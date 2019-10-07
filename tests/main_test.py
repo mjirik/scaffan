@@ -12,6 +12,10 @@ import io3d
 # import openslide
 import scaffan
 import scaffan.algorithm
+from PyQt5 import QtWidgets
+import sys
+
+qapp = QtWidgets.QApplication(sys.argv)
 
 
 class MainGuiTest(unittest.TestCase):
@@ -38,7 +42,7 @@ class MainGuiTest(unittest.TestCase):
         mainapp.set_parameter("Processing;Run Skeleton Analysis", False)
         mainapp.set_parameter("Processing;Run Texture Analysis", False)
         mainapp.set_parameter("Processing;Slide Segmentation;Run Training", True)
-        mainapp.start_gui()
+        mainapp.start_gui(qapp=qapp)
 
     def test_just_start_app(self):
         # fn = io3d.datasets.join_path("medical", "orig", "CMU-1.ndpi", get_root=True)
@@ -56,7 +60,7 @@ class MainGuiTest(unittest.TestCase):
         # mainapp.set_annotation_color_selection("#FF0000")
         # mainapp.set_annotation_color_selection("red")
         mainapp.set_annotation_color_selection("yellow")
-        mainapp.start_gui(skip_exec=True)
+        mainapp.start_gui(skip_exec=True, qapp=qapp)
 
     skip_on_local = True
     @unittest.skipIf(os.environ.get("TRAVIS", True), "Skip on Travis-CI")

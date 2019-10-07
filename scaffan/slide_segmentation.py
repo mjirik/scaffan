@@ -100,7 +100,7 @@ class SlideSegmentation():
         self.clf.fit(pixels, y=y)
 
     def save_classifier(self):
-        joblib.dump(self.clf, 'standard_svm_model.pkl')
+        joblib.dump(self.clf, self.clf_fn)
 
     def prepare_training_pixels(self):
         """

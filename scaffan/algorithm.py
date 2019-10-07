@@ -208,6 +208,7 @@ class Scaffan:
         # print("ahoj")
 
     def set_output_dir(self, path):
+        logger.debug(f"output directory path={path}")
         fnparam = self.parameters.param("Output", "Directory Path")
         fnparam.setValue(str(path))
 
