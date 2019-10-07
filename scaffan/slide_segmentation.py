@@ -26,7 +26,7 @@ from exsu.report import Report
 
 
 class SlideSegmentation():
-    def __init__(self):
+    def __init__(self, report:Report=None):
         params = [
             # {
             #     "name": "Tile Size",
@@ -64,7 +64,7 @@ class SlideSegmentation():
         ]
 
         self.parameters = Parameter.create(name="Slide Segmentation", type="group", children=params, expanded=False)
-        self.report: Report = None
+        self.report: Report = report
         self.anim = None
         self.tile_size = None
         self.level = None
@@ -74,8 +74,6 @@ class SlideSegmentation():
         self.clf_fn = Path(Path(__file__).parent / "segmentation_model.pkl")
         if self.clf_fn.exists():
             self.clf = joblib.load(self.clf_fn)
-        else:
-            self.clf = None
         self.predicted_tiles = None
         # self.output_label_fn = "label.png"
         # self.output_raster_fn = "image.png"
@@ -334,16 +332,16 @@ class SlideSegmentation():
         #         plt.figure(figsize=(10, 10))
         #         plt.imshow(self.full_output_image)
         self.report.imsave("slice_label.png", self.full_output_image)
-        plt.imsave(self.output_label_fn, self.full_output_image)
+        # plt.imsave(self.output_label_fn, self.full_output_image)
 
         #         plt.figure(figsize=(10, 10))
         img = self.get_raster_image(as_gray=False)
         #         plt.imshow(img)
-        plt.imsave("slice_raster.png", img.astype(np.uint8))
+        self.report.imsave("slice_raster.png", img.astype(np.uint8))
         self.report.set_persistent_cols({
-            "Slice Empty Area [mm^2]": (self.real_pixelsize_mm**2) * count[0],
-            "Slice Septum Area [mm^2]": (self.real_pixelsize_mm**2) * count[1],
-            "Slice Sinusoidal Area [mm^2]": (self.real_pixelsize_mm**2) * count[2],
+            "Slice Empty Area [mm^2]": np.prod(self.real_pixelsize_mm) * count[0],
+            "Slice Septum Area [mm^2]": np.prod(self.real_pixelsize_mm) * count[1],
+            "Slice Sinusoidal Area [mm^2]": np.prod(self.real_pixelsize_mm) * count[2],
         })
 
     def find_biggest_lobuli(self, n_max: int = 5):
