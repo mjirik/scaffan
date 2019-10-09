@@ -34,9 +34,9 @@ def open_path(path):
     try:
         retcode = subprocess.call(cmd + " " + str(path), shell=True)
         if retcode < 0:
-            logger.error("Child was terminated by signal %i", -retcode)
+            logger.error(f"Child was terminated by signal {retcode}", )
         else:
-            logger.info("Child returned %i", retcode)
+            logger.info(f"Child returned {retcode}")
     except OSError as e:
         logger.error("Execution failed: %s", e)
         raise e

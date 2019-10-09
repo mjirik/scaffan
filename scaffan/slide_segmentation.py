@@ -4,7 +4,7 @@ from loguru import logger
 import scaffan
 import io3d # just to get data
 import scaffan.image as scim
-from typing import List
+from typing import List, Union
 from pathlib import Path
 import sklearn.cluster
 import sklearn.naive_bayes
@@ -61,6 +61,12 @@ class SlideSegmentation():
                     "Magenta area is empty part of the image.",
             },
             {
+                "name": "Clean Before Training",
+                "type": "bool",
+                "value": False,
+                "tip": "Reset classifier before training."
+            },
+            {
                 "name": "Lobulus Number",
                 "type": "int",
                 "value": 5,
@@ -72,7 +78,7 @@ class SlideSegmentation():
             {
                 "name": "Annotation Radius",
                 "type": "float",
-                "value": 0.0001,  # 0.1 mm
+                "value": 0.0002,  # 0.1 mm
                 "suffix": "m",
                 "siPrefix": True,
                 "tip": "Automatic annotation radius used when the automatic lobulus selection is prefered "
@@ -86,7 +92,7 @@ class SlideSegmentation():
         self.anim = None
         self.tile_size = None
         self.level = None
-        self.tiles: List["View"] = None
+        self.tiles: List[List["View"]] = None
         #         self.clf = sklearn.svm.SVC(gamma='scale')
         self.clf = GaussianNB()
         self.clf_fn = Path(Path(__file__).parent / "segmentation_model.pkl")
@@ -104,8 +110,9 @@ class SlideSegmentation():
 
         pass
 
-    def init(self, fn: Path):
-        self.anim = scim.AnnotatedImage(str(fn))
+    def init(self, anim:scim.AnnotatedImage):
+        self.anim = anim
+        # self.anim = scim.AnnotatedImage(str(fn))
         self.level = self._find_best_level()
         self.tiles = None
         self.tile_size = None
@@ -113,11 +120,18 @@ class SlideSegmentation():
         #         self.predicted_tiles = None
         # self.make_tiles()
 
-    def train_svm_classifier(self, pixels=None, y=None):
+    def train_classifier(self, pixels=None, y=None):
+        logger.debug("start training")
+
+        if bool(self.parameters.param("Clean Before Training").value()):
+            self.clf = GaussianNB()
+            logger.debug(f"cleaning the classifier")
         if pixels is None:
             pixels, y = self.prepare_training_pixels()
 
-        self.clf.fit(pixels, y=y)
+        self.clf.partial_fit(pixels, y=y)
+        logger.debug("training finished")
+
 
     def save_classifier(self):
         joblib.dump(self.clf, self.clf_fn)
@@ -248,6 +262,7 @@ class SlideSegmentation():
             column_tiles = []
 
             for y0 in range(0, int(imsize[1]), int(size_on_level0[1])):
+                logger.debug(f"processing tile {x0}, {y0}")
                 view = self.anim.get_view(location=(x0, y0), size_on_level=size_on_level, level=self.level)
                 column_tiles.append(view)
 
@@ -277,6 +292,7 @@ class SlideSegmentation():
         """
         predict tiles and compose everything together
         """
+        logger.debug("predict")
         if self.predicted_tiles is None:
             self.predict_tiles()
 
@@ -309,6 +325,7 @@ class SlideSegmentation():
         """
         smooth label 0 and label 1, keep label 2
         """
+        logger.debug("labeling filtration")
         tmp_img = full_image.copy()
         tmp_img[full_image == 2] = 1
         import skimage.filters
@@ -347,6 +364,7 @@ class SlideSegmentation():
         return full_image
 
     def evaluate(self):
+        logger.debug("evaluate")
         _, count = np.unique(self.full_output_image, return_counts=True)
         self.intralobular_ratio = count[1] / (count[1] + count[2])
         #         plt.figure(figsize=(10, 10))
@@ -403,7 +421,7 @@ class SlideSegmentation():
         # r_mm = 0.1
         t = np.linspace(0, 2 * np.pi, 30)
 
-
+        logger.debug(f"Automatic selection centers_px={centers_px}")
         for center_px in centers_px:
             r_px = view_corner.mm_to_px(r_mm)
             #     print(f"r_px={r_px}")
@@ -412,10 +430,11 @@ class SlideSegmentation():
             y_px = r_px_glob[1] * np.cos(t) + center_px[1]
 
             ann = {
-                "title": "",
+                "title": "Automatic Selection",
                 "x_px": x_px,
                 "y_px": y_px,
-                "color": "#00FF88"
+                "color": "#00FF88",
+                "details": "",
 
             }
             newid = len(self.anim.annotations)
@@ -424,9 +443,11 @@ class SlideSegmentation():
         # self.ann_biggest_ids = new_ann_ids
 
     def run(self):
+        logger.debug("run")
         if bool(self.parameters.param("Run Training").value()):
-            self.train_svm_classifier()
+            self.train_classifier()
             self.save_classifier()
+        logger.debug()
         self.predict()
         self.evaluate()
 

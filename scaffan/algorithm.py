@@ -359,7 +359,8 @@ class Scaffan:
         run_slide_segmentation = self.parameters.param("Processing", "Run Slide Segmentation").value()
         if run_slide_segmentation:
             fn_input = self.parameters.param("Input", "File Path").value()
-            self.slide_segmentation.init(Path(fn_input))
+            # self.slide_segmentation.init(Path(fn_input))
+            self.slide_segmentation.init(self.anim)
             self.slide_segmentation.run()
         automatic_lobulus_selection = self.parameters.param("Processing","Automatic Lobulus Selection").value()
         if automatic_lobulus_selection:

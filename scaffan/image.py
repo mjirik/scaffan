@@ -13,7 +13,7 @@ With request subimage with size=[A, B] it will return subimage with shape [B, A]
 from loguru import logger
 # problem is loading lxml together with openslide
 # from lxml import etree
-from typing import List
+from typing import List, Union
 import os.path as op
 import glob
 import matplotlib.pyplot as plt
@@ -27,6 +27,9 @@ import imma
 
 from matplotlib.path import Path as mplPath
 from mpl_toolkits.axes_grid1 import make_axes_locatable
+
+annotationID = Union[int, str]
+annotationIDs = List[annotationID]
 
 
 #
@@ -457,7 +460,7 @@ class AnnotatedImage:
             id = [idi for idi in id if id in ann_ids]
         return id
 
-    def get_annotation_ids(self, id):
+    def get_annotation_ids(self, id:Union[annotationIDs, annotationID])->annotationIDs:
         if type(id) is str:
             id = self.id_by_titles[id]
         else:

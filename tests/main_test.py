@@ -20,14 +20,18 @@ qapp = QtWidgets.QApplication(sys.argv)
 
 class MainGuiTest(unittest.TestCase):
 
-    skip_on_local = False
     # skip_on_local = True
+    skip_on_local = False
+
     @unittest.skipIf(os.environ.get("TRAVIS", skip_on_local), "Skip on Travis-CI")
-    def test_just_start_app_interactive_with_predefined_params(self):
+    def test_just_start_gui_interactive_with_predefined_params(self):
         # fn = io3d.datasets.join_path("medical", "orig", "CMU-1.ndpi", get_root=True)
         # fn = io3d.datasets.join_path("medical", "orig", "CMU-1.ndpi", get_root=True)
-        fn = io3d.datasets.join_path("scaffold", "Hamamatsu", "PIG-003_J-18-0165_HE.ndpi", get_root=True)
-        fn = io3d.datasets.join_path("medical", "orig","Scaffan-analysis", "PIG-003_J-18-0165_HE.ndpi", get_root=True)
+        # fn = io3d.datasets.join_path("scaffold", "Hamamatsu", "PIG-003_J-18-0165_HE.ndpi", get_root=True)
+        # fn = io3d.datasets.join_path("scaffold", "Hamamatsu", "PIG-003_J-18-0168_HE.ndpi", get_root=True)
+        # fn = io3d.datasets.join_path("medical", "orig","Scaffan-analysis", "PIG-003_J-18-0165_HE.ndpi", get_root=True) # training
+        fn = io3d.datasets.join_path("medical", "orig","Scaffan-analysis", "PIG-002_J-18-0091_HE.ndpi", get_root=True) # training
+        # fn = io3d.datasets.join_path("medical", "orig","Scaffan-analysis", "PIG-003_J-18-0168_HE.ndpi", get_root=True) # training
         # fn = io3d.datasets.join_path(
         #     "medical", "orig", "sample_data", "SCP003", "SCP003.ndpi", get_root=True
         # )
@@ -42,6 +46,7 @@ class MainGuiTest(unittest.TestCase):
         mainapp.set_parameter("Processing;Run Skeleton Analysis", False)
         mainapp.set_parameter("Processing;Run Texture Analysis", False)
         mainapp.set_parameter("Processing;Slide Segmentation;Run Training", True)
+        mainapp.set_parameter("Processing;Slide Segmentation;Lobulus Number", 3)
         mainapp.start_gui(qapp=qapp)
 
     def test_just_start_app(self):
