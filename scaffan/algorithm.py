@@ -16,6 +16,7 @@ from io3d import cachefile
 import json
 import time
 import platform
+from typing import List, Union
 
 # import PyQt5.QtWidgets
 # print("start 3")
@@ -213,7 +214,14 @@ class Scaffan:
         # import pdb; pdb.set_trace()
         # print("ahoj")
 
-    def set_output_dir(self, path):
+    def set_output_dir(self, path:Union[str, Path]=None):
+        """
+        Set directory for all outputs. The standard
+        :param path: if no parameter is given the standard path in ~/data/SA_%Date_%Time is selected
+        :return:
+        """
+        if path is None:
+            path = self._prepare_default_output_dir()
         logger.debug(f"output directory path={path}")
         fnparam = self.parameters.param("Output", "Directory Path")
         fnparam.setValue(str(path))

@@ -107,6 +107,9 @@ class SlideSegmentation():
         self.full_raster_image = None
         self.real_pixelsize_mm = None
         self.ann_biggest_ids = []
+        self.empty_area_mm = None
+        self.septum_area_mm = None
+        self.sinusoidal_area_mm = None
 
         pass
 
@@ -376,15 +379,18 @@ class SlideSegmentation():
         img = self.get_raster_image(as_gray=False)
         #         plt.imshow(img)
         self.report.imsave("slice_raster.png", img.astype(np.uint8))
+        self.empty_area_mm = np.prod(self.real_pixelsize_mm) * count[0],
+        self.septum_area_mm = np.prod(self.real_pixelsize_mm) * count[1],
+        self.sinusoidal_area_mm = np.prod(self.real_pixelsize_mm) * count[2],
         self.report.set_persistent_cols({
-            "Slice Empty Area [mm^2]": np.prod(self.real_pixelsize_mm) * count[0],
-            "Slice Septum Area [mm^2]": np.prod(self.real_pixelsize_mm) * count[1],
-            "Slice Sinusoidal Area [mm^2]": np.prod(self.real_pixelsize_mm) * count[2],
+            "Slice Empty Area [mm^2]": self.empty_area_mm,
+            "Slice Septum Area [mm^2]": self.septum_area_mm,
+            "Slice Sinusoidal Area [mm^2]": self.sinusoidal_area_mm,
         })
 
     def _find_biggest_lobuli(self):
         """
-        :param n_max: Number of points. All points are returned if set to 0.
+        :param n_max: Number of points. All points are returned if set to negative values.
         """
         n_max = int(self.parameters.param("Lobulus Number").value())
         mask = self.full_output_image == 1
@@ -397,7 +403,8 @@ class SlideSegmentation():
         coordinates = peak_local_max(dist, min_distance=20)
         point_dist = dist[list(zip(*coordinates))]
         # display(point_dist)
-        max_point_inds = point_dist.argsort()[-n_max:][::-1]
+        # max_point_inds = point_dist.argsort()[-n_max:][::-1]
+        max_point_inds = point_dist.argsort()[::-1][:n_max]
         max_points = coordinates[max_point_inds]
         self.centers_all = coordinates
         self.centers_max = max_points
@@ -443,12 +450,13 @@ class SlideSegmentation():
         # self.ann_biggest_ids = new_ann_ids
 
     def run(self):
-        logger.debug("run")
+        logger.debug("run...")
         if bool(self.parameters.param("Run Training").value()):
             self.train_classifier()
             self.save_classifier()
-        logger.debug()
+        logger.debug("predict...")
         self.predict()
+        logger.debug("evaluate...")
         self.evaluate()
 
 
