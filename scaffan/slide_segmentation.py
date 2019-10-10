@@ -209,10 +209,10 @@ class SlideSegmentation():
 
         img = np.copy(img)
         imgout = np.zeros([img.shape[0], img.shape[1], 8])
-        img_sob = skimage.filters.sobel(img[:, :, 0] / 255)
+        img_sob = skimage.filters.sobel(np.abs((img[:, :, 0] / 255)).astype(np.uint8))
         img_sob_gauss2 = gaussian_filter(img_sob, 2)
         img_sob_gauss5 = gaussian_filter(img_sob, 5)
-        img_sob_median = skimage.filters.median(img_sob, disk(5))
+        img_sob_median = skimage.filters.median(img_sob.astype(np.uint8), disk(5))
 
         imgout[:, :, :3] = img[:, :, :3]
         imgout[:, :, 3] = img_gauss2
@@ -286,6 +286,7 @@ class SlideSegmentation():
         if self.tiles is None:
             self.make_tiles()
 
+        logger.debug("predicting tiles")
         self.predicted_tiles = []
         for tile_view_col in self.tiles:
             predicted_col = []
@@ -311,6 +312,7 @@ class SlideSegmentation():
 
         imsize, tile_size_on_level0, tile_size_on_level, imsize_on_level = self._get_tiles_parameters()
         output_image = np.zeros(self.tile_size * np.asarray([szy, szx]), dtype=int)
+        logger.debug("composing predicted image")
         for iy, tile_column in enumerate(self.tiles):
             for ix, tile in enumerate(tile_column):
                 output_image[

@@ -150,8 +150,8 @@ class MainGuiTest(unittest.TestCase):
         mainapp.start_gui(skip_exec=skip_exec, qapp=None)
 
 
-    @pytest.mark.dataset
-    @pytest.mark.slow
+    # @pytest.mark.dataset
+    # @pytest.mark.slow
     def test_training_slide_segmentation_clf(self):
         mainapp = scaffan.algorithm.Scaffan()
         clf_fn = Path(mainapp.slide_segmentation.clf_fn)
@@ -163,9 +163,10 @@ class MainGuiTest(unittest.TestCase):
         # fn = io3d.datasets.join_path("scaffold", "Hamamatsu", "PIG-003_J-18-0168_HE.ndpi", get_root=True)
 
         fns = [
-            io3d.datasets.join_path("medical", "orig","Scaffan-analysis", "PIG-002_J-18-0091_HE.ndpi", get_root=True), # training
-            io3d.datasets.join_path("medical", "orig","Scaffan-analysis", "PIG-003_J-18-0165_HE.ndpi", get_root=True), # training
-            io3d.datasets.join_path("medical", "orig","Scaffan-analysis", "PIG-003_J-18-0168_HE.ndpi", get_root=True)  # training
+            io3d.datasets.join_path("medical", "orig", "Scaffan-analysis", "PIG-002_J-18-0091_HE.ndpi", get_root=True), # training
+            io3d.datasets.join_path("medical", "orig", "Scaffan-analysis", "PIG-003_J-18-0165_HE.ndpi", get_root=True), # training
+            io3d.datasets.join_path("medical", "orig", "Scaffan-analysis", "PIG-003_J-18-0168_HE.ndpi", get_root=True), # training
+            io3d.datasets.join_path("medical", "orig", "Scaffan-analysis", "PIG-003_J-18-0169_HE.ndpi", get_root=True)  # training
         ]
         for i, fn in enumerate(fns):
             mainapp.set_input_file(fn)
@@ -174,6 +175,7 @@ class MainGuiTest(unittest.TestCase):
             # mainapp.set_annotation_color_selection("#FF00FF")
             # mainapp.set_annotation_color_selection("#FF0000")
             mainapp.set_annotation_color_selection("#FFFF00")
+            mainapp.set_parameter("Processing;Automatic Lobulus Selection", True)
             mainapp.set_parameter("Processing;Run Skeleton Analysis", False)
             mainapp.set_parameter("Processing;Run Texture Analysis", False)
             if i == 0:
@@ -218,12 +220,13 @@ class MainGuiTest(unittest.TestCase):
             # mainapp.set_annotation_color_selection("#FF00FF")
             # mainapp.set_annotation_color_selection("#FF0000")
             mainapp.set_annotation_color_selection("#FFFF00")
+            mainapp.set_parameter("Processing;Automatic Lobulus Selection", True)
             mainapp.set_parameter("Processing;Run Skeleton Analysis", False)
             mainapp.set_parameter("Processing;Run Texture Analysis", False)
             mainapp.set_parameter("Processing;Open output dir", False)
             mainapp.set_parameter("Processing;Slide Segmentation;Clean Before Training", False)
             mainapp.set_parameter("Processing;Slide Segmentation;Run Training", False)
-            mainapp.set_parameter("Processing;Slide Segmentation;Lobulus Number", 1)
+            mainapp.set_parameter("Processing;Slide Segmentation;Lobulus Number", 0)
             # mainapp.start_gui(qapp=qapp)
             mainapp.run_lobuluses()
 
