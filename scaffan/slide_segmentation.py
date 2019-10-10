@@ -127,15 +127,16 @@ class SlideSegmentation():
     def train_classifier(self, pixels=None, y=None):
         logger.debug("start training")
 
-        if bool(self.parameters.param("Clean Before Training").value()):
-            self.clf = GaussianNB()
-            logger.debug(f"cleaning the classifier")
         if pixels is None:
             pixels, y = self.prepare_training_pixels()
 
-        self.clf.partial_fit(pixels, y=y)
+        if bool(self.parameters.param("Clean Before Training").value()):
+            self.clf = GaussianNB()
+            logger.debug(f"cleaning the classifier")
+            self.clf.fit(pixels, y=y)
+        else:
+            self.clf.partial_fit(pixels, y=y)
         logger.debug("training finished")
-
 
     def save_classifier(self):
         logger.debug("save clf")
