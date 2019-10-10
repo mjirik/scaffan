@@ -272,6 +272,12 @@ class AnnotatedImage:
         # self.details = scan.annotation_details(self.annotations)
         return self.annotations
 
+    def get_annotation_center_mm(self, ann_id:Union[str,int]):
+        ann_id = self.get_annotation_id(ann_id)
+        ann = self.annotations[ann_id]
+        return (np.mean(ann["x_mm"]), np.mean(ann["y_mm"]))
+
+
     def get_view(
             self, center=None, level=0, size_on_level=None,
             location=None, size_mm=None, pixelsize_mm=None, center_mm=None, location_mm=None, safety_bound=2,

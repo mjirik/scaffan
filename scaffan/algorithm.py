@@ -454,12 +454,16 @@ class Scaffan:
                                               lobulus_segmentation=self.lobulus_processing.lobulus_mask)
             self.glcm_textures.run()
         t1 = time.time()
+
+        ann_center = self.anim.get_annotation_center_mm(annotation_id)
         inpath = Path(self.parameters.param("Input", "File Path").value())
         fn = inpath.parts[-1]
         self.report.add_cols_to_actual_row(
             {
                 "File Path": str(inpath),
                 "Annotation Color": self.parameters.param("Input", "Annotation Color").value(),
+                "Annotation Center X [mm]": ann_center[0],
+                "Annotation Center Y [mm]": ann_center[1],
                 "Processing Time [s]": t1 - t0,
                 "Datetime": datetime.datetime.now().isoformat(' ', 'seconds'),
                 "platform.system": platform.uname().system,

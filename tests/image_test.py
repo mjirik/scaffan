@@ -300,3 +300,17 @@ class ImageAnnotationTest(unittest.TestCase):
         assert len(holes_ids) > 0
         assert len(holes_ids[0]) > 0
         assert anim.select_inner_annotations(outer_ids[0], color=color)[0] == holes_ids[0][0]
+
+    def test_get_annotation_center(self):
+        fn = io3d.datasets.join_path(
+            "medical", "orig", "sample_data", "SCP003", "SCP003.ndpi", get_root=True
+        )
+        anim = scim.AnnotatedImage(fn)
+        center_x, center_y = anim.get_annotation_center_mm(1)
+        # print(anim.annotations[1]["y_mm"])
+        # print(anim.annotations[1]["x_mm"])
+        # for some strange reason the y is usually negative
+        assert center_x > -100
+        assert center_y > -100
+        assert center_x < 100
+        assert center_y < 100
