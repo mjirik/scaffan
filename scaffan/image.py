@@ -151,6 +151,24 @@ def get_offset_px(imsl):
     return offset_px
 
 
+def annoatation_px_to_mm(imsl:openslide.OpenSlide, annotation:dict) -> dict:
+    """
+    Calculate x,y in mm from xy in pixels
+    :param imsl:
+    :param annotation:
+    :return:
+    """
+    offset_px = get_offset_px(imsl)
+    pixelsize, pixelunit = get_pixelsize(imsl)
+    x_px = np.asarray(annotation["x_px"])
+    y_px = np.asarray(annotation["y_px"])
+    x_mm = pixelsize[0]*(x_px - offset_px[0])
+    y_mm = pixelsize[1]*(y_px - offset_px[1])
+    annotation["x_mm"] = x_mm
+    annotation["y_mm"] = y_mm
+    return annotation
+
+
 def get_resize_parameters(imsl, former_level, former_size, new_level):
     """
     Get scale factor and size of image on different level.
@@ -175,7 +193,7 @@ class AnnotatedImage:
     def __init__(self, path:str, skip_read_annotations=False):
         logger.debug("Reading file {}".format(path))
         self.path = path
-        self.openslide = openslide.OpenSlide(path)
+        self.openslide:openslide.OpenSlide = openslide.OpenSlide(path)
         self.region_location = None
         self.region_size = None
         self.region_level = None

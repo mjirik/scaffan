@@ -1,15 +1,15 @@
 # /usr/bin/env python
 # -*- coding: utf-8 -*-
 from loguru import logger
-import scaffan
-import io3d # just to get data
+# import scaffan
+# import io3d # just to get data
 import scaffan.image as scim
 from typing import List, Union
 from pathlib import Path
-import sklearn.cluster
-import sklearn.naive_bayes
-import sklearn.svm
-from scaffan.image import View
+# import sklearn.cluster
+# import sklearn.naive_bayes
+# import sklearn.svm
+from scaffan.image import View, annoatation_px_to_mm
 from sklearn.externals import joblib
 from scipy.ndimage import gaussian_filter
 import skimage
@@ -21,8 +21,8 @@ from skimage.morphology import disk
 import scipy.ndimage
 import matplotlib.pyplot as plt
 from pyqtgraph.parametertree import Parameter, ParameterTree
-import exsu
 from exsu.report import Report
+from .image import AnnotatedImage
 
 
 class SlideSegmentation():
@@ -78,7 +78,7 @@ class SlideSegmentation():
             {
                 "name": "Annotation Radius",
                 "type": "float",
-                "value": 0.0002,  # 0.1 mm
+                "value": 0.00015,  # 0.1 mm
                 "suffix": "m",
                 "siPrefix": True,
                 "tip": "Automatic annotation radius used when the automatic lobulus selection is prefered "
@@ -88,8 +88,8 @@ class SlideSegmentation():
         ]
 
         self.parameters = Parameter.create(name="Slide Segmentation", type="group", children=params, expanded=False)
-        self.report: Report = report
-        self.anim = None
+        self.report:Report = report
+        self.anim:AnnotatedImage = None
         self.tile_size = None
         self.level = None
         self.tiles: List[List["View"]] = None
@@ -118,6 +118,7 @@ class SlideSegmentation():
         # self.anim = scim.AnnotatedImage(str(fn))
         self.level = self._find_best_level()
         self.tiles = None
+        self.predicted_tiles = None
         self.tile_size = None
         self.ann_biggest_ids = []
         #         self.predicted_tiles = None
@@ -137,6 +138,7 @@ class SlideSegmentation():
 
 
     def save_classifier(self):
+        logger.debug("save clf")
         joblib.dump(self.clf, self.clf_fn)
 
     def prepare_training_pixels(self):
@@ -379,9 +381,11 @@ class SlideSegmentation():
         img = self.get_raster_image(as_gray=False)
         #         plt.imshow(img)
         self.report.imsave("slice_raster.png", img.astype(np.uint8))
-        self.empty_area_mm = np.prod(self.real_pixelsize_mm) * count[0],
-        self.septum_area_mm = np.prod(self.real_pixelsize_mm) * count[1],
-        self.sinusoidal_area_mm = np.prod(self.real_pixelsize_mm) * count[2],
+        logger.debug(f"real_pixel_size={self.real_pixelsize_mm}")
+        self.empty_area_mm = np.prod(self.real_pixelsize_mm) * count[0]
+        self.septum_area_mm = np.prod(self.real_pixelsize_mm) * count[1]
+        self.sinusoidal_area_mm = np.prod(self.real_pixelsize_mm) * count[2]
+        logger.debug(f"empty_area_mm={self.empty_area_mm}")
         self.report.set_persistent_cols({
             "Slice Empty Area [mm^2]": self.empty_area_mm,
             "Slice Septum Area [mm^2]": self.septum_area_mm,
@@ -444,6 +448,7 @@ class SlideSegmentation():
                 "details": "",
 
             }
+            ann = annoatation_px_to_mm(self.anim.openslide, ann)
             newid = len(self.anim.annotations)
             self.anim.annotations.append(ann)
             self.ann_biggest_ids.append(newid)

@@ -6,15 +6,24 @@
 from loguru import logger
 import unittest
 import os
+import os.path as op
+import sys
 import io3d
+from pathlib import Path
 
+path_to_script = op.dirname(op.abspath(__file__))
+sys.path.insert(0, op.abspath(op.join(path_to_script, "../../exsu")))
+# sys.path.insert(0, op.abspath(op.join(path_to_script, "../../imma")))
+exsu_pth = Path(__file__).parents[2] / "exsu"
+logger.debug(f"exsupth{exsu_pth}, {exsu_pth.exists()}")
+sys.path.insert(0, exsu_pth)
 
+import exsu
+logger.debug(f"exsu path: {exsu.__file__}")
 # import openslide
 import scaffan
 import scaffan.algorithm
 from PyQt5 import QtWidgets
-import sys
-from pathlib import Path
 import pytest
 from datetime import datetime
 
@@ -211,14 +220,16 @@ class MainGuiTest(unittest.TestCase):
             mainapp.set_annotation_color_selection("#FFFF00")
             mainapp.set_parameter("Processing;Run Skeleton Analysis", False)
             mainapp.set_parameter("Processing;Run Texture Analysis", False)
+            mainapp.set_parameter("Processing;Open output dir", False)
             mainapp.set_parameter("Processing;Slide Segmentation;Clean Before Training", False)
             mainapp.set_parameter("Processing;Slide Segmentation;Run Training", False)
-            mainapp.set_parameter("Processing;Slide Segmentation;Lobulus Number", 0)
+            mainapp.set_parameter("Processing;Slide Segmentation;Lobulus Number", 1)
             # mainapp.start_gui(qapp=qapp)
             mainapp.run_lobuluses()
 
             specimen_size_mm = mainapp.slide_segmentation.sinusoidal_area_mm + mainapp.slide_segmentation.septum_area_mm
             whole_area_mm = mainapp.slide_segmentation.empty_area_mm + specimen_size_mm
+            logger.debug("asserts")
             assert specimen_size_mm  > whole_area_mm * 0.1
             assert mainapp.slide_segmentation.sinusoidal_area_mm > 0.1 * specimen_size_mm
             assert mainapp.slide_segmentation.septum_area_mm > 0.1 * specimen_size_mm

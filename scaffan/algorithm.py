@@ -424,6 +424,7 @@ class Scaffan:
         open_dir = self.parameters.param("Processing", "Open output dir").value()
         if open_dir:
             os_interaction.open_path(self.report.outputdir)
+        logger.debug("finished")
 
         # print("ann ids", annotation_ids)
 
