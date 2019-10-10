@@ -152,7 +152,7 @@ class Scaffan:
                     {
                         "name": "Automatic Lobulus Selection",
                         "type": "bool",
-                        "value": True,
+                        "value": False,
                         "tip": "Select lobulus based on Slide Segmentation. ",
                     },
                     {
