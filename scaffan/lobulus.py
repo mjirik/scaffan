@@ -221,7 +221,7 @@ class Lobulus:
         outer_ids = self.anim.select_outer_annotations(self.annotation_id, color="#000000",
                                                        raise_exception_if_not_found=False)
         if len(outer_ids) > 1:
-            logger.warning("More than one outer annotation find to annotation with ID %i", self.annotation_id)
+            logger.warning(f"More than one outer annotation find to annotation with ID: {self.annotation_id}")
         elif len(outer_ids) > 0:
             outer_id = outer_ids[0]
             seg_true = self.view.get_annotation_raster(annotation_id=outer_id) > 0
@@ -239,7 +239,7 @@ class Lobulus:
         logger.debug("Image size {}".format(self.image.shape))
         circle = self.annotation_mask
         if self.report is not None:
-            self.report.imsave_as_fig("gradient_outer_{}.png", self._im_gradient_border_frangi, level=30)
+            self.report.imsave_as_fig(f"gradient_outer_{self.annotation_id}.png", self._im_gradient_border_frangi, level=30)
         param_acwe_smoothing = self.parameters.param("Border Segmentation", "Smoothing").value()
         param_acwe_lambda1 =   self.parameters.param("Border Segmentation", "Lambda1").value()
         param_acwe_lambda2 =   self.parameters.param("Border Segmentation", "Lambda2").value()

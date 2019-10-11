@@ -55,7 +55,7 @@ class LobulusTest(unittest.TestCase):
         self.assertGreater(thr_size, skeleton_size, "More threshold than Skeleton")
 
         self.assertTrue((output_dir/"lobulus_central_thr_skeleton_7.png").exists())
-        self.assertTrue((output_dir/"lobulus_central_thr_skeleton_7_fig.png").exists())
+        self.assertTrue((output_dir/"lobulus_central_thr_skeleton_7_skimage.png").exists())
         self.assertTrue((output_dir/"data.xlsx").exists())
 
         self.assertLess(0.6, mainapp.evaluation.evaluation_history[0]["Lobulus Border Dice"],
