@@ -184,14 +184,17 @@ class MainGuiTest(unittest.TestCase):
         fns = [
             io3d.datasets.join_path("medical", "orig", "sample_data", "SCP003", "SCP003.ndpi", get_root=True),
         ]
-        self._testing_slide_segmentation_clf(fns, clf_fn=".temp_clf.pkl")
+        self._testing_slide_segmentation_clf(fns)
 
-    def _testing_slide_segmentation_clf(self, fns, clf_fn):
+    def _testing_slide_segmentation_clf(self, fns):
 
         mainapp = scaffan.algorithm.Scaffan()
-        if clf_fn is not None:
-            mainapp.slide_segmentation.clf_fn = Path(clf_fn)
-        clf_fn = Path(mainapp.slide_segmentation.clf_fn)
+        # if clf_fn is not None:
+        #     mainapp.slide_segmentation.clf_fn = Path(clf_fn)
+        # clf_fn = Path(mainapp.slide_segmentation.clf_fn)
+        clf_fn = mainapp.slide_segmentation.clf_fn
+        assert clf_fn.exists()
+
         if clf_fn.exists():
             modtime0 = datetime.fromtimestamp(clf_fn.stat().st_mtime)
         else:

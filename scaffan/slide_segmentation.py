@@ -151,7 +151,7 @@ class SlideSegmentation():
         logger.debug("training finished")
 
     def save_classifier(self):
-        logger.debug("save clf")
+        logger.debug(f"save clf to {self.clf_fn}")
         joblib.dump(self.clf, self.clf_fn)
 
     def prepare_training_pixels(self):
