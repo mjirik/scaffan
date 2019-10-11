@@ -107,7 +107,7 @@ class SlideSegmentation():
         self.tiles: List[List["View"]] = None
         #         self.clf = sklearn.svm.SVC(gamma='scale')
         self.clf = GaussianNB()
-        self.clf_fn = Path(Path(__file__).parent / "segmentation_model.pkl")
+        self.clf_fn:Path = Path(Path(__file__).parent / "segmentation_model.pkl")
         if self.clf_fn.exists():
             self.clf = joblib.load(self.clf_fn)
         self.predicted_tiles = None

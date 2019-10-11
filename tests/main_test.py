@@ -190,7 +190,7 @@ class MainGuiTest(unittest.TestCase):
 
         mainapp = scaffan.algorithm.Scaffan()
         if clf_fn is not None:
-            mainapp.slide_segmentation.clf_fn = clf_fn
+            mainapp.slide_segmentation.clf_fn = Path(clf_fn)
         clf_fn = Path(mainapp.slide_segmentation.clf_fn)
         if clf_fn.exists():
             modtime0 = datetime.fromtimestamp(clf_fn.stat().st_mtime)
