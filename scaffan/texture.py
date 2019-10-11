@@ -167,6 +167,7 @@ class GLCMTextureMeasurement:
         self.anim = view.anim
         self.annotation_id = id
         self.parent_view = view
+        logger.trace(f"lobulus segmentation {lobulus_segmentation}")
         self.lobulus_segmentation = lobulus_segmentation
 
     def run(self):
@@ -216,7 +217,7 @@ class GLCMTextureMeasurement:
         image.imshow_with_colorbar(energy[:, :, 2])
         mx = np.max(energy, axis=(0, 1))
         # mn = np.min(energy, axis=(0, 1))
-        logger.debug(mx)
+        logger.debug(f"GLCM max energy, homogeneity, correlation: {mx}")
         # plt.colorbar()
         if self.report is not None:
             self.report.savefig_and_show(
@@ -237,6 +238,7 @@ class GLCMTextureMeasurement:
         self.measured_features = energy
 
         if self.lobulus_segmentation is None:
+            logger.debug(f"No lobulus segmentation given")
             seg = (slice(None), slice(None))
         row = {}
         row = make_stats("GLCM Energy", e0[seg], row)
@@ -249,6 +251,7 @@ class GLCMTextureMeasurement:
         # }
         if self.report is not None and self.add_cols_to_report:
             self.report.add_cols_to_actual_row(row)
+        logger.debug(f"GLCM textures for id {self.annotation_id} finished")
         # plt.show()
 
 
@@ -321,7 +324,7 @@ class TextureSegmentation:
         # radius = 3
         # METHOD = "uniform"
         # self.feature_function_args = [n_points, radius, METHOD]
-        pass
+        logger.debug("texture run finished")
 
     def _seg_tile_size_params(self):
         self.set_tile_size(self.parameters.param("Tile Size").value())

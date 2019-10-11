@@ -29,7 +29,7 @@ class SkeletonAnalysis:
             pname="Skeleton Analysis",
             ptype="bool",
             pvalue=True,
-            ptip="Skeleton Analusis after lobulus segmentation is performed",
+            ptip="Skeleton Analysis after lobulus segmentation is performed",
     ):
 
         params = [
@@ -78,6 +78,7 @@ class SkeletonAnalysis:
         self.lobulus: scaffan.lobulus.Lobulus = lobulus
         pixelsize_mm = [(self.parameters.param("Working Resolution").value() * 1000)] * 2
         self.view = self.lobulus.view.to_pixelsize(pixelsize_mm=pixelsize_mm)
+        logger.debug("Lobulus setup done")
 
     def skeleton_analysis(self, show=False):
         datarow = {}

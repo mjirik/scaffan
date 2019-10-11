@@ -120,10 +120,19 @@ def install():
     help='Path to output directory with video files.',
     default=None,
 )
+@click.option(
+    "--log-level",
+    "-ll",
+    # type=,
+    help='Set logging level',
+    default=None,
+)
 @click.option('--params', '-p', multiple=True, default='', nargs=2,
               help='Set parameter. First argument is path to parameter separated by ";". Second is the value.'
                    'python -m scaffan gui -p Processing,Show True')
-def nogui(input_path, color, output_path, params):
+def nogui(input_path, color, output_path, log_level, params):
+    if log_level is not None:
+        i = logger.add(level=log_level)
     logger.debug(f"input path={input_path} color={color}, output_path={output_path}, params={params}")
     mainapp = algorithm.Scaffan()
     logger.debug(f"Scaffan created")

@@ -58,11 +58,11 @@ mainapp.set_persistent_cols({
 # mainapp.set_parameter("Processing;Lobulus Segmentation;Central Vein Segmentation;Threshold", 0.18)
 # mainapp.set_parameter("Processing;Lobulus Segmentation;Central Vein Segmentation;Threshold", 0.20)
 # mainapp.parameters.param("Processing", "Lobulus Segmentation", "Central Vein Segmentation", "Threshold").setValue(0.20)
-# mainapp.set_parameter("Processing;Skeleton Analusis", True)
+# mainapp.set_parameter("Processing;Skeleton Analysis", True)
 # mainapp.set_parameter("Processing;Texture Analysis", True)
 mainapp.set_parameter("Processing;Lobulus Segmentation;Manual Segmentation", False)
 
-mainapp.set_parameter("Processing;Skeleton Analusis", True)
+mainapp.set_parameter("Processing;Skeleton Analysis", True)
 mainapp.set_parameter("Processing;Texture Analysis", True)
 mainapp.raise_exception_if_color_not_found = False
 mainapp.set_report_level(10)

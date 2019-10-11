@@ -156,7 +156,7 @@ class Scaffan:
                         "tip": "Select lobulus based on Slide Segmentation. ",
                     },
                     # {
-                    #     "name": "Skeleton Analusis",
+                    #     "name": "Skeleton Analysis",
                     #     "type": "bool",
                     #     "value": True,
                     #     # "tip": "Show images",
@@ -320,6 +320,7 @@ class Scaffan:
         self.anim = image.AnnotatedImage(path)
         fnparam = self.parameters.param("Output", "Directory Path")
         self.report.init_with_output_dir(fnparam.value())
+        logger.debug(f"report output dir: {self.report.outputdir}")
         fn_spreadsheet = self.parameters.param("Output", "Common Spreadsheet File")
         self.report.additional_spreadsheet_fn = str(fn_spreadsheet.value())
 
@@ -396,9 +397,12 @@ class Scaffan:
         dumped = False
         while not dumped:
             try:
+                logger.debug(f"data frame {self.report.df}")
+                logger.debug("Saving dataframe")
                 self.report.dump()
                 dumped = True
             except PermissionError as e:
+                logger.error("Permission Error")
                 if self.win is not None:
                     ret = QtGui.QMessageBox.warning(
                         self.win,
@@ -442,10 +446,14 @@ class Scaffan:
 
         self.lobulus_processing.set_annotated_image_and_id(self.anim, annotation_id)
         self.lobulus_processing.run(show=show)
+        logger.trace(f"type lobulus_processing.lobulus_mask: {type(self.lobulus_processing.lobulus_mask)}")
+        logger.debug(f"type lobulus_processing.lobulus_mask: {type(self.lobulus_processing.lobulus_mask)}")
         self.skeleton_analysis.set_lobulus(lobulus=self.lobulus_processing)
-        run_slide_segmentation = self.parameters.param("Processing", "Texture Analysis").value()
-        run_skeleton_analysis = self.parameters.param("Processing", "Skeleton Analusis").value()
+        logger.debug("set lobulus done")
+        # run_slide_segmentation = self.parameters.param("Processing", "Texture Analysis").value()
+        run_skeleton_analysis = self.parameters.param("Processing", "Skeleton Analysis").value()
         run_texture_analysis = self.parameters.param("Processing", "Texture Analysis").value()
+        logger.debug("before skeleton analysis")
         if run_skeleton_analysis:
             self.skeleton_analysis.skeleton_analysis(show=show)
         if run_texture_analysis:
@@ -453,8 +461,8 @@ class Scaffan:
             self.glcm_textures.set_input_data(view=self.lobulus_processing.view, id=annotation_id,
                                               lobulus_segmentation=self.lobulus_processing.lobulus_mask)
             self.glcm_textures.run()
+        logger.trace("after texture analysis")
         t1 = time.time()
-
         ann_center = self.anim.get_annotation_center_mm(annotation_id)
         inpath = Path(self.parameters.param("Input", "File Path").value())
         fn = inpath.parts[-1]
