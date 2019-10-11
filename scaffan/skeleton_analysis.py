@@ -24,7 +24,13 @@ import imma.image
 
 
 class SkeletonAnalysis:
-    def __init__(self):
+    def __init__(
+            self,
+            pname="Skeleton Analysis",
+            ptype="bool",
+            pvalue=True,
+            ptip="Skeleton Analusis after lobulus segmentation is performed",
+    ):
 
         params = [
             # {
@@ -56,7 +62,13 @@ class SkeletonAnalysis:
 
         ]
 
-        self.parameters = Parameter.create(name="Skeleton Analysis", type="group", children=params, expanded=False)
+        self.parameters = Parameter.create(
+            name=pname,
+            type=ptype,
+            value=pvalue,
+            tip=ptip,
+            children=params,
+            expanded=False)
         self.report: Report = None
 
     def set_report(self, report: Report):

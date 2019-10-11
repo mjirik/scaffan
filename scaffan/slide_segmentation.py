@@ -26,7 +26,17 @@ from .image import AnnotatedImage
 
 
 class SlideSegmentation():
-    def __init__(self, report:Report=None):
+    def __init__(self, report:Report=None,
+                 pname="Slide Segmentation",
+                 ptype="bool",
+                 pvalue=True,
+                 ptip= "Run analysis of whole slide before all other processing is perfomed",
+    ):
+        """
+
+        :param report:
+        :param ptype: group or bool
+        """
         params = [
             # {
             #     "name": "Tile Size",
@@ -87,7 +97,9 @@ class SlideSegmentation():
 
         ]
 
-        self.parameters = Parameter.create(name="Slide Segmentation", type="group", children=params, expanded=False)
+        self.parameters = Parameter.create(
+            name=pname, type=ptype, value=pvalue, tip=ptip, children=params, expanded=False
+        )
         self.report:Report = report
         self.anim:AnnotatedImage = None
         self.tile_size = None

@@ -143,30 +143,30 @@ class Scaffan:
                         "value": False,
                         "tip": "Open system window with output dir when processing is finished",
                     },
-                    {
-                        "name": "Run Slide Segmentation",
-                        "type": "bool",
-                        "value": True,
-                        "tip": "Run analysis of whole slide before all other processing is perfomed",
-                    },
+                    # {
+                    #     "name": "Run Slide Segmentation",
+                    #     "type": "bool",
+                    #     "value": True,
+                    #     "tip": "Run analysis of whole slide before all other processing is perfomed",
+                    # },
                     {
                         "name": "Automatic Lobulus Selection",
                         "type": "bool",
                         "value": False,
                         "tip": "Select lobulus based on Slide Segmentation. ",
                     },
-                    {
-                        "name": "Run Skeleton Analysis",
-                        "type": "bool",
-                        "value": True,
-                        # "tip": "Show images",
-                    },
-                    {
-                        "name": "Run Texture Analysis",
-                        "type": "bool",
-                        "value": True,
-                        # "tip": "Show images",
-                    },
+                    # {
+                    #     "name": "Skeleton Analusis",
+                    #     "type": "bool",
+                    #     "value": True,
+                    #     # "tip": "Show images",
+                    # },
+                    # {
+                    #     "name": "Texture Analysis",
+                    #     "type": "bool",
+                    #     "value": True,
+                    #     # "tip": "Show images",
+                    # },
                     self.slide_segmentation.parameters,
                     self.lobulus_processing.parameters,
                     self.skeleton_analysis.parameters,
@@ -364,7 +364,7 @@ class Scaffan:
         show = self.parameters.param("Processing", "Show").value()
         self.report.set_show(show)
         self.report.set_save(True)
-        run_slide_segmentation = self.parameters.param("Processing", "Run Slide Segmentation").value()
+        run_slide_segmentation = self.parameters.param("Processing", "Slide Segmentation").value()
         if run_slide_segmentation:
             fn_input = self.parameters.param("Input", "File Path").value()
             # self.slide_segmentation.init(Path(fn_input))
@@ -443,9 +443,9 @@ class Scaffan:
         self.lobulus_processing.set_annotated_image_and_id(self.anim, annotation_id)
         self.lobulus_processing.run(show=show)
         self.skeleton_analysis.set_lobulus(lobulus=self.lobulus_processing)
-        run_slide_segmentation = self.parameters.param("Processing", "Run Texture Analysis").value()
-        run_skeleton_analysis = self.parameters.param("Processing", "Run Skeleton Analysis").value()
-        run_texture_analysis = self.parameters.param("Processing", "Run Texture Analysis").value()
+        run_slide_segmentation = self.parameters.param("Processing", "Texture Analysis").value()
+        run_skeleton_analysis = self.parameters.param("Processing", "Skeleton Analusis").value()
+        run_texture_analysis = self.parameters.param("Processing", "Texture Analysis").value()
         if run_skeleton_analysis:
             self.skeleton_analysis.skeleton_analysis(show=show)
         if run_texture_analysis:

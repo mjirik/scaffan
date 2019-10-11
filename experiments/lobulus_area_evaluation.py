@@ -55,13 +55,13 @@ mainapp.set_persistent_cols({
 })
 
 mainapp.set_parameter("Processing;Lobulus Segmentation;Central Vein Segmentation;Threshold", 0.18)
-mainapp.set_parameter("Processing;Run Skeleton Analysis", True)
-mainapp.set_parameter("Processing;Run Texture Analysis", True)
+mainapp.set_parameter("Processing;Skeleton Analusis", True)
+mainapp.set_parameter("Processing;Texture Analysis", True)
 mainapp.set_report_level(10)
 # mainapp.set_parameter("Processing;Lobulus Segmentation;Manual Segmentation", False)
 
-# mainapp.set_parameter("Processing;Run Skeleton Analysis", False)
-# mainapp.set_parameter("Processing;Run Texture Analysis", False)
+# mainapp.set_parameter("Processing;Skeleton Analusis", False)
+# mainapp.set_parameter("Processing;Texture Analysis", False)
 mainapp.set_parameter("Processing;Lobulus Segmentation;Manual Segmentation", True)
 
 def set_same(mainapp, fn):

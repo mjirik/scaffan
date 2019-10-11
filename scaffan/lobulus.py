@@ -29,7 +29,13 @@ _cite = "" +\
     "[2]: Morphological Snakes. Luis Álvarez, Luis Baumela, Pablo Márquez-Neila. In Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition 2010 (CVPR10)."
 
 class Lobulus:
-    def __init__(self):
+    def __init__(
+            self,
+            pname="Lobulus Segmentation",
+            ptype="group",
+            pvalue=True,
+            ptip="Select the area for sinusoidal area texture analysis",
+    ):
         # TODO the segmentation resolution was probably different.
         #  For segmentation was used different level than 2. Probably 3 or 4
         #  The level 2 has been used in detail view
@@ -159,7 +165,16 @@ class Lobulus:
 
         ]
 
-        self.parameters = Parameter.create(name="Lobulus Segmentation", type="group", children=params, expanded=False)
+        self.parameters = Parameter.create(
+            name="Lobulus Segmentation", type="group",
+            children=params, expanded=False)
+        self.parameters = Parameter.create(
+            name=pname,
+            type=ptype,
+            value=pvalue,
+            tip=ptip,
+            children=params,
+            expanded=False)
         self.report: Report = None
 
     def set_annotated_image_and_id(self, anim: scim.AnnotatedImage, annotation_id, level=None):

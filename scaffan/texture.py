@@ -111,7 +111,13 @@ def nonzero_with_step(data, step):
 
 
 class GLCMTextureMeasurement:
-    def __init__(self, filename_label=""):
+    def __init__(self, filename_label="",
+        pname = "Texture Analysis",
+        ptype = "bool",
+        pvalue = True,
+        ptip = "Run Gray Level Co-occurrence texture analysis after lobulus segmentation is performed",
+
+    ):
         params = [
             {
                 "name": "Tile Size",
@@ -143,7 +149,13 @@ class GLCMTextureMeasurement:
 
         ]
 
-        self.parameters = Parameter.create(name="Texture Analysis", type="group", children=params, expanded=False)
+        self.parameters = Parameter.create(
+            name=pname,
+            type=ptype,
+            value=pvalue,
+            tip=ptip,
+            children=params,
+            expanded=False)
         self.report: Report = None
         self.filename_label = filename_label
         self.add_cols_to_report: bool = True
