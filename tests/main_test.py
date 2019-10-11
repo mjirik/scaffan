@@ -150,17 +150,9 @@ class MainGuiTest(unittest.TestCase):
         mainapp.start_gui(skip_exec=skip_exec, qapp=None)
 
 
-    # @pytest.mark.dataset
-    # @pytest.mark.slow
+    @pytest.mark.dataset
+    @pytest.mark.slow
     def test_training_slide_segmentation_clf(self):
-        mainapp = scaffan.algorithm.Scaffan()
-        clf_fn = Path(mainapp.slide_segmentation.clf_fn)
-        modtime0 = datetime.fromtimestamp(clf_fn.stat().st_mtime)
-        logger.debug(f"classificator prior modification time: {modtime0}")
-        # fn = io3d.datasets.join_path("medical", "orig", "CMU-1.ndpi", get_root=True)
-        # fn = io3d.datasets.join_path("medical", "orig", "CMU-1.ndpi", get_root=True)
-        # fn = io3d.datasets.join_path("scaffold", "Hamamatsu", "PIG-003_J-18-0165_HE.ndpi", get_root=True)
-        # fn = io3d.datasets.join_path("scaffold", "Hamamatsu", "PIG-003_J-18-0168_HE.ndpi", get_root=True)
 
         fns = [
             io3d.datasets.join_path("medical", "orig", "Scaffan-analysis", "PIG-002_J-18-0091_HE.ndpi", get_root=True), # training
@@ -168,51 +160,44 @@ class MainGuiTest(unittest.TestCase):
             io3d.datasets.join_path("medical", "orig", "Scaffan-analysis", "PIG-003_J-18-0168_HE.ndpi", get_root=True), # training
             io3d.datasets.join_path("medical", "orig", "Scaffan-analysis", "PIG-003_J-18-0169_HE.ndpi", get_root=True)  # training
         ]
-        for i, fn in enumerate(fns):
-            mainapp.set_input_file(fn)
-            mainapp.set_output_dir()
-            # There does not have to be set some color
-            # mainapp.set_annotation_color_selection("#FF00FF")
-            # mainapp.set_annotation_color_selection("#FF0000")
-            mainapp.set_annotation_color_selection("#FFFF00")
-            mainapp.set_parameter("Processing;Automatic Lobulus Selection", True)
-            mainapp.set_parameter("Processing;Skeleton Analusis", False)
-            mainapp.set_parameter("Processing;Texture Analysis", False)
-            if i == 0:
-                mainapp.set_parameter("Processing;Slide Segmentation;Clean Before Training", True)
-            else:
-                mainapp.set_parameter("Processing;Slide Segmentation;Clean Before Training", False)
-            mainapp.set_parameter("Processing;Slide Segmentation;Run Training", True)
-            mainapp.set_parameter("Processing;Slide Segmentation;Lobulus Number", 0)
-            # mainapp.start_gui(qapp=qapp)
-            mainapp.run_lobuluses()
+        self._slide_segmentation_train_clf(fns)
 
-        assert Path(mainapp.slide_segmentation.clf_fn).exists()
-        clf_fn = Path(mainapp.slide_segmentation.clf_fn)
-        modtime1 = datetime.fromtimestamp(clf_fn.stat().st_mtime)
-        logger.debug(f"classificator prior modification time: {modtime1}")
-        assert modtime0 != modtime1
+    def test_training_small_slide_segmentation_clf(self):
 
-
+        fns = [
+            io3d.datasets.join_path("medical", "orig", "sample_data", "SCP003", "SCP003.ndpi", get_root=True),
+        ]
+        self._slide_segmentation_train_clf(fns, clf_fn=".temp_clf.pkl")
 
     @pytest.mark.dataset
     @pytest.mark.slow
     def test_testing_slide_segmentation_clf(self):
-        mainapp = scaffan.algorithm.Scaffan()
-        clf_fn = Path(mainapp.slide_segmentation.clf_fn)
-        modtime0 = datetime.fromtimestamp(clf_fn.stat().st_mtime)
-        logger.debug(f"classificator prior modification time: {modtime0}")
-        # fn = io3d.datasets.join_path("medical", "orig", "CMU-1.ndpi", get_root=True)
-        # fn = io3d.datasets.join_path("medical", "orig", "CMU-1.ndpi", get_root=True)
-        # fn = io3d.datasets.join_path("scaffold", "Hamamatsu", "PIG-003_J-18-0165_HE.ndpi", get_root=True)
-        # fn = io3d.datasets.join_path("scaffold", "Hamamatsu", "PIG-003_J-18-0168_HE.ndpi", get_root=True)
-
         fns = [
-            io3d.datasets.join_path("medical", "orig","Scaffan-analysis", "PIG-003_J-18-0166_HE.ndpi", get_root=True),
-            io3d.datasets.join_path("medical", "orig","Scaffan-analysis", "PIG-003_J-18-0167_HE.ndpi", get_root=True),
-            io3d.datasets.join_path("medical", "orig","Scaffan-analysis", "PIG-003_J-18-0169_HE.ndpi", get_root=True)
+            io3d.datasets.join_path("medical", "orig", "Scaffan-analysis", "PIG-003_J-18-0166_HE.ndpi", get_root=True),
+            io3d.datasets.join_path("medical", "orig", "Scaffan-analysis", "PIG-003_J-18-0167_HE.ndpi", get_root=True),
+            io3d.datasets.join_path("medical", "orig", "Scaffan-analysis", "PIG-003_J-18-0169_HE.ndpi", get_root=True)
             # io3d.datasets.join_path("medical", "orig","Scaffan-analysis", "PIG-002_J-18-0091_HE.ndpi", get_root=True),
         ]
+        self._testing_slide_segmentation_clf(fns)
+
+    def test_testing_slide_segmentation_clf(self):
+        fns = [
+            io3d.datasets.join_path("medical", "orig", "sample_data", "SCP003", "SCP003.ndpi", get_root=True),
+        ]
+        self._testing_slide_segmentation_clf(fns, clf_fn=".temp_clf.pkl")
+
+    def _testing_slide_segmentation_clf(self, fns, clf_fn):
+
+        mainapp = scaffan.algorithm.Scaffan()
+        if clf_fn is not None:
+            mainapp.slide_segmentation.clf_fn = clf_fn
+        clf_fn = Path(mainapp.slide_segmentation.clf_fn)
+        if clf_fn.exists():
+            modtime0 = datetime.fromtimestamp(clf_fn.stat().st_mtime)
+        else:
+            modtime0 = ""
+        logger.debug(f"classificator prior modification time: {modtime0}")
+
         for fn in fns:
             mainapp.set_input_file(fn)
             mainapp.set_output_dir()
@@ -242,3 +227,43 @@ class MainGuiTest(unittest.TestCase):
         modtime1 = datetime.fromtimestamp(clf_fn.stat().st_mtime)
         logger.debug(f"classificator prior modification time: {modtime1}")
         assert modtime0 == modtime1
+
+    def _slide_segmentation_train_clf(self, fns, clf_fn=None):
+        mainapp = scaffan.algorithm.Scaffan()
+        if clf_fn is not None:
+            mainapp.slide_segmentation.clf_fn = clf_fn
+        clf_fn = Path(mainapp.slide_segmentation.clf_fn)
+        if clf_fn.exists():
+            modtime0 = datetime.fromtimestamp(clf_fn.stat().st_mtime)
+        else:
+            modtime0 = ""
+        logger.debug(f"classificator prior modification time: {modtime0}")
+        # fn = io3d.datasets.join_path("medical", "orig", "CMU-1.ndpi", get_root=True)
+        # fn = io3d.datasets.join_path("medical", "orig", "CMU-1.ndpi", get_root=True)
+        # fn = io3d.datasets.join_path("scaffold", "Hamamatsu", "PIG-003_J-18-0165_HE.ndpi", get_root=True)
+        # fn = io3d.datasets.join_path("scaffold", "Hamamatsu", "PIG-003_J-18-0168_HE.ndpi", get_root=True)
+
+        for i, fn in enumerate(fns):
+            mainapp.set_input_file(fn)
+            mainapp.set_output_dir()
+            # There does not have to be set some color
+            # mainapp.set_annotation_color_selection("#FF00FF")
+            # mainapp.set_annotation_color_selection("#FF0000")
+            mainapp.set_annotation_color_selection("#FFFF00")
+            mainapp.set_parameter("Processing;Automatic Lobulus Selection", True)
+            mainapp.set_parameter("Processing;Skeleton Analusis", False)
+            mainapp.set_parameter("Processing;Texture Analysis", False)
+            if i == 0:
+                mainapp.set_parameter("Processing;Slide Segmentation;Clean Before Training", True)
+            else:
+                mainapp.set_parameter("Processing;Slide Segmentation;Clean Before Training", False)
+            mainapp.set_parameter("Processing;Slide Segmentation;Run Training", True)
+            mainapp.set_parameter("Processing;Slide Segmentation;Lobulus Number", 0)
+            # mainapp.start_gui(qapp=qapp)
+            mainapp.run_lobuluses()
+
+        assert Path(mainapp.slide_segmentation.clf_fn).exists()
+        clf_fn = Path(mainapp.slide_segmentation.clf_fn)
+        modtime1 = datetime.fromtimestamp(clf_fn.stat().st_mtime)
+        logger.debug(f"classificator prior modification time: {modtime1}")
+        assert modtime0 != modtime1
