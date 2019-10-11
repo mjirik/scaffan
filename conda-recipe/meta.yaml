@@ -51,6 +51,8 @@ requirements:
     - pywin32 # [win]
     - loguru
     - exsu
+    - scikit-image
+    - scikit-learn
 
   run:
     - python=3,<3.6.7
@@ -83,6 +85,8 @@ requirements:
     - xlrd
     - loguru
     - openslide-python # [not win]
+    - scikit-image
+    - scikit-learn
 
 test:
   # Python imports

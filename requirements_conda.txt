@@ -12,3 +12,5 @@ loguru
 scipy=1.2
 click
 exsu
+scikit-learn
+scikit-image
