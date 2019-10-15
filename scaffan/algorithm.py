@@ -388,6 +388,7 @@ class Scaffan:
 
         # in the case no lobulus has been measured the segmentation measurement is stored to table
         if run_slide_segmentation and len(annotation_ids) == 0:
+            self._add_general_information_to_actual_row()
             self.report.finish_actual_row()
 
 
@@ -431,6 +432,20 @@ class Scaffan:
         logger.debug("finished")
 
         # print("ann ids", annotation_ids)
+    def _add_general_information_to_actual_row(self):
+        inpath = Path(self.parameters.param("Input", "File Path").value())
+        fn = inpath.parts[-1]
+        self.report.add_cols_to_actual_row(
+            {
+                "File Name": str(fn),
+                "File Path": str(inpath),
+                "Annotation Color": self.parameters.param("Input", "Annotation Color").value(),
+                "Datetime": datetime.datetime.now().isoformat(' ', 'seconds'),
+                "platform.system": platform.uname().system,
+                "platform.node": platform.uname().node,
+                "platform.processor": platform.uname().processor,
+                "Scaffan Version": scaffan.__version__,
+            })
 
     def _run_lobulus(self, annotation_id):
         show = self.parameters.param("Processing", "Show").value()
