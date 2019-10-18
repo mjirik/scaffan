@@ -314,3 +314,24 @@ class ImageAnnotationTest(unittest.TestCase):
         assert center_y > -100
         assert center_x < 100
         assert center_y < 100
+
+    def test_get_ann_by_color(self):
+        fn = io3d.datasets.join_path(
+            "medical", "orig", "sample_data", "SCP003", "SCP003.ndpi", get_root=True
+        )
+        anim = scim.AnnotatedImage(fn)
+        ann_ids_black = anim.select_annotations_by_color("#000000")
+        assert 10 in ann_ids_black
+        assert 11 in ann_ids_black
+
+
+    def test_just_outer_annotations(self):
+        fn = io3d.datasets.join_path(
+            "medical", "orig", "sample_data", "SCP003", "SCP003.ndpi", get_root=True
+        )
+        anim = scim.AnnotatedImage(fn)
+        outer_ids, holes_ids = anim.select_just_outer_annotations("#000000")
+        assert 10 in outer_ids
+        assert [11] in holes_ids
+
+

@@ -100,6 +100,10 @@ class SlideSegmentation():
         self.parameters = Parameter.create(
             name=pname, type=ptype, value=pvalue, tip=ptip, children=params, expanded=False
         )
+        if report is None:
+            report = Report()
+            report.save = False
+            report.show = False
         self.report:Report = report
         self.anim:AnnotatedImage = None
         self.tile_size = None
@@ -122,8 +126,6 @@ class SlideSegmentation():
         self.empty_area_mm = None
         self.septum_area_mm = None
         self.sinusoidal_area_mm = None
-
-        pass
 
     def init(self, anim:scim.AnnotatedImage):
         self.anim = anim
