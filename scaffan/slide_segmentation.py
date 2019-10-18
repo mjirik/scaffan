@@ -34,6 +34,9 @@ class SlideSegmentation():
     ):
         """
 
+        An alternative features computation can be done by setting callback function
+        self.alternative_get_features = fcn(seg:SlideSegmentation, view:View) -> ndarray:
+
         :param report:
         :param ptype: group or bool
         """
@@ -113,6 +116,7 @@ class SlideSegmentation():
         self.clf = GaussianNB()
         self.clf_fn:Path = Path(Path(__file__).parent / "segmentation_model.pkl")
         if self.clf_fn.exists():
+            logger.debug(f"Reading classifier from {str(self.clf_fn)}")
             self.clf = joblib.load(self.clf_fn)
         self.predicted_tiles = None
         # self.output_label_fn = "label.png"
@@ -126,6 +130,7 @@ class SlideSegmentation():
         self.empty_area_mm = None
         self.septum_area_mm = None
         self.sinusoidal_area_mm = None
+        self.alternative_get_features = None
 
     def init(self, anim:scim.AnnotatedImage):
         self.anim = anim
@@ -135,8 +140,7 @@ class SlideSegmentation():
         self.predicted_tiles = None
         self.tile_size = None
         self.ann_biggest_ids = []
-        #         self.predicted_tiles = None
-        # self.make_tiles()
+        self.make_tiles()
 
     def train_classifier(self, pixels=None, y=None):
         logger.debug("start training")
@@ -210,13 +214,18 @@ class SlideSegmentation():
 
     #         return pixels, view
 
-    def _get_features(self, view: View):
+    def _get_features(self, view: View) -> np.ndarray:
         """
         Three colors and one gaussian smooth reg channel.
+        An alternative features computation can be done by setting callback function
+        self.alternative_get_features = fcn(seg:SlideSegmentation, view:View) -> ndarray:
 
         img_sob: gaussian blure applied on gradient sobel operator give information about texture richness in neighborhood
 
+
         """
+        if self.alternative_get_features is not None:
+            return self.alternative_get_features(self, view)
         img = view.get_region_image(as_gray=False)
         img_gauss2 = gaussian_filter(img[:, :, 0], 2)
         img_gauss5 = gaussian_filter(img[:, :, 0], 5)
@@ -282,7 +291,7 @@ class SlideSegmentation():
             column_tiles = []
 
             for y0 in range(0, int(imsize[1]), int(size_on_level0[1])):
-                logger.debug(f"processing tile {x0}, {y0}")
+                logger.trace(f"processing tile {x0}, {y0}")
                 view = self.anim.get_view(location=(x0, y0), size_on_level=size_on_level, level=self.level)
                 column_tiles.append(view)
 
@@ -431,16 +440,16 @@ class SlideSegmentation():
         self.centers_max = max_points
 
         #     report
-        plt.figure(figsize=(10, 10))
+        fig = plt.figure(figsize=(10, 10))
         plt.imshow(dist, cmap=plt.cm.gray)
         plt.autoscale(False)
-        plt.plot(coordinates[:, 1], coordinates[:, 0], 'g.')
-        plt.plot(max_points[:, 1], max_points[:, 0], 'ro')
+        plt.plot(coordinates[:, 1], coordinates[:, 0], 'g.' , max_points[:, 1], max_points[:, 0], 'ro')
         plt.axis('off')
+        self.report.savefig_and_show("sinusoidal_tissue_local_centers.pdf", fig, level=55)
 
         return max_points
 
-    def add_biggest_to_annotations(self, n_max:int=5):
+    def add_biggest_to_annotations(self):
         points_px = self._find_biggest_lobuli()
         view_corner = self.tiles[0][0]
         pts_glob_px = view_corner.coords_view_px_to_glob_px(points_px[:, 1], points_px[:, 0])

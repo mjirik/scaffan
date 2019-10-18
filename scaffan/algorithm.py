@@ -371,7 +371,7 @@ class Scaffan:
             # self.slide_segmentation.init(Path(fn_input))
             self.slide_segmentation.init(self.anim)
             self.slide_segmentation.run()
-        automatic_lobulus_selection = self.parameters.param("Processing","Automatic Lobulus Selection").value()
+        automatic_lobulus_selection = self.parameters.param("Processing", "Automatic Lobulus Selection").value()
         if automatic_lobulus_selection:
             if run_slide_segmentation:
                 self.slide_segmentation.add_biggest_to_annotations()
@@ -398,7 +398,7 @@ class Scaffan:
         dumped = False
         while not dumped:
             try:
-                logger.debug(f"data frame {self.report.df}")
+                # logger.debug(f"data frame {self.report.df}")
                 logger.debug("Saving dataframe")
                 self.report.dump()
                 dumped = True
