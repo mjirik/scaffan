@@ -324,7 +324,6 @@ class ImageAnnotationTest(unittest.TestCase):
         assert 10 in ann_ids_black
         assert 11 in ann_ids_black
 
-
     def test_just_outer_annotations(self):
         fn = io3d.datasets.join_path(
             "medical", "orig", "sample_data", "SCP003", "SCP003.ndpi", get_root=True
@@ -333,5 +332,15 @@ class ImageAnnotationTest(unittest.TestCase):
         outer_ids, holes_ids = anim.select_just_outer_annotations("#000000")
         assert 10 in outer_ids
         assert [11] in holes_ids
+
+        views = anim.get_views(outer_ids, level=6)
+        # ann_rasters = []
+        for id1, id2, view_ann in zip(outer_ids, holes_ids, views):
+            ann_raster = view_ann.get_annotation_raster(id1, holes_ids=id2)
+            # ann_rasters.append(ann_raster)
+            assert np.min(ann_raster) == 0
+            assert np.max(ann_raster) > 0
+
+
 
 
