@@ -97,27 +97,27 @@ mainapp.set_report_level(10)
 #     mainapp.set_parameter("Processing;Scan Segmentation;Lobulus Number", 0)
 #     # mainapp.set_parameter("Processing;Lobulus Segmentation;Manual Segmentation", True)
 
-fns = [
-    "medical/orig/Scaffan-analysis/PIG-001_J-17-0571_LM central_HE.ndpi",
-    "medical/orig/Scaffan-analysis/PIG-001_J-17-0569_LM_HE.ndpi",
-    # "medical/orig/Scaffan-analysis/PIG-001_J-17-0567_edge RM_HE.ndpi",  # no annotation
-    "medical/orig/Scaffan-analysis/PIG-002_J-18-0091_HE.ndpi",
-    "medical/orig/Scaffan-analysis/PIG-002_J-18-0092_HE.ndpi",
-    "medical/orig/Scaffan-analysis/PIG-002_J-18-0094_HE_rescan.ndpi", # bad focus
-    "medical/orig/Scaffan-analysis/PIG-003_J-18-0165_HE.ndpi",
-    "medical/orig/Scaffan-analysis/PIG-003_J-18-0166_HE.ndpi",
-    "medical/orig/Scaffan-analysis/PIG-003_J-18-0167_HE.ndpi",
-    "medical/orig/Scaffan-analysis/PIG-003_J-18-0168_HE.ndpi",
-    "medical/orig/Scaffan-analysis/PIG-003_J-18-0169_HE.ndpi",
-    "medical/orig/Scaffan-analysis/PIG-003_J-18-0170_HE.ndpi",
-    "medical/orig/Scaffan-analysis/PIG-004_BBJ-004-4_HE_parenchyme.ndpi",
-    "medical/orig/Scaffan-analysis/PIG-004_BBJ-004-3 _HE_parenchyme.ndpi",
-    "medical/orig/Scaffan-analysis/PIG-004_BBJ-004-2 _HE_parenchyme.ndpi",
-    "medical/orig/Scaffan-analysis/PIG-005_J-18-0633_HE_PRML per decell.ndpi",
-    "medical/orig/Scaffan-analysis/PIG-008_P008 LL-C_HE_parenchyme centr..ndpi",
-    "medical/orig/Scaffan-analysis/PIG-008_P008 LL-P_HE_parenchyme perif..ndpi",
-
-]
+# fns = [
+#     "medical/orig/Scaffan-analysis/PIG-001_J-17-0571_LM central_HE.ndpi",
+#     "medical/orig/Scaffan-analysis/PIG-001_J-17-0569_LM_HE.ndpi",
+#     # "medical/orig/Scaffan-analysis/PIG-001_J-17-0567_edge RM_HE.ndpi",  # no annotation
+#     "medical/orig/Scaffan-analysis/PIG-002_J-18-0091_HE.ndpi",
+#     "medical/orig/Scaffan-analysis/PIG-002_J-18-0092_HE.ndpi",
+#     "medical/orig/Scaffan-analysis/PIG-002_J-18-0094_HE_rescan.ndpi", # bad focus
+#     "medical/orig/Scaffan-analysis/PIG-003_J-18-0165_HE.ndpi",
+#     "medical/orig/Scaffan-analysis/PIG-003_J-18-0166_HE.ndpi",
+#     "medical/orig/Scaffan-analysis/PIG-003_J-18-0167_HE.ndpi",
+#     "medical/orig/Scaffan-analysis/PIG-003_J-18-0168_HE.ndpi",
+#     "medical/orig/Scaffan-analysis/PIG-003_J-18-0169_HE.ndpi",
+#     "medical/orig/Scaffan-analysis/PIG-003_J-18-0170_HE.ndpi",
+#     "medical/orig/Scaffan-analysis/PIG-004_BBJ-004-4_HE_parenchyme.ndpi",
+#     "medical/orig/Scaffan-analysis/PIG-004_BBJ-004-3 _HE_parenchyme.ndpi",
+#     "medical/orig/Scaffan-analysis/PIG-004_BBJ-004-2 _HE_parenchyme.ndpi",
+#     "medical/orig/Scaffan-analysis/PIG-005_J-18-0633_HE_PRML per decell.ndpi",
+#     "medical/orig/Scaffan-analysis/PIG-008_P008 LL-C_HE_parenchyme centr..ndpi",
+#     "medical/orig/Scaffan-analysis/PIG-008_P008 LL-P_HE_parenchyme perif..ndpi",
+#
+# ]
 fns = [
     io3d.datasets.join_path("medical", "orig", "Scaffan-analysis", "PIG-002_J-18-0091_HE.ndpi", get_root=True),
     # training
@@ -126,7 +126,7 @@ fns = [
     io3d.datasets.join_path("medical", "orig", "Scaffan-analysis", "PIG-003_J-18-0168_HE.ndpi", get_root=True),
     # training
     io3d.datasets.join_path("medical", "orig", "Scaffan-analysis", "PIG-003_J-18-0169_HE.ndpi", get_root=True),  # training  bubles
-    io3d.datasets.join_path("medical", "orig", "Scaffan-analysis", "PIG-005_J-18-0631_HE.ndpi", get_root=True)
+    io3d.datasets.join_path("medical", "orig", "Scaffan-analysis", "PIG-005_J-18-0631_HE_LML per decell.ndpi", get_root=True)
     # training  bubles
 ]
 
