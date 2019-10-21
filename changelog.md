@@ -6,7 +6,8 @@
 
 * [Fixed] Get inner and outer annotation. Fixed call without color.
 * [Added] Get just outer annotation and find the holes.
-* [Added] Slide segmentation to calculate intra-lobular and extra-lobular surface area
+* [Added] Scan segmentation to calculate intra-lobular and extra-lobular surface area
+* [Added] Fixed reading file with no annotation
 
 # 0.15
 

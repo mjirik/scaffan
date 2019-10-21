@@ -73,7 +73,10 @@ def ndpa_to_json(path):
         fn, ext = op.splitext(path)
         if ext == ".ndpi":
             path = path + ".ndpa"
-        _ndpa_file_to_json(path)
+        if op.exists(path):
+            _ndpa_file_to_json(path)
+        else:
+            logger.info(f"No annotation file found '{path}'")
     else:
         extended_path = op.join(path, "*.ndpa")
         #         print(extended_path)
@@ -123,8 +126,11 @@ def read_annotations(pth):
         ndpa_to_json(pth)
 
     fn = pth + ".ndpa.json"
-    with open(fn) as f:
-        data = json.load(f)
+    if op.exists(fn):
+        with open(fn) as f:
+            data = json.load(f)
+    else:
+        data = []
     return data
 
 
