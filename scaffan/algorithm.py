@@ -344,6 +344,41 @@ class Scaffan:
         else:
             raise ValueError("Color '{}' not found in allowed colors.".format(color))
 
+    def train_scan_segmentation(self, fns:List[Union[str, Path]], clean_before_training=True):
+        """
+        Train scan segmentation based on list of files with annotation.
+        Output dir set before processing is ignored.
+        :param fns: list of filenames
+        :return:
+        """
+        #     mainapp = scaffan.algorithm.Scaffan()
+        # if clf_fn is not None:
+        #     mainapp.slide_segmentation.clf_fn = Path(clf_fn)
+        # clf_fn = Path(mainapp.slide_segmentation.clf_fn)
+        clf_fn = self.slide_segmentation.clf_fn
+        assert clf_fn.exists()
+
+        for i, fn in enumerate(fns):
+            self.set_input_file(fn)
+            self.set_output_dir()
+            # There does not have to be set some color
+            # mainapp.set_annotation_color_selection("#FF00FF")
+            # mainapp.set_annotation_color_selection("#FF0000")
+            #             mainapp.set_annotation_color_selection("#FFFF00")
+            self.set_parameter("Input;Automatic Lobulus Selection", True)
+            self.set_parameter("Processing;Skeleton Analysis", False)
+            self.set_parameter("Processing;Texture Analysis", False)
+            self.set_parameter("Processing;Lobulus Segmentation", False)
+            if i == 0:
+                if clean_before_training is not None:
+                    self.set_parameter("Processing;Slide Segmentation;Clean Before Training", clean_before_training)
+            else:
+                self.set_parameter("Processing;Slide Segmentation;Clean Before Training", False)
+            self.set_parameter("Processing;Slide Segmentation;Run Training", True)
+            #             mainapp.set_parameter("Processing;Slide Segmentation;Lobulus Number", 0)
+            # mainapp.start_gui(qapp=qapp)
+            self.run_lobuluses()
+
     def run_lobuluses(self, event=None):
         self.init_run()
         # if color is None:

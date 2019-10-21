@@ -245,25 +245,26 @@ class MainGuiTest(unittest.TestCase):
         # fn = io3d.datasets.join_path("medical", "orig", "CMU-1.ndpi", get_root=True)
         # fn = io3d.datasets.join_path("scaffold", "Hamamatsu", "PIG-003_J-18-0165_HE.ndpi", get_root=True)
         # fn = io3d.datasets.join_path("scaffold", "Hamamatsu", "PIG-003_J-18-0168_HE.ndpi", get_root=True)
+        mainapp.train_scan_segmentation(fns)
 
-        for i, fn in enumerate(fns):
-            mainapp.set_input_file(fn)
-            mainapp.set_output_dir()
-            # There does not have to be set some color
-            # mainapp.set_annotation_color_selection("#FF00FF")
-            # mainapp.set_annotation_color_selection("#FF0000")
-            mainapp.set_annotation_color_selection("#FFFF00")
-            mainapp.set_parameter("Input;Automatic Lobulus Selection", True)
-            mainapp.set_parameter("Processing;Skeleton Analysis", False)
-            mainapp.set_parameter("Processing;Texture Analysis", False)
-            if i == 0:
-                mainapp.set_parameter("Processing;Scan Segmentation;Clean Before Training", True)
-            else:
-                mainapp.set_parameter("Processing;Scan Segmentation;Clean Before Training", False)
-            mainapp.set_parameter("Processing;Scan Segmentation;Run Training", True)
-            mainapp.set_parameter("Processing;Scan Segmentation;Lobulus Number", 0)
-            # mainapp.start_gui(qapp=qapp)
-            mainapp.run_lobuluses()
+        # for i, fn in enumerate(fns):
+        #     mainapp.set_input_file(fn)
+        #     mainapp.set_output_dir()
+        #     # There does not have to be set some color
+        #     # mainapp.set_annotation_color_selection("#FF00FF")
+        #     # mainapp.set_annotation_color_selection("#FF0000")
+        #     mainapp.set_annotation_color_selection("#FFFF00")
+        #     mainapp.set_parameter("Input;Automatic Lobulus Selection", True)
+        #     mainapp.set_parameter("Processing;Skeleton Analysis", False)
+        #     mainapp.set_parameter("Processing;Texture Analysis", False)
+        #     if i == 0:
+        #         mainapp.set_parameter("Processing;Scan Segmentation;Clean Before Training", True)
+        #     else:
+        #         mainapp.set_parameter("Processing;Scan Segmentation;Clean Before Training", False)
+        #     mainapp.set_parameter("Processing;Scan Segmentation;Run Training", True)
+        #     mainapp.set_parameter("Processing;Scan Segmentation;Lobulus Number", 0)
+        #     # mainapp.start_gui(qapp=qapp)
+        #     mainapp.run_lobuluses()
 
         assert Path(mainapp.slide_segmentation.clf_fn).exists()
         clf_fn = Path(mainapp.slide_segmentation.clf_fn)
