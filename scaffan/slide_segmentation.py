@@ -25,9 +25,9 @@ from exsu.report import Report
 from .image import AnnotatedImage
 
 
-class SlideSegmentation():
+class ScanSegmentation():
     def __init__(self, report:Report=None,
-                 pname="Slide Segmentation",
+                 pname="Scan Segmentation",
                  ptype="bool",
                  pvalue=True,
                  ptip= "Run analysis of whole slide before all other processing is perfomed",
@@ -125,7 +125,7 @@ class SlideSegmentation():
         #         self.devel_imcrop = np.array([20000, 15000])
         self.full_output_image = None
         self.full_raster_image = None
-        self.real_pixelsize_mm = None
+        self.used_pixelsize_mm = None
         self.ann_biggest_ids = []
         self.empty_area_mm = None
         self.septum_area_mm = None
@@ -295,7 +295,7 @@ class SlideSegmentation():
                     error = err
                     closest_i = i
                     best_pxsz = pxsz
-        self.real_pixelsize_mm = best_pxsz
+        self.used_pixelsize_mm = best_pxsz
         logger.debug(f"real pixelsize mm={best_pxsz}")
 
         return closest_i
@@ -440,16 +440,16 @@ class SlideSegmentation():
         img = self.get_raster_image(as_gray=False)
         #         plt.imshow(img)
         self.report.imsave("slice_raster.png", img.astype(np.uint8))
-        logger.debug(f"real_pixel_size={self.real_pixelsize_mm}")
-        self.empty_area_mm = np.prod(self.real_pixelsize_mm) * count[0]
-        self.septum_area_mm = np.prod(self.real_pixelsize_mm) * count[1]
-        self.sinusoidal_area_mm = np.prod(self.real_pixelsize_mm) * count[2]
+        logger.debug(f"real_pixel_size={self.used_pixelsize_mm}")
+        self.empty_area_mm = np.prod(self.used_pixelsize_mm) * count[0]
+        self.septum_area_mm = np.prod(self.used_pixelsize_mm) * count[1]
+        self.sinusoidal_area_mm = np.prod(self.used_pixelsize_mm) * count[2]
         logger.debug(f"empty_area_mm={self.empty_area_mm}")
         self.report.set_persistent_cols({
-            "Slice Empty Area [mm^2]": self.empty_area_mm,
-            "Slice Septum Area [mm^2]": self.septum_area_mm,
-            "Slice Sinusoidal Area [mm^2]": self.sinusoidal_area_mm,
-            "Slice real pixelsize [mm]": self.real_pixelsize_mm,
+            "Scan Segmentation Empty Area [mm^2]": self.empty_area_mm,
+            "Scan Segmentation Septum Area [mm^2]": self.septum_area_mm,
+            "Scan Segmentation Sinusoidal Area [mm^2]": self.sinusoidal_area_mm,
+            "Scan Segmentation Used Pixelsize [mm]": self.used_pixelsize_mm[0],
         })
 
     def _find_biggest_lobuli(self):

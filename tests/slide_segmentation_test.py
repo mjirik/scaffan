@@ -13,7 +13,7 @@ import scaffan.slide_segmentation
 
 def test_slide_segmentation():
     fn = io3d.datasets.join_path("medical", "orig", "sample_data", "SCP003", "SCP003.ndpi", get_root=True)
-    seg = scaffan.slide_segmentation.SlideSegmentation()
+    seg = scaffan.slide_segmentation.ScanSegmentation()
     dir(seg)
     anim = scaffan.image.AnnotatedImage(fn)
     seg.init(anim)

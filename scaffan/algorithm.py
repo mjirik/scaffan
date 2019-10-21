@@ -54,7 +54,7 @@ class Scaffan:
         self.lobulus_processing = scaffan.lobulus.Lobulus(ptype="bool")
         self.skeleton_analysis = scaffan.skeleton_analysis.SkeletonAnalysis()
         self.evaluation = scaffan.evaluation.Evaluation()
-        self.slide_segmentation = scaffan.slide_segmentation.SlideSegmentation()
+        self.slide_segmentation = scaffan.slide_segmentation.ScanSegmentation()
         self.slide_segmentation.report = self.report
 
         self.lobulus_processing.set_report(self.report)
@@ -79,7 +79,7 @@ class Scaffan:
                         "name": "Automatic Lobulus Selection",
                         "type": "bool",
                         "value": False,
-                        "tip": "Skip selection based on annotation color and select lobulus based on Slide Segmentation. ",
+                        "tip": "Skip selection based on annotation color and select lobulus based on Scan Segmentation. ",
                     },
                     {
                         "name": "Annotation Color",
@@ -151,7 +151,7 @@ class Scaffan:
                         "tip": "Open system window with output dir when processing is finished",
                     },
                     # {
-                    #     "name": "Run Slide Segmentation",
+                    #     "name": "Run Scan Segmentation",
                     #     "type": "bool",
                     #     "value": True,
                     #     "tip": "Run analysis of whole slide before all other processing is perfomed",
@@ -366,7 +366,7 @@ class Scaffan:
         show = self.parameters.param("Processing", "Show").value()
         self.report.set_show(show)
         self.report.set_save(True)
-        run_slide_segmentation = self.parameters.param("Processing", "Slide Segmentation").value()
+        run_slide_segmentation = self.parameters.param("Processing", "Scan Segmentation").value()
         if run_slide_segmentation:
             fn_input = self.parameters.param("Input", "File Path").value()
             # self.slide_segmentation.init(Path(fn_input))
