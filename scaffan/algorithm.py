@@ -207,7 +207,7 @@ class Scaffan:
         )
         self.set_input_file(fn)
 
-    def set_input_file(self, fn):
+    def set_input_file(self, fn:Union[Path, str]):
         fn = str(fn)
         fnparam = self.parameters.param("Input", "File Path")
         fnparam.setValue(fn)
@@ -355,7 +355,7 @@ class Scaffan:
         # if clf_fn is not None:
         #     mainapp.slide_segmentation.clf_fn = Path(clf_fn)
         # clf_fn = Path(mainapp.slide_segmentation.clf_fn)
-        clf_fn = self.slide_segmentation.clf_fn
+        clf_fn = Path(self.slide_segmentation.clf_fn)
         assert clf_fn.exists()
 
         for i, fn in enumerate(fns):
