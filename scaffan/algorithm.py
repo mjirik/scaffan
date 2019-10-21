@@ -356,7 +356,7 @@ class Scaffan:
         #     mainapp.slide_segmentation.clf_fn = Path(clf_fn)
         # clf_fn = Path(mainapp.slide_segmentation.clf_fn)
         clf_fn = Path(self.slide_segmentation.clf_fn)
-        assert clf_fn.exists()
+        logger.debug(f"train clf on path: {clf_fn}, exists: {clf_fn.exists()}")
 
         for i, fn in enumerate(fns):
             self.set_input_file(fn)
