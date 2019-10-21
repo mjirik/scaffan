@@ -586,7 +586,6 @@ class AnnotatedImage:
         """
 
         px_factor = self.openslide.level_downsamples[self.region_level]
-        print(px_factor)
         x_px = self.region_location[0] + points_view_px[0] * px_factor
         y_px = self.region_location[1] + points_view_px[1] * px_factor
 
@@ -599,7 +598,6 @@ class AnnotatedImage:
         """
 
         px_factor = self.openslide.level_downsamples[self.region_level]
-        print(px_factor)
         x_glob_px = points_glob_px[0]
         y_glob_px = points_glob_px[1]
         x_view_px = (x_glob_px - self.region_location[0]) / px_factor

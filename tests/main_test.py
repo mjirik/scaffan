@@ -208,7 +208,7 @@ class MainGuiTest(unittest.TestCase):
             # mainapp.set_annotation_color_selection("#FF00FF")
             # mainapp.set_annotation_color_selection("#FF0000")
             mainapp.set_annotation_color_selection("#FFFF00")
-            mainapp.set_parameter("Processing;Automatic Lobulus Selection", True)
+            mainapp.set_parameter("Input;Automatic Lobulus Selection", True)
             mainapp.set_parameter("Processing;Skeleton Analysis", False)
             mainapp.set_parameter("Processing;Texture Analysis", False)
             mainapp.set_parameter("Processing;Open output dir", False)
@@ -253,7 +253,7 @@ class MainGuiTest(unittest.TestCase):
             # mainapp.set_annotation_color_selection("#FF00FF")
             # mainapp.set_annotation_color_selection("#FF0000")
             mainapp.set_annotation_color_selection("#FFFF00")
-            mainapp.set_parameter("Processing;Automatic Lobulus Selection", True)
+            mainapp.set_parameter("Input;Automatic Lobulus Selection", True)
             mainapp.set_parameter("Processing;Skeleton Analysis", False)
             mainapp.set_parameter("Processing;Texture Analysis", False)
             if i == 0:

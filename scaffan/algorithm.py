@@ -51,7 +51,7 @@ class Scaffan:
 
         import scaffan.texture as satex
         self.glcm_textures = satex.GLCMTextureMeasurement()
-        self.lobulus_processing = scaffan.lobulus.Lobulus()
+        self.lobulus_processing = scaffan.lobulus.Lobulus(ptype="bool")
         self.skeleton_analysis = scaffan.skeleton_analysis.SkeletonAnalysis()
         self.evaluation = scaffan.evaluation.Evaluation()
         self.slide_segmentation = scaffan.slide_segmentation.SlideSegmentation()
@@ -74,9 +74,17 @@ class Scaffan:
                 "children": [
                     {"name": "File Path", "type": "str"},
                     {"name": "Select", "type": "action"},
+                    {"name": "Data Info", "type": "str", "readonly": True},
+                    {
+                        "name": "Automatic Lobulus Selection",
+                        "type": "bool",
+                        "value": False,
+                        "tip": "Skip selection based on annotation color and select lobulus based on Slide Segmentation. ",
+                    },
                     {
                         "name": "Annotation Color",
                         "type": "list",
+                        "tip": "Select lobulus based on annotation color. Skipped if Automatic Lobulus Selection is used.",
                         "values": {
                             "None": None,
                             "White": "#FFFFFF",
@@ -92,7 +100,6 @@ class Scaffan:
                     },
                     # {'name': 'Boolean', 'type': 'bool', 'value': True, 'tip': "This is a checkbox"},
                     # {'name': 'Color', 'type': 'color', 'value': "FF0", 'tip': "This is a color button"},
-                    {"name": "Data Info", "type": "str", "readonly": True},
                     # BatchFileProcessingParameter(
                     #     name="Batch processing", children=[]
                     # ),
@@ -149,12 +156,6 @@ class Scaffan:
                     #     "value": True,
                     #     "tip": "Run analysis of whole slide before all other processing is perfomed",
                     # },
-                    {
-                        "name": "Automatic Lobulus Selection",
-                        "type": "bool",
-                        "value": False,
-                        "tip": "Select lobulus based on Slide Segmentation. ",
-                    },
                     # {
                     #     "name": "Skeleton Analysis",
                     #     "type": "bool",
@@ -178,9 +179,9 @@ class Scaffan:
                         "tip": "Control ammount of stored images. 0 - all debug imagess will be stored. "
                                "100 - just important images will be saved.",
                     },
-                    {"name": "Run", "type": "action"},
                 ],
             },
+            {"name": "Run", "type": "action"},
         ]
         self.parameters = Parameter.create(name="params", type="group", children=params)
         # here is everything what should work with or without GUI
@@ -234,8 +235,8 @@ class Scaffan:
         fnparam = self.parameters.param("Output", "Common Spreadsheet File")
         fnparam.setValue(path)
         self.cache.update('common_spreadsheet_file', path)
-        logger.debug("common_spreadsheet_file set to {}".format(path))
-        print("common_spreadsheet_file set to {}".format(path))
+        logger.info("common_spreadsheet_file set to {}".format(path))
+        # print("common_spreadsheet_file set to {}".format(path))
 
     def set_parameter(self, param_path, value, parse_path=True):
         """
@@ -371,7 +372,7 @@ class Scaffan:
             # self.slide_segmentation.init(Path(fn_input))
             self.slide_segmentation.init(self.anim)
             self.slide_segmentation.run()
-        automatic_lobulus_selection = self.parameters.param("Processing", "Automatic Lobulus Selection").value()
+        automatic_lobulus_selection = self.parameters.param("Input", "Automatic Lobulus Selection").value()
         if automatic_lobulus_selection:
             if run_slide_segmentation:
                 self.slide_segmentation.add_biggest_to_annotations()
@@ -383,16 +384,15 @@ class Scaffan:
                 color,
                 raise_exception_if_not_found=self.raise_exception_if_color_not_found)
         logger.debug("Annotation IDs: {}".format(annotation_ids))
-        for id in annotation_ids:
-            self._run_lobulus(id)
+        run_lob = self.parameters.param("Processing", "Lobulus Segmentation").value()
+        if run_lob:
+            for id in annotation_ids:
+                self._run_lobulus(id)
 
         # in the case no lobulus has been measured the segmentation measurement is stored to table
-        if run_slide_segmentation and len(annotation_ids) == 0:
+        if not run_lob or (run_slide_segmentation and len(annotation_ids) == 0):
             self._add_general_information_to_actual_row()
             self.report.finish_actual_row()
-
-
-
 
         # self.report.df.to_excel(op.join(self.report.outputdir, "data.xlsx"))
         dumped = False
@@ -537,7 +537,7 @@ class Scaffan:
         self.parameters.param("Output", "Select Common Spreadsheet File").sigActivated.connect(
             self.select_output_spreadsheet_gui
         )
-        self.parameters.param("Processing", "Run").sigActivated.connect(
+        self.parameters.param("Run").sigActivated.connect(
             self.run_lobuluses
         )
 

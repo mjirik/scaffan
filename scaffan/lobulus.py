@@ -34,7 +34,8 @@ class Lobulus:
             pname="Lobulus Segmentation",
             ptype="group",
             pvalue=True,
-            ptip="Select the area for sinusoidal area texture analysis",
+            ptip="Select the area for sinusoidal area texture analysis after lobuli selection",
+            pexpanded=False,
     ):
         # TODO the segmentation resolution was probably different.
         #  For segmentation was used different level than 2. Probably 3 or 4
@@ -165,16 +166,16 @@ class Lobulus:
 
         ]
 
-        self.parameters = Parameter.create(
-            name="Lobulus Segmentation", type="group",
-            children=params, expanded=False)
+        # self.parameters = Parameter.create(
+        #     name="Lobulus Segmentation", type="group",
+        #     children=params, expanded=False)
         self.parameters = Parameter.create(
             name=pname,
             type=ptype,
             value=pvalue,
             tip=ptip,
             children=params,
-            expanded=False)
+            expanded=pexpanded)
         self.report: Report = None
 
     def set_annotated_image_and_id(self, anim: scim.AnnotatedImage, annotation_id, level=None):

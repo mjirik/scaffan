@@ -214,6 +214,37 @@ class SlideSegmentation():
 
     #         return pixels, view
 
+    # def _get_features(self, view: View) -> np.ndarray:
+    #     """
+    #     Three colors and one gaussian smooth reg channel.
+    #     An alternative features computation can be done by setting callback function
+    #     self.alternative_get_features = fcn(seg:SlideSegmentation, view:View) -> ndarray:
+    #
+    #     img_sob: gaussian blure applied on gradient sobel operator give information about texture richness in neighborhood
+    #
+    #
+    #     """
+    #     if self.alternative_get_features is not None:
+    #         return self.alternative_get_features(self, view)
+    #     img = view.get_region_image(as_gray=False)
+    #     img_gauss2 = gaussian_filter(img[:, :, 0], 2)
+    #     img_gauss5 = gaussian_filter(img[:, :, 0], 5)
+    #
+    #     img = np.copy(img)
+    #     imgout = np.zeros([img.shape[0], img.shape[1], 8])
+    #     img_sob = skimage.filters.sobel(np.abs((img[:, :, 0] / 255)).astype(np.uint8))
+    #     img_sob_gauss2 = gaussian_filter(img_sob, 2)
+    #     img_sob_gauss5 = gaussian_filter(img_sob, 5)
+    #     img_sob_median = skimage.filters.median(img_sob.astype(np.uint8), disk(5))
+    #
+    #     imgout[:, :, :3] = img[:, :, :3]
+    #     imgout[:, :, 3] = img_gauss2
+    #     imgout[:, :, 4] = img_gauss5
+    #     imgout[:, :, 5] = img_sob_gauss2
+    #     imgout[:, :, 6] = img_sob_gauss5
+    #     imgout[:, :, 7] = img_sob_median
+    #     return imgout
+
     def _get_features(self, view: View) -> np.ndarray:
         """
         Three colors and one gaussian smooth reg channel.
@@ -222,27 +253,29 @@ class SlideSegmentation():
 
         img_sob: gaussian blure applied on gradient sobel operator give information about texture richness in neighborhood
 
-
         """
-        if self.alternative_get_features is not None:
-            return self.alternative_get_features(self, view)
         img = view.get_region_image(as_gray=False)
         img_gauss2 = gaussian_filter(img[:, :, 0], 2)
         img_gauss5 = gaussian_filter(img[:, :, 0], 5)
 
         img = np.copy(img)
-        imgout = np.zeros([img.shape[0], img.shape[1], 8])
-        img_sob = skimage.filters.sobel(np.abs((img[:, :, 0] / 255)).astype(np.uint8))
+        imgout = np.zeros([img.shape[0], img.shape[1], 9], dtype=np.uint8)
+        img_just_sob = skimage.filters.sobel(img[:, :, 0])
+        # print(f"just_sob {img_just_sob.dtype} stats: {stats.describe(img_just_sob[:], axis=None)}")
+        #         img_sob = (np.abs(img_just_sob) * 255).astype(np.uint8)
+        img_sob = (np.abs(img_just_sob) * 255).astype(np.uint8)
+        # print(f"sob {img_sob.dtype} stats: {stats.describe(img_sob[:], axis=None)}")
         img_sob_gauss2 = gaussian_filter(img_sob, 2)
         img_sob_gauss5 = gaussian_filter(img_sob, 5)
-        img_sob_median = skimage.filters.median(img_sob.astype(np.uint8), disk(5))
+        img_sob_median = skimage.filters.median((img_just_sob * 2000).astype(np.uint8), disk(10))
 
         imgout[:, :, :3] = img[:, :, :3]
         imgout[:, :, 3] = img_gauss2
         imgout[:, :, 4] = img_gauss5
-        imgout[:, :, 5] = img_sob_gauss2
-        imgout[:, :, 6] = img_sob_gauss5
-        imgout[:, :, 7] = img_sob_median
+        imgout[:, :, 5] = img_sob
+        imgout[:, :, 6] = img_sob_gauss2
+        imgout[:, :, 7] = img_sob_gauss5
+        imgout[:, :, 8] = img_sob_median
         return imgout
 
     def _find_best_level(self):
@@ -416,6 +449,7 @@ class SlideSegmentation():
             "Slice Empty Area [mm^2]": self.empty_area_mm,
             "Slice Septum Area [mm^2]": self.septum_area_mm,
             "Slice Sinusoidal Area [mm^2]": self.sinusoidal_area_mm,
+            "Slice real pixelsize [mm]": self.real_pixelsize_mm,
         })
 
     def _find_biggest_lobuli(self):

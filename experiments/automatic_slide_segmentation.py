@@ -76,7 +76,7 @@ def set_same(mainapp, fn):
     # mainapp.set_annotation_color_selection("#0000FF") # Blue is used for unlabeled
     # mainapp.set_annotation_color_selection("#00FF00")
     # mainapp.set_annotation_color_selection("#FFFF00")
-    mainapp.set_parameter("Processing;Automatic Lobulus Selection", True)
+    mainapp.set_parameter("Input;Automatic Lobulus Selection", True)
     mainapp.set_parameter("Processing;Skeleton Analysis", False)
     mainapp.set_parameter("Processing;Texture Analysis", False)
     mainapp.set_parameter("Processing;Open output dir", False)
