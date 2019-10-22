@@ -21,6 +21,16 @@ from skimage.morphology import disk
 import scipy.ndimage
 import matplotlib.pyplot as plt
 from pyqtgraph.parametertree import Parameter, ParameterTree
+from sklearn.neural_network import MLPClassifier
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.svm import SVC
+from sklearn.gaussian_process import GaussianProcessClassifier
+from sklearn.gaussian_process.kernels import RBF
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
+from sklearn.naive_bayes import GaussianNB
+from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
+import exsu
 from exsu.report import Report
 from .image import AnnotatedImage
 
@@ -113,7 +123,17 @@ class ScanSegmentation():
         self.level = None
         self.tiles: List[List["View"]] = None
         #         self.clf = sklearn.svm.SVC(gamma='scale')
-        self.clf = GaussianNB()
+        # KNeighborsClassifier(3),
+        # SVC(kernel="linear", C=0.025),
+        # SVC(gamma=2, C=1),
+        # #     GaussianProcessClassifier(1.0 * RBF(1.0)),
+        self.clf_fn = DecisionTreeClassifier(max_depth=5),
+        # RandomForestClassifier(max_depth=5, n_estimators=10, max_features=1),
+        # MLPClassifier(alpha=1, max_iter=1000),
+        # AdaBoostClassifier(),
+        # QuadraticDiscriminantAnalysis(),
+        # GaussianNB(),
+        # self.clf = GaussianNB()
         self.clf_fn:Path = Path(Path(__file__).parent / "segmentation_model.pkl")
         if self.clf_fn.exists():
             logger.debug(f"Reading classifier from {str(self.clf_fn)}")
@@ -204,48 +224,8 @@ class ScanSegmentation():
         pixels_all = np.concatenate(pixels_list, axis=0)
         return pixels_all
 
-    #     def _get_pixels(self, anim, color, n):
-    #         ann_ids = anim.select_annotations_by_color(color)
-    #         view = anim.get_views(ann_ids, level=self.level)[n]
-    #         img_ann = view.get_annotation_region_raster(ann_ids[n])
 
-    #         img = self._get_features(view)
-    #         pixels = img[img_ann]
-
-    #         return pixels, view
-
-    # def _get_features(self, view: View) -> np.ndarray:
-    #     """
-    #     Three colors and one gaussian smooth reg channel.
-    #     An alternative features computation can be done by setting callback function
-    #     self.alternative_get_features = fcn(seg:SlideSegmentation, view:View) -> ndarray:
-    #
-    #     img_sob: gaussian blure applied on gradient sobel operator give information about texture richness in neighborhood
-    #
-    #
-    #     """
-    #     if self.alternative_get_features is not None:
-    #         return self.alternative_get_features(self, view)
-    #     img = view.get_region_image(as_gray=False)
-    #     img_gauss2 = gaussian_filter(img[:, :, 0], 2)
-    #     img_gauss5 = gaussian_filter(img[:, :, 0], 5)
-    #
-    #     img = np.copy(img)
-    #     imgout = np.zeros([img.shape[0], img.shape[1], 8])
-    #     img_sob = skimage.filters.sobel(np.abs((img[:, :, 0] / 255)).astype(np.uint8))
-    #     img_sob_gauss2 = gaussian_filter(img_sob, 2)
-    #     img_sob_gauss5 = gaussian_filter(img_sob, 5)
-    #     img_sob_median = skimage.filters.median(img_sob.astype(np.uint8), disk(5))
-    #
-    #     imgout[:, :, :3] = img[:, :, :3]
-    #     imgout[:, :, 3] = img_gauss2
-    #     imgout[:, :, 4] = img_gauss5
-    #     imgout[:, :, 5] = img_sob_gauss2
-    #     imgout[:, :, 6] = img_sob_gauss5
-    #     imgout[:, :, 7] = img_sob_median
-    #     return imgout
-
-    def _get_features(self, view: View) -> np.ndarray:
+    def _get_features(self, view: View, debug_return=False) -> np.ndarray:
         """
         Three colors and one gaussian smooth reg channel.
         An alternative features computation can be done by setting callback function
@@ -276,6 +256,9 @@ class ScanSegmentation():
         imgout[:, :, 6] = img_sob_gauss2
         imgout[:, :, 7] = img_sob_gauss5
         imgout[:, :, 8] = img_sob_median
+
+        if debug_return:
+            return imgout, [img_sob]
         return imgout
 
     def _find_best_level(self):
@@ -374,10 +357,6 @@ class ScanSegmentation():
                 output_image[
                 ix * self.tile_size[0]: (ix + 1) * self.tile_size[0],
                 iy * self.tile_size[1]: (iy + 1) * self.tile_size[1]
-                #                     int(x0):int(x0 + tile_size_on_level[0]),
-                #                     int(y0):int(y0 + tile_size_on_level[1])
-                #                 ] = self.tiles[ix][iy].get_region_image(as_gray=True)
-                #                 ] = self.tiles[iy][ix].get_region_image(as_gray=True)
                 ] = self.predicted_tiles[iy][ix]
 
         full_image = output_image[:int(imsize_on_level[1]), :int(imsize_on_level[0])]
@@ -433,13 +412,13 @@ class ScanSegmentation():
         self.intralobular_ratio = count[1] / (count[1] + count[2])
         #         plt.figure(figsize=(10, 10))
         #         plt.imshow(self.full_output_image)
-        self.report.imsave("slice_label.png", self.full_output_image)
+        self.report.imsave("slice_label.png", self.full_output_image, level_skimage=20, level_npz=30)
         # plt.imsave(self.output_label_fn, self.full_output_image)
 
         #         plt.figure(figsize=(10, 10))
         img = self.get_raster_image(as_gray=False)
         #         plt.imshow(img)
-        self.report.imsave("slice_raster.png", img.astype(np.uint8))
+        self.report.imsave("slice_raster.png", img.astype(np.uint8), level_skimage=20, level_npz=30)
         logger.debug(f"real_pixel_size={self.used_pixelsize_mm}")
         self.empty_area_mm = np.prod(self.used_pixelsize_mm) * count[0]
         self.septum_area_mm = np.prod(self.used_pixelsize_mm) * count[1]
