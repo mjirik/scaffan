@@ -376,7 +376,8 @@ class Lobulus:
             self.report.savefig_and_show("lobulus_{}.png".format(self.annotation_id), fig, level=80)
 
         self.lobulus_mask = (self.central_vein_mask + self.border_mask) == 1
-        self.report.imsave_as_fig(f"lobulus_mask_{self.annotation_id}.png", self.lobulus_mask.astype(np.uint8), level=70, npz_level=55)
+        self.report.imsave_as_fig(f"lobulus_mask_{self.annotation_id}.png", self.lobulus_mask.astype(np.uint8),
+                                  level=70, level_skimage=20, npz_level=30 )
         area_px = np.sum(self.lobulus_mask)
         datarow["Area"] = area_px * np.prod(
             self.view.region_pixelsize

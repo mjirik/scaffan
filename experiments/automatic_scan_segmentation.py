@@ -64,7 +64,7 @@ mainapp.set_parameter("Processing;Lobulus Segmentation;Manual Segmentation", Fal
 
 mainapp.set_parameter("Processing;Skeleton Analysis", False)
 mainapp.set_parameter("Processing;Texture Analysis", False)
-mainapp.set_report_level(10)
+mainapp.set_report_level(50)
 # mainapp.set_parameter("Processing;Lobulus Segmentation;Manual Segmentation", True)
 
 def set_same(mainapp, fn):
