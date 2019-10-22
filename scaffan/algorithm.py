@@ -408,16 +408,18 @@ class Scaffan:
             self.slide_segmentation.init(self.anim)
             self.slide_segmentation.run()
         automatic_lobulus_selection = self.parameters.param("Input", "Automatic Lobulus Selection").value()
-        if automatic_lobulus_selection:
-            if run_slide_segmentation:
-                self.slide_segmentation.add_biggest_to_annotations()
-                annotation_ids = self.slide_segmentation.ann_biggest_ids
-            else:
-                raise NoLobulusSelectionUsedError
-        else:
+        if run_slide_segmentation:
+            self.slide_segmentation.add_biggest_to_annotations()
+            annotation_ids = self.slide_segmentation.ann_biggest_ids
+
+        # Error messages
+        if not automatic_lobulus_selection:
             annotation_ids = self.anim.select_annotations_by_color(
                 color,
                 raise_exception_if_not_found=self.raise_exception_if_color_not_found)
+        elif automatic_lobulus_selection and not run_slide_segmentation:
+            raise NoLobulusSelectionUsedError
+
         logger.debug("Annotation IDs: {}".format(annotation_ids))
         run_lob = self.parameters.param("Processing", "Lobulus Segmentation").value()
         if run_lob:

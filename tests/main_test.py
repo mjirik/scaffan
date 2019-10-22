@@ -236,15 +236,12 @@ class MainGuiTest(unittest.TestCase):
         if clf_fn is not None:
             mainapp.slide_segmentation.clf_fn = clf_fn
         clf_fn = Path(mainapp.slide_segmentation.clf_fn)
+        logger.debug(f"clf_fn={clf_fn}")
         if clf_fn.exists():
             modtime0 = datetime.fromtimestamp(clf_fn.stat().st_mtime)
         else:
             modtime0 = ""
         logger.debug(f"classificator prior modification time: {modtime0}")
-        # fn = io3d.datasets.join_path("medical", "orig", "CMU-1.ndpi", get_root=True)
-        # fn = io3d.datasets.join_path("medical", "orig", "CMU-1.ndpi", get_root=True)
-        # fn = io3d.datasets.join_path("scaffold", "Hamamatsu", "PIG-003_J-18-0165_HE.ndpi", get_root=True)
-        # fn = io3d.datasets.join_path("scaffold", "Hamamatsu", "PIG-003_J-18-0168_HE.ndpi", get_root=True)
         mainapp.train_scan_segmentation(fns)
 
         # for i, fn in enumerate(fns):
