@@ -413,6 +413,7 @@ class ScanSegmentation():
         #         plt.figure(figsize=(10, 10))
         #         plt.imshow(self.full_output_image)
         self.report.imsave("slice_label.png", self.full_output_image, level_skimage=20, level_npz=30)
+        self.report.imsave("slice_prefilter_label.png", self.full_prefilter_image, level=40, level_skimage=20, level_npz=30)
         # plt.imsave(self.output_label_fn, self.full_output_image)
 
         #         plt.figure(figsize=(10, 10))
