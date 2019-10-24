@@ -11,7 +11,8 @@ import pandas as pd
 
 
 # import openslide
-import scaffan.report
+import exsu
+import exsu.report
 
 
 
@@ -28,7 +29,7 @@ class ReportTest(unittest.TestCase):
         if commonsheet.exists():
             os.remove(commonsheet)
 
-        report = scaffan.report.Report(outputdir=outputdir, additional_spreadsheet_fn=commonsheet)
+        report = exsu.report.Report(outputdir=outputdir, additional_spreadsheet_fn=commonsheet)
         report.add_cols_to_actual_row({"Col1": 25, "Col2": "test string", "Col5": 5})
         report.add_cols_to_actual_row({"Col2": "prepsanu", "Col1": 26, "Col4": "ctyrka"})
         report.finish_actual_row()
