@@ -31,7 +31,8 @@ ipython_genutils=0.2.0=py_1
 ipywidgets=7.4.2=py_0
 jdcal=1.4=py_1
 jedi=0.13.2=py36_1000
-jinja2=2.10=py_1
+# jinja2=2.10=py_1 # removed based on gihub suggestion
+jinja2>=2.10.1
 jpeg=9c=hfa6e2cd_1001
 jsonschema=3.0.0a3=py36_1000
 kiwisolver=1.0.1=py36he980bc4_1002
@@ -68,7 +69,8 @@ pandoc=2.6=1
 pandocfilters=1.4.2=py_1
 parso=0.3.4=py_0
 pickleshare=0.7.5=py36_1000
-pillow=5.4.1=py36h9a613e6_1000
+# pillow=5.4.1=py36h9a613e6_1000 # removed based on github suggestion
+pillow>=6.2.0
 pip=19.0.1=py36_0
 prometheus_client=0.6.0=py_0
 prompt_toolkit=2.0.9=py_0
