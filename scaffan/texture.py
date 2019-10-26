@@ -111,24 +111,43 @@ def nonzero_with_step(data, step):
 
 
 class GLCMTextureMeasurement:
-    def __init__(self, filename_label="",
-        pname = "Texture Analysis",
-        ptype = "bool",
-        pvalue = True,
-        ptip = "Run Gray Level Co-occurrence texture analysis after lobulus segmentation is performed",
-
+    def __init__(
+            self, filename_label="",
+            pname = "Texture Analysis",
+            ptype = "bool",
+            pvalue = True,
+            ptip = "Run Gray Level Co-occurrence texture analysis after lobulus segmentation is performed",
+            texture_label=None,
+            working_resolution_mm=0.0000004,
+            tile_size=64,
+            tile_spacing=32,
+            add_cols_to_report:bool=True
     ):
+        """
+
+        :param filename_label:
+        :param pname:
+        :param ptype:
+        :param pvalue:
+        :param ptip:
+        :param texture_label: Used to identify where the texture processing is used (central vein, whole_slide, ...)
+        :param working_resolution_mm:
+        :param tile_size:
+        :param tile_spacing:
+        """
         params = [
             {
                 "name": "Tile Size",
                 "type": "int",
-                "value": 64,
+                # "value": 64,
+                "value": tile_size,
                 "suffix": "px",
             },
             {
                 "name": "Tile Spacing",
                 "type": "int",
-                "value": 32,
+                # "value": 32,
+                "value": tile_spacing,
                 "suffix": "px",
             },
             {
@@ -136,7 +155,8 @@ class GLCMTextureMeasurement:
                 "type": "float",
                 # "value": 0.000001,
                 # "value": 0.0000005,
-                "value": 0.0000004,
+                # "value": 0.0000004,
+                "value": working_resolution_mm,
                 "suffix": "m",
                 "siPrefix": True
 
@@ -148,6 +168,7 @@ class GLCMTextureMeasurement:
             },
 
         ]
+        self.texture_label = texture_label
 
         self.parameters = Parameter.create(
             name=pname,
@@ -158,7 +179,7 @@ class GLCMTextureMeasurement:
             expanded=False)
         self.report: Report = None
         self.filename_label = filename_label
-        self.add_cols_to_report: bool = True
+        self.add_cols_to_report: bool = add_cols_to_report
 
     def set_report(self, report: Report):
         self.report = report
@@ -181,11 +202,15 @@ class GLCMTextureMeasurement:
         tile_spacing = [self.parameters.param("Tile Spacing").value()] * 2
         levels = self.parameters.param("GLCM Levels").value()
         # view = views[0].to_pixelsize(pxsize_mm)
-
+        if self.texture_label is not None:
+            texture_label_fn = "_" + self.texture_label
+        else:
+            texture_label_fn = ""
         view = self.parent_view.to_pixelsize(pxsize_mm)
         texture_image = view.get_region_image(as_gray=True)
+        fn_id = "{}_{}{}".format(self.filename_label, self.annotation_id, texture_label_fn)
         if self.report is not None:
-            self.report.imsave("texture_input_image_{}_{}.png".format(self.filename_label, self.annotation_id),
+            self.report.imsave("texture_input_image_{}.png".format(fn_id),
                                (texture_image * 255).astype(np.uint8))
         energy = tiles_processing(
             1 - texture_image,
@@ -221,7 +246,7 @@ class GLCMTextureMeasurement:
         # plt.colorbar()
         if self.report is not None:
             self.report.savefig_and_show(
-                "glcm_features_{}_{}.png".format(self.filename_label, self.annotation_id), fig
+                "glcm_features_{}.png".format(fn_id), fig
             )
         # plt.savefig("glcm_features_{}.png".format(title))
 
@@ -229,7 +254,7 @@ class GLCMTextureMeasurement:
         plt.imshow(energy)
         if self.report is not None:
             self.report.savefig_and_show(
-                "glcm_features_color_{}_{}.png".format(self.filename_label, self.annotation_id), fig
+                "glcm_features_color_{}.png".format(fn_id), fig
             )
 
         e0 = energy[:, :, 0]
@@ -240,10 +265,15 @@ class GLCMTextureMeasurement:
         if self.lobulus_segmentation is None:
             logger.debug(f"No lobulus segmentation given")
             seg = (slice(None), slice(None))
+        if self.texture_label is None:
+            texture_label_stats = ""
+        else:
+            texture_label_stats = f" {self.texture_label}"
+
         row = {}
-        row = make_stats("GLCM Energy", e0[seg], row)
-        row = make_stats("GLCM Homogenity", e1[seg], row)
-        row = make_stats("GLCM Correlation", e2[seg], row)
+        row = make_stats(f"GLCM Energy{texture_label_stats}", e0[seg], row)
+        row = make_stats(f"GLCM Homogenity{texture_label_stats}", e1[seg], row)
+        row = make_stats(f"GLCM Correlation{texture_label_stats}", e2[seg], row)
         # row = {
         #     "GLCM Energy": np.mean(e0[seg]),
         #     "GLCM Homogenity": np.mean(e1[seg]),
@@ -275,8 +305,6 @@ def make_stats(prefix:str, data, dct=None):
     dct[f"{prefix} p75"] = np.percentile(data, 75)
     dct[f"{prefix} p90"] = np.percentile(data, 90)
     return dct
-
-
 
 class TextureSegmentation:
     def __init__(self, feature_function=None, classifier=None):

@@ -41,7 +41,7 @@ class Lobulus:
         #  For segmentation was used different level than 2. Probably 3 or 4
         #  The level 2 has been used in detail view
 
-        self._inner_texture = scaffan.texture.GLCMTextureMeasurement("central_vein")
+        self._inner_texture = scaffan.texture.GLCMTextureMeasurement("central_vein", texture_label="central_vein")
         params = [
             # {
             #     "name": "Tile Size",
