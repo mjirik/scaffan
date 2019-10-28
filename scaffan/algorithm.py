@@ -510,7 +510,7 @@ class Scaffan:
             self.skeleton_analysis.skeleton_analysis(show=show)
         if run_texture_analysis:
             # self.glcm_textures.report = self.report
-            self.glcm_textures.set_input_data(view=self.lobulus_processing.view, id=annotation_id,
+            self.glcm_textures.set_input_data(view=self.lobulus_processing.view, annotation_id=annotation_id,
                                               lobulus_segmentation=self.lobulus_processing.lobulus_mask)
             self.glcm_textures.run()
         logger.trace("after texture analysis")

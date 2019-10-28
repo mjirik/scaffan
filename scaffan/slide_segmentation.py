@@ -33,6 +33,7 @@ from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
 import exsu
 from exsu.report import Report
 from .image import AnnotatedImage
+from . import texture
 
 
 class ScanSegmentation():
@@ -50,6 +51,10 @@ class ScanSegmentation():
         :param report:
         :param ptype: group or bool
         """
+        self._inner_texture:texture.GLCMTextureMeasurement = texture.GLCMTextureMeasurement(
+            "slide_segmentation", texture_label="slide_segmentation", report_severity_offset=-30,
+            glcm_levels=128
+        )
         params = [
             # {
             #     "name": "Tile Size",
@@ -107,6 +112,7 @@ class ScanSegmentation():
                 "tip": "Automatic annotation radius used when the automatic lobulus selection is prefered "
 
             },
+            self._inner_texture.parameters,
 
         ]
 
@@ -127,7 +133,8 @@ class ScanSegmentation():
         # SVC(kernel="linear", C=0.025),
         # SVC(gamma=2, C=1),
         # #     GaussianProcessClassifier(1.0 * RBF(1.0)),
-        self.clf_fn = DecisionTreeClassifier(max_depth=5),
+        # self.clf_fn = DecisionTreeClassifier(max_depth=5),
+        self.clf_fn = SVC(gamma=2, C=1)
         # RandomForestClassifier(max_depth=5, n_estimators=10, max_features=1),
         # MLPClassifier(alpha=1, max_iter=1000),
         # AdaBoostClassifier(),
@@ -224,7 +231,6 @@ class ScanSegmentation():
         pixels_all = np.concatenate(pixels_list, axis=0)
         return pixels_all
 
-
     def _get_features(self, view: View, debug_return=False) -> np.ndarray:
         """
         Three colors and one gaussian smooth reg channel.
@@ -239,7 +245,7 @@ class ScanSegmentation():
         img_gauss5 = gaussian_filter(img[:, :, 0], 5)
 
         img = np.copy(img)
-        imgout = np.zeros([img.shape[0], img.shape[1], 9], dtype=np.uint8)
+        imgout = np.zeros([img.shape[0], img.shape[1], 12], dtype=np.uint8)
         img_just_sob = skimage.filters.sobel(img[:, :, 0])
         # print(f"just_sob {img_just_sob.dtype} stats: {stats.describe(img_just_sob[:], axis=None)}")
         #         img_sob = (np.abs(img_just_sob) * 255).astype(np.uint8)
@@ -249,6 +255,10 @@ class ScanSegmentation():
         img_sob_gauss5 = gaussian_filter(img_sob, 5)
         img_sob_median = skimage.filters.median((img_just_sob * 2000).astype(np.uint8), disk(10))
 
+        self._inner_texture.set_input_data(view=view, annotation_id=None, lobulus_segmentation=None)
+        self._inner_texture.run(recalculate_view=False)
+        glcm_features = (self._inner_texture.measured_features * 255).astype(np.uint8)
+
         imgout[:, :, :3] = img[:, :, :3]
         imgout[:, :, 3] = img_gauss2
         imgout[:, :, 4] = img_gauss5
@@ -256,6 +266,7 @@ class ScanSegmentation():
         imgout[:, :, 6] = img_sob_gauss2
         imgout[:, :, 7] = img_sob_gauss5
         imgout[:, :, 8] = img_sob_median
+        imgout[:, :, 9:12] = glcm_features[:, :, :3]
 
         if debug_return:
             return imgout, [img_sob]
@@ -327,9 +338,10 @@ class ScanSegmentation():
 
         logger.debug("predicting tiles")
         self.predicted_tiles = []
-        for tile_view_col in self.tiles:
+        for i, tile_view_col in enumerate(self.tiles):
             predicted_col = []
-            for tile_view in tile_view_col:
+            for j, tile_view in enumerate(tile_view_col):
+                self._inner_texture.texture_label = f"slide_segmentation_{i},{j}"
                 predicted_image = self.predict_on_view(tile_view)
                 predicted_col.append(predicted_image)
             self.predicted_tiles.append(predicted_col)
@@ -496,6 +508,9 @@ class ScanSegmentation():
 
     def run(self):
         logger.debug("run...")
+        self._inner_texture.set_report(self.report)
+        self._inner_texture.add_cols_to_report = False
+        # self._inner_texture.parameters.param("")
         if bool(self.parameters.param("Run Training").value()):
             self.train_classifier()
             self.save_classifier()

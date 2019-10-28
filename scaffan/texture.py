@@ -121,7 +121,10 @@ class GLCMTextureMeasurement:
             working_resolution_mm=0.0000004,
             tile_size=64,
             tile_spacing=32,
-            add_cols_to_report:bool=True
+            add_cols_to_report:bool=True,
+            report_severity_offset=0,
+            glcm_levels=64
+
     ):
         """
 
@@ -164,7 +167,7 @@ class GLCMTextureMeasurement:
             {
                 "name": "GLCM Levels",
                 "type": "int",
-                "value": 64
+                "value": glcm_levels
             },
 
         ]
@@ -180,18 +183,26 @@ class GLCMTextureMeasurement:
         self.report: Report = None
         self.filename_label = filename_label
         self.add_cols_to_report: bool = add_cols_to_report
+        self.annotation_id = None
+        self.lobulus_segmentation = None
+        self.report_severity_offset = report_severity_offset
 
     def set_report(self, report: Report):
         self.report = report
 
-    def set_input_data(self, view: image.View, id, lobulus_segmentation):
+    def set_input_data(self, view: image.View, annotation_id:int=None, lobulus_segmentation=None):
         self.anim = view.anim
-        self.annotation_id = id
+        self.annotation_id = annotation_id
         self.parent_view = view
         logger.trace(f"lobulus segmentation {lobulus_segmentation}")
         self.lobulus_segmentation = lobulus_segmentation
 
-    def run(self):
+    def run(self, recalculate_view=True):
+        """
+
+        :param recalculate_view: if False do not calculate other view paramters and use this one
+        :return:
+        """
 
         # title = "test3"
         # title = "test2"
@@ -206,12 +217,22 @@ class GLCMTextureMeasurement:
             texture_label_fn = "_" + self.texture_label
         else:
             texture_label_fn = ""
-        view = self.parent_view.to_pixelsize(pxsize_mm)
+        if recalculate_view:
+            view = self.parent_view.to_pixelsize(pxsize_mm)
+        else:
+            view = self.parent_view
+
         texture_image = view.get_region_image(as_gray=True)
-        fn_id = "{}_{}{}".format(self.filename_label, self.annotation_id, texture_label_fn)
+
+        fn_ann_id = "" if self.annotation_id is None else f"_{self.annotation_id}"
+        fn_id = "{}{}{}".format(self.filename_label, fn_ann_id, texture_label_fn)
         if self.report is not None:
             self.report.imsave("texture_input_image_{}.png".format(fn_id),
-                               (texture_image * 255).astype(np.uint8))
+                               (texture_image * 255).astype(np.uint8),
+                               level=60+self.report_severity_offset,
+                               level_npz=40+self.report_severity_offset,
+                               level_skimage=20+self.report_severity_offset
+                               )
         energy = tiles_processing(
             1 - texture_image,
             fcn=lambda img: texture_glcm_features(img, levels),
@@ -226,6 +247,7 @@ class GLCMTextureMeasurement:
         # grayscale image is there because of travis memory error
         img = view.get_region_image(as_gray=True)
         plt.imshow(img)
+        # if self.annotation_id is not None:
         view.plot_annotations(self.annotation_id)
         if self.lobulus_segmentation is not None:
             seg = imma.image.resize_to_shape(self.lobulus_segmentation, shape=img.shape[:2], order=0) == 1
@@ -246,7 +268,8 @@ class GLCMTextureMeasurement:
         # plt.colorbar()
         if self.report is not None:
             self.report.savefig_and_show(
-                "glcm_features_{}.png".format(fn_id), fig
+                "glcm_features_{}.png".format(fn_id), fig,
+                level=60+self.report_severity_offset
             )
         # plt.savefig("glcm_features_{}.png".format(title))
 
@@ -254,7 +277,8 @@ class GLCMTextureMeasurement:
         plt.imshow(energy)
         if self.report is not None:
             self.report.savefig_and_show(
-                "glcm_features_color_{}.png".format(fn_id), fig
+                "glcm_features_color_{}.png".format(fn_id), fig,
+                level=60 + self.report_severity_offset
             )
 
         e0 = energy[:, :, 0]
@@ -281,7 +305,7 @@ class GLCMTextureMeasurement:
         # }
         if self.report is not None and self.add_cols_to_report:
             self.report.add_cols_to_actual_row(row)
-        logger.debug(f"GLCM textures for id {self.annotation_id} finished")
+        logger.debug(f"GLCM textures for id {self.annotation_id if self.annotation_id is not None else '-'} finished")
         # plt.show()
 
 

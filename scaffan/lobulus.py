@@ -278,7 +278,7 @@ class Lobulus:
         pixelsize_mm = [(self.parameters.param("Working Resolution").value() * 1000)] * 2
         central_vein_view = self.view.anim.get_views([self.annotation_id], pixelsize_mm=pixelsize_mm, margin=0.1)[0]
 
-        self._inner_texture.set_input_data(view=central_vein_view, id=self.annotation_id, lobulus_segmentation=None)
+        self._inner_texture.set_input_data(view=central_vein_view, annotation_id=self.annotation_id, lobulus_segmentation=None)
         self._inner_texture.set_report(self.report)
         self._inner_texture.add_cols_to_report = False
         self._inner_texture.run()

@@ -54,10 +54,6 @@ if clf_fn.exists():
 else:
     modtime0 = ""
 logger.debug(f"classificator prior modification time: {modtime0}")
-# fn = io3d.datasets.join_path("medical", "orig", "CMU-1.ndpi", get_root=True)
-# fn = io3d.datasets.join_path("medical", "orig", "CMU-1.ndpi", get_root=True)
-# fn = io3d.datasets.join_path("scaffold", "Hamamatsu", "PIG-003_J-18-0165_HE.ndpi", get_root=True)
-# fn = io3d.datasets.join_path("scaffold", "Hamamatsu", "PIG-003_J-18-0168_HE.ndpi", get_root=True)
 
 #############
 # mainapp.set_output_dir(experiment_dir/"PIG-001")
@@ -78,24 +74,6 @@ mainapp.set_persistent_cols({
 # mainapp.set_parameter("Processing;Texture Analysis", False)
 mainapp.set_report_level(10)
 # mainapp.set_parameter("Processing;Lobulus Segmentation;Manual Segmentation", True)
-
-# def set_same(mainapp, fn):
-#     logger.debug(f"fn exists {Path(fn).exists()}, fn: {fn}")
-#     mainapp.set_input_file(fn)
-#     odir = experiment_dir / Path(fn).stem
-#     mainapp.set_output_dir(odir)
-#     logger.debug(f"output dir: {str(odir)}")
-#     # mainapp.set_annotation_color_selection("#0000FF") # Blue is used for unlabeled
-#     # mainapp.set_annotation_color_selection("#00FF00")
-#     # mainapp.set_annotation_color_selection("#FFFF00")
-#     mainapp.set_parameter("Input;Automatic Lobulus Selection", True)
-#     mainapp.set_parameter("Processing;Skeleton Analysis", False)
-#     mainapp.set_parameter("Processing;Texture Analysis", False)
-#     mainapp.set_parameter("Processing;Open output dir", False)
-#     mainapp.set_parameter("Processing;Scan Segmentation;Clean Before Training", False)
-#     mainapp.set_parameter("Processing;Scan Segmentation;Run Training", False)
-#     mainapp.set_parameter("Processing;Scan Segmentation;Lobulus Number", 0)
-#     # mainapp.set_parameter("Processing;Lobulus Segmentation;Manual Segmentation", True)
 
 # fns = [
 #     "medical/orig/Scaffan-analysis/PIG-001_J-17-0571_LM central_HE.ndpi",
