@@ -434,8 +434,8 @@ class ScanSegmentation():
         self.report.imsave("slice_raster.png", img.astype(np.uint8), level_skimage=20, level_npz=30)
         logger.debug(f"real_pixel_size={self.used_pixelsize_mm}")
         self.empty_area_mm = np.prod(self.used_pixelsize_mm) * count[0]
-        self.septum_area_mm = np.prod(self.used_pixelsize_mm) * count[1]
-        self.sinusoidal_area_mm = np.prod(self.used_pixelsize_mm) * count[2]
+        self.sinusoidal_area_mm = np.prod(self.used_pixelsize_mm) * count[1]
+        self.septum_area_mm = np.prod(self.used_pixelsize_mm) * count[2]
         logger.debug(f"empty_area_mm={self.empty_area_mm}")
         self.report.set_persistent_cols({
             "Scan Segmentation Empty Area [mm^2]": self.empty_area_mm,
