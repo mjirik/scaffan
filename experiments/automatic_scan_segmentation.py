@@ -11,7 +11,7 @@ import sys
 from pathlib import Path
 import datetime
 
-experiment_title = "first segmentation params"
+experiment_title = "scan segmentation params"
 
 experiment_datetime = datetime.datetime.now()
 experiment_datetime_fn = experiment_datetime.strftime("%Y%m%d-%H%M%S")
