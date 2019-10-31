@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+# 0.17
+
+* [Added] Whole scan Classifier description to output spreadsheet
+
 # 0.16 
 
 * [Fixed] Get inner and outer annotation. Fixed call without color.

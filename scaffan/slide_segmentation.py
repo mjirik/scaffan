@@ -128,13 +128,18 @@ class ScanSegmentation():
         self.tile_size = None
         self.level = None
         self.tiles: List[List["View"]] = None
+        self._clf_object = SVC
+        self._clf_params = dict(gamma=2, C=1)
+        # self._clf_object = GaussianNB
+        # self._clf_params = {}
+
         #         self.clf = sklearn.svm.SVC(gamma='scale')
         # KNeighborsClassifier(3),
         # SVC(kernel="linear", C=0.025),
         # SVC(gamma=2, C=1),
         # #     GaussianProcessClassifier(1.0 * RBF(1.0)),
         # self.clf_fn = DecisionTreeClassifier(max_depth=5),
-        self.clf_fn = SVC(gamma=2, C=1)
+        self.clf = self._clf_object(**self._clf_params)
         # RandomForestClassifier(max_depth=5, n_estimators=10, max_features=1),
         # MLPClassifier(alpha=1, max_iter=1000),
         # AdaBoostClassifier(),
@@ -176,7 +181,8 @@ class ScanSegmentation():
             pixels, y = self.prepare_training_pixels()
 
         if bool(self.parameters.param("Clean Before Training").value()):
-            self.clf = GaussianNB()
+            self.clf = self._clf_object(**self._clf_params)
+            # self.clf = GaussianNB()
             logger.debug(f"cleaning the classifier")
             self.clf.fit(pixels, y=y)
         else:
@@ -442,6 +448,7 @@ class ScanSegmentation():
             "Scan Segmentation Septum Area [mm^2]": self.septum_area_mm,
             "Scan Segmentation Sinusoidal Area [mm^2]": self.sinusoidal_area_mm,
             "Scan Segmentation Used Pixelsize [mm]": self.used_pixelsize_mm[0],
+            "Scan Segmentation Classifier": str(self.clf),
         })
 
     def _find_biggest_lobuli(self):
