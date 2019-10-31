@@ -128,12 +128,12 @@ class ScanSegmentation():
         self.tile_size = None
         self.level = None
         self.tiles: List[List["View"]] = None
-        # self._clf_object = SVC
-        # self._clf_params = dict(gamma=2, C=1)
+        self._clf_object = SVC
+        self._clf_params = dict(gamma=2, C=1)
         # self._clf_object = GaussianNB
         # self._clf_params = {}
-        self._clf_object = DecisionTreeClassifier
-        self._clf_params = dict(max_depth=5)
+        # self._clf_object = DecisionTreeClassifier # no partial fit :-(
+        # self._clf_params = dict(max_depth=5)
 
         #         self.clf = sklearn.svm.SVC(gamma='scale')
         # KNeighborsClassifier(3),
