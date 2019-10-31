@@ -36,7 +36,7 @@ build:
 
 requirements:
   build:
-    - python=3
+    - python=>3.6
     - setuptools
 #    - io3d
     - {{ pin_compatible('io3d', max_pin='x') }}
@@ -55,7 +55,7 @@ requirements:
     - scikit-learn
 
   run:
-      - python>=3.6.0
+    - python>=3.6
     #     # maybe dont work with -convert option
 #    - python=3 # [not win]
 #    - python=3.6.6 # [win]
