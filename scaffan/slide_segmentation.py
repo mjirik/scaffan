@@ -51,10 +51,10 @@ class ScanSegmentation():
         :param report:
         :param ptype: group or bool
         """
-        self._inner_texture:texture.GLCMTextureMeasurement = texture.GLCMTextureMeasurement(
-            "slide_segmentation", texture_label="slide_segmentation", report_severity_offset=-30,
-            glcm_levels=128
-        )
+        # self._inner_texture:texture.GLCMTextureMeasurement = texture.GLCMTextureMeasurement(
+        #     "slide_segmentation", texture_label="slide_segmentation", report_severity_offset=-30,
+        #     glcm_levels=128
+        # )
         params = [
             # {
             #     "name": "Tile Size",
@@ -112,7 +112,7 @@ class ScanSegmentation():
                 "tip": "Automatic annotation radius used when the automatic lobulus selection is prefered "
 
             },
-            self._inner_texture.parameters,
+            # self._inner_texture.parameters,
 
         ]
 
@@ -128,10 +128,10 @@ class ScanSegmentation():
         self.tile_size = None
         self.level = None
         self.tiles: List[List["View"]] = None
-        self._clf_object = SVC
-        self._clf_params = dict(gamma=2, C=1)
-        # self._clf_object = GaussianNB
-        # self._clf_params = {}
+        # self._clf_object = SVC
+        # self._clf_params = dict(gamma=2, C=1)
+        self._clf_object = GaussianNB
+        self._clf_params = {}
         # self._clf_object = DecisionTreeClassifier # no partial fit :-(
         # self._clf_params = dict(max_depth=5)
 
@@ -185,7 +185,7 @@ class ScanSegmentation():
         if bool(self.parameters.param("Clean Before Training").value()):
             self.clf = self._clf_object(**self._clf_params)
             # self.clf = GaussianNB()
-            logger.debug(f"cleaning the classifier")
+            logger.debug(f"cleaning the classifier {self.clf}")
             self.clf.fit(pixels, y=y)
         else:
             self.clf.partial_fit(pixels, y=y)
@@ -253,7 +253,9 @@ class ScanSegmentation():
         img_gauss5 = gaussian_filter(img[:, :, 0], 5)
 
         img = np.copy(img)
-        imgout = np.zeros([img.shape[0], img.shape[1], 12], dtype=np.uint8)
+        nfeatures = 9
+        # nfeatures = 12 #GLCM
+        imgout = np.zeros([img.shape[0], img.shape[1], nfeatures], dtype=np.uint8)
         img_just_sob = skimage.filters.sobel(img[:, :, 0])
         # print(f"just_sob {img_just_sob.dtype} stats: {stats.describe(img_just_sob[:], axis=None)}")
         #         img_sob = (np.abs(img_just_sob) * 255).astype(np.uint8)
@@ -263,9 +265,11 @@ class ScanSegmentation():
         img_sob_gauss5 = gaussian_filter(img_sob, 5)
         img_sob_median = skimage.filters.median((img_just_sob * 2000).astype(np.uint8), disk(10))
 
-        self._inner_texture.set_input_data(view=view, annotation_id=None, lobulus_segmentation=None)
-        self._inner_texture.run(recalculate_view=False)
-        glcm_features = (self._inner_texture.measured_features * 255).astype(np.uint8)
+        # GLCM
+        # self._inner_texture.set_input_data(view=view, annotation_id=None, lobulus_segmentation=None)
+        # self._inner_texture.run(recalculate_view=False)
+        # glcm_features = (self._inner_texture.measured_features * 255).astype(np.uint8)
+        # imgout[:, :, 9:12] = glcm_features[:, :, :3]
 
         imgout[:, :, :3] = img[:, :, :3]
         imgout[:, :, 3] = img_gauss2
@@ -274,7 +278,6 @@ class ScanSegmentation():
         imgout[:, :, 6] = img_sob_gauss2
         imgout[:, :, 7] = img_sob_gauss5
         imgout[:, :, 8] = img_sob_median
-        imgout[:, :, 9:12] = glcm_features[:, :, :3]
 
         if debug_return:
             return imgout, [img_sob]
@@ -349,7 +352,7 @@ class ScanSegmentation():
         for i, tile_view_col in enumerate(self.tiles):
             predicted_col = []
             for j, tile_view in enumerate(tile_view_col):
-                self._inner_texture.texture_label = f"slide_segmentation_{i},{j}"
+                # self._inner_texture.texture_label = f"slide_segmentation_{i},{j}"
                 predicted_image = self.predict_on_view(tile_view)
                 predicted_col.append(predicted_image)
             self.predicted_tiles.append(predicted_col)
@@ -517,9 +520,11 @@ class ScanSegmentation():
 
     def run(self):
         logger.debug("run...")
-        self._inner_texture.set_report(self.report)
-        self._inner_texture.add_cols_to_report = False
-        # self._inner_texture.parameters.param("")
+        # GLCM
+        # self._inner_texture.set_report(self.report)
+        # self._inner_texture.add_cols_to_report = False
+
+
         if bool(self.parameters.param("Run Training").value()):
             self.train_classifier()
             self.save_classifier()

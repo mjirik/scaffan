@@ -191,8 +191,14 @@ class AnnotatedImage:
     Read the image and the annotation. The
     """
     def __init__(self, path:str, skip_read_annotations=False):
+        fs_enc = sys.getfilesystemencoding()
+        logger.debug(f"fs_enc: {fs_enc}")
         logger.debug("Reading file {}".format(path))
+
         self.path = path
+        # pth_encoded = path.encode(fs_enc)
+        # path.encode()
+        # logger.debug(f"path encoded {pth_encoded}")
         self.openslide:openslide.OpenSlide = openslide.OpenSlide(path)
         self.region_location = None
         self.region_size = None
@@ -205,7 +211,6 @@ class AnnotatedImage:
             for i in range(0, self.openslide.level_count)
         ]
         if not skip_read_annotations:
-            logger.debug("Reading the annotation")
             self.read_annotations()
 
     def get_file_info(self):
@@ -218,7 +223,6 @@ class AnnotatedImage:
         if np.isscalar(pixelsize_mm):
             pixelsize_mm = [pixelsize_mm, pixelsize_mm]
         pixelsize_mm = np.asarray(pixelsize_mm)
-
 
         pixelsize_mm2 = pixelsize_mm / safety_bound
         best_level = 0
@@ -265,6 +269,7 @@ class AnnotatedImage:
         Read all annotations of the file and save extracted information.
         :return:
         """
+        logger.debug(f"Reading the annotation {self.path}")
         self.annotations = scan.read_annotations(self.path)
         self.annotations = scan.annotations_to_px(self.openslide, self.annotations)
         self.id_by_titles = scan.annotation_titles(self.annotations)
