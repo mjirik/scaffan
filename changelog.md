@@ -9,6 +9,7 @@
 * [Added] Scan segmentation to calculate intra-lobular and extra-lobular surface area
 * [Added] Fixed reading file with no annotation
 * [Added] GLCM texture features used for whole scan segmentation
+* [Changed] GUI update
 
 # 0.15
 
