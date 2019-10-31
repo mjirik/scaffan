@@ -128,10 +128,12 @@ class ScanSegmentation():
         self.tile_size = None
         self.level = None
         self.tiles: List[List["View"]] = None
-        self._clf_object = SVC
-        self._clf_params = dict(gamma=2, C=1)
+        # self._clf_object = SVC
+        # self._clf_params = dict(gamma=2, C=1)
         # self._clf_object = GaussianNB
         # self._clf_params = {}
+        self._clf_object = DecisionTreeClassifier
+        self._clf_params = dict(max_depth=5)
 
         #         self.clf = sklearn.svm.SVC(gamma='scale')
         # KNeighborsClassifier(3),
@@ -139,13 +141,13 @@ class ScanSegmentation():
         # SVC(gamma=2, C=1),
         # #     GaussianProcessClassifier(1.0 * RBF(1.0)),
         # self.clf_fn = DecisionTreeClassifier(max_depth=5),
-        self.clf = self._clf_object(**self._clf_params)
         # RandomForestClassifier(max_depth=5, n_estimators=10, max_features=1),
         # MLPClassifier(alpha=1, max_iter=1000),
         # AdaBoostClassifier(),
         # QuadraticDiscriminantAnalysis(),
         # GaussianNB(),
         # self.clf = GaussianNB()
+        self.clf = self._clf_object(**self._clf_params)
         self.clf_fn:Path = Path(Path(__file__).parent / "segmentation_model.pkl")
         if self.clf_fn.exists():
             logger.debug(f"Reading classifier from {str(self.clf_fn)}")
