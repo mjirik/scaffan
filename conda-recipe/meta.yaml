@@ -1,10 +1,10 @@
 package:
   name: scaffan
-  version: "0.16.0"
+  version: "0.16.3"
 
 source:
 # this is used for build from git hub
-  git_rev: 0.16.0
+  git_rev: 0.16.3
   git_url: https://github.com/mjirik/scaffan.git
 
 # this is used for pypi
@@ -36,7 +36,7 @@ build:
 
 requirements:
   build:
-    - python=3
+    - python=>3.6
     - setuptools
 #    - io3d
     - {{ pin_compatible('io3d', max_pin='x') }}
@@ -55,7 +55,7 @@ requirements:
     - scikit-learn
 
   run:
-    - python=3,<3.6.7
+    - python>=3.6
     #     # maybe dont work with -convert option
 #    - python=3 # [not win]
 #    - python=3.6.6 # [win]
