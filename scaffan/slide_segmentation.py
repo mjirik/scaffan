@@ -89,6 +89,12 @@ class ScanSegmentation():
                     "Magenta area is empty part of the image.",
             },
             {
+                "name": "Load Default Classifier",
+                "type": "bool",
+                "value": False,
+                "tip": "Load default classifier before training."
+            },
+            {
                 "name": "Clean Before Training",
                 "type": "bool",
                 "value": False,
@@ -149,6 +155,7 @@ class ScanSegmentation():
         # self.clf = GaussianNB()
         self.clf = self._clf_object(**self._clf_params)
         self.clf_fn:Path = Path(Path(__file__).parent / "segmentation_model.pkl")
+        self.clf_default_fn:Path = Path(Path(__file__).parent / "segmentation_model_default.pkl")
         if self.clf_fn.exists():
             logger.debug(f"Reading classifier from {str(self.clf_fn)}")
             self.clf = joblib.load(self.clf_fn)
@@ -523,6 +530,13 @@ class ScanSegmentation():
         # GLCM
         # self._inner_texture.set_report(self.report)
         # self._inner_texture.add_cols_to_report = False
+
+        if bool(self.parameters.param("Load Default Classifier").value()):
+            if self.clf_default_fn.exists():
+                logger.debug(f"Reading classifier from {str(self.clf_fn)}")
+                self.clf = joblib.load(self.clf_default_fn)
+            else:
+                logger.error("Default classifier not found")
 
 
         if bool(self.parameters.param("Run Training").value()):
