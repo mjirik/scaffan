@@ -11,7 +11,7 @@ import sys
 from pathlib import Path
 import datetime
 
-experiment_title = "scan segmentation params"
+experiment_title = "scan segmentation default and each training"
 
 experiment_datetime = datetime.datetime.now()
 experiment_datetime_fn = experiment_datetime.strftime("%Y%m%d-%H%M%S")
@@ -80,8 +80,9 @@ def set_same(mainapp, fn):
     mainapp.set_parameter("Processing;Skeleton Analysis", False)
     mainapp.set_parameter("Processing;Texture Analysis", False)
     mainapp.set_parameter("Processing;Open output dir", False)
+    mainapp.set_parameter("Processing;Scan Segmentation;Load Default Classifier", True)
     mainapp.set_parameter("Processing;Scan Segmentation;Clean Before Training", False)
-    mainapp.set_parameter("Processing;Scan Segmentation;Run Training", False)
+    mainapp.set_parameter("Processing;Scan Segmentation;Run Training", True)
     mainapp.set_parameter("Processing;Scan Segmentation;Lobulus Number", 0)
     # mainapp.set_parameter("Processing;Lobulus Segmentation;Manual Segmentation", True)
 

@@ -5,6 +5,7 @@
 # 0.17
 
 * [Added] Whole scan Classifier description to output spreadsheet
+* [Added] Training weight added in whole scan analysis
 
 # 0.16 
 

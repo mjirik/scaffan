@@ -101,13 +101,20 @@ class ScanSegmentation():
                 "tip": "Reset classifier before training."
             },
             {
+                "name": "Training Weight",
+                "type": "float",
+                "value": 1,
+                # "suffix": "px",
+                "siPrefix": False,
+                "tip": "Weight of training samples given in actual image",
+            },
+            {
                 "name": "Lobulus Number",
                 "type": "int",
                 "value": 5,
                 # "suffix": "px",
                 "siPrefix": False,
                 "tip": "Number of lobuluses automatically selected."
-                       ""
             },
             {
                 "name": "Annotation Radius",
@@ -183,19 +190,22 @@ class ScanSegmentation():
         self.ann_biggest_ids = []
         self.make_tiles()
 
-    def train_classifier(self, pixels=None, y=None):
+    def train_classifier(self, pixels=None, y=None, sample_weight:float=None):
         logger.debug("start training")
 
         if pixels is None:
             pixels, y = self.prepare_training_pixels()
+        if sample_weight is None:
+            sample_weight = float(self.parameters.param("Training Weight").value())
+        sample_weight = [sample_weight] * len(y)
 
         if bool(self.parameters.param("Clean Before Training").value()):
             self.clf = self._clf_object(**self._clf_params)
             # self.clf = GaussianNB()
             logger.debug(f"cleaning the classifier {self.clf}")
-            self.clf.fit(pixels, y=y)
+            self.clf.fit(pixels, y=y, sample_weight=sample_weight)
         else:
-            self.clf.partial_fit(pixels, y=y)
+            self.clf.partial_fit(pixels, y=y, sample_weight=sample_weight)
         logger.debug("training finished")
 
     def save_classifier(self):
