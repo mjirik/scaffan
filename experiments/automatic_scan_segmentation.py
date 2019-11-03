@@ -83,7 +83,7 @@ def set_same(mainapp, fn):
     mainapp.set_parameter("Processing;Open output dir", False)
     mainapp.set_parameter("Processing;Scan Segmentation;Load Default Classifier", True)
     mainapp.set_parameter("Processing;Scan Segmentation;Clean Before Training", False)
-    mainapp.set_parameter("Processing;Scan Segmentation;Training Weight", 10)
+    mainapp.set_parameter("Processing;Scan Segmentation;Training Weight", 100)
     mainapp.set_parameter("Processing;Scan Segmentation;Run Training", True)
     mainapp.set_parameter("Processing;Scan Segmentation;Lobulus Number", 0)
     # mainapp.set_parameter("Processing;Lobulus Segmentation;Manual Segmentation", True)

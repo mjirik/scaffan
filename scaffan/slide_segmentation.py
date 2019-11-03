@@ -543,7 +543,7 @@ class ScanSegmentation():
 
         if bool(self.parameters.param("Load Default Classifier").value()):
             if self.clf_default_fn.exists():
-                logger.debug(f"Reading classifier from {str(self.clf_fn)}")
+                logger.debug(f"Reading default classifier from {str(self.clf_default_fn)}")
                 self.clf = joblib.load(self.clf_default_fn)
             else:
                 logger.error("Default classifier not found")
