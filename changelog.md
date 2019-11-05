@@ -6,6 +6,7 @@
 
 * [Added] Whole scan Classifier description to output spreadsheet
 * [Added] Training weight added in whole scan analysis
+* [Added] All parameters stored also if only whole scan analysis is performed
 
 # 0.16 
 

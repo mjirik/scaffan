@@ -472,6 +472,7 @@ class Scaffan:
     def _add_general_information_to_actual_row(self):
         inpath = Path(self.parameters.param("Input", "File Path").value())
         fn = inpath.parts[-1]
+        fn_out = (self.parameters.param("Output", "Directory Path").value())
         self.report.add_cols_to_actual_row(
             {
                 "File Name": str(fn),
@@ -482,7 +483,9 @@ class Scaffan:
                 "platform.node": platform.uname().node,
                 "platform.processor": platform.uname().processor,
                 "Scaffan Version": scaffan.__version__,
+                "Output Directory Path": str(fn_out)
             })
+        self.report.add_cols_to_actual_row(self.parameters_to_dict())
 
     def _run_lobulus(self, annotation_id):
         show = self.parameters.param("Processing", "Show").value()
@@ -491,7 +494,7 @@ class Scaffan:
         fn = inpath.parts[-1]
         self.report.add_cols_to_actual_row(
             {
-                "File Name": str(fn),
+                # "File Name": str(fn),
                 "Annotation ID": annotation_id,
             })
         logger.info(f"Processing file: {fn} with Annotation ID: {annotation_id}")
@@ -516,27 +519,27 @@ class Scaffan:
         logger.trace("after texture analysis")
         t1 = time.time()
         ann_center = self.anim.get_annotation_center_mm(annotation_id)
-        inpath = Path(self.parameters.param("Input", "File Path").value())
-        fn = inpath.parts[-1]
+        # inpath = Path(self.parameters.param("Input", "File Path").value())
+        # fn = inpath.parts[-1]
+        self._add_general_information_to_actual_row()
         self.report.add_cols_to_actual_row(
             {
-                "File Path": str(inpath),
-                "Annotation Color": self.parameters.param("Input", "Annotation Color").value(),
+                # "File Path": str(inpath),
+                # "Annotation Color": self.parameters.param("Input", "Annotation Color").value(),
                 "Annotation Center X [mm]": ann_center[0],
                 "Annotation Center Y [mm]": ann_center[1],
                 "Processing Time [s]": t1 - t0,
-                "Datetime": datetime.datetime.now().isoformat(' ', 'seconds'),
-                "platform.system": platform.uname().system,
-                "platform.node": platform.uname().node,
-                "platform.processor": platform.uname().processor,
-                "Scaffan Version": scaffan.__version__,
+                # "Datetime": datetime.datetime.now().isoformat(' ', 'seconds'),
+                # "platform.system": platform.uname().system,
+                # "platform.node": platform.uname().node,
+                # "platform.processor": platform.uname().processor,
+                # "Scaffan Version": scaffan.__version__,
 
             })
         # evaluation
         self.evaluation.set_input_data(self.anim, annotation_id, self.lobulus_processing)
         self.evaluation.run()
         # Copy all parameters to table
-        self.report.add_cols_to_actual_row(self.parameters_to_dict())
         self.report.finish_actual_row()
 
 
