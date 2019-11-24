@@ -26,8 +26,6 @@ from PyQt5 import QtGui
 
 # print("start 5")
 from pyqtgraph.parametertree import Parameter, ParameterTree
-import pyqtgraph.widgets
-import pyqtgraph.widgets
 
 # print("start 6")
 
@@ -383,8 +381,6 @@ class Scaffan:
         self.init_run()
         # if color is None:
         pcolor = self.parameters.param("Input", "Annotation Color")
-        # print("color ", pcolor.value())
-        # color = pcolor.reverse[0][pcolor.value()]
         color = pcolor.value()
         self.report.level = self.parameters.param("Processing", "Report Level").value()
         # print("Color ", color)

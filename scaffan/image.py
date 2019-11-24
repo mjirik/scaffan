@@ -868,7 +868,7 @@ class View:
 
             # im1 = imma.image.resize_to_mm(im, pxsz_level, self.region_pixelsize)
             # swap coordinates because openslice output image have swapped image coordinates
-            im = imma.image.resize_to_mm(im, pxsz_level[::-1], self.region_pixelsize[::-1])
+            im = imma.image.resize_to_mm(im, pxsz_level[::-1], self.region_pixelsize[::-1], anti_aliasing=True)
 
 
         return im
@@ -943,7 +943,8 @@ class View:
         resized_other_img = imma.image.resize_to_mm(
             other_img,
             voxelsize_mm=pxsz2[::-1],
-            new_voxelsize_mm=pxsz1[::-1]
+            new_voxelsize_mm=pxsz1[::-1],
+            anti_aliasing=True
         )
 
         sl = self.get_slices_for_insert_image_from_view(other_view)
