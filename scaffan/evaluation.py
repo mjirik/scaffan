@@ -19,12 +19,20 @@ class Evaluation:
         self.evaluation_history = []
         pass
 
-    def set_input_data(self, anim: scaffan.image.AnnotatedImage, annotation_id, lobulus:scaffan.lobulus.Lobulus):
+    def set_input_data(
+        self,
+        anim: scaffan.image.AnnotatedImage,
+        annotation_id,
+        lobulus: scaffan.lobulus.Lobulus,
+    ):
         data = {}
         # lobulus.view
         inner_ids = anim.select_inner_annotations(annotation_id, color="#000000")
         if len(inner_ids) > 1:
-            logger.warning("More than one inner annotation find to annotation with ID %i", annotation_id)
+            logger.warning(
+                "More than one inner annotation find to annotation with ID %i",
+                annotation_id,
+            )
         elif len(inner_ids) > 0:
             inner_id = inner_ids[0]
             seg_true = lobulus.view.get_annotation_raster(annotation_id=inner_id) > 0
@@ -41,11 +49,16 @@ class Evaluation:
             if self.report is not None:
                 fig = plt.figure()
                 plt.imshow(seg_true.astype(np.int8) + seg.astype(np.int8))
-                self.report.savefig_and_show("evaluation_central_vein_{}.png".format(annotation_id), fig=fig)
+                self.report.savefig_and_show(
+                    "evaluation_central_vein_{}.png".format(annotation_id), fig=fig
+                )
 
         outer_ids = anim.select_outer_annotations(annotation_id, color="#000000")
         if len(outer_ids) > 1:
-            logger.warning("More than one outer annotation find to annotation with ID %i", annotation_id)
+            logger.warning(
+                "More than one outer annotation find to annotation with ID %i",
+                annotation_id,
+            )
         elif len(outer_ids) > 0:
             outer_id = outer_ids[0]
             seg_true = lobulus.view.get_annotation_raster(annotation_id=outer_id) > 0
@@ -53,7 +66,9 @@ class Evaluation:
             if self.report is not None:
                 fig = plt.figure()
                 plt.imshow(seg_true.astype(np.int8) + seg.astype(np.int8))
-                self.report.savefig_and_show("evaluation_lobulus_border_{}.png".format(annotation_id), fig=fig)
+                self.report.savefig_and_show(
+                    "evaluation_lobulus_border_{}.png".format(annotation_id), fig=fig
+                )
 
             dice0 = np.sum((seg & seg_true)) * 2
             dice1 = np.sum(seg) + np.sum(seg_true)

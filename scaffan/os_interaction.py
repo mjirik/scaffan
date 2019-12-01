@@ -1,4 +1,3 @@
-
 # /usr/bin/env python
 # -*- coding: utf-8 -*-
 """
@@ -19,13 +18,13 @@ def open_path(path):
     :param path:
     :return:
     """
-    if sys.platform.startswith('darwin'):
-        cmd  = "open"
+    if sys.platform.startswith("darwin"):
+        cmd = "open"
         # subprocess.call(('open', path))
-    elif os.name == 'nt':  # For Windows
+    elif os.name == "nt":  # For Windows
         cmd = "start"
         # os.startfile(filepath)
-    elif os.name == 'posix':  # For Linux, Mac, etc.
+    elif os.name == "posix":  # For Linux, Mac, etc.
         cmd = "xdg-open"
         # subprocess.call(('xdg-open', filepath))
     else:
@@ -34,7 +33,7 @@ def open_path(path):
     try:
         retcode = subprocess.call(cmd + " " + str(path), shell=True)
         if retcode < 0:
-            logger.error(f"Child was terminated by signal {retcode}", )
+            logger.error(f"Child was terminated by signal {retcode}",)
         else:
             logger.info(f"Child returned {retcode}")
     except OSError as e:

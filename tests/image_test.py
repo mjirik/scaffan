@@ -26,6 +26,7 @@ import matplotlib.pyplot as plt
 skip_on_local = False
 
 import scaffan.image as scim
+
 scim.import_openslide()
 import openslide
 
@@ -35,7 +36,6 @@ import scaffan.image as scim
 
 
 class ImageAnnotationTest(unittest.TestCase):
-
     def test_get_pixelsize_on_different_levels(self):
         fn = io3d.datasets.join_path("medical", "orig", "CMU-1.ndpi", get_root=True)
         logger.debug("filename {}".format(fn))
@@ -57,12 +57,14 @@ class ImageAnnotationTest(unittest.TestCase):
         anim = scim.AnnotatedImage(fn)
         offset = anim.get_offset_px()
         self.assertEqual(len(offset), 2, "should be 2D")
-        im = anim.get_image_by_center((10000, 10000), as_gray=True )
+        im = anim.get_image_by_center((10000, 10000), as_gray=True)
         self.assertEqual(len(im.shape), 2, "should be 2D")
 
         annotations = anim.read_annotations()
         self.assertGreater(len(annotations), 1, "there should be 2 annotations")
-        assert im[0, 0] == pytest.approx(0.767964705882353, 0.001)  # expected intensity is 0.76
+        assert im[0, 0] == pytest.approx(
+            0.767964705882353, 0.001
+        )  # expected intensity is 0.76
         # assert np.abs(im[0, 0] - 0.767964705882353) < 0.001  # expected intensity is 0.76
 
     def test_file_info(self):
@@ -101,7 +103,10 @@ class ImageAnnotationTest(unittest.TestCase):
         plt.contour(mask)
         # plt.show()
         self.assertGreater(np.sum(mask), 20)
-        self.assertTrue(np.array_equal(mask.shape[:2], image.shape[:2]), "shape of mask should be the same as shape of image")
+        self.assertTrue(
+            np.array_equal(mask.shape[:2], image.shape[:2]),
+            "shape of mask should be the same as shape of image",
+        )
         assert image[0, 0, 0] == pytest.approx(187, 10)
 
     # def test_region_select_area_definition_in_mm(self):
@@ -127,8 +132,10 @@ class ImageAnnotationTest(unittest.TestCase):
         # plt.show()
         self.assertGreater(image.shape[0], 100)
         mask = view.get_annotation_raster("obj1")
-        self.assertTrue(np.array_equal(mask.shape[:2], image.shape[:2]),
-                        "shape of mask should be the same as shape of image")
+        self.assertTrue(
+            np.array_equal(mask.shape[:2], image.shape[:2]),
+            "shape of mask should be the same as shape of image",
+        )
         assert image[0, 0, 0] == 202
 
     def test_select_view_by_title_and_plot_floating_resolution(self):
@@ -145,10 +152,13 @@ class ImageAnnotationTest(unittest.TestCase):
 
         self.assertGreater(image.shape[0], 100)
         mask = view.get_annotation_raster("obj1")
-        self.assertTrue(np.array_equal(mask.shape[:2], image.shape[:2]), "shape of mask should be the same as shape of image")
+        self.assertTrue(
+            np.array_equal(mask.shape[:2], image.shape[:2]),
+            "shape of mask should be the same as shape of image",
+        )
         plt.subplot(222)
         plt.imshow(mask)
-        assert np.sum(mask == 1) == 874739 # number of expected pixels in mask
+        assert np.sum(mask == 1) == 874739  # number of expected pixels in mask
 
         view2 = view.to_pixelsize(pixelsize_mm=[0.01, 0.01])
         image2 = view2.get_region_image()
@@ -158,7 +168,10 @@ class ImageAnnotationTest(unittest.TestCase):
         mask = view2.get_annotation_raster("obj1")
         plt.subplot(224)
         plt.imshow(mask)
-        self.assertTrue(np.array_equal(mask.shape[:2], image2.shape[:2]), "shape of mask should be the same as shape of image")
+        self.assertTrue(
+            np.array_equal(mask.shape[:2], image2.shape[:2]),
+            "shape of mask should be the same as shape of image",
+        )
         assert np.sum(mask == 1) == 1812
 
         # plt.show()
@@ -172,7 +185,9 @@ class ImageAnnotationTest(unittest.TestCase):
         fn = io3d.datasets.join_path("medical", "orig", "CMU-1.ndpi", get_root=True)
         anim = scim.AnnotatedImage(fn)
         annotation_ids = anim.select_annotations_by_title("obj1")
-        view1 = anim.get_views(annotation_ids, margin=1.0, pixelsize_mm=[0.005, 0.005])[0]
+        view1 = anim.get_views(annotation_ids, margin=1.0, pixelsize_mm=[0.005, 0.005])[
+            0
+        ]
         image1 = view1.get_region_image()
         # plt.imshow(image1)
         # plt.colorbar()
@@ -182,7 +197,9 @@ class ImageAnnotationTest(unittest.TestCase):
         image2 = view2.get_region_image()
         # plt.imshow(image2)
         # plt.show()
-        logger.debug(f"Annotation ID: {annotation_ids}, location view1 {view1.region_location}, view2 {view2.region_location}")
+        logger.debug(
+            f"Annotation ID: {annotation_ids}, location view1 {view1.region_location}, view2 {view2.region_location}"
+        )
 
         merged = view1.insert_image_from_view(view2, image1, image2)
         # plt.imshow(merged)
@@ -191,8 +208,14 @@ class ImageAnnotationTest(unittest.TestCase):
         errimg = np.mean(np.abs(diffim), 2)
 
         err = np.mean(errimg)
-        self.assertLess(err, 3, "Mean error in intensity levels per pixel should be low")
-        self.assertLess(1, err, "Mean error in intensity levels per pixel should be low but there should be some error.")
+        self.assertLess(
+            err, 3, "Mean error in intensity levels per pixel should be low"
+        )
+        self.assertLess(
+            1,
+            err,
+            "Mean error in intensity levels per pixel should be low but there should be some error.",
+        )
 
     def test_view_margin_size(self):
         """
@@ -203,26 +226,39 @@ class ImageAnnotationTest(unittest.TestCase):
         anim = scim.AnnotatedImage(fn)
         annotation_ids = anim.select_annotations_by_title("obj1")
 
-        img1 = anim.get_views(annotation_ids, margin=0.0, pixelsize_mm=[0.005, 0.005])[0].get_region_image(as_gray=True)
-        img2 = anim.get_views(annotation_ids, margin=1.0, pixelsize_mm=[0.005, 0.005])[0].get_region_image(as_gray=True)
+        img1 = anim.get_views(annotation_ids, margin=0.0, pixelsize_mm=[0.005, 0.005])[
+            0
+        ].get_region_image(as_gray=True)
+        img2 = anim.get_views(annotation_ids, margin=1.0, pixelsize_mm=[0.005, 0.005])[
+            0
+        ].get_region_image(as_gray=True)
 
         sh1 = np.asarray(img1.shape)
         sh2 = np.asarray(img2.shape)
-        self.assertTrue(np.all((sh1 * 2.9) < sh2), "Boundary adds 2*margin*size of image to the image size")
-        self.assertTrue(np.all(sh2 < (sh1 * 3.1 )), "Boundary adds 2*margin*size of image to the image size")
+        self.assertTrue(
+            np.all((sh1 * 2.9) < sh2),
+            "Boundary adds 2*margin*size of image to the image size",
+        )
+        self.assertTrue(
+            np.all(sh2 < (sh1 * 3.1)),
+            "Boundary adds 2*margin*size of image to the image size",
+        )
 
         # test that everything is still pixel-precise
-        assert img1[0, 0] == pytest.approx(0.47553590, 0.001)  # expected intensity is 0.76
+        assert img1[0, 0] == pytest.approx(
+            0.47553590, 0.001
+        )  # expected intensity is 0.76
         assert img2[0, 0] == pytest.approx(0.765724, 0.001)
 
     def test_select_view_by_center_mm(self):
         fn = io3d.datasets.join_path("medical", "orig", "CMU-1.ndpi", get_root=True)
         anim = scim.AnnotatedImage(fn)
-        view = anim.get_view(center_mm=[10, 11],
-                             size_on_level=[100, 100],
-                             # level=5,
-                             # size_mm=[0.1, 0.1]
-                             )
+        view = anim.get_view(
+            center_mm=[10, 11],
+            size_on_level=[100, 100],
+            # level=5,
+            # size_mm=[0.1, 0.1]
+        )
         image = view.get_region_image()
         logger.debug(f"location: {view.region_location}")
         logger.debug(f"pixelsize: {view.region_pixelsize}")
@@ -236,11 +272,12 @@ class ImageAnnotationTest(unittest.TestCase):
     def test_select_view_by_loc_mm(self):
         fn = io3d.datasets.join_path("medical", "orig", "CMU-1.ndpi", get_root=True)
         anim = scim.AnnotatedImage(fn)
-        view = anim.get_view(location_mm=[10, 11],
-                             size_on_level=[100, 100],
-                             # level=5,
-                             # size_mm=[0.1, 0.1]
-                             )
+        view = anim.get_view(
+            location_mm=[10, 11],
+            size_on_level=[100, 100],
+            # level=5,
+            # size_mm=[0.1, 0.1]
+        )
         image = view.get_region_image()
         logger.debug(f"location: {view.region_location}")
         logger.debug(f"pixelsize: {view.region_pixelsize}")
@@ -281,7 +318,6 @@ class ImageAnnotationTest(unittest.TestCase):
         assert len(cyan_inner_ids) == 1
         assert ann_ids[0] == cyan_inner_ids[0]
 
-
         black_ann_ids = anim.select_annotations_by_color("#000000")
         # find black inner annotations to outer annotation of 0th object
         inner_ids = anim.select_inner_annotations(outer_id[0], ann_ids=black_ann_ids)
@@ -293,13 +329,18 @@ class ImageAnnotationTest(unittest.TestCase):
         )
         anim = scim.AnnotatedImage(fn)
         color = "#000000"
-        outer_ids, holes_ids = anim.select_just_outer_annotations(color, return_holes=True)
+        outer_ids, holes_ids = anim.select_just_outer_annotations(
+            color, return_holes=True
+        )
         logger.debug(f"outer ids {outer_ids}")
         logger.debug(f"holes ids {holes_ids}")
         assert len(outer_ids) > 0
         assert len(holes_ids) > 0
         assert len(holes_ids[0]) > 0
-        assert anim.select_inner_annotations(outer_ids[0], color=color)[0] == holes_ids[0][0]
+        assert (
+            anim.select_inner_annotations(outer_ids[0], color=color)[0]
+            == holes_ids[0][0]
+        )
 
     def test_get_annotation_center(self):
         fn = io3d.datasets.join_path(
@@ -340,7 +381,3 @@ class ImageAnnotationTest(unittest.TestCase):
             # ann_rasters.append(ann_raster)
             assert np.min(ann_raster) == 0
             assert np.max(ann_raster) > 0
-
-
-
-

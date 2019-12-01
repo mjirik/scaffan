@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 
-
 from loguru import logger
 
 import zipfile
@@ -72,14 +71,12 @@ def libfix():
 #     return conda_dir
 
 
-def libfix_windows(
-    url=None
-):
+def libfix_windows(url=None):
     if url is None:
-        if sys.maxsize > 2**32:
-            url="https://github.com/openslide/openslide-winbuild/releases/download/v20171122/openslide-win64-20171122.zip"
+        if sys.maxsize > 2 ** 32:
+            url = "https://github.com/openslide/openslide-winbuild/releases/download/v20171122/openslide-win64-20171122.zip"
         else:
-            url="https://github.com/openslide/openslide-winbuild/releases/download/v20171122/openslide-win32-20171122.zip"
+            url = "https://github.com/openslide/openslide-winbuild/releases/download/v20171122/openslide-win32-20171122.zip"
     outdir = download_and_unzip(url, op.expanduser("~/Downloads/"))
 
     # dest_dir = get_conda_dir()

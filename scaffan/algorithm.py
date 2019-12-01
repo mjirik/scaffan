@@ -48,6 +48,7 @@ class Scaffan:
         self.raise_exception_if_color_not_found = True
 
         import scaffan.texture as satex
+
         self.glcm_textures = satex.GLCMTextureMeasurement()
         self.lobulus_processing = scaffan.lobulus.Lobulus(ptype="bool")
         self.skeleton_analysis = scaffan.skeleton_analysis.SkeletonAnalysis()
@@ -59,12 +60,16 @@ class Scaffan:
         self.glcm_textures.set_report(self.report)
         self.skeleton_analysis.set_report(self.report)
         self.evaluation.report = self.report
-        self.win:QtGui.QWidget = None
+        self.win: QtGui.QWidget = None
         self.cache = cachefile.CacheFile("~/.scaffan_cache.yaml")
         # self.cache.update('', path)
         common_spreadsheet_file = self.cache.get_or_save_default(
-            "common_spreadsheet_file", self._prepare_default_output_common_spreadsheet_file())
-        logger.debug("common_spreadsheet_file loaded as: {}".format(common_spreadsheet_file))
+            "common_spreadsheet_file",
+            self._prepare_default_output_common_spreadsheet_file(),
+        )
+        logger.debug(
+            "common_spreadsheet_file loaded as: {}".format(common_spreadsheet_file)
+        )
         params = [
             {
                 "name": "Input",
@@ -126,9 +131,11 @@ class Scaffan:
                         "type": "str",
                         "value": common_spreadsheet_file,
                     },
-                    {"name": "Select Common Spreadsheet File", "type": "action",
-                     "tip": "All measurements are appended to this file in addition to data stored in Output Directory Path."
-                     },
+                    {
+                        "name": "Select Common Spreadsheet File",
+                        "type": "action",
+                        "tip": "All measurements are appended to this file in addition to data stored in Output Directory Path.",
+                    },
                 ],
             },
             {
@@ -175,7 +182,7 @@ class Scaffan:
                         "type": "int",
                         "value": 50,
                         "tip": "Control ammount of stored images. 0 - all debug imagess will be stored. "
-                               "100 - just important images will be saved.",
+                        "100 - just important images will be saved.",
                     },
                 ],
             },
@@ -205,7 +212,7 @@ class Scaffan:
         )
         self.set_input_file(fn)
 
-    def set_input_file(self, fn:Union[Path, str]):
+    def set_input_file(self, fn: Union[Path, str]):
         fn = str(fn)
         fnparam = self.parameters.param("Input", "File Path")
         fnparam.setValue(fn)
@@ -213,7 +220,7 @@ class Scaffan:
         # import pdb; pdb.set_trace()
         # print("ahoj")
 
-    def set_output_dir(self, path:Union[str, Path]=None):
+    def set_output_dir(self, path: Union[str, Path] = None):
         """
         Set directory for all outputs. The standard
         :param path: if no parameter is given the standard path in ~/data/SA_%Date_%Time is selected
@@ -225,14 +232,14 @@ class Scaffan:
         fnparam = self.parameters.param("Output", "Directory Path")
         fnparam.setValue(str(path))
 
-    def set_report_level(self, level:int):
+    def set_report_level(self, level: int):
         fnparam = self.parameters.param("Processing", "Report Level")
         fnparam.setValue(level)
 
     def set_common_spreadsheet_file(self, path):
         fnparam = self.parameters.param("Output", "Common Spreadsheet File")
         fnparam.setValue(path)
-        self.cache.update('common_spreadsheet_file', path)
+        self.cache.update("common_spreadsheet_file", path)
         logger.info("common_spreadsheet_file set to {}".format(path))
         # print("common_spreadsheet_file set to {}".format(path))
 
@@ -281,7 +288,7 @@ class Scaffan:
             None,
             "Select Common Spreadsheet File",
             directory=start_dir,
-            filter="Excel File (*.xlsx)"
+            filter="Excel File (*.xlsx)",
         )[0]
         # print (fn)
         self.set_common_spreadsheet_file(fn)
@@ -309,7 +316,8 @@ class Scaffan:
         return default_dir
 
     def parameters_to_dict(self):
-        from .import dilipg
+        from . import dilipg
+
         return dilipg.params_and_values(self.parameters)
 
     def init_run(self):
@@ -323,7 +331,7 @@ class Scaffan:
         fn_spreadsheet = self.parameters.param("Output", "Common Spreadsheet File")
         self.report.additional_spreadsheet_fn = str(fn_spreadsheet.value())
 
-    def set_annotation_color_selection(self, color:str):
+    def set_annotation_color_selection(self, color: str):
         logger.debug(f"color={color}")
         pcolor = self.parameters.param("Input", "Annotation Color")
         color = color.upper()
@@ -342,7 +350,9 @@ class Scaffan:
         else:
             raise ValueError("Color '{}' not found in allowed colors.".format(color))
 
-    def train_scan_segmentation(self, fns:List[Union[str, Path]], clean_before_training=True):
+    def train_scan_segmentation(
+        self, fns: List[Union[str, Path]], clean_before_training=True
+    ):
         """
         Train scan segmentation based on list of files with annotation.
         Output dir set before processing is ignored.
@@ -369,9 +379,14 @@ class Scaffan:
             self.set_parameter("Processing;Lobulus Segmentation", False)
             if i == 0:
                 if clean_before_training is not None:
-                    self.set_parameter("Processing;Scan Segmentation;Clean Before Training", clean_before_training)
+                    self.set_parameter(
+                        "Processing;Scan Segmentation;Clean Before Training",
+                        clean_before_training,
+                    )
             else:
-                self.set_parameter("Processing;Scan Segmentation;Clean Before Training", False)
+                self.set_parameter(
+                    "Processing;Scan Segmentation;Clean Before Training", False
+                )
             self.set_parameter("Processing;Scan Segmentation;Run Training", True)
             #             mainapp.set_parameter("Processing;Slide Segmentation;Lobulus Number", 0)
             # mainapp.start_gui(qapp=qapp)
@@ -397,13 +412,17 @@ class Scaffan:
         show = self.parameters.param("Processing", "Show").value()
         self.report.set_show(show)
         self.report.set_save(True)
-        run_slide_segmentation = self.parameters.param("Processing", "Scan Segmentation").value()
+        run_slide_segmentation = self.parameters.param(
+            "Processing", "Scan Segmentation"
+        ).value()
         if run_slide_segmentation:
             fn_input = self.parameters.param("Input", "File Path").value()
             # self.slide_segmentation.init(Path(fn_input))
             self.slide_segmentation.init(self.anim)
             self.slide_segmentation.run()
-        automatic_lobulus_selection = self.parameters.param("Input", "Automatic Lobulus Selection").value()
+        automatic_lobulus_selection = self.parameters.param(
+            "Input", "Automatic Lobulus Selection"
+        ).value()
         if run_slide_segmentation:
             self.slide_segmentation.add_biggest_to_annotations()
             annotation_ids = self.slide_segmentation.ann_biggest_ids
@@ -412,7 +431,8 @@ class Scaffan:
         if not automatic_lobulus_selection:
             annotation_ids = self.anim.select_annotations_by_color(
                 color,
-                raise_exception_if_not_found=self.raise_exception_if_color_not_found)
+                raise_exception_if_not_found=self.raise_exception_if_color_not_found,
+            )
         elif automatic_lobulus_selection and not run_slide_segmentation:
             raise NoLobulusSelectionUsedError
 
@@ -441,20 +461,23 @@ class Scaffan:
                     ret = QtGui.QMessageBox.warning(
                         self.win,
                         "XLSX file opened in external application",
-                        "Close opened spreadsheet files before continue")
+                        "Close opened spreadsheet files before continue",
+                    )
 
                 else:
                     raise e
         saved_params = self.parameters.saveState()
         io3d.misc.obj_to_file(
-            saved_params,
-            str(Path(self.report.outputdir) / "parameters.yaml")
+            saved_params, str(Path(self.report.outputdir) / "parameters.yaml")
         )
         try:
-            with open(str(Path(self.report.outputdir) / "parameters.json"), "w") as outfile:
+            with open(
+                str(Path(self.report.outputdir) / "parameters.json"), "w"
+            ) as outfile:
                 json.dump(saved_params, outfile)
         except:
             import traceback
+
             logger.debug("saved_params: " + str(saved_params))
             logger.warning(f"Problem with dump file to json: {traceback.format_exc()}")
         from . import os_interaction
@@ -465,22 +488,26 @@ class Scaffan:
         logger.debug("finished")
 
         # print("ann ids", annotation_ids)
+
     def _add_general_information_to_actual_row(self):
         inpath = Path(self.parameters.param("Input", "File Path").value())
         fn = inpath.parts[-1]
-        fn_out = (self.parameters.param("Output", "Directory Path").value())
+        fn_out = self.parameters.param("Output", "Directory Path").value()
         self.report.add_cols_to_actual_row(
             {
                 "File Name": str(fn),
                 "File Path": str(inpath),
-                "Annotation Color": self.parameters.param("Input", "Annotation Color").value(),
-                "Datetime": datetime.datetime.now().isoformat(' ', 'seconds'),
+                "Annotation Color": self.parameters.param(
+                    "Input", "Annotation Color"
+                ).value(),
+                "Datetime": datetime.datetime.now().isoformat(" ", "seconds"),
                 "platform.system": platform.uname().system,
                 "platform.node": platform.uname().node,
                 "platform.processor": platform.uname().processor,
                 "Scaffan Version": scaffan.__version__,
-                "Output Directory Path": str(fn_out)
-            })
+                "Output Directory Path": str(fn_out),
+            }
+        )
         self.report.add_cols_to_actual_row(self.parameters_to_dict())
 
     def _run_lobulus(self, annotation_id):
@@ -492,25 +519,37 @@ class Scaffan:
             {
                 # "File Name": str(fn),
                 "Annotation ID": annotation_id,
-            })
+            }
+        )
         logger.info(f"Processing file: {fn} with Annotation ID: {annotation_id}")
 
         self.lobulus_processing.set_annotated_image_and_id(self.anim, annotation_id)
         self.lobulus_processing.run(show=show)
-        logger.trace(f"type lobulus_processing.lobulus_mask: {type(self.lobulus_processing.lobulus_mask)}")
-        logger.debug(f"type lobulus_processing.lobulus_mask: {type(self.lobulus_processing.lobulus_mask)}")
+        logger.trace(
+            f"type lobulus_processing.lobulus_mask: {type(self.lobulus_processing.lobulus_mask)}"
+        )
+        logger.debug(
+            f"type lobulus_processing.lobulus_mask: {type(self.lobulus_processing.lobulus_mask)}"
+        )
         self.skeleton_analysis.set_lobulus(lobulus=self.lobulus_processing)
         logger.debug("set lobulus done")
         # run_slide_segmentation = self.parameters.param("Processing", "Texture Analysis").value()
-        run_skeleton_analysis = self.parameters.param("Processing", "Skeleton Analysis").value()
-        run_texture_analysis = self.parameters.param("Processing", "Texture Analysis").value()
+        run_skeleton_analysis = self.parameters.param(
+            "Processing", "Skeleton Analysis"
+        ).value()
+        run_texture_analysis = self.parameters.param(
+            "Processing", "Texture Analysis"
+        ).value()
         logger.debug("before skeleton analysis")
         if run_skeleton_analysis:
             self.skeleton_analysis.skeleton_analysis(show=show)
         if run_texture_analysis:
             # self.glcm_textures.report = self.report
-            self.glcm_textures.set_input_data(view=self.lobulus_processing.view, annotation_id=annotation_id,
-                                              lobulus_segmentation=self.lobulus_processing.lobulus_mask)
+            self.glcm_textures.set_input_data(
+                view=self.lobulus_processing.view,
+                annotation_id=annotation_id,
+                lobulus_segmentation=self.lobulus_processing.lobulus_mask,
+            )
             self.glcm_textures.run()
         logger.trace("after texture analysis")
         t1 = time.time()
@@ -530,23 +569,23 @@ class Scaffan:
                 # "platform.node": platform.uname().node,
                 # "platform.processor": platform.uname().processor,
                 # "Scaffan Version": scaffan.__version__,
-
-            })
+            }
+        )
         # evaluation
-        self.evaluation.set_input_data(self.anim, annotation_id, self.lobulus_processing)
+        self.evaluation.set_input_data(
+            self.anim, annotation_id, self.lobulus_processing
+        )
         self.evaluation.run()
         # Copy all parameters to table
         self.report.finish_actual_row()
 
-
-    def set_persistent_cols(self, dct:dict):
+    def set_persistent_cols(self, dct: dict):
         """
         Set data which will be appended to all rows.
         :param dct: dictionary with column name and value
         :return:
         """
         self.report.set_persistent_cols(dct)
-
 
     def _get_file_info(self):
         fnparam = Path(self.parameters.param("Input", "File Path").value())
@@ -570,12 +609,10 @@ class Scaffan:
         self.parameters.param("Output", "Select").sigActivated.connect(
             self.select_output_dir_gui
         )
-        self.parameters.param("Output", "Select Common Spreadsheet File").sigActivated.connect(
-            self.select_output_spreadsheet_gui
-        )
-        self.parameters.param("Run").sigActivated.connect(
-            self.run_lobuluses
-        )
+        self.parameters.param(
+            "Output", "Select Common Spreadsheet File"
+        ).sigActivated.connect(self.select_output_spreadsheet_gui)
+        self.parameters.param("Run").sigActivated.connect(self.run_lobuluses)
 
         self.parameters.param("Processing", "Open output dir").setValue(True)
         t = ParameterTree()
@@ -609,6 +646,7 @@ class Scaffan:
         if not skip_exec:
 
             qapp.exec_()
+
 
 class NoLobulusSelectionUsedError(Exception):
     pass

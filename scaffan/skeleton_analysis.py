@@ -25,11 +25,11 @@ import imma.image
 
 class SkeletonAnalysis:
     def __init__(
-            self,
-            pname="Skeleton Analysis",
-            ptype="bool",
-            pvalue=True,
-            ptip="Skeleton Analysis after lobulus segmentation is performed",
+        self,
+        pname="Skeleton Analysis",
+        ptype="bool",
+        pvalue=True,
+        ptip="Skeleton Analysis after lobulus segmentation is performed",
     ):
 
         params = [
@@ -42,14 +42,13 @@ class SkeletonAnalysis:
                 "name": "Working Resolution",
                 "type": "float",
                 # "value": 0.000001,
-                "value": 0.00000091, # this is typical resolution on level 2
+                "value": 0.00000091,  # this is typical resolution on level 2
                 # "value": 0.00000182,  # this is typical resolution on level 3
                 # "value": 0.00000364,  # this is typical resolution on level 4
                 # "value": 0.00000728,  # this is typical resolution on level 5
                 # "value": 0.00001456,  # this is typical resolution on level 6
                 "suffix": "m",
-                "siPrefix": True
-
+                "siPrefix": True,
             },
             {
                 "name": "Inner Lobulus Margin",
@@ -57,9 +56,8 @@ class SkeletonAnalysis:
                 "value": 0.00002,
                 "suffix": "m",
                 "siPrefix": True,
-                "tip": "Area close to the border is ignored in Otsu threshold computation before skeletonization step."
+                "tip": "Area close to the border is ignored in Otsu threshold computation before skeletonization step.",
             },
-
         ]
 
         self.parameters = Parameter.create(
@@ -68,7 +66,8 @@ class SkeletonAnalysis:
             value=pvalue,
             tip=ptip,
             children=params,
-            expanded=False)
+            expanded=False,
+        )
         self.report: Report = None
 
     def set_report(self, report: Report):
@@ -76,7 +75,9 @@ class SkeletonAnalysis:
 
     def set_lobulus(self, lobulus: scaffan.lobulus.Lobulus):
         self.lobulus: scaffan.lobulus.Lobulus = lobulus
-        pixelsize_mm = [(self.parameters.param("Working Resolution").value() * 1000)] * 2
+        pixelsize_mm = [
+            (self.parameters.param("Working Resolution").value() * 1000)
+        ] * 2
         self.view = self.lobulus.view.to_pixelsize(pixelsize_mm=pixelsize_mm)
         logger.debug("Lobulus setup done")
 
@@ -84,12 +85,20 @@ class SkeletonAnalysis:
         datarow = {}
 
         inner = self.lobulus.central_vein_mask
-        logger.debug(f"dtype of lobulus.central_vein_mask {self.lobulus.central_vein_mask.dtype}")
-        logger.debug(f"shape of lobulus.central_vein_mask {self.lobulus.central_vein_mask.shape} {np.max(self.lobulus.central_vein_mask)}")
-        logger.debug(f"unique of shape of lobulus.central_vein_mask {np.unique(self.lobulus.central_vein_mask)}")
+        logger.debug(
+            f"dtype of lobulus.central_vein_mask {self.lobulus.central_vein_mask.dtype}"
+        )
+        logger.debug(
+            f"shape of lobulus.central_vein_mask {self.lobulus.central_vein_mask.shape} {np.max(self.lobulus.central_vein_mask)}"
+        )
+        logger.debug(
+            f"unique of shape of lobulus.central_vein_mask {np.unique(self.lobulus.central_vein_mask)}"
+        )
         # import pdb; pdb.set_trace()
         # TODO Split the function here
-        inner_lobulus_margin_mm = self.parameters.param("Inner Lobulus Margin").value() * 1000
+        inner_lobulus_margin_mm = (
+            self.parameters.param("Inner Lobulus Margin").value() * 1000
+        )
 
         # eroded image for threshold analysis
         dstmask = scipy.ndimage.morphology.distance_transform_edt(
@@ -107,11 +116,15 @@ class SkeletonAnalysis:
             order=0,
             anti_aliasing=False,
         )
-        detail_mask = skimage.transform.resize(self.lobulus.lobulus_mask, **resize_params).astype(np.int8)
+        detail_mask = skimage.transform.resize(
+            self.lobulus.lobulus_mask, **resize_params
+        ).astype(np.int8)
         detail_inner_lobulus_mask = skimage.transform.resize(
             inner_lobulus_mask, **resize_params
         )
-        detail_central_vein_mask = skimage.transform.resize(inner == 1, **resize_params).astype(np.int8)
+        detail_central_vein_mask = skimage.transform.resize(
+            inner == 1, **resize_params
+        ).astype(np.int8)
 
         detail_view = self.view
         detail_image = detail_view.get_region_image(as_gray=True)
@@ -121,7 +134,9 @@ class SkeletonAnalysis:
         detail_view.add_ticks()
         if self.report is not None:
             self.report.savefig_and_show(
-                "skeleton_analysis_detail_image_and_mask_{}.png".format(self.lobulus.annotation_id),
+                "skeleton_analysis_detail_image_and_mask_{}.png".format(
+                    self.lobulus.annotation_id
+                ),
                 fig,
             )
 
@@ -133,8 +148,10 @@ class SkeletonAnalysis:
 
         # from pdb import set_trace
         # set_trace()
-        logger.debug(f"detail_inner_lobulus_mask {detail_central_vein_mask.shape} {detail_central_vein_mask.dtype} "
-                     f"{np.min(detail_central_vein_mask)} {np.max(detail_central_vein_mask)}")
+        logger.debug(
+            f"detail_inner_lobulus_mask {detail_central_vein_mask.shape} {detail_central_vein_mask.dtype} "
+            f"{np.min(detail_central_vein_mask)} {np.max(detail_central_vein_mask)}"
+        )
         threshold = skimage.filters.threshold_otsu(
             detail_image[detail_inner_lobulus_mask == 1]
         )
@@ -149,10 +166,10 @@ class SkeletonAnalysis:
         datarow["Output pixel size 0"] = detail_view.region_pixelsize[0]
         datarow["Output pixel size 1"] = detail_view.region_pixelsize[1]
         datarow["Output image size 0"] = (
-                detail_view.region_pixelsize[0] * imthr.shape[0]
+            detail_view.region_pixelsize[0] * imthr.shape[0]
         )
         datarow["Output image size 1"] = (
-                detail_view.region_pixelsize[1] * imthr.shape[1]
+            detail_view.region_pixelsize[1] * imthr.shape[1]
         )
         fig = plt.figure(figsize=(12, 10))
         plt.imshow(skeleton + imthr)
@@ -190,8 +207,7 @@ class SkeletonAnalysis:
         detail_view.add_ticks()
         if self.report is not None:
             self.report.savefig_and_show(
-                "figure_skeleton_nodes_{}.png".format(self.lobulus.annotation_id),
-                fig
+                "figure_skeleton_nodes_{}.png".format(self.lobulus.annotation_id), fig
             )
 
             with warnings.catch_warnings():

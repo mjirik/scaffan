@@ -15,7 +15,6 @@ import exsu
 import exsu.report
 
 
-
 class ReportTest(unittest.TestCase):
 
     skip_on_local = False
@@ -29,22 +28,28 @@ class ReportTest(unittest.TestCase):
         if commonsheet.exists():
             os.remove(commonsheet)
 
-        report = exsu.report.Report(outputdir=outputdir, additional_spreadsheet_fn=commonsheet)
+        report = exsu.report.Report(
+            outputdir=outputdir, additional_spreadsheet_fn=commonsheet
+        )
         report.add_cols_to_actual_row({"Col1": 25, "Col2": "test string", "Col5": 5})
-        report.add_cols_to_actual_row({"Col2": "prepsanu", "Col1": 26, "Col4": "ctyrka"})
+        report.add_cols_to_actual_row(
+            {"Col2": "prepsanu", "Col1": 26, "Col4": "ctyrka"}
+        )
         report.finish_actual_row()
 
-        report.add_cols_to_actual_row({"Col1": 27, "Col2": "test string", "Col3": "trojka"})
+        report.add_cols_to_actual_row(
+            {"Col1": 27, "Col2": "test string", "Col3": "trojka"}
+        )
         report.finish_actual_row()
         report.dump()
 
         # new write to common excel
         report.init()
-        report.add_cols_to_actual_row({"Col1": 28, "Col2": "new line to common", "Col7": 77})
+        report.add_cols_to_actual_row(
+            {"Col1": 28, "Col2": "new line to common", "Col7": 77}
+        )
         report.finish_actual_row()
         report.dump()
 
         df = pd.read_excel(commonsheet)
         self.assertEqual(len(df), 3, "3 lines expected in the excel file")
-
-

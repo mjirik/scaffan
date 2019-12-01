@@ -3,14 +3,13 @@
 
 from loguru import logger
 import unittest
+
 # import openslide
 import scaffan
 import scaffan.algorithm
 import pyqtgraph.parametertree
 
 import scaffan.dilipg
-
-
 
 
 class ParameterTest(unittest.TestCase):
@@ -25,5 +24,4 @@ class ParameterTest(unittest.TestCase):
         dct = scaffan.dilipg.params_and_values(p)
         self.assertEqual(type(dct), dict)
 
-        self.assertIn('Output;Directory Path', dct)
-
+        self.assertIn("Output;Directory Path", dct)

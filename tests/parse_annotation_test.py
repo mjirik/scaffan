@@ -33,7 +33,9 @@ class ParseAnnotationTest(unittest.TestCase):
         "On windows there is problem with openslides import. Test works standalone but not together with the others.",
     )
     def test_convert_annotation_hamamatsu_data(self):
-        slices_dir = io3d.datasets.join_path("medical/orig/sample_data/SCP003/", get_root=True)
+        slices_dir = io3d.datasets.join_path(
+            "medical/orig/sample_data/SCP003/", get_root=True
+        )
 
         json_files = glob.glob(op.join(slices_dir, "*.json"))
         for fn in json_files:

@@ -4,6 +4,7 @@
 from loguru import logger
 import unittest
 import os.path as op
+
 # from nose.plugins.attrib import attr
 
 path_to_script = op.dirname(op.abspath(__file__))
@@ -27,6 +28,7 @@ import glob
 import os
 
 import scaffan.image as scim
+
 scim.import_openslide()
 import openslide
 
@@ -34,7 +36,6 @@ skip_on_local = False
 
 
 class ProcessJsonAnnotationTest(unittest.TestCase):
-
     def test_read_annotations(self):
         fn = io3d.datasets.join_path("medical", "orig", "CMU-1.ndpi", get_root=True)
         imsl = openslide.OpenSlide(fn)

@@ -54,14 +54,22 @@ class LobulusTest(unittest.TestCase):
         self.assertGreater(skeleton_size, 0.001, "Skeleton size 0.1%")
         self.assertGreater(thr_size, skeleton_size, "More threshold than Skeleton")
 
-        self.assertTrue((output_dir/"lobulus_central_thr_skeleton_7.png").exists())
-        self.assertTrue((output_dir/"lobulus_central_thr_skeleton_7_skimage.png").exists())
-        self.assertTrue((output_dir/"data.xlsx").exists())
+        self.assertTrue((output_dir / "lobulus_central_thr_skeleton_7.png").exists())
+        self.assertTrue(
+            (output_dir / "lobulus_central_thr_skeleton_7_skimage.png").exists()
+        )
+        self.assertTrue((output_dir / "data.xlsx").exists())
 
-        self.assertLess(0.6, mainapp.evaluation.evaluation_history[0]["Lobulus Border Dice"],
-                        "Lobulus segmentation should have Dice coefficient above some low level")
+        self.assertLess(
+            0.6,
+            mainapp.evaluation.evaluation_history[0]["Lobulus Border Dice"],
+            "Lobulus segmentation should have Dice coefficient above some low level",
+        )
         # self.assertLess(0.6, mainapp.evaluation.evaluation_history[1]["Lobulus Border Dice"],
         #                 "Lobulus segmentation should have Dice coefficient above some low level")
-        self.assertLess(0.2, mainapp.evaluation.evaluation_history[0]["Central Vein Dice"],
-                        "Central Vein segmentation should have Dice coefficient above some low level")
+        self.assertLess(
+            0.2,
+            mainapp.evaluation.evaluation_history[0]["Central Vein Dice"],
+            "Central Vein segmentation should have Dice coefficient above some low level",
+        )
         # mainapp.start_gui()

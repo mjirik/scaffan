@@ -22,7 +22,9 @@ def test_cli():
 
     runner = click.testing.CliRunner()
     # runner.invoke(anwa.main_click.nogui, ["-i", str(pth)])
-    runner.invoke(scaffan.main_cli.run,
-                  ["nogui", "-i", pth, "-o", expected_pth.parent, "-c", "#FFFF00"])
+    runner.invoke(
+        scaffan.main_cli.run,
+        ["nogui", "-i", pth, "-o", expected_pth.parent, "-c", "#FFFF00"],
+    )
 
     assert expected_pth.exists()

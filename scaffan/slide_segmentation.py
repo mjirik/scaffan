@@ -1,11 +1,13 @@
 # /usr/bin/env python
 # -*- coding: utf-8 -*-
 from loguru import logger
+
 # import scaffan
 # import io3d # just to get data
 import scaffan.image as scim
 from typing import List, Union
 from pathlib import Path
+
 # import sklearn.cluster
 # import sklearn.naive_bayes
 # import sklearn.svm
@@ -36,12 +38,14 @@ from .image import AnnotatedImage
 from . import texture
 
 
-class ScanSegmentation():
-    def __init__(self, report:Report=None,
-                 pname="Scan Segmentation",
-                 ptype="bool",
-                 pvalue=True,
-                 ptip= "Run analysis of whole slide before all other processing is perfomed",
+class ScanSegmentation:
+    def __init__(
+        self,
+        report: Report = None,
+        pname="Scan Segmentation",
+        ptype="bool",
+        pvalue=True,
+        ptip="Run analysis of whole slide before all other processing is perfomed",
     ):
         """
 
@@ -64,12 +68,11 @@ class ScanSegmentation():
             {
                 "name": "Working Resolution",
                 "type": "float",
-                "value": 0.00001, # 0.01 mm
+                "value": 0.00001,  # 0.01 mm
                 "suffix": "m",
                 "siPrefix": True,
-                "tip": "Resolution used for segmentation processing. " +
-                       "Real working resolution will be selected according to image levels."
-
+                "tip": "Resolution used for segmentation processing. "
+                + "Real working resolution will be selected according to image levels.",
             },
             {
                 "name": "Working Tile Size",
@@ -77,28 +80,28 @@ class ScanSegmentation():
                 "value": 256,
                 "suffix": "px",
                 "siPrefix": False,
-                "tip": "Image is processed tile by tile. This value defines size of the tile"
+                "tip": "Image is processed tile by tile. This value defines size of the tile",
             },
             {
                 "name": "Run Training",
                 "type": "bool",
                 "value": False,
-                "tip": "Use annotated image to train classifier." +
-                    "Red area is extra-lobular tissue." +
-                    "Black area is intra-lobular tissue." +
-                    "Magenta area is empty part of the image.",
+                "tip": "Use annotated image to train classifier."
+                + "Red area is extra-lobular tissue."
+                + "Black area is intra-lobular tissue."
+                + "Magenta area is empty part of the image.",
             },
             {
                 "name": "Load Default Classifier",
                 "type": "bool",
                 "value": False,
-                "tip": "Load default classifier before training."
+                "tip": "Load default classifier before training.",
             },
             {
                 "name": "Clean Before Training",
                 "type": "bool",
                 "value": False,
-                "tip": "Reset classifier before training."
+                "tip": "Reset classifier before training.",
             },
             {
                 "name": "Training Weight",
@@ -114,7 +117,7 @@ class ScanSegmentation():
                 "value": 5,
                 # "suffix": "px",
                 "siPrefix": False,
-                "tip": "Number of lobuluses automatically selected."
+                "tip": "Number of lobuluses automatically selected.",
             },
             {
                 "name": "Annotation Radius",
@@ -122,22 +125,25 @@ class ScanSegmentation():
                 "value": 0.00015,  # 0.1 mm
                 "suffix": "m",
                 "siPrefix": True,
-                "tip": "Automatic annotation radius used when the automatic lobulus selection is prefered "
-
+                "tip": "Automatic annotation radius used when the automatic lobulus selection is prefered ",
             },
             # self._inner_texture.parameters,
-
         ]
 
         self.parameters = Parameter.create(
-            name=pname, type=ptype, value=pvalue, tip=ptip, children=params, expanded=False
+            name=pname,
+            type=ptype,
+            value=pvalue,
+            tip=ptip,
+            children=params,
+            expanded=False,
         )
         if report is None:
             report = Report()
             report.save = False
             report.show = False
-        self.report:Report = report
-        self.anim:AnnotatedImage = None
+        self.report: Report = report
+        self.anim: AnnotatedImage = None
         self.tile_size = None
         self.level = None
         self.tiles: List[List["View"]] = None
@@ -161,8 +167,10 @@ class ScanSegmentation():
         # GaussianNB(),
         # self.clf = GaussianNB()
         self.clf = self._clf_object(**self._clf_params)
-        self.clf_fn:Path = Path(Path(__file__).parent / "segmentation_model.pkl")
-        self.clf_default_fn:Path = Path(Path(__file__).parent / "segmentation_model_default.pkl")
+        self.clf_fn: Path = Path(Path(__file__).parent / "segmentation_model.pkl")
+        self.clf_default_fn: Path = Path(
+            Path(__file__).parent / "segmentation_model_default.pkl"
+        )
         if self.clf_fn.exists():
             logger.debug(f"Reading classifier from {str(self.clf_fn)}")
             self.clf = joblib.load(self.clf_fn)
@@ -180,7 +188,7 @@ class ScanSegmentation():
         self.sinusoidal_area_mm = None
         self.alternative_get_features = None
 
-    def init(self, anim:scim.AnnotatedImage):
+    def init(self, anim: scim.AnnotatedImage):
         self.anim = anim
         # self.anim = scim.AnnotatedImage(str(fn))
         self.level = self._find_best_level()
@@ -190,7 +198,7 @@ class ScanSegmentation():
         self.ann_biggest_ids = []
         self.make_tiles()
 
-    def train_classifier(self, pixels=None, y=None, sample_weight:float=None):
+    def train_classifier(self, pixels=None, y=None, sample_weight: float = None):
         logger.debug("start training")
 
         if pixels is None:
@@ -280,7 +288,9 @@ class ScanSegmentation():
         # print(f"sob {img_sob.dtype} stats: {stats.describe(img_sob[:], axis=None)}")
         img_sob_gauss2 = gaussian_filter(img_sob, 2)
         img_sob_gauss5 = gaussian_filter(img_sob, 5)
-        img_sob_median = skimage.filters.median((img_just_sob * 2000).astype(np.uint8), disk(10))
+        img_sob_median = skimage.filters.median(
+            (img_just_sob * 2000).astype(np.uint8), disk(10)
+        )
 
         # GLCM
         # self._inner_texture.set_input_data(view=view, annotation_id=None, lobulus_segmentation=None)
@@ -301,7 +311,9 @@ class ScanSegmentation():
         return imgout
 
     def _find_best_level(self):
-        pixelsize_mm = np.array([float(self.parameters.param("Working Resolution").value()) * 1000] * 2)
+        pixelsize_mm = np.array(
+            [float(self.parameters.param("Working Resolution").value()) * 1000] * 2
+        )
         logger.debug(f"wanted pixelsize mm={pixelsize_mm}")
         error = None
         closest_i = None
@@ -323,8 +335,8 @@ class ScanSegmentation():
         return closest_i
 
     def _get_tiles_parameters(self):
-        height0 = self.anim.openslide.properties['openslide.level[0].height']
-        width0 = self.anim.openslide.properties['openslide.level[0].width']
+        height0 = self.anim.openslide.properties["openslide.level[0].height"]
+        width0 = self.anim.openslide.properties["openslide.level[0].width"]
 
         imsize = np.array([int(width0), int(height0)])
         if self.devel_imcrop is not None:
@@ -334,12 +346,22 @@ class ScanSegmentation():
         downsamples = self.anim.openslide.level_downsamples[self.level]
         imsize_on_level = imsize / downsamples
         tile_size_on_level0 = tile_size_on_level * downsamples
-        return imsize.astype(np.int), tile_size_on_level0.astype(np.int), tile_size_on_level, imsize_on_level
+        return (
+            imsize.astype(np.int),
+            tile_size_on_level0.astype(np.int),
+            tile_size_on_level,
+            imsize_on_level,
+        )
 
     def make_tiles(self):
         sz = int(self.parameters.param("Working Tile Size").value())
         self.tile_size = [sz, sz]
-        imsize, size_on_level0, size_on_level, imsize_on_level = self._get_tiles_parameters()
+        (
+            imsize,
+            size_on_level0,
+            size_on_level,
+            imsize_on_level,
+        ) = self._get_tiles_parameters()
         self.tiles = []
 
         for x0 in range(0, int(imsize[0]), int(size_on_level0[0])):
@@ -347,7 +369,9 @@ class ScanSegmentation():
 
             for y0 in range(0, int(imsize[1]), int(size_on_level0[1])):
                 logger.trace(f"processing tile {x0}, {y0}")
-                view = self.anim.get_view(location=(x0, y0), size_on_level=size_on_level, level=self.level)
+                view = self.anim.get_view(
+                    location=(x0, y0), size_on_level=size_on_level, level=self.level
+                )
                 column_tiles.append(view)
 
             self.tiles.append(column_tiles)
@@ -389,17 +413,22 @@ class ScanSegmentation():
         szy = len(self.tiles[0])
         #         print(f"size x={szx} y={szy}")
 
-        imsize, tile_size_on_level0, tile_size_on_level, imsize_on_level = self._get_tiles_parameters()
+        (
+            imsize,
+            tile_size_on_level0,
+            tile_size_on_level,
+            imsize_on_level,
+        ) = self._get_tiles_parameters()
         output_image = np.zeros(self.tile_size * np.asarray([szy, szx]), dtype=int)
         logger.debug("composing predicted image")
         for iy, tile_column in enumerate(self.tiles):
             for ix, tile in enumerate(tile_column):
                 output_image[
-                ix * self.tile_size[0]: (ix + 1) * self.tile_size[0],
-                iy * self.tile_size[1]: (iy + 1) * self.tile_size[1]
+                    ix * self.tile_size[0] : (ix + 1) * self.tile_size[0],
+                    iy * self.tile_size[1] : (iy + 1) * self.tile_size[1],
                 ] = self.predicted_tiles[iy][ix]
 
-        full_image = output_image[:int(imsize_on_level[1]), :int(imsize_on_level[0])]
+        full_image = output_image[: int(imsize_on_level[1]), : int(imsize_on_level[0])]
         self.full_prefilter_image = full_image
         self.full_output_image = self._labeling_filtration(full_image)
         return self.full_output_image
@@ -412,6 +441,7 @@ class ScanSegmentation():
         tmp_img = full_image.copy()
         tmp_img[full_image == 2] = 1
         import skimage.filters
+
         tmp_img = skimage.filters.gaussian(tmp_img.astype(np.float), sigma=4)
 
         tmp_img = (tmp_img > 0.5).astype(np.int)
@@ -429,20 +459,25 @@ class ScanSegmentation():
         if not as_gray:
             output_size = np.asarray([output_size[0], output_size[1], 3])
 
-        imsize, tile_size_on_level0, tile_size_on_level, imsize_on_level = self._get_tiles_parameters()
+        (
+            imsize,
+            tile_size_on_level0,
+            tile_size_on_level,
+            imsize_on_level,
+        ) = self._get_tiles_parameters()
         output_image = np.zeros(output_size, dtype=int)
         for iy, tile_column in enumerate(self.tiles):
             for ix, tile in enumerate(tile_column):
                 output_image[
-                ix * self.tile_size[0]: (ix + 1) * self.tile_size[0],
-                iy * self.tile_size[1]: (iy + 1) * self.tile_size[1]
-                #                     int(x0):int(x0 + tile_size_on_level[0]),
-                #                     int(y0):int(y0 + tile_size_on_level[1])
-                #                 ] = self.tiles[ix][iy].get_region_image(as_gray=True)
+                    ix * self.tile_size[0] : (ix + 1) * self.tile_size[0],
+                    iy * self.tile_size[1] : (iy + 1) * self.tile_size[1]
+                    #                     int(x0):int(x0 + tile_size_on_level[0]),
+                    #                     int(y0):int(y0 + tile_size_on_level[1])
+                    #                 ] = self.tiles[ix][iy].get_region_image(as_gray=True)
                 ] = self.tiles[iy][ix].get_region_image(as_gray=as_gray)[:, :, :3]
         #                 ] = self.predicted_tiles[iy][ix]
 
-        full_image = output_image[:int(imsize_on_level[1]), :int(imsize_on_level[0])]
+        full_image = output_image[: int(imsize_on_level[1]), : int(imsize_on_level[0])]
         self.full_raster_image = full_image
         return full_image
 
@@ -452,26 +487,38 @@ class ScanSegmentation():
         self.intralobular_ratio = count[1] / (count[1] + count[2])
         #         plt.figure(figsize=(10, 10))
         #         plt.imshow(self.full_output_image)
-        self.report.imsave("slice_label.png", self.full_output_image, level_skimage=20, level_npz=30)
-        self.report.imsave("slice_prefilter_label.png", self.full_prefilter_image, level=40, level_skimage=20, level_npz=30)
+        self.report.imsave(
+            "slice_label.png", self.full_output_image, level_skimage=20, level_npz=30
+        )
+        self.report.imsave(
+            "slice_prefilter_label.png",
+            self.full_prefilter_image,
+            level=40,
+            level_skimage=20,
+            level_npz=30,
+        )
         # plt.imsave(self.output_label_fn, self.full_output_image)
 
         #         plt.figure(figsize=(10, 10))
         img = self.get_raster_image(as_gray=False)
         #         plt.imshow(img)
-        self.report.imsave("slice_raster.png", img.astype(np.uint8), level_skimage=20, level_npz=30)
+        self.report.imsave(
+            "slice_raster.png", img.astype(np.uint8), level_skimage=20, level_npz=30
+        )
         logger.debug(f"real_pixel_size={self.used_pixelsize_mm}")
         self.empty_area_mm = np.prod(self.used_pixelsize_mm) * count[0]
         self.sinusoidal_area_mm = np.prod(self.used_pixelsize_mm) * count[1]
         self.septum_area_mm = np.prod(self.used_pixelsize_mm) * count[2]
         logger.debug(f"empty_area_mm={self.empty_area_mm}")
-        self.report.set_persistent_cols({
-            "Scan Segmentation Empty Area [mm^2]": self.empty_area_mm,
-            "Scan Segmentation Septum Area [mm^2]": self.septum_area_mm,
-            "Scan Segmentation Sinusoidal Area [mm^2]": self.sinusoidal_area_mm,
-            "Scan Segmentation Used Pixelsize [mm]": self.used_pixelsize_mm[0],
-            "Scan Segmentation Classifier": str(self.clf),
-        })
+        self.report.set_persistent_cols(
+            {
+                "Scan Segmentation Empty Area [mm^2]": self.empty_area_mm,
+                "Scan Segmentation Septum Area [mm^2]": self.septum_area_mm,
+                "Scan Segmentation Sinusoidal Area [mm^2]": self.sinusoidal_area_mm,
+                "Scan Segmentation Used Pixelsize [mm]": self.used_pixelsize_mm[0],
+                "Scan Segmentation Classifier": str(self.clf),
+            }
+        )
 
     def _find_biggest_lobuli(self):
         """
@@ -483,7 +530,7 @@ class ScanSegmentation():
         self.dist = dist
         # report
 
-        image_max = scipy.ndimage.maximum_filter(dist, size=20, mode='constant')
+        image_max = scipy.ndimage.maximum_filter(dist, size=20, mode="constant")
         # Comparison between image_max and im to find the coordinates of local maxima
         coordinates = peak_local_max(dist, min_distance=20)
         point_dist = dist[list(zip(*coordinates))]
@@ -498,16 +545,27 @@ class ScanSegmentation():
         fig = plt.figure(figsize=(10, 10))
         plt.imshow(dist, cmap=plt.cm.gray)
         plt.autoscale(False)
-        plt.plot(coordinates[:, 1], coordinates[:, 0], 'g.' , max_points[:, 1], max_points[:, 0], 'ro')
-        plt.axis('off')
-        self.report.savefig_and_show("sinusoidal_tissue_local_centers.pdf", fig, level=55)
+        plt.plot(
+            coordinates[:, 1],
+            coordinates[:, 0],
+            "g.",
+            max_points[:, 1],
+            max_points[:, 0],
+            "ro",
+        )
+        plt.axis("off")
+        self.report.savefig_and_show(
+            "sinusoidal_tissue_local_centers.pdf", fig, level=55
+        )
 
         return max_points
 
     def add_biggest_to_annotations(self):
         points_px = self._find_biggest_lobuli()
         view_corner = self.tiles[0][0]
-        pts_glob_px = view_corner.coords_view_px_to_glob_px(points_px[:, 1], points_px[:, 0])
+        pts_glob_px = view_corner.coords_view_px_to_glob_px(
+            points_px[:, 1], points_px[:, 0]
+        )
         centers_px = list(zip(*pts_glob_px))
         r_mm = float(self.parameters.param("Annotation Radius").value()) * 1000
         # r_mm = 0.1
@@ -517,7 +575,9 @@ class ScanSegmentation():
         for center_px in centers_px:
             r_px = view_corner.mm_to_px(r_mm)
             #     print(f"r_px={r_px}")
-            r_px_glob = view_corner.coords_view_px_to_glob_px(np.array([r_px[0]]), np.array([r_px[1]]))
+            r_px_glob = view_corner.coords_view_px_to_glob_px(
+                np.array([r_px[0]]), np.array([r_px[1]])
+            )
             x_px = r_px_glob[0] * np.sin(t) + center_px[0]
             y_px = r_px_glob[1] * np.cos(t) + center_px[1]
 
@@ -527,7 +587,6 @@ class ScanSegmentation():
                 "y_px": y_px,
                 "color": "#00FF88",
                 "details": "",
-
             }
             ann = annoatation_px_to_mm(self.anim.openslide, ann)
             newid = len(self.anim.annotations)
@@ -543,11 +602,12 @@ class ScanSegmentation():
 
         if bool(self.parameters.param("Load Default Classifier").value()):
             if self.clf_default_fn.exists():
-                logger.debug(f"Reading default classifier from {str(self.clf_default_fn)}")
+                logger.debug(
+                    f"Reading default classifier from {str(self.clf_default_fn)}"
+                )
                 self.clf = joblib.load(self.clf_default_fn)
             else:
                 logger.error("Default classifier not found")
-
 
         if bool(self.parameters.param("Run Training").value()):
             self.train_classifier()
@@ -556,6 +616,3 @@ class ScanSegmentation():
         self.predict()
         logger.debug("evaluate...")
         self.evaluate()
-
-
-

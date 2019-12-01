@@ -9,7 +9,9 @@ from typing import List
 import ast
 
 
-def create_icon(app_name: str, icon_filename=None, conda_env_name=None, package_name=None):
+def create_icon(
+    app_name: str, icon_filename=None, conda_env_name=None, package_name=None
+):
     """
 
     :param app_name: Used for desktop icon name
@@ -61,7 +63,9 @@ def create_icon(app_name: str, icon_filename=None, conda_env_name=None, package_
         shortcut.Save()
 
 
-def params_and_values(p:pyqtgraph.parametertree.Parameter, pth=None, dct={}, separator=";"):
+def params_and_values(
+    p: pyqtgraph.parametertree.Parameter, pth=None, dct={}, separator=";"
+):
     """
     Get dict of all parameters. Key is the path to the parameter, value is value of the parameter.
     :param p:
@@ -88,7 +92,12 @@ def params_and_values(p:pyqtgraph.parametertree.Parameter, pth=None, dct={}, sep
     return dct
 
 
-def set_parameters_by_path(parameters:pyqtgraph.parametertree.Parameter, path_val_couple_list:List, parse_path=True, separator=";"):
+def set_parameters_by_path(
+    parameters: pyqtgraph.parametertree.Parameter,
+    path_val_couple_list: List,
+    parse_path=True,
+    separator=";",
+):
     """
     Set value to parameter.
     :param parameters: paramtree.Paramterr
@@ -104,10 +113,22 @@ def set_parameters_by_path(parameters:pyqtgraph.parametertree.Parameter, path_va
         else:
             value = param_value
         logger.debug(f"param path={param_path}, ast value={value}")
-        set_parameter_by_path(parameters, param_path, value=value, parse_path=parse_path, separator=separator)
+        set_parameter_by_path(
+            parameters,
+            param_path,
+            value=value,
+            parse_path=parse_path,
+            separator=separator,
+        )
 
 
-def set_parameter_by_path(parameters:pyqtgraph.parametertree.Parameter, param_path:str, value, parse_path=True, separator=";"):
+def set_parameter_by_path(
+    parameters: pyqtgraph.parametertree.Parameter,
+    param_path: str,
+    value,
+    parse_path=True,
+    separator=";",
+):
     """
     Set value to parameter.
     :param param_path: Path to parameter can be separated by ";"

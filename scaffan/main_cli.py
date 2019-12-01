@@ -9,6 +9,7 @@ import sys
 import click
 from pathlib import Path
 import ast
+
 # print("start")
 # from . import image
 
@@ -18,7 +19,7 @@ import ast
 from scaffan import algorithm
 from . import app_tools
 
-CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
+CONTEXT_SETTINGS = dict(help_option_names=["-h", "--help"])
 
 
 # print("Running __main__.py")
@@ -37,11 +38,16 @@ def run(ctx, *args, **kwargs):
         # a.main()
     else:
         pass
-        click.echo('I am about to invoke %s' % ctx.invoked_subcommand)
+        click.echo("I am about to invoke %s" % ctx.invoked_subcommand)
     pass
 
+
 @run.command(context_settings=CONTEXT_SETTINGS, help="Set persistent values")
-@click.option("--common-spreadsheet-file",  help="Set path for common spreadsheet file.", type=click.Path())
+@click.option(
+    "--common-spreadsheet-file",
+    help="Set path for common spreadsheet file.",
+    type=click.Path(),
+)
 def set(common_spreadsheet_file=None):
     mainapp = algorithm.Scaffan()
     if common_spreadsheet_file is not None:
@@ -49,19 +55,28 @@ def set(common_spreadsheet_file=None):
         logger.info(f"Common spreadsheet file path is : {common_spreadsheet_file}")
         print(f"Common spreadsheet file path is : {common_spreadsheet_file}")
 
+
 # def print_params(params):
 #     algorithm.Scaffan().parameters.
 #     params.
 
+
 @run.command(context_settings=CONTEXT_SETTINGS)
-@click.option('--params', '-p', multiple=True, default='', nargs=2,
-              help='Set parameter. First argument is path to parameter separated by ";". Second is the value.'
-                   'python -m scaffan gui -p Processing,Show True')
-@click.option('--print-params', '-pp', is_flag=True, help='Print parameters')
+@click.option(
+    "--params",
+    "-p",
+    multiple=True,
+    default="",
+    nargs=2,
+    help='Set parameter. First argument is path to parameter separated by ";". Second is the value.'
+    "python -m scaffan gui -p Processing,Show True",
+)
+@click.option("--print-params", "-pp", is_flag=True, help="Print parameters")
 def gui(params, print_params):
     mainapp = algorithm.Scaffan()
     if print_params:
         import pprint
+
         pprint.pprint(mainapp.parameters_to_dict())
         exit()
     for param in params:
@@ -70,15 +85,21 @@ def gui(params, print_params):
     mainapp.start_gui()
 
 
-@run.command(context_settings=CONTEXT_SETTINGS, help="Create an icon on Windows platform")
+@run.command(
+    context_settings=CONTEXT_SETTINGS, help="Create an icon on Windows platform"
+)
 def install():
     import platform
+
     print(platform.system)
     if platform.system() == "Windows":
         from .app_tools import create_icon
         import pathlib
+
         logo_fn2 = pathlib.Path(__file__).parent / pathlib.Path("scaffan_icon512.ico")
-        create_icon("Scaffan", logo_fn2, conda_env_name="scaffan", package_name="scaffan")
+        create_icon(
+            "Scaffan", logo_fn2, conda_env_name="scaffan", package_name="scaffan"
+        )
 
         # logo_fn = op.join(op.dirname(__file__), "scaffan_icon512.ico")
         # import win32com.client
@@ -103,37 +124,41 @@ def install():
     "--input-path",
     "-i",
     type=click.Path(exists=True),
-    help='Path to input directory with video files.',
+    help="Path to input directory with video files.",
     default=None,
 )
 @click.option(
-    "--color",
-    "-c",
-    type=str,
-    help='Annotation collor in hexa (#0000FF)',
-    default=None,
+    "--color", "-c", type=str, help="Annotation collor in hexa (#0000FF)", default=None,
 )
 @click.option(
     "--output-path",
     "-o",
     type=click.Path(),
-    help='Path to output directory with video files.',
+    help="Path to output directory with video files.",
     default=None,
 )
 @click.option(
     "--log-level",
     "-ll",
     # type=,
-    help='Set logging level',
+    help="Set logging level",
     default=None,
 )
-@click.option('--params', '-p', multiple=True, default='', nargs=2,
-              help='Set parameter. First argument is path to parameter separated by ";". Second is the value.'
-                   'python -m scaffan gui -p Processing,Show True')
+@click.option(
+    "--params",
+    "-p",
+    multiple=True,
+    default="",
+    nargs=2,
+    help='Set parameter. First argument is path to parameter separated by ";". Second is the value.'
+    "python -m scaffan gui -p Processing,Show True",
+)
 def nogui(input_path, color, output_path, log_level, params):
     if log_level is not None:
         i = logger.add(level=log_level)
-    logger.debug(f"input path={input_path} color={color}, output_path={output_path}, params={params}")
+    logger.debug(
+        f"input path={input_path} color={color}, output_path={output_path}, params={params}"
+    )
     mainapp = algorithm.Scaffan()
     logger.debug(f"Scaffan created")
     app_tools.set_parameters_by_path(mainapp.parameters, params)
@@ -151,5 +176,6 @@ def nogui(input_path, color, output_path, log_level, params):
         mainapp.set_annotation_color_selection(color)
 
     mainapp.run_lobuluses()
-# def install():
 
+
+# def install():

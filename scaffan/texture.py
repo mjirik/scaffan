@@ -28,7 +28,9 @@ def tile_centers(image_shape, tile_spacing):
     return centers
 
 
-def tiles_processing(image, fcn, tile_spacing, fcn_output_n=None, dtype=np.int8, tile_size = None):
+def tiles_processing(
+    image, fcn, tile_spacing, fcn_output_n=None, dtype=np.int8, tile_size=None
+):
     """
     Process image tile by tile. Last tile in every row and avery column may be smaller if modulo of shape of image and
     shape of tile is different from zero. On the border of image tile is smaller according to the edge of the image.
@@ -56,13 +58,14 @@ def tiles_processing(image, fcn, tile_spacing, fcn_output_n=None, dtype=np.int8,
     for x0 in range(0, image.shape[0], tile_spacing[0]):
         for x1 in range(0, image.shape[1], tile_spacing[1]):
             sl_in = (
-                slice(max(x0 - tile_margin[0], 0), x0 + tile_spacing[0] + tile_margin[0]),
-                slice(max(x1 - tile_margin[1], 0), x1 + tile_spacing[1] + tile_margin[1])
+                slice(
+                    max(x0 - tile_margin[0], 0), x0 + tile_spacing[0] + tile_margin[0]
+                ),
+                slice(
+                    max(x1 - tile_margin[1], 0), x1 + tile_spacing[1] + tile_margin[1]
+                ),
             )
-            sl_out = (
-                slice(x0, x0 + tile_spacing[0]),
-                slice(x1, x1 + tile_spacing[1])
-            )
+            sl_out = (slice(x0, x0 + tile_spacing[0]), slice(x1, x1 + tile_spacing[1]))
             img = image[sl_in]
             output[sl_out] = fcn(img)
 
@@ -76,7 +79,7 @@ def get_feature_and_predict(img, fv_function, classif):
 
 
 def select_texture_patch_centers_from_one_annotation(
-        anim, title, tile_size, level, step=50
+    anim, title, tile_size, level, step=50
 ):
     if not np.isscalar(tile_size):
         if tile_size[0] == tile_size[1]:
@@ -112,19 +115,19 @@ def nonzero_with_step(data, step):
 
 class GLCMTextureMeasurement:
     def __init__(
-            self, filename_label="",
-            pname = "Texture Analysis",
-            ptype = "bool",
-            pvalue = True,
-            ptip = "Run Gray Level Co-occurrence texture analysis after lobulus segmentation is performed",
-            texture_label=None,
-            working_resolution_mm=0.0000004,
-            tile_size=64,
-            tile_spacing=32,
-            add_cols_to_report:bool=True,
-            report_severity_offset=0,
-            glcm_levels=64
-
+        self,
+        filename_label="",
+        pname="Texture Analysis",
+        ptype="bool",
+        pvalue=True,
+        ptip="Run Gray Level Co-occurrence texture analysis after lobulus segmentation is performed",
+        texture_label=None,
+        working_resolution_mm=0.0000004,
+        tile_size=64,
+        tile_spacing=32,
+        add_cols_to_report: bool = True,
+        report_severity_offset=0,
+        glcm_levels=64,
     ):
         """
 
@@ -161,15 +164,9 @@ class GLCMTextureMeasurement:
                 # "value": 0.0000004,
                 "value": working_resolution_mm,
                 "suffix": "m",
-                "siPrefix": True
-
+                "siPrefix": True,
             },
-            {
-                "name": "GLCM Levels",
-                "type": "int",
-                "value": glcm_levels
-            },
-
+            {"name": "GLCM Levels", "type": "int", "value": glcm_levels},
         ]
         self.texture_label = texture_label
 
@@ -179,7 +176,8 @@ class GLCMTextureMeasurement:
             value=pvalue,
             tip=ptip,
             children=params,
-            expanded=False)
+            expanded=False,
+        )
         self.report: Report = None
         self.filename_label = filename_label
         self.add_cols_to_report: bool = add_cols_to_report
@@ -190,7 +188,9 @@ class GLCMTextureMeasurement:
     def set_report(self, report: Report):
         self.report = report
 
-    def set_input_data(self, view: image.View, annotation_id:int=None, lobulus_segmentation=None):
+    def set_input_data(
+        self, view: image.View, annotation_id: int = None, lobulus_segmentation=None
+    ):
         self.anim = view.anim
         self.annotation_id = annotation_id
         self.parent_view = view
@@ -227,19 +227,20 @@ class GLCMTextureMeasurement:
         fn_ann_id = "" if self.annotation_id is None else f"_{self.annotation_id}"
         fn_id = "{}{}{}".format(self.filename_label, fn_ann_id, texture_label_fn)
         if self.report is not None:
-            self.report.imsave("texture_input_image_{}.png".format(fn_id),
-                               (texture_image * 255).astype(np.uint8),
-                               level=60+self.report_severity_offset,
-                               level_npz=40+self.report_severity_offset,
-                               level_skimage=20+self.report_severity_offset
-                               )
+            self.report.imsave(
+                "texture_input_image_{}.png".format(fn_id),
+                (texture_image * 255).astype(np.uint8),
+                level=60 + self.report_severity_offset,
+                level_npz=40 + self.report_severity_offset,
+                level_skimage=20 + self.report_severity_offset,
+            )
         energy = tiles_processing(
             1 - texture_image,
             fcn=lambda img: texture_glcm_features(img, levels),
             tile_spacing=tile_spacing,
             fcn_output_n=3,
             dtype=None,
-            tile_size=tile_size
+            tile_size=tile_size,
         )
         # seg = texseg.predict(views[0], show=False, function=texture_energy)
         fig = plt.figure(figsize=(10, 12))
@@ -250,7 +251,12 @@ class GLCMTextureMeasurement:
         # if self.annotation_id is not None:
         view.plot_annotations(self.annotation_id)
         if self.lobulus_segmentation is not None:
-            seg = imma.image.resize_to_shape(self.lobulus_segmentation, shape=img.shape[:2], order=0) == 1
+            seg = (
+                imma.image.resize_to_shape(
+                    self.lobulus_segmentation, shape=img.shape[:2], order=0
+                )
+                == 1
+            )
             plt.contour(seg)
             plt.title("original image")
         plt.subplot(222)
@@ -268,8 +274,9 @@ class GLCMTextureMeasurement:
         # plt.colorbar()
         if self.report is not None:
             self.report.savefig_and_show(
-                "glcm_features_{}.png".format(fn_id), fig,
-                level=60+self.report_severity_offset
+                "glcm_features_{}.png".format(fn_id),
+                fig,
+                level=60 + self.report_severity_offset,
             )
         # plt.savefig("glcm_features_{}.png".format(title))
 
@@ -277,8 +284,9 @@ class GLCMTextureMeasurement:
         plt.imshow(energy)
         if self.report is not None:
             self.report.savefig_and_show(
-                "glcm_features_color_{}.png".format(fn_id), fig,
-                level=60 + self.report_severity_offset
+                "glcm_features_color_{}.png".format(fn_id),
+                fig,
+                level=60 + self.report_severity_offset,
             )
 
         e0 = energy[:, :, 0]
@@ -305,11 +313,13 @@ class GLCMTextureMeasurement:
         # }
         if self.report is not None and self.add_cols_to_report:
             self.report.add_cols_to_actual_row(row)
-        logger.debug(f"GLCM textures for id {self.annotation_id if self.annotation_id is not None else '-'} finished")
+        logger.debug(
+            f"GLCM textures for id {self.annotation_id if self.annotation_id is not None else '-'} finished"
+        )
         # plt.show()
 
 
-def make_stats(prefix:str, data, dct=None):
+def make_stats(prefix: str, data, dct=None):
     """
     Calculate mean, variance and 10, 25, 75 and 90 percentiles. Output
     is stored to dict with key starting with `prefix`
@@ -330,15 +340,12 @@ def make_stats(prefix:str, data, dct=None):
     dct[f"{prefix} p90"] = np.percentile(data, 90)
     return dct
 
+
 class TextureSegmentation:
     def __init__(self, feature_function=None, classifier=None):
 
         params = [
-            {
-                "name": "Tile Size",
-                "type": "int",
-                "value": 256
-            },
+            {"name": "Tile Size", "type": "int", "value": 256},
             # {
             #     "name": "Working Resolution",
             #     "type": "float",
@@ -347,15 +354,18 @@ class TextureSegmentation:
             #     "siPrefix": True
             #
             # }
-
         ]
 
-        self.parameters = Parameter.create(name="Texture Processing", type="group", children=params)
+        self.parameters = Parameter.create(
+            name="Texture Processing", type="group", children=params
+        )
         self.parameters
         self.tile_size = None
         self.tile_size1 = None
         self.set_tile_size(self.parameters.param("Tile Size").value())
-        self.parameters.param("Tile Size").sigValueChanged.connect(self._seg_tile_size_params)
+        self.parameters.param("Tile Size").sigValueChanged.connect(
+            self._seg_tile_size_params
+        )
 
         self.level = 1
         self.step = 64
@@ -405,7 +415,9 @@ class TextureSegmentation:
             patch_centers1_points = list(zip(*patch_centers1))
             return patch_centers1_points
 
-    def get_patch_view(self, anim: image.AnnotatedImage, patch_center=None, annotation_id=None):
+    def get_patch_view(
+        self, anim: image.AnnotatedImage, patch_center=None, annotation_id=None
+    ):
         if patch_center is not None:
             view: image.View = anim.get_view(
                 center=[patch_center[0], patch_center[1]],
@@ -477,6 +489,7 @@ class TextureSegmentation:
 
 def texture_glcm_features(img, levels):
     import skimage.feature.texture
+
     # levels =
     # if distances is None:
     distances = [1]

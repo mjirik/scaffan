@@ -11,6 +11,7 @@ With request subimage with size=[A, B] it will return subimage with shape [B, A]
 """
 
 from loguru import logger
+
 # problem is loading lxml together with openslide
 # from lxml import etree
 from typing import List, Union
@@ -57,7 +58,11 @@ import openslide
 
 
 def fix_location(imsl, location, level):
-    return list((location - np.mod(location, imsl.level_downsamples[level])).astype(np.int))
+    return list(
+        (location - np.mod(location, imsl.level_downsamples[level])).astype(np.int)
+    )
+
+
 # def
 def get_image_by_center(imsl, center, level=3, size=None, as_gray=True):
     if size is None:
@@ -151,7 +156,7 @@ def get_offset_px(imsl):
     return offset_px
 
 
-def annoatation_px_to_mm(imsl:openslide.OpenSlide, annotation:dict) -> dict:
+def annoatation_px_to_mm(imsl: openslide.OpenSlide, annotation: dict) -> dict:
     """
     Calculate x,y in mm from xy in pixels
     :param imsl:
@@ -162,8 +167,8 @@ def annoatation_px_to_mm(imsl:openslide.OpenSlide, annotation:dict) -> dict:
     pixelsize, pixelunit = get_pixelsize(imsl)
     x_px = np.asarray(annotation["x_px"])
     y_px = np.asarray(annotation["y_px"])
-    x_mm = pixelsize[0]*(x_px - offset_px[0])
-    y_mm = pixelsize[1]*(y_px - offset_px[1])
+    x_mm = pixelsize[0] * (x_px - offset_px[0])
+    y_mm = pixelsize[1] * (y_px - offset_px[1])
     annotation["x_mm"] = x_mm
     annotation["y_mm"] = y_mm
     return annotation
@@ -190,7 +195,8 @@ class AnnotatedImage:
     """
     Read the image and the annotation. The
     """
-    def __init__(self, path:str, skip_read_annotations=False):
+
+    def __init__(self, path: str, skip_read_annotations=False):
         fs_enc = sys.getfilesystemencoding()
         logger.debug(f"fs_enc: {fs_enc}")
         logger.debug("Reading file {}".format(path))
@@ -199,7 +205,7 @@ class AnnotatedImage:
         # pth_encoded = path.encode(fs_enc)
         # path.encode()
         # logger.debug(f"path encoded {pth_encoded}")
-        self.openslide:openslide.OpenSlide = openslide.OpenSlide(path)
+        self.openslide: openslide.OpenSlide = openslide.OpenSlide(path)
         self.region_location = None
         self.region_size = None
         self.region_level = None
@@ -217,7 +223,9 @@ class AnnotatedImage:
         pxsz, unit = self.get_pixel_size(0)
         # self.titles
         # self.colors
-        return "Pixelsize: {}x{} [{}], {} annotations".format(pxsz[0], pxsz[1], unit, len(self.id_by_colors))
+        return "Pixelsize: {}x{} [{}], {} annotations".format(
+            pxsz[0], pxsz[1], unit, len(self.id_by_colors)
+        )
 
     def get_optimal_level_for_fluent_resize(self, pixelsize_mm, safety_bound=2):
         if np.isscalar(pixelsize_mm):
@@ -277,41 +285,63 @@ class AnnotatedImage:
         # self.details = scan.annotation_details(self.annotations)
         return self.annotations
 
-    def get_annotation_center_mm(self, ann_id:Union[str,int]):
+    def get_annotation_center_mm(self, ann_id: Union[str, int]):
         ann_id = self.get_annotation_id(ann_id)
         ann = self.annotations[ann_id]
         return (np.mean(ann["x_mm"]), np.mean(ann["y_mm"]))
 
-
     def get_view(
-            self, center=None, level=0, size_on_level=None,
-            location=None, size_mm=None, pixelsize_mm=None, center_mm=None, location_mm=None, safety_bound=2,
-            annotation_id=None, margin=0.5, margin_in_pixels=False) -> "View":
+        self,
+        center=None,
+        level=0,
+        size_on_level=None,
+        location=None,
+        size_mm=None,
+        pixelsize_mm=None,
+        center_mm=None,
+        location_mm=None,
+        safety_bound=2,
+        annotation_id=None,
+        margin=0.5,
+        margin_in_pixels=False,
+    ) -> "View":
         if annotation_id is not None:
             center, size = self.get_annotations_bounds_px(annotation_id)
             if margin_in_pixels:
                 margin_px = int(margin)
             else:
                 margin_px = (size * margin).astype(
-                    np.int ) / self.openslide.level_downsamples[level]
+                    np.int
+                ) / self.openslide.level_downsamples[level]
             size_on_level = (
-                    (size / self.openslide.level_downsamples[level]) + 2 * margin_px
+                (size / self.openslide.level_downsamples[level]) + 2 * margin_px
             ).astype(int)
         view = View(
-            anim=self, center=center, level=level, size_on_level=size_on_level,
-            location=location, size_mm=size_mm, pixelsize_mm=pixelsize_mm, center_mm=center_mm, location_mm=location_mm,
-            safety_bound=safety_bound
-            )
+            anim=self,
+            center=center,
+            level=level,
+            size_on_level=size_on_level,
+            location=location,
+            size_mm=size_mm,
+            pixelsize_mm=pixelsize_mm,
+            center_mm=center_mm,
+            location_mm=location_mm,
+            safety_bound=safety_bound,
+        )
         return view
 
-    def get_views_by_title(self, title=None, level=2, return_ids=False, **kwargs) -> List['View']:
+    def get_views_by_title(
+        self, title=None, level=2, return_ids=False, **kwargs
+    ) -> List["View"]:
         annotation_ids = self.get_annotation_ids(title)
         if return_ids:
             return self.get_views(annotation_ids, level=level, **kwargs), annotation_ids
         else:
             return self.get_views(annotation_ids, level=level, **kwargs)
 
-    def select_inner_annotations(self, id, color=None, raise_exception_if_not_found=False, ann_ids:List=None):
+    def select_inner_annotations(
+        self, id, color=None, raise_exception_if_not_found=False, ann_ids: List = None
+    ):
         """
 
         :param id:
@@ -322,7 +352,10 @@ class AnnotatedImage:
         """
         if color is not None:
             an_ids_sel1 = self.select_annotations_by_color(
-                color, raise_exception_if_not_found=raise_exception_if_not_found, ann_ids=ann_ids)
+                color,
+                raise_exception_if_not_found=raise_exception_if_not_found,
+                ann_ids=ann_ids,
+            )
         else:
             if ann_ids is None:
                 # an_ids_sel1 = list(self.annotations.keys())
@@ -339,13 +372,17 @@ class AnnotatedImage:
             y_pxi = ann["y_px"]
 
             if (
-                    np.max(x_pxi) < np.max(x_px) and np.max(y_pxi) < np.max(y_px) and
-                    np.min(x_px) < np.min(x_pxi) and np.min(y_px) < np.min(y_pxi)
+                np.max(x_pxi) < np.max(x_px)
+                and np.max(y_pxi) < np.max(y_px)
+                and np.min(x_px) < np.min(x_pxi)
+                and np.min(y_px) < np.min(y_pxi)
             ):
                 ids.append(idi)
         return ids
 
-    def select_outer_annotations(self, id, color=None, raise_exception_if_not_found=False, ann_ids:List=None):
+    def select_outer_annotations(
+        self, id, color=None, raise_exception_if_not_found=False, ann_ids: List = None
+    ):
         """
 
         :param id:
@@ -356,7 +393,10 @@ class AnnotatedImage:
         """
         if color is not None:
             an_ids_sel1 = self.select_annotations_by_color(
-                color, raise_exception_if_not_found=raise_exception_if_not_found, ann_ids=ann_ids)
+                color,
+                raise_exception_if_not_found=raise_exception_if_not_found,
+                ann_ids=ann_ids,
+            )
         else:
             if ann_ids is None:
                 an_ids_sel1 = list(range(0, len(self.annotations)))
@@ -372,13 +412,17 @@ class AnnotatedImage:
             y_pxi = ann["y_px"]
 
             if (
-                    np.max(x_px) < np.max(x_pxi) and np.max(y_px) < np.max(y_pxi) and
-                    np.min(x_pxi) < np.min(x_px) and np.min(y_pxi) < np.min(y_px)
+                np.max(x_px) < np.max(x_pxi)
+                and np.max(y_px) < np.max(y_pxi)
+                and np.min(x_pxi) < np.min(x_px)
+                and np.min(y_pxi) < np.min(y_px)
             ):
                 ids.append(idi)
         return ids
 
-    def select_just_outer_annotations(self, color, return_holes=True, ann_ids: List[int] = None) -> List:
+    def select_just_outer_annotations(
+        self, color, return_holes=True, ann_ids: List[int] = None
+    ) -> List:
         """
         Select outer annotation and skip all inner annotations with same color. Put inner annotations to list of holes.
         :param color: set the required annotation color
@@ -387,8 +431,11 @@ class AnnotatedImage:
         :return:
         """
         ann_ids = self.select_annotations_by_color(color, ann_ids=ann_ids)
-        ann_pairs = [[aid, self.select_inner_annotations(aid, ann_ids=ann_ids)] for aid in ann_ids if
-                     len(self.select_outer_annotations(aid, ann_ids=ann_ids)) == 0]
+        ann_pairs = [
+            [aid, self.select_inner_annotations(aid, ann_ids=ann_ids)]
+            for aid in ann_ids
+            if len(self.select_outer_annotations(aid, ann_ids=ann_ids)) == 0
+        ]
         outer_inds, holes = zip(*ann_pairs)
         if return_holes:
             return list(outer_inds), list(holes)
@@ -399,16 +446,15 @@ class AnnotatedImage:
         return self.get_annotation_ids(title)
         # return self.get_views(annotation_ids, level=level, **kwargs), annotation_ids
 
-
     def get_views(
         self,
         annotation_ids=None,
         level=None,
         margin=0.5,
-        margin_in_pixels: bool=False,
+        margin_in_pixels: bool = False,
         show=False,
         pixelsize_mm=None,
-        safety_bound=2
+        safety_bound=2,
     ) -> List["View"]:
         """
 
@@ -421,14 +467,20 @@ class AnnotatedImage:
         :return:
         """
         if pixelsize_mm is not None:
-            level = self.get_optimal_level_for_fluent_resize(pixelsize_mm, safety_bound=safety_bound)
+            level = self.get_optimal_level_for_fluent_resize(
+                pixelsize_mm, safety_bound=safety_bound
+            )
         if level is None:
             level = 0
         views = [None] * len(annotation_ids)
         for i, annotation_id in enumerate(annotation_ids):
-            view = self.get_view(annotation_id=annotation_id, level=level, margin=margin,
-                                 margin_in_pixels=margin_in_pixels,
-                                 pixelsize_mm=pixelsize_mm)
+            view = self.get_view(
+                annotation_id=annotation_id,
+                level=level,
+                margin=margin,
+                margin_in_pixels=margin_in_pixels,
+                pixelsize_mm=pixelsize_mm,
+            )
             if show:
                 view.region_imshow_annotation(annotation_id)
             views[i] = view
@@ -454,16 +506,17 @@ class AnnotatedImage:
         self.region_pixelsize, self.region_pixelunit = self.get_pixel_size(level)
         self.level_pixelsize = [
             get_pixelsize(
-                self.openslide,
-                level=i,
-                requested_unit=self.region_pixelunit)[0]
+                self.openslide, level=i, requested_unit=self.region_pixelunit
+            )[0]
             for i in range(0, self.openslide.level_count)
         ]
         scan.adjust_annotation_to_image_view(
             self.openslide, self.annotations, center, level, size
         )
 
-    def select_annotations_by_color(self, id, raise_exception_if_not_found=True, ann_ids=None):
+    def select_annotations_by_color(
+        self, id, raise_exception_if_not_found=True, ann_ids=None
+    ):
         """
 
         :param id: number or color '#00FF00
@@ -489,7 +542,9 @@ class AnnotatedImage:
             id = [idi for idi in id if id in ann_ids]
         return id
 
-    def get_annotation_ids(self, id:Union[annotationIDs, annotationID])->annotationIDs:
+    def get_annotation_ids(
+        self, id: Union[annotationIDs, annotationID]
+    ) -> annotationIDs:
         if type(id) is str:
             id = self.id_by_titles[id]
         else:
@@ -613,16 +668,17 @@ class AnnotatedImage:
 
 class View:
     def __init__(
-            self,
-            anim: AnnotatedImage,
-            center=None, level=0,
-            size_on_level=None,
-            location=None,
-            size_mm=None,
-            pixelsize_mm=None,
-            center_mm=None,
-            location_mm=None,
-            safety_bound=2
+        self,
+        anim: AnnotatedImage,
+        center=None,
+        level=0,
+        size_on_level=None,
+        location=None,
+        size_mm=None,
+        pixelsize_mm=None,
+        center_mm=None,
+        location_mm=None,
+        safety_bound=2,
     ):
         self.anim: AnnotatedImage = anim
         self.set_region(
@@ -634,35 +690,40 @@ class View:
             pixelsize_mm=pixelsize_mm,
             center_mm=center_mm,
             location_mm=location_mm,
-            safety_bound=safety_bound)
+            safety_bound=safety_bound,
+        )
         self.select_outer_annotations = self.anim.select_outer_annotations
         self.select_inner_annotations = self.anim.select_inner_annotations
         self.get_raster_image = self.get_region_image
         self.get_annotation_region_raster = self.get_annotation_raster
 
     def set_region(
-            self,
-            center=None,
-            level=None,
-            size_on_level=None,
-            location=None,
-            size_mm=None,
-            pixelsize_mm=None,
-            center_mm=None,
-            location_mm=None,
-            safety_bound=2
+        self,
+        center=None,
+        level=None,
+        size_on_level=None,
+        location=None,
+        size_mm=None,
+        pixelsize_mm=None,
+        center_mm=None,
+        location_mm=None,
+        safety_bound=2,
     ):
         if (level is None) and (size_on_level is not None):
-                raise ValueError("Parameter 'size_on_level' cannot be used if 'level' is not defined")
+            raise ValueError(
+                "Parameter 'size_on_level' cannot be used if 'level' is not defined"
+            )
         if pixelsize_mm is not None:
             self.is_resized_by_pixelsize = True
             if np.isscalar(pixelsize_mm):
                 pixelsize_mm = [pixelsize_mm, pixelsize_mm]
             pixelsize_mm = np.asarray(pixelsize_mm)
-            self.region_pixelsize  = pixelsize_mm
+            self.region_pixelsize = pixelsize_mm
             self.region_pixelunit = "mm"
             if level is None:
-                level = self.anim.get_optimal_level_for_fluent_resize(self.region_pixelsize, safety_bound=safety_bound)
+                level = self.anim.get_optimal_level_for_fluent_resize(
+                    self.region_pixelsize, safety_bound=safety_bound
+                )
 
         else:
             if level is None:
@@ -670,7 +731,9 @@ class View:
             self.is_resized_by_pixelsize = False
             # self.region_pixelsize = None
             # self.region_pixelunit = "mm"
-            self.region_pixelsize, self.region_pixelunit = self.get_pixelsize_on_level(level)
+            self.region_pixelsize, self.region_pixelunit = self.get_pixelsize_on_level(
+                level
+            )
 
         if size_mm is not None:
             if np.isscalar(size_mm):
@@ -678,7 +741,9 @@ class View:
             if size_on_level is not None:
                 raise ValueError("Parameter size and size_mm are exclusive.")
             size_mm = np.asarray(size_mm)
-            size_on_level = np.ceil(size_mm / self.get_pixelsize_on_level(level)[0]).astype(np.int)
+            size_on_level = np.ceil(
+                size_mm / self.get_pixelsize_on_level(level)[0]
+            ).astype(np.int)
 
         if size_on_level is None:
             size_on_level = [256, 256]
@@ -689,8 +754,10 @@ class View:
 
         if pixelsize_mm is not None:
             pxsz = self.get_pixelsize_on_level(level)[0]
-            self.zoom = pxsz/ (1.0 * pixelsize_mm)
-            self.region_size_on_pixelsize_mm = np.ceil(size_on_level * self.zoom).astype(np.int)
+            self.zoom = pxsz / (1.0 * pixelsize_mm)
+            self.region_size_on_pixelsize_mm = np.ceil(
+                size_on_level * self.zoom
+            ).astype(np.int)
         else:
             self.region_size_on_pixelsize_mm = size_on_level
             self.zoom = np.array([1, 1])
@@ -698,7 +765,9 @@ class View:
         if location_mm is not None:
             location = (location_mm / self.get_pixelsize_on_level(0)[0]).astype(np.int)
         if center_mm is not None:
-            center = (np.asarray(center_mm) / self.get_pixelsize_on_level(0)[0]).astype(np.int)
+            center = (np.asarray(center_mm) / self.get_pixelsize_on_level(0)[0]).astype(
+                np.int
+            )
 
         if location is None:
             location = self.get_region_location_by_center(center, level, size_on_level)
@@ -759,7 +828,9 @@ class View:
         x_view_px, y_view_px = self.coords_glob_px_to_view_px(x_glob_px, y_glob_px)
         plt.plot(x_view_px, y_view_px, "oy")
 
-    def get_annotation_raster(self, annotation_id:int, holes_ids:List[int]=None) -> np.ndarray:
+    def get_annotation_raster(
+        self, annotation_id: int, holes_ids: List[int] = None
+    ) -> np.ndarray:
         if holes_ids is None:
             holes_ids = []
         ann_raster = self._get_single_annotation_region_raster(annotation_id)
@@ -783,7 +854,9 @@ class View:
 
         # coordinates are swapped also here
         # x, y = np.mgrid[: self.region_size_on_level[1], : self.region_size_on_level[0]]
-        x, y = np.mgrid[: self.region_size_on_pixelsize_mm[1], : self.region_size_on_pixelsize_mm[0]]
+        x, y = np.mgrid[
+            : self.region_size_on_pixelsize_mm[1], : self.region_size_on_pixelsize_mm[0]
+        ]
         coors = np.hstack(
             (x.reshape(-1, 1), y.reshape(-1, 1))
         )  # coors.shape is (4000000,2)
@@ -831,7 +904,9 @@ class View:
     #         im = skimage.color.rgb2gray(im)
     #     return im
 
-    def get_region_image_resolution(self, resolution_mm, as_gray=False, ):
+    def get_region_image_resolution(
+        self, resolution_mm, as_gray=False,
+    ):
         self.anim.openslide.level_downsamples
 
     def get_region_image(self, as_gray=False):
@@ -852,7 +927,9 @@ class View:
         #     level = self.region_level
         #     size = self.region_size_on_level
 
-        location = fix_location(self.anim.openslide, self.region_location, self.region_level)
+        location = fix_location(
+            self.anim.openslide, self.region_location, self.region_level
+        )
         imcr = self.anim.openslide.read_region(
             location, level=self.region_level, size=self.region_size_on_level
         )
@@ -868,8 +945,9 @@ class View:
 
             # im1 = imma.image.resize_to_mm(im, pxsz_level, self.region_pixelsize)
             # swap coordinates because openslice output image have swapped image coordinates
-            im = imma.image.resize_to_mm(im, pxsz_level[::-1], self.region_pixelsize[::-1], anti_aliasing=True)
-
+            im = imma.image.resize_to_mm(
+                im, pxsz_level[::-1], self.region_pixelsize[::-1], anti_aliasing=True
+            )
 
         return im
 
@@ -893,15 +971,24 @@ class View:
     def to_level(self, new_level):
         size = self.get_size_on_level(new_level)
         newview = View(
-            self.anim, location=self.region_location, size_on_level=size, level=new_level
+            self.anim,
+            location=self.region_location,
+            size_on_level=size,
+            level=new_level,
         )
         return newview
 
-    def to_pixelsize(self, pixelsize_mm, safety_bound=2.):
-        level = self.anim.get_optimal_level_for_fluent_resize(pixelsize_mm, safety_bound=safety_bound)
+    def to_pixelsize(self, pixelsize_mm, safety_bound=2.0):
+        level = self.anim.get_optimal_level_for_fluent_resize(
+            pixelsize_mm, safety_bound=safety_bound
+        )
         size = self.get_size_on_level(level)
         newview = View(
-            self.anim, location=self.region_location, size_on_level=size, level=level, pixelsize_mm=pixelsize_mm
+            self.anim,
+            location=self.region_location,
+            size_on_level=size,
+            level=level,
+            pixelsize_mm=pixelsize_mm,
         )
         return newview
 
@@ -912,19 +999,22 @@ class View:
         :return:
         """
         pixelsize_factor = self.get_pixelsize_on_level(0)[0] / self.region_pixelsize
-        delta_px = ((other_view.region_location - self.region_location) * pixelsize_factor).astype(np.int)
+        delta_px = (
+            (other_view.region_location - self.region_location) * pixelsize_factor
+        ).astype(np.int)
         # start = (self.region_location + delta_px)[::-1]
         # delta_size_px = (other_view.get_size_on_pixelsize_mm() * pixelsize_factor).astype(np.int)
-        start=delta_px[::-1]
+        start = delta_px[::-1]
         import imma.image
+
         pxsz1 = self.region_pixelsize[:2]
         pxsz2 = other_view.region_pixelsize[:2]
         stop = start + imma.image.calculate_new_shape(
             other_view.get_size_on_pixelsize_mm()[::-1],
             voxelsize_mm=pxsz2[::-1],
-            new_voxelsize_mm=pxsz1[::-1]
+            new_voxelsize_mm=pxsz1[::-1],
         )
-        return (slice(start[0], stop[0], 1), slice(start[1], stop[1],1))
+        return (slice(start[0], stop[0], 1), slice(start[1], stop[1], 1))
 
     def insert_image_from_view(self, other_view: "View", img, other_img):
         """
@@ -936,6 +1026,7 @@ class View:
         :return:
         """
         import copy
+
         img_copy = copy.copy(img)
 
         pxsz1 = self.region_pixelsize[:2]
@@ -944,7 +1035,7 @@ class View:
             other_img,
             voxelsize_mm=pxsz2[::-1],
             new_voxelsize_mm=pxsz1[::-1],
-            anti_aliasing=True
+            anti_aliasing=True,
         )
 
         sl = self.get_slices_for_insert_image_from_view(other_view)
@@ -955,7 +1046,6 @@ class View:
 
 class ColorError(Exception):
     pass
-
 
 
 def imshow_with_colorbar(*args, **kwargs):

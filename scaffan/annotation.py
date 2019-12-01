@@ -4,6 +4,7 @@
 Modul is used for GUI of Lisa
 """
 from loguru import logger
+
 # problem is loading lxml together with openslide
 # from lxml import etree
 import os
@@ -68,7 +69,7 @@ def ndpa_to_json(path):
     if ind < 0:
         logger.debug(f"Not found 'openslide' in PATH: {syspth}")
     else:
-        logger.debug(f'PATH: ...{syspth[st:sp]}...')
+        logger.debug(f"PATH: ...{syspth[st:sp]}...")
     if op.isfile(path):
         fn, ext = op.splitext(path)
         if ext == ".ndpi":
@@ -107,11 +108,10 @@ def read_annotations(pth):
         cwd = op.dirname(op.dirname(__file__))
         command = [sys.executable, "-m", "scaffan.ann_to_json", pth]
         try:
-            output = subprocess.check_output(command, cwd=cwd, stderr=subprocess.STDOUT
-
-            )
+            output = subprocess.check_output(command, cwd=cwd, stderr=subprocess.STDOUT)
         except subprocess.CalledProcessError as e:
             import traceback
+
             logger.error(traceback.format_exc())
             logger.debug(f"Command {' '.join(command)}")
             logger.debug(f"Command '{e.cmd}' returned with code {e.returncode}")
@@ -218,6 +218,7 @@ def annotation_colors(annotations):
             colors[title] = [i]
 
     return colors
+
 
 def annotation_details(annotations):
     return _get_annotation_elements(annotations, "details")

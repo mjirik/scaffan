@@ -19,6 +19,7 @@ logger.debug(f"exsupth{exsu_pth}, {exsu_pth.exists()}")
 sys.path.insert(0, exsu_pth)
 
 import exsu
+
 logger.debug(f"exsu path: {exsu.__file__}")
 # import openslide
 import scaffan
@@ -42,7 +43,13 @@ class MainGuiTest(unittest.TestCase):
         # fn = io3d.datasets.join_path("scaffold", "Hamamatsu", "PIG-003_J-18-0165_HE.ndpi", get_root=True)
         # fn = io3d.datasets.join_path("scaffold", "Hamamatsu", "PIG-003_J-18-0168_HE.ndpi", get_root=True)
         # fn = io3d.datasets.join_path("medical", "orig","Scaffan-analysis", "PIG-003_J-18-0165_HE.ndpi", get_root=True) # training
-        fn = io3d.datasets.join_path("medical", "orig","Scaffan-analysis", "PIG-002_J-18-0091_HE.ndpi", get_root=True) # training
+        fn = io3d.datasets.join_path(
+            "medical",
+            "orig",
+            "Scaffan-analysis",
+            "PIG-002_J-18-0091_HE.ndpi",
+            get_root=True,
+        )  # training
         # fn = io3d.datasets.join_path("medical", "orig","Scaffan-analysis", "PIG-003_J-18-0168_HE.ndpi", get_root=True) # training
         # fn = io3d.datasets.join_path(
         #     "medical", "orig", "sample_data", "SCP003", "SCP003.ndpi", get_root=True
@@ -80,6 +87,7 @@ class MainGuiTest(unittest.TestCase):
         mainapp.start_gui(skip_exec=True, qapp=qapp)
 
     skip_on_local = True
+
     @unittest.skipIf(os.environ.get("TRAVIS", True), "Skip on Travis-CI")
     def test_run_lobuluses(self):
         fn = io3d.datasets.join_path(
@@ -97,16 +105,23 @@ class MainGuiTest(unittest.TestCase):
         # cyan causes memory fail
         mainapp.set_annotation_color_selection("#FFFF00")
         mainapp.run_lobuluses()
-        self.assertLess(0.6, mainapp.evaluation.evaluation_history[0]["Lobulus Border Dice"],
-                        "Lobulus segmentation should have Dice coefficient above some low level")
+        self.assertLess(
+            0.6,
+            mainapp.evaluation.evaluation_history[0]["Lobulus Border Dice"],
+            "Lobulus segmentation should have Dice coefficient above some low level",
+        )
         # self.assertLess(0.6, mainapp.evaluation.evaluation_history[1]["Lobulus Border Dice"],
         #                 "Lobulus segmentation should have Dice coefficient above some low level")
-        self.assertLess(0.2, mainapp.evaluation.evaluation_history[0]["Central Vein Dice"],
-                        "Central Vein segmentation should have Dice coefficient above some low level")
+        self.assertLess(
+            0.2,
+            mainapp.evaluation.evaluation_history[0]["Central Vein Dice"],
+            "Central Vein segmentation should have Dice coefficient above some low level",
+        )
         # self.assertLess(0.5, mainapp.evaluation.evaluation_history[1]["Central Vein Dice"],
         #                 "Central Vein should have Dice coefficient above some low level")
 
     skip_on_local = False
+
     @unittest.skipIf(os.environ.get("TRAVIS", skip_on_local), "Skip on Travis-CI")
     def test_run_lobuluses_manual_segmentation(self):
         fn = io3d.datasets.join_path(
@@ -120,16 +135,30 @@ class MainGuiTest(unittest.TestCase):
         mainapp.set_output_dir("test_run_lobuluses_output_dir")
         # mainapp.init_run()
         mainapp.set_annotation_color_selection("#00FFFF")
-        mainapp.set_parameter("Processing;Lobulus Segmentation;Manual Segmentation", True)
+        mainapp.set_parameter(
+            "Processing;Lobulus Segmentation;Manual Segmentation", True
+        )
         mainapp.run_lobuluses()
-        self.assertLess(0.9, mainapp.evaluation.evaluation_history[0]["Lobulus Border Dice"],
-                        "Lobulus segmentation should have Dice coefficient above some low level")
-        self.assertLess(0.9, mainapp.evaluation.evaluation_history[1]["Lobulus Border Dice"],
-                        "Lobulus segmentation should have Dice coefficient above some low level")
-        self.assertLess(0.9, mainapp.evaluation.evaluation_history[0]["Central Vein Dice"],
-                        "Central Vein segmentation should have Dice coefficient above some low level")
-        self.assertLess(0.9, mainapp.evaluation.evaluation_history[1]["Central Vein Dice"],
-                        "Central Vein should have Dice coefficient above some low level")
+        self.assertLess(
+            0.9,
+            mainapp.evaluation.evaluation_history[0]["Lobulus Border Dice"],
+            "Lobulus segmentation should have Dice coefficient above some low level",
+        )
+        self.assertLess(
+            0.9,
+            mainapp.evaluation.evaluation_history[1]["Lobulus Border Dice"],
+            "Lobulus segmentation should have Dice coefficient above some low level",
+        )
+        self.assertLess(
+            0.9,
+            mainapp.evaluation.evaluation_history[0]["Central Vein Dice"],
+            "Central Vein segmentation should have Dice coefficient above some low level",
+        )
+        self.assertLess(
+            0.9,
+            mainapp.evaluation.evaluation_history[1]["Central Vein Dice"],
+            "Central Vein should have Dice coefficient above some low level",
+        )
 
     def test_start_gui_no_exec(self):
         # fn = io3d.datasets.join_path("medical", "orig", "CMU-1.ndpi", get_root=True)
@@ -149,15 +178,32 @@ class MainGuiTest(unittest.TestCase):
         # skip_exec = False
         mainapp.start_gui(skip_exec=skip_exec, qapp=None)
 
-
     @pytest.mark.dataset
     @pytest.mark.slow
     def test_training_slide_segmentation_clf(self):
 
         fns = [
-            io3d.datasets.join_path("medical", "orig", "Scaffan-analysis", "PIG-002_J-18-0091_HE.ndpi", get_root=True), # training
-            io3d.datasets.join_path("medical", "orig", "Scaffan-analysis", "PIG-003_J-18-0165_HE.ndpi", get_root=True), # training
-            io3d.datasets.join_path("medical", "orig", "Scaffan-analysis", "PIG-003_J-18-0168_HE.ndpi", get_root=True), # training
+            io3d.datasets.join_path(
+                "medical",
+                "orig",
+                "Scaffan-analysis",
+                "PIG-002_J-18-0091_HE.ndpi",
+                get_root=True,
+            ),  # training
+            io3d.datasets.join_path(
+                "medical",
+                "orig",
+                "Scaffan-analysis",
+                "PIG-003_J-18-0165_HE.ndpi",
+                get_root=True,
+            ),  # training
+            io3d.datasets.join_path(
+                "medical",
+                "orig",
+                "Scaffan-analysis",
+                "PIG-003_J-18-0168_HE.ndpi",
+                get_root=True,
+            ),  # training
             # io3d.datasets.join_path("medical", "orig", "Scaffan-analysis", "PIG-003_J-18-0169_HE.ndpi", get_root=True)  # training  bubles
         ]
         self._slide_segmentation_train_clf(fns)
@@ -165,7 +211,9 @@ class MainGuiTest(unittest.TestCase):
     def test_training_small_slide_segmentation_clf(self):
 
         fns = [
-            io3d.datasets.join_path("medical", "orig", "sample_data", "SCP003", "SCP003.ndpi", get_root=True),
+            io3d.datasets.join_path(
+                "medical", "orig", "sample_data", "SCP003", "SCP003.ndpi", get_root=True
+            ),
         ]
         self._slide_segmentation_train_clf(fns, clf_fn=".temp_clf.pkl")
 
@@ -173,16 +221,36 @@ class MainGuiTest(unittest.TestCase):
     @pytest.mark.slow
     def test_testing_slide_segmentation_clf(self):
         fns = [
-            io3d.datasets.join_path("medical", "orig", "Scaffan-analysis", "PIG-003_J-18-0166_HE.ndpi", get_root=True),
-            io3d.datasets.join_path("medical", "orig", "Scaffan-analysis", "PIG-003_J-18-0167_HE.ndpi", get_root=True),
-            io3d.datasets.join_path("medical", "orig", "Scaffan-analysis", "PIG-003_J-18-0169_HE.ndpi", get_root=True)
+            io3d.datasets.join_path(
+                "medical",
+                "orig",
+                "Scaffan-analysis",
+                "PIG-003_J-18-0166_HE.ndpi",
+                get_root=True,
+            ),
+            io3d.datasets.join_path(
+                "medical",
+                "orig",
+                "Scaffan-analysis",
+                "PIG-003_J-18-0167_HE.ndpi",
+                get_root=True,
+            ),
+            io3d.datasets.join_path(
+                "medical",
+                "orig",
+                "Scaffan-analysis",
+                "PIG-003_J-18-0169_HE.ndpi",
+                get_root=True,
+            )
             # io3d.datasets.join_path("medical", "orig","Scaffan-analysis", "PIG-002_J-18-0091_HE.ndpi", get_root=True),
         ]
         self._testing_slide_segmentation_clf(fns)
 
     def test_testing_slide_segmentation_clf(self):
         fns = [
-            io3d.datasets.join_path("medical", "orig", "sample_data", "SCP003", "SCP003.ndpi", get_root=True),
+            io3d.datasets.join_path(
+                "medical", "orig", "sample_data", "SCP003", "SCP003.ndpi", get_root=True
+            ),
         ]
         self._testing_slide_segmentation_clf(fns)
 
@@ -212,17 +280,24 @@ class MainGuiTest(unittest.TestCase):
             mainapp.set_parameter("Processing;Skeleton Analysis", False)
             mainapp.set_parameter("Processing;Texture Analysis", False)
             mainapp.set_parameter("Processing;Open output dir", False)
-            mainapp.set_parameter("Processing;Scan Segmentation;Clean Before Training", False)
+            mainapp.set_parameter(
+                "Processing;Scan Segmentation;Clean Before Training", False
+            )
             mainapp.set_parameter("Processing;Scan Segmentation;Run Training", False)
             mainapp.set_parameter("Processing;Scan Segmentation;Lobulus Number", 0)
             # mainapp.start_gui(qapp=qapp)
             mainapp.run_lobuluses()
 
-            specimen_size_mm = mainapp.slide_segmentation.sinusoidal_area_mm + mainapp.slide_segmentation.septum_area_mm
+            specimen_size_mm = (
+                mainapp.slide_segmentation.sinusoidal_area_mm
+                + mainapp.slide_segmentation.septum_area_mm
+            )
             whole_area_mm = mainapp.slide_segmentation.empty_area_mm + specimen_size_mm
             logger.debug("asserts")
-            assert specimen_size_mm  > whole_area_mm * 0.1
-            assert mainapp.slide_segmentation.sinusoidal_area_mm > 0.1 * specimen_size_mm
+            assert specimen_size_mm > whole_area_mm * 0.1
+            assert (
+                mainapp.slide_segmentation.sinusoidal_area_mm > 0.1 * specimen_size_mm
+            )
             assert mainapp.slide_segmentation.septum_area_mm > 0.1 * specimen_size_mm
 
         assert Path(mainapp.slide_segmentation.clf_fn).exists()

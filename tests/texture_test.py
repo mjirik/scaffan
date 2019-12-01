@@ -108,16 +108,24 @@ class TextureTest(unittest.TestCase):
         )
         # import pdb; pdb.set_trace()
         view0 = anim.get_view(
-            center=[patch_centers0[0][0], patch_centers0[1][0]], level=level, size_on_level=size
+            center=[patch_centers0[0][0], patch_centers0[1][0]],
+            level=level,
+            size_on_level=size,
         )
         view1 = anim.get_view(
-            center=[patch_centers1[0][0], patch_centers1[1][0]], level=level, size_on_level=size
+            center=[patch_centers1[0][0], patch_centers1[1][0]],
+            level=level,
+            size_on_level=size,
         )
         view2 = anim.get_view(
-            center=[patch_centers2[0][0], patch_centers2[1][0]], level=level, size_on_level=size
+            center=[patch_centers2[0][0], patch_centers2[1][0]],
+            level=level,
+            size_on_level=size,
         )
         view3 = anim.get_view(
-            center=[patch_centers3[0][0], patch_centers3[1][0]], level=level, size_on_level=size
+            center=[patch_centers3[0][0], patch_centers3[1][0]],
+            level=level,
+            size_on_level=size,
         )
 
         # print("before imshow 1")
@@ -325,4 +333,3 @@ class TextureTest(unittest.TestCase):
         plt.imshow(energy)
         plt.savefig("glcm_features_color_{}.png".format(title))
         # plt.show()
-
