@@ -16,7 +16,7 @@ def test_cli():
 
     logger.debug(f"pth={pth}, exists={Path(pth).exists()}")
     expected_pth = Path(".test_output/data.xlsx")
-    logger.debug(f"expected_pth={expected_pth}")
+    logger.debug(f"expected_pth={expected_pth}, exists: {expected_pth.exists()}")
     if expected_pth.exists():
         shutil.rmtree(expected_pth.parent)
 
