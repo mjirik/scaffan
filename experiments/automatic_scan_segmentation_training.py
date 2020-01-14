@@ -106,6 +106,7 @@ fns = [
     io3d.datasets.join_path("medical", "orig", "Scaffan-analysis", "PIG-003_J-18-0169_HE.ndpi", get_root=True),  # training  bubles
     io3d.datasets.join_path("medical", "orig", "Scaffan-analysis", "PIG-005_J-18-0631_HE_LML per decell.ndpi", get_root=True),
     io3d.datasets.join_path("medical", "orig", "Scaffan-analysis", "PIG-005_J-18-0633_HE_PRML per decell.ndpi", get_root=True),
+    io3d.datasets.join_path("medical", "orig", "Scaffan-analysis", "Pig-009_Pilsen_HE_009-LM-P.ndpi", get_root=True),
     io3d.datasets.join_path("medical", "orig", "Scaffan-analysis", "PIG-004_BBJ-004-3 _HE_parenchyme.ndpi", get_root=True)
 ]
 
