@@ -56,9 +56,8 @@ install:
 
 #    - Install dependencies
 #    - conda install --yes --file requirements_conda.txt
-    - conda create -n travis --yes --file requirements_conda.txt python=3.6
+    - conda create -n travis --yes --file requirements_conda.txt python=3.6 openslide-python
     - source activate travis
-    - conda install -yes openslide-python
     - conda install --yes pip nose coveralls pytest pytest-cov
     - conda list -e
     - python -m io3d.datasets -v -gdp
