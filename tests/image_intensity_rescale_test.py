@@ -20,7 +20,7 @@ def test_image_intensity_rescale():
 
 
     rescaler = image_intensity_rescale.RescaleIntensityPercentile()
-    rescaler.calculate_parameters(img)
+    rescaler.calculate_intensity_dependent_parameters(img)
     img_rescaled = rescaler.rescale_intensity(img)
     # plt.figure()
     # plt.imshow(img)

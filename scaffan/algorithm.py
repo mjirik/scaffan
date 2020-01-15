@@ -155,6 +155,50 @@ class Scaffan:
                         "value": False,
                         "tip": "Open system window with output dir when processing is finished",
                     },
+                    {
+                        "name": "Intensity Normalization",
+                        "type": "group",
+                        "tip": "A preprocessing of input image. It emphasize important structures",
+                        "children": [
+                            {
+                                "name": "Run Intensity Normalization",
+                                "type": "bool",
+                                "tip": "Do the histogram normalization",
+                                "value": False
+                            },
+                            {
+                                "name": "Input Low Percentile",
+                                "type": "int",
+                                "tip": "Input point for intensity mapping",
+                                "value": 5
+                            },
+                            {
+                                "name": "Input High Percentile",
+                                "type": "int",
+                                # "tip": "Slope of sigmoidal limit function",
+                                "tip": "Input point for intensity mapping",
+                                "value": 95
+                            },
+                            {
+                                "name": "Low Percentile Mapping",
+                                "type": "float",
+                                # "tip": "",
+                                "value": -0.9
+                            },
+                            {
+                                "name": "High Percentile Mapping",
+                                "type": "float",
+                                # "tip": "Slope of sigmoidal limit function",
+                                "value": 0.9
+                            },
+                            {
+                                "name": "Sigmoidal Slope",
+                                "type": "float",
+                                "tip": "Slope of sigmoidal limit function",
+                                "value": 1.0
+                            },
+                        ]
+                    },
                     # {
                     #     "name": "Run Scan Segmentation",
                     #     "type": "bool",

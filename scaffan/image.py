@@ -24,6 +24,7 @@ import numpy as np
 import skimage.color
 from scaffan import annotation as scan
 from scaffan import libfixer
+from scaffan import image_intensity_rescale
 import imma
 
 from matplotlib.path import Path as mplPath
@@ -196,7 +197,7 @@ class AnnotatedImage:
     Read the image and the annotation. The
     """
 
-    def __init__(self, path: str, skip_read_annotations=False):
+    def __init__(self, path: str, skip_read_annotations=False, run_intensity_rescale=False):
         fs_enc = sys.getfilesystemencoding()
         logger.debug(f"fs_enc: {fs_enc}")
         logger.debug("Reading file {}".format(path))
@@ -218,6 +219,8 @@ class AnnotatedImage:
         ]
         if not skip_read_annotations:
             self.read_annotations()
+        self.intensity_rescaler = image_intensity_rescale.RescaleIntensityPercentile()
+        self.run_intensity_rescale = run_intensity_rescale
 
     def get_file_info(self):
         pxsz, unit = self.get_pixel_size(0)
@@ -264,7 +267,10 @@ class AnnotatedImage:
         # return get_pixelsize(self.openslide, level)
 
     def get_image_by_center(self, center, level=3, size=None, as_gray=True):
-        return get_image_by_center(self.openslide, center, level, size, as_gray)
+        img = get_image_by_center(self.openslide, center, level, size, as_gray)
+        if self.run_intensity_rescale:
+            img = self.intensity_rescaler.rescale_intensity(img)
+        return img
 
     def get_region_location_by_center(self, center, level, size):
         return get_region_location_by_center(self.openslide, center, level, size)
@@ -608,6 +614,9 @@ class AnnotatedImage:
             im = skimage.color.rgb2gray(im)
             if as_unit8:
                 im = (im * 255).astype(np.uint8)
+
+        if self.run_intensity_rescale:
+            im = self.intensity_rescaler.rescale_intensity(im)
         return im
 
     def plot_annotations(self, annotation_id=None):
@@ -948,6 +957,9 @@ class View:
             im = imma.image.resize_to_mm(
                 im, pxsz_level[::-1], self.region_pixelsize[::-1], anti_aliasing=True
             )
+
+        if self.anim.run_intensity_rescale:
+            im = self.anim.intensity_rescaler(im)
 
         return im
 

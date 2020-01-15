@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+# 0.18
+
+* [Added] Intensity normalization of input data
+
 # 0.17
 
 * [Added] Whole scan Classifier description to output spreadsheet
