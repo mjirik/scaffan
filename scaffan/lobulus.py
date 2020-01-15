@@ -86,7 +86,7 @@ class Lobulus:
                 "children": [
                     {
                         "name": "Smoothing",
-                        "type": "float",
+                        "type": "int",
                         "value": 2,
                         "suffix": "px",
                         "siPrefix": False,
@@ -123,7 +123,7 @@ class Lobulus:
                 "children": [
                     {
                         "name": "Smoothing",
-                        "type": "float",
+                        "type": "int",
                         "value": 2,
                         "suffix": "px",
                         "siPrefix": False,
