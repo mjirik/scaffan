@@ -1,6 +1,6 @@
 io3d
 imma
-openslide-python
+# openslide-python # installed with pip on windows or with conda on linux
 lxml
 pyqtgraph
 morphsnakes
