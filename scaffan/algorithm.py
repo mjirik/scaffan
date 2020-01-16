@@ -368,7 +368,22 @@ class Scaffan:
         logger.debug("Init Run")
         fnparam = self.parameters.param("Input", "File Path")
         path = fnparam.value()
+        int_norm_params = self.parameters.param("Processing", "Intensity Normalization")
+        # run_resc_int = self.parameters.param("Processing", "Intensity Normalization", "Run Intensity Normalization").value()
+        run_resc_int = int_norm_params.param("Run Intensity Normalization").value()
         self.anim = image.AnnotatedImage(path)
+        self.anim.set_intensity_rescale_parameters(
+            run_intensity_rescale=run_resc_int,
+            percentile_range=(
+                int_norm_params.param("Input Low Percentile").value(),
+                int_norm_params.param("Input High Percentile").value(),
+            ),
+            percentile_map_range=(
+                int_norm_params.param("Low Percentile Mapping").value(),
+                int_norm_params.param("High Percentile Mapping").value(),
+            ),
+            sig_slope= int_norm_params.param("Sigmoidal Slope").value(),
+        )
         fnparam = self.parameters.param("Output", "Directory Path")
         self.report.init_with_output_dir(fnparam.value())
         logger.debug(f"report output dir: {self.report.outputdir}")
@@ -570,9 +585,6 @@ class Scaffan:
         self.lobulus_processing.set_annotated_image_and_id(self.anim, annotation_id)
         self.lobulus_processing.run(show=show)
         logger.trace(
-            f"type lobulus_processing.lobulus_mask: {type(self.lobulus_processing.lobulus_mask)}"
-        )
-        logger.debug(
             f"type lobulus_processing.lobulus_mask: {type(self.lobulus_processing.lobulus_mask)}"
         )
         self.skeleton_analysis.set_lobulus(lobulus=self.lobulus_processing)

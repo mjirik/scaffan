@@ -62,8 +62,35 @@ class ImageAnnotationTest(unittest.TestCase):
 
         annotations = anim.read_annotations()
         self.assertGreater(len(annotations), 1, "there should be 2 annotations")
+        plt.figure()
+        plt.imshow(im)
+        plt.show()
         assert im[0, 0] == pytest.approx(
             0.767964705882353, 0.001
+        )  # expected intensity is 0.76
+        # assert np.abs(im[0, 0] - 0.767964705882353) < 0.001  # expected intensity is 0.76
+
+    def test_anim_intensity_rescale(self):
+        fn = io3d.datasets.join_path("medical", "orig", "CMU-1.ndpi", get_root=True)
+        anim = scim.AnnotatedImage(fn)
+        offset = anim.get_offset_px()
+        anim.set_intensity_rescale_parameters(
+            run_intensity_rescale=True,
+            percentile_range=(5, 95),
+            percentile_map_range=(-0.9, 0.9),
+            sig_slope=1
+        )
+        self.assertEqual(len(offset), 2, "should be 2D")
+        im = anim.get_image_by_center((10000, 10000), as_gray=True)
+        self.assertEqual(len(im.shape), 2, "should be 2D")
+
+        annotations = anim.read_annotations()
+        self.assertGreater(len(annotations), 1, "there should be 2 annotations")
+        plt.figure()
+        plt.imshow(im)
+        plt.show()
+        assert im[0, 0] == pytest.approx(
+            0.055, 0.1
         )  # expected intensity is 0.76
         # assert np.abs(im[0, 0] - 0.767964705882353) < 0.001  # expected intensity is 0.76
 

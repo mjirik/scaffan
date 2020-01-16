@@ -41,7 +41,7 @@ class RescaleIntensityPercentile():
         self.percentile_range = None
         self.percentile_map_range = None
         self.sig_slope = None
-        self.input_dtype = None
+        # self.input_dtype = None
         self.set_parameters()
 
     def set_parameters(self, percentile_range=(5, 95), percentile_map_range=(-0.9, 0.9), sig_slope=1):
@@ -51,11 +51,12 @@ class RescaleIntensityPercentile():
 
     def calculate_intensity_dependent_parameters(self, img):
         self.percentile_range_values = np.percentile(img, self.percentile_range)
-        self.input_dtype = img.dtype
+        # self.input_dtype = img.dtype
 
     def rescale_intensity(self, img):
+        input_dtype = img.dtype
         imgout = rescale_intensity_no_limits(img, in_range=self.percentile_range_values, out_range=self.percentile_map_range)
         imgout = sigmoidal(imgout * self.sig_slope)
-        if self.input_dtype == np.uint8:
+        if input_dtype == np.uint8:
             imgout = imgout * 255
-        return imgout.astype(self.input_dtype)
+        return imgout.astype(input_dtype)

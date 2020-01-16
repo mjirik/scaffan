@@ -197,7 +197,7 @@ class AnnotatedImage:
     Read the image and the annotation. The
     """
 
-    def __init__(self, path: str, skip_read_annotations=False, run_intensity_rescale=False):
+    def __init__(self, path: str, skip_read_annotations=False):
         fs_enc = sys.getfilesystemencoding()
         logger.debug(f"fs_enc: {fs_enc}")
         logger.debug("Reading file {}".format(path))
@@ -220,7 +220,23 @@ class AnnotatedImage:
         if not skip_read_annotations:
             self.read_annotations()
         self.intensity_rescaler = image_intensity_rescale.RescaleIntensityPercentile()
+        self.run_intensity_rescale = False
+
+    def set_intensity_rescale_parameters(
+            self, run_intensity_rescale=False,
+            percentile_range=(5, 95), percentile_map_range=(-0.9, 0.9), sig_slope=1
+    ):
+        self.intensity_rescaler.set_parameters(
+            percentile_range=percentile_range, percentile_map_range=percentile_map_range,
+            sig_slope=sig_slope)
+
         self.run_intensity_rescale = run_intensity_rescale
+        if self.run_intensity_rescale:
+            self.update_rescale_parameters()
+
+    def update_rescale_parameters(self):
+        img = np.array(self.openslide.get_thumbnail((512, 512)))
+        self.intensity_rescaler.calculate_intensity_dependent_parameters(img)
 
     def get_file_info(self):
         pxsz, unit = self.get_pixel_size(0)
