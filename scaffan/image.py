@@ -975,7 +975,7 @@ class View:
             )
 
         if self.anim.run_intensity_rescale:
-            im = self.anim.intensity_rescaler(im)
+            im = self.anim.intensity_rescaler.rescale_intensity(im)
 
         return im
 
