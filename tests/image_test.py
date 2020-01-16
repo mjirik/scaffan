@@ -62,9 +62,9 @@ class ImageAnnotationTest(unittest.TestCase):
 
         annotations = anim.read_annotations()
         self.assertGreater(len(annotations), 1, "there should be 2 annotations")
-        plt.figure()
-        plt.imshow(im)
-        plt.show()
+        # plt.figure()
+        # plt.imshow(im)
+        # plt.show()
         assert im[0, 0] == pytest.approx(
             0.767964705882353, 0.001
         )  # expected intensity is 0.76
@@ -86,9 +86,9 @@ class ImageAnnotationTest(unittest.TestCase):
 
         annotations = anim.read_annotations()
         self.assertGreater(len(annotations), 1, "there should be 2 annotations")
-        plt.figure()
-        plt.imshow(im)
-        plt.show()
+        # plt.figure()
+        # plt.imshow(im)
+        # plt.show()
         assert im[0, 0] == pytest.approx(
             0.055, 0.1
         )  # expected intensity is 0.76
