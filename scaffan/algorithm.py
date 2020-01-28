@@ -37,6 +37,7 @@ from exsu.report import Report
 import scaffan.evaluation
 import scaffan.slide_segmentation
 from scaffan.pyqt_widgets import BatchFileProcessingParameter
+from scaffan.image_intensity_rescale_pyqtgraph import RescaleIntensityPercentilePQG
 
 
 class Scaffan:
@@ -53,6 +54,7 @@ class Scaffan:
         self.lobulus_processing = scaffan.lobulus.Lobulus(ptype="bool")
         self.skeleton_analysis = scaffan.skeleton_analysis.SkeletonAnalysis()
         self.evaluation = scaffan.evaluation.Evaluation()
+        self.intensity_rescale = RescaleIntensityPercentilePQG()
         self.slide_segmentation = scaffan.slide_segmentation.ScanSegmentation()
         self.slide_segmentation.report = self.report
 
@@ -155,50 +157,6 @@ class Scaffan:
                         "value": False,
                         "tip": "Open system window with output dir when processing is finished",
                     },
-                    {
-                        "name": "Intensity Normalization",
-                        "type": "group",
-                        "tip": "A preprocessing of input image. It emphasize important structures",
-                        "children": [
-                            {
-                                "name": "Run Intensity Normalization",
-                                "type": "bool",
-                                "tip": "Do the histogram normalization",
-                                "value": False
-                            },
-                            {
-                                "name": "Input Low Percentile",
-                                "type": "int",
-                                "tip": "Input point for intensity mapping",
-                                "value": 5
-                            },
-                            {
-                                "name": "Input High Percentile",
-                                "type": "int",
-                                # "tip": "Slope of sigmoidal limit function",
-                                "tip": "Input point for intensity mapping",
-                                "value": 95
-                            },
-                            {
-                                "name": "Low Percentile Mapping",
-                                "type": "float",
-                                # "tip": "",
-                                "value": -0.9
-                            },
-                            {
-                                "name": "High Percentile Mapping",
-                                "type": "float",
-                                # "tip": "Slope of sigmoidal limit function",
-                                "value": 0.9
-                            },
-                            {
-                                "name": "Sigmoidal Slope",
-                                "type": "float",
-                                "tip": "Slope of sigmoidal limit function",
-                                "value": 1.0
-                            },
-                        ]
-                    },
                     # {
                     #     "name": "Run Scan Segmentation",
                     #     "type": "bool",
@@ -217,6 +175,7 @@ class Scaffan:
                     #     "value": True,
                     #     # "tip": "Show images",
                     # },
+                    self.intensity_rescale.parameters,
                     self.slide_segmentation.parameters,
                     self.lobulus_processing.parameters,
                     self.skeleton_analysis.parameters,
@@ -368,22 +327,9 @@ class Scaffan:
         logger.debug("Init Run")
         fnparam = self.parameters.param("Input", "File Path")
         path = fnparam.value()
-        int_norm_params = self.parameters.param("Processing", "Intensity Normalization")
         # run_resc_int = self.parameters.param("Processing", "Intensity Normalization", "Run Intensity Normalization").value()
-        run_resc_int = int_norm_params.param("Run Intensity Normalization").value()
         self.anim = image.AnnotatedImage(path)
-        self.anim.set_intensity_rescale_parameters(
-            run_intensity_rescale=run_resc_int,
-            percentile_range=(
-                int_norm_params.param("Input Low Percentile").value(),
-                int_norm_params.param("Input High Percentile").value(),
-            ),
-            percentile_map_range=(
-                int_norm_params.param("Low Percentile Mapping").value(),
-                int_norm_params.param("High Percentile Mapping").value(),
-            ),
-            sig_slope= int_norm_params.param("Sigmoidal Slope").value(),
-        )
+        self.intensity_rescale.set_anim_params(self.anim)
         fnparam = self.parameters.param("Output", "Directory Path")
         self.report.init_with_output_dir(fnparam.value())
         logger.debug(f"report output dir: {self.report.outputdir}")

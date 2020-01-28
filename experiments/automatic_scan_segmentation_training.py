@@ -63,8 +63,9 @@ mainapp.set_persistent_cols({
     "Experiment Datetime": experiment_datetime.isoformat(" ", "seconds"),
 })
 
-mainapp.set_parameter("Processing;Intensity Normalization;Run Intensity Normalization", True)
-mainapp.set_parameter("Processing;Scan Segmentation;Working Resolution", 0.000005) # default is 0.000001 (10 um)
+mainapp.set_parameter("Processing;Intensity Normalization", True)
+# mainapp.set_parameter("Processing;Scan Segmentation;Working Resolution", 0.000005) # default is 0.000001 (10 um)
+mainapp.set_parameter("Processing;Scan Segmentation;Working Resolution", 0.0000025) # default is 0.000001 (10 um)
 # mainapp.set_parameter("Processing;Lobulus Segmentation;Central Vein Segmentation;Threshold", 0.18)
 # mainapp.set_parameter("Processing;Lobulus Segmentation;Central Vein Segmentation;Threshold", 0.20)
 # mainapp.parameters.param("Processing", "Lobulus Segmentation", "Central Vein Segmentation", "Threshold").setValue(0.20)
