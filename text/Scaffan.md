@@ -137,14 +137,17 @@ Active Contours without Edges, Tony Chan and Luminita Vese. In IEEE Transactions
 
 ## Python
 
+```
 @book{van1995python, 
   title={Python tutorial}, 
   author={Van Rossum, Guido and Drake Jr, Fred L}, 
   year={1995}, 
   publisher={Centrum voor Wiskunde en Informatica Amsterdam, The Netherlands} 
 }
+```
 
 ## Numpy
+```
 @book{book,
 author = {Oliphant, Travis},
 year = {2006},
@@ -152,8 +155,9 @@ month = {01},
 pages = {},
 title = {Guide to NumPy}
 }
-
+```
 ## Scipy
+```
 @Misc{, 
   author =    {Eric Jones and Travis Oliphant and Pearu Peterson and others}, 
   title =     {{SciPy}: Open source scientific tools for {Python}}, 
@@ -161,8 +165,10 @@ title = {Guide to NumPy}
   url = "http://www.scipy.org/", 
   note = {[Online; accessed ]} 
 }
+```
 
 ## Scikimage
+```
 @article{van2014scikit, 
   title={scikit-image: image processing in Python}, 
   author={Van der Walt, Stefan and Sch{\"o}nberger, Johannes L and Nunez-Iglesias, Juan and Boulogne, Fran{\c{c}}ois and Warner, Joshua D and Yager, Neil and Gouillart, Emmanuelle and Yu, Tony}, 
@@ -172,9 +178,11 @@ title = {Guide to NumPy}
   year={2014}, 
   publisher={PeerJ Inc.} 
 }
+```
 
 ## Sciklearn
 
+```
 @article{scikit-learn,
  title={Scikit-learn: Machine Learning in {P}ython},
  author={Pedregosa, F. and Varoquaux, G. and Gramfort, A. and Michel, V.
@@ -186,9 +194,11 @@ title = {Guide to NumPy}
  pages={2825--2830},
  year={2011}
 }
+```
 
 ## Sklearn API
 
+```
 @inproceedings{sklearn_api,
   author    = {Lars Buitinck and Gilles Louppe and Mathieu Blondel and
                Fabian Pedregosa and Andreas Mueller and Olivier Grisel and
@@ -201,6 +211,7 @@ title = {Guide to NumPy}
   year      = {2013},
   pages = {108--122},
 }
+```
 
 ## Jaccard
 
