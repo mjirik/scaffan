@@ -157,10 +157,11 @@ title = {Guide to NumPy}
 }
 ```
 ## Scipy
+
 ```
 @Misc{, 
   author =    {Eric Jones and Travis Oliphant and Pearu Peterson and others}, 
-  title =     {{SciPy}: Open source scientific tools for {Python}}, 
+  title =     {{SciPy} : Open source scientific tools for {Python}}, 
   year =      {2001--}, 
   url = "http://www.scipy.org/", 
   note = {[Online; accessed ]} 
