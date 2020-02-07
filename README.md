@@ -1,12 +1,11 @@
-# scaffan
+# ScaffAn
 Scaffold Analyser
 
 [![Build Status](https://travis-ci.org/mjirik/scaffan.svg?branch=master)](https://travis-ci.org/mjirik/scaffan)
 [![Coverage Status](https://coveralls.io/repos/github/mjirik/scaffan/badge.svg?branch=master)](https://coveralls.io/github/mjirik/scaffan?branch=master)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/ambv/black)
 
-Application for scaffold analysis.
-
+Application for scaffold analysis. Application algorithm details can be found [here](text/Scaffan.md)
 
 You may want to use it with [Hamamatsu NDP Viewer](https://www.hamamatsu.com/eu/en/product/type/U12388-01/index.html)
 
