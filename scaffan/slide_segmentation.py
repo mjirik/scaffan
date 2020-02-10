@@ -36,6 +36,7 @@ import exsu
 from exsu.report import Report
 from .image import AnnotatedImage
 from . import texture
+from . import whole_slide_seg_unet
 
 
 class ScanSegmentation:
@@ -45,7 +46,9 @@ class ScanSegmentation:
         pname="Scan Segmentation",
         ptype="bool",
         pvalue=True,
-        ptip="Run analysis of whole slide before all other processing is perfomed",
+        ptip="Run analysis of whole slide before all other processing is perfomed.\n"\
+            + "If automatic lobulus selection is selected, "\
+            + "defined number of biggest lobuli are selected for texture analysis.",
     ):
         """
 
@@ -59,6 +62,7 @@ class ScanSegmentation:
         #     "slide_segmentation", texture_label="slide_segmentation", report_severity_offset=-30,
         #     glcm_levels=128
         # )
+        self._unet = whole_slide_seg_unet.WholeSlideSegmentationUNet(report=report)
         params = [
             # {
             #     "name": "Tile Size",
@@ -82,42 +86,49 @@ class ScanSegmentation:
                 "siPrefix": False,
                 "tip": "Image is processed tile by tile. This value defines size of the tile",
             },
-            {
-                "name": "Run Training",
-                "type": "bool",
-                "value": False,
-                "tip": "Use annotated image to train classifier."
-                + "Red area is extra-lobular tissue."
-                + "Black area is intra-lobular tissue."
-                + "Magenta area is empty part of the image.",
-            },
-            {
-                "name": "Load Default Classifier",
-                "type": "bool",
-                "value": False,
-                "tip": "Load default classifier before training.",
-            },
-            {
-                "name": "Clean Before Training",
-                "type": "bool",
-                "value": False,
-                "tip": "Reset classifier before training.",
-            },
-            {
-                "name": "Training Weight",
-                "type": "float",
-                "value": 1,
-                # "suffix": "px",
-                "siPrefix": False,
-                "tip": "Weight of training samples given in actual image",
-            },
+            {'name': 'Segmentation Method', 'type': 'list', 'values': ["U-Net", "HCTFS"], 'value': "HCTFS"},
+            self._unet.parameters,
+            {"name":"HCTFS", 'type':"group", "tip": "Hand-crafter Texture Features based Segmentation parameters",
+            'expanded': False,
+             "children":[
+                 {
+                     "name": "Run Training",
+                     "type": "bool",
+                     "value": False,
+                     "tip": "Use annotated image to train classifier.\n"
+                            + "Red area is extra-lobular tissue.\n"
+                            + "Black area is intra-lobular tissue.\n"
+                            + "Magenta area is empty part of the image.\n",
+                 },
+                 {
+                     "name": "Load Default Classifier",
+                     "type": "bool",
+                     "value": False,
+                     "tip": "Load default classifier before training and prediction.",
+                 },
+                 {
+                     "name": "Clean Before Training",
+                     "type": "bool",
+                     "value": False,
+                     "tip": "Reset classifier before training.",
+                 },
+                 {
+                     "name": "Training Weight",
+                     "type": "float",
+                     "value": 1,
+                     # "suffix": "px",
+                     "siPrefix": False,
+                     "tip": "Weight of training samples given in actual image",
+                 },
+             ]
+             },
             {
                 "name": "Lobulus Number",
                 "type": "int",
                 "value": 5,
                 # "suffix": "px",
                 "siPrefix": False,
-                "tip": "Number of lobuluses automatically selected.",
+                "tip": "Number of lobuluses automatically selected after whole slide segmentation",
             },
             {
                 "name": "Annotation Radius",
@@ -125,7 +136,8 @@ class ScanSegmentation:
                 "value": 0.00015,  # 0.1 mm
                 "suffix": "m",
                 "siPrefix": True,
-                "tip": "Automatic annotation radius used when the automatic lobulus selection is prefered ",
+                "tip": "Radius of circle seed used as input for individual lobulus segmentation "\
+                       + "when the automatic lobulus selection is prefered ",
             },
             # self._inner_texture.parameters,
         ]
@@ -204,10 +216,10 @@ class ScanSegmentation:
         if pixels is None:
             pixels, y = self.prepare_training_pixels()
         if sample_weight is None:
-            sample_weight = float(self.parameters.param("Training Weight").value())
+            sample_weight = float(self.parameters.param("HCTFS", "Training Weight").value())
         sample_weight = [sample_weight] * len(y)
 
-        if bool(self.parameters.param("Clean Before Training").value()):
+        if bool(self.parameters.param("HCTFS", "Clean Before Training").value()):
             self.clf = self._clf_object(**self._clf_params)
             # self.clf = GaussianNB()
             logger.debug(f"cleaning the classifier {self.clf}")
@@ -377,6 +389,12 @@ class ScanSegmentation:
             self.tiles.append(column_tiles)
 
     def predict_on_view(self, view):
+        if str(self.parameters.param("Segmentation Method").value()) == "HCTFS":
+            return self.predict_on_view_hctfs(view)
+        elif str(self.parameters.param("Segmentation Method").value()) == "U-Net":
+            pass
+
+    def predict_on_view_hctfs(self, view):
         image = self._get_features(view)
         fvs = image.reshape(-1, image.shape[2])
         #         print(f"fvs: {fvs[:10]}")
@@ -394,7 +412,7 @@ class ScanSegmentation:
             predicted_col = []
             for j, tile_view in enumerate(tile_view_col):
                 # self._inner_texture.texture_label = f"slide_segmentation_{i},{j}"
-                predicted_image = self.predict_on_view(tile_view)
+                predicted_image = self.predict_on_view_hctfs(tile_view)
                 predicted_col.append(predicted_image)
             self.predicted_tiles.append(predicted_col)
 
@@ -405,6 +423,9 @@ class ScanSegmentation:
         logger.debug("predict")
         if self.predicted_tiles is None:
             self.predict_tiles()
+        if str(self.parameters.param("Segmentation Method").value()) == "U-Net":
+            self._unet.init_segmentation()
+
 
         #         if self.predicted_tiles is None:
         #             self.predict_tiles()
@@ -430,7 +451,10 @@ class ScanSegmentation:
 
         full_image = output_image[: int(imsize_on_level[1]), : int(imsize_on_level[0])]
         self.full_prefilter_image = full_image
-        self.full_output_image = self._labeling_filtration(full_image)
+        if str(self.parameters.param("Segmentation Method").value()) == "HCTFS":
+            self.full_output_image = self._labeling_filtration(full_image)
+        else:
+            self.full_output_image = full_image
         return self.full_output_image
 
     def _labeling_filtration(self, full_image):
@@ -600,16 +624,17 @@ class ScanSegmentation:
         # self._inner_texture.set_report(self.report)
         # self._inner_texture.add_cols_to_report = False
 
-        if bool(self.parameters.param("Load Default Classifier").value()):
-            if self.clf_default_fn.exists():
-                logger.debug(
-                    f"Reading default classifier from {str(self.clf_default_fn)}"
-                )
-                self.clf = joblib.load(self.clf_default_fn)
-            else:
-                logger.error("Default classifier not found")
+        if str(self.parameters.param("Segmentation Method").value()) == "HCTFS":
+            if bool(self.parameters.param("HCTFS", "Load Default Classifier").value()):
+                if self.clf_default_fn.exists():
+                    logger.debug(
+                        f"Reading default classifier from {str(self.clf_default_fn)}"
+                    )
+                    self.clf = joblib.load(self.clf_default_fn)
+                else:
+                    logger.error("Default classifier not found")
 
-        if bool(self.parameters.param("Run Training").value()):
+        if bool(self.parameters.param("HCTFS", "Run Training").value()):
             self.train_classifier()
             self.save_classifier()
         logger.debug("predict...")

@@ -64,7 +64,7 @@ class MainGuiTest(unittest.TestCase):
         mainapp.set_annotation_color_selection("#FFFF00")
         mainapp.set_parameter("Processing;Skeleton Analysis", False)
         mainapp.set_parameter("Processing;Texture Analysis", False)
-        mainapp.set_parameter("Processing;Scan Segmentation;Run Training", True)
+        mainapp.set_parameter("Processing;Scan Segmentation;HCTFS;Run Training", True)
         mainapp.set_parameter("Processing;Scan Segmentation;Lobulus Number", 3)
         mainapp.start_gui(qapp=qapp)
 
@@ -281,9 +281,9 @@ class MainGuiTest(unittest.TestCase):
             mainapp.set_parameter("Processing;Texture Analysis", False)
             mainapp.set_parameter("Processing;Open output dir", False)
             mainapp.set_parameter(
-                "Processing;Scan Segmentation;Clean Before Training", False
+                "Processing;Scan Segmentation;HCTFS;Clean Before Training", False
             )
-            mainapp.set_parameter("Processing;Scan Segmentation;Run Training", False)
+            mainapp.set_parameter("Processing;Scan Segmentation;HCTFS;Run Training", False)
             mainapp.set_parameter("Processing;Scan Segmentation;Lobulus Number", 0)
             # mainapp.start_gui(qapp=qapp)
             mainapp.run_lobuluses()
@@ -330,10 +330,10 @@ class MainGuiTest(unittest.TestCase):
         #     mainapp.set_parameter("Processing;Skeleton Analysis", False)
         #     mainapp.set_parameter("Processing;Texture Analysis", False)
         #     if i == 0:
-        #         mainapp.set_parameter("Processing;Scan Segmentation;Clean Before Training", True)
+        #         mainapp.set_parameter("Processing;Scan Segmentation;HCTFS;Clean Before Training", True)
         #     else:
-        #         mainapp.set_parameter("Processing;Scan Segmentation;Clean Before Training", False)
-        #     mainapp.set_parameter("Processing;Scan Segmentation;Run Training", True)
+        #         mainapp.set_parameter("Processing;Scan Segmentation;HCTFS;Clean Before Training", False)
+        #     mainapp.set_parameter("Processing;Scan Segmentation;HCTFS;Run Training", True)
         #     mainapp.set_parameter("Processing;Scan Segmentation;Lobulus Number", 0)
         #     # mainapp.start_gui(qapp=qapp)
         #     mainapp.run_lobuluses()
