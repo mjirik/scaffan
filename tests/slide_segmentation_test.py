@@ -20,7 +20,7 @@ def test_slide_segmentation():
     anim = scaffan.image.AnnotatedImage(fn)
 
     seg.init(anim)
-    seg.init.parameters.param("Segmentation Method").setValue("HCFTS")
+    seg.parameters.param("Segmentation Method").setValue("HCFTS")
     ann_ids_black = seg.anim.select_annotations_by_color("#000000")
     assert 10 in ann_ids_black
     assert 11 in ann_ids_black

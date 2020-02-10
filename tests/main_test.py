@@ -244,7 +244,7 @@ class MainGuiTest(unittest.TestCase):
             )
             # io3d.datasets.join_path("medical", "orig","Scaffan-analysis", "PIG-002_J-18-0091_HE.ndpi", get_root=True),
         ]
-        self._testing_slide_segmentation_clf(fns)
+        self._testing_slide_segmentation_clf(fns, "HCTFS")
 
     def test_testing_slide_segmentation_clf(self):
         fns = [
@@ -252,9 +252,28 @@ class MainGuiTest(unittest.TestCase):
                 "medical", "orig", "sample_data", "SCP003", "SCP003.ndpi", get_root=True
             ),
         ]
-        self._testing_slide_segmentation_clf(fns)
+        self._testing_slide_segmentation_clf(fns, segmentation_method="HCTFS")
 
-    def _testing_slide_segmentation_clf(self, fns):
+
+    def test_testing_slide_segmentation_clf_unet(self):
+        fns = [
+            io3d.datasets.join_path(
+                "medical", "orig", "sample_data", "SCP003", "SCP003.ndpi", get_root=True
+            ),
+        ]
+
+        # TODO Uncomment fallowing line when CNN is done
+        # self._testing_slide_segmentation_clf(fns, segmentation_method="U-Net")
+
+    def _testing_slide_segmentation_clf(self, fns, segmentation_method):
+        """
+        Run whole slide segmentation on all input files and check whether all three labels are
+        represented in the output labeling.
+
+        :param fns:
+        :param segmentation_method:
+        :return:
+        """
 
         mainapp = scaffan.algorithm.Scaffan()
         # if clf_fn is not None:
@@ -283,7 +302,10 @@ class MainGuiTest(unittest.TestCase):
             mainapp.set_parameter(
                 "Processing;Scan Segmentation;HCTFS;Clean Before Training", False
             )
+            mainapp.set_parameter("Processing;Scan Segmentation;HCTFS;Segmentation Method", segmentation_method)
             mainapp.set_parameter("Processing;Scan Segmentation;HCTFS;Run Training", False)
+            # Set some Unet parameter here. It is used if the U-Net Segmentation method is used.
+            # mainapp.set_parameter("Processing;Scan Segmentation;U-Net;Some Parameter", False)
             mainapp.set_parameter("Processing;Scan Segmentation;Lobulus Number", 0)
             # mainapp.start_gui(qapp=qapp)
             mainapp.run_lobuluses()

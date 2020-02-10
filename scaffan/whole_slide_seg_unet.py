@@ -1,9 +1,9 @@
 from pyqtgraph.parametertree import Parameter
-import numpy as np
 from . import image
 from exsu import Report
-
-
+#
+# The automatic test is in
+# main_test.py: test_testing_slide_segmentation_clf_unet()
 
 class WholeSlideSegmentationUNet:
     def __init__(
