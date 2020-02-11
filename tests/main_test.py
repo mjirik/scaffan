@@ -302,7 +302,7 @@ class MainGuiTest(unittest.TestCase):
             mainapp.set_parameter(
                 "Processing;Scan Segmentation;HCTFS;Clean Before Training", False
             )
-            mainapp.set_parameter("Processing;Scan Segmentation;HCTFS;Segmentation Method", segmentation_method)
+            mainapp.set_parameter("Processing;Scan Segmentation;Segmentation Method", segmentation_method)
             mainapp.set_parameter("Processing;Scan Segmentation;HCTFS;Run Training", False)
             # Set some Unet parameter here. It is used if the U-Net Segmentation method is used.
             # mainapp.set_parameter("Processing;Scan Segmentation;U-Net;Some Parameter", False)
