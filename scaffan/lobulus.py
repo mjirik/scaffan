@@ -414,7 +414,7 @@ class Lobulus:
             plt.colorbar()
             plt.contour(circle + inner)
             self.report.savefig_and_show(
-                "lobulus_gradient_inner_{}.png".format(self.annotation_id), fig
+                "lobulus_gradient_inner_{}.png".format(self.annotation_id), fig=fig
             )
 
         cvmask = np.zeros_like(self.border_mask)
@@ -457,7 +457,7 @@ class Lobulus:
         # datarow["Annotation Details"] = self.anim.details[self.annotation_id]
         if self.report is not None:
             self.report.savefig_and_show(
-                "lobulus_{}.png".format(self.annotation_id), fig, level=80
+                "lobulus_{}.png".format(self.annotation_id), fig=fig, level=80
             )
 
         self.lobulus_mask = (self.central_vein_mask + self.border_mask) == 1
