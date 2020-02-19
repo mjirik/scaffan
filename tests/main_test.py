@@ -316,17 +316,19 @@ class MainGuiTest(unittest.TestCase):
             )
             whole_area_mm = mainapp.slide_segmentation.empty_area_mm + specimen_size_mm
             logger.debug("asserts")
-            assert specimen_size_mm > whole_area_mm * 0.1
+            assert specimen_size_mm < whole_area_mm, "Specimen should be smaller then whole slide"
+            assert specimen_size_mm > whole_area_mm * 0.1, "Specimen should big enough"
             assert (
                 mainapp.slide_segmentation.sinusoidal_area_mm > 0.1 * specimen_size_mm
-            )
-            assert mainapp.slide_segmentation.septum_area_mm > 0.1 * specimen_size_mm
+            ), "sinusoidal area should be at least 10% of the specimen area"
+            assert mainapp.slide_segmentation.septum_area_mm > 0.1 * specimen_size_mm,\
+                "Septum area should be at least 10% of the specimen area"
 
-        assert Path(mainapp.slide_segmentation.clf_fn).exists()
+        assert Path(mainapp.slide_segmentation.clf_fn).exists(), "The file with pretrained classifier should exist"
         clf_fn = Path(mainapp.slide_segmentation.clf_fn)
         modtime1 = datetime.fromtimestamp(clf_fn.stat().st_mtime)
         logger.debug(f"classificator prior modification time: {modtime1}")
-        assert modtime0 == modtime1
+        assert modtime0 == modtime1, "We are not changing the pretrained classifier file"
 
     def _slide_segmentation_train_clf(self, fns, clf_fn=None):
         mainapp = scaffan.algorithm.Scaffan()
