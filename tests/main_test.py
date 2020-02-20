@@ -367,3 +367,66 @@ class MainGuiTest(unittest.TestCase):
         modtime1 = datetime.fromtimestamp(clf_fn.stat().st_mtime)
         logger.debug(f"classificator prior modification time: {modtime1}")
         assert modtime0 != modtime1
+
+    def test_testing_slide_segmentation_clf_unet_controled_parameters(self):
+        fns = [
+            io3d.datasets.join_path(
+                "medical", "orig", "sample_data", "SCP003", "SCP003.ndpi", get_root=True
+            ),
+        ]
+
+        # TODO Uncomment fallowing line when CNN is done
+        # self._testing_slide_segmentation_clf(fns, segmentation_method="U-Net")
+
+        mainapp = scaffan.algorithm.Scaffan()
+        # clf_fn = mainapp.slide_segmentation.clf_fn
+        # assert clf_fn.exists()
+        #
+        # if clf_fn.exists():
+        #     modtime0 = datetime.fromtimestamp(clf_fn.stat().st_mtime)
+        # else:
+        #     modtime0 = ""
+        # logger.debug(f"classificator prior modification time: {modtime0}")
+        #
+        # for fn in fns:
+        #     mainapp.set_input_file(fn)
+        #     mainapp.set_output_dir()
+        #     # There does not have to be set some color
+        #     # mainapp.set_annotation_color_selection("#FF00FF")
+        #     # mainapp.set_annotation_color_selection("#FF0000")
+        #     mainapp.set_annotation_color_selection("#FFFF00")
+        #     mainapp.set_parameter("Input;Automatic Lobulus Selection", True)
+        #     mainapp.set_parameter("Processing;Skeleton Analysis", False)
+        #     mainapp.set_parameter("Processing;Texture Analysis", False)
+        #     mainapp.set_parameter("Processing;Open output dir", False)
+        #     mainapp.set_parameter(
+        #         "Processing;Scan Segmentation;HCTFS;Clean Before Training", False
+        #     )
+        #     mainapp.set_parameter("Processing;Scan Segmentation;Segmentation Method", "U-Net")
+        #     mainapp.set_parameter("Processing;Scan Segmentation;Working Tile Size", 224)
+        #     mainapp.set_parameter("Processing;Scan Segmentation;HCTFS;Run Training", False)
+        #     # Set some Unet parameter here. It is used if the U-Net Segmentation method is used.
+        #     # mainapp.set_parameter("Processing;Scan Segmentation;U-Net;Some Parameter", False)
+        #     mainapp.set_parameter("Processing;Scan Segmentation;Lobulus Number", 0)
+        #     # mainapp.start_gui(qapp=qapp)
+        #     mainapp.run_lobuluses()
+        #
+        #     specimen_size_mm = (
+        #             mainapp.slide_segmentation.sinusoidal_area_mm
+        #             + mainapp.slide_segmentation.septum_area_mm
+        #     )
+        #     whole_area_mm = mainapp.slide_segmentation.empty_area_mm + specimen_size_mm
+        #     logger.debug("asserts")
+        #     assert specimen_size_mm < whole_area_mm, "Specimen should be smaller then whole slide"
+        #     assert specimen_size_mm > whole_area_mm * 0.1, "Specimen should big enough"
+        #     assert (
+        #             mainapp.slide_segmentation.sinusoidal_area_mm > 0.1 * specimen_size_mm
+        #     ), "sinusoidal area should be at least 10% of the specimen area"
+        #     assert mainapp.slide_segmentation.septum_area_mm > 0.1 * specimen_size_mm, \
+        #         "Septum area should be at least 10% of the specimen area"
+        #
+        # assert Path(mainapp.slide_segmentation.clf_fn).exists(), "The file with pretrained classifier should exist"
+        # clf_fn = Path(mainapp.slide_segmentation.clf_fn)
+        # modtime1 = datetime.fromtimestamp(clf_fn.stat().st_mtime)
+        # logger.debug(f"classificator prior modification time: {modtime1}")
+        # assert modtime0 == modtime1, "We are not changing the pretrained classifier file"
