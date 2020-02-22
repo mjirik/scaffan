@@ -1,6 +1,7 @@
 from pyqtgraph.parametertree import Parameter
 from . import image
 from exsu import Report
+import numpy as np
 #
 # The automatic test is in
 # main_test.py: test_testing_slide_segmentation_clf_unet()
@@ -67,4 +68,4 @@ class WholeSlideSegmentationUNet:
         # Get parameter value
         sample_weight = float(self.parameters.param("Example Float Param").value())
 
-        return grayscale_image > 0.5
+        return (grayscale_image > 0.5).astype(np.uint8)
