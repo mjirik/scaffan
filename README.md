@@ -9,6 +9,9 @@ Application for scaffold analysis. Application algorithm details can be found [h
 
 You may want to use it with [Hamamatsu NDP Viewer](https://www.hamamatsu.com/eu/en/product/type/U12388-01/index.html)
 
+
+![scaffan_gui](text/scaffan_gui_05.PNG)
+
 # Install
 
 
