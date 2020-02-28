@@ -547,16 +547,22 @@ class ScanSegmentation:
     def _find_biggest_lobuli(self):
         """
         :param n_max: Number of points. All points are returned if set to negative values.
+        The minimum distance between two maximums is given by Annotation Radius parameter (2*annotation_radius).
         """
         n_max = int(self.parameters.param("Lobulus Number").value())
         mask = self.full_output_image == 1
         dist = scipy.ndimage.morphology.distance_transform_edt(mask)
         self.dist = dist
         # report
+        r_m = float(self.parameters.param("Annotation Radius").value()) # * 1000 # mm
+        resolution_m = float(self.parameters.param("Working Resolution").value()) # * 1000
 
-        image_max = scipy.ndimage.maximum_filter(dist, size=20, mode="constant")
+        min_distance = int(2 * r_m / resolution_m)
+        logger.debug(f"minimum distance [px]: {min_distance}")
+
+        # image_max = scipy.ndimage.maximum_filter(dist, size=min_distance, mode="constant")
         # Comparison between image_max and im to find the coordinates of local maxima
-        coordinates = peak_local_max(dist, min_distance=20)
+        coordinates = peak_local_max(dist, min_distance=min_distance)
         point_dist = dist[list(zip(*coordinates))]
         # display(point_dist)
         # max_point_inds = point_dist.argsort()[-n_max:][::-1]
