@@ -2,9 +2,61 @@ from pyqtgraph.parametertree import Parameter
 from . import image
 from exsu import Report
 import numpy as np
+import chainer
+import chainer.functions as F
+import chainer.links as L
+from chainer import serializers
 #
 # The automatic test is in
 # main_test.py: test_testing_slide_segmentation_clf_unet()
+
+class PoseNet(chainer.Chain): #architektura PoseNetu
+
+    def __init__(self, num_of_classes=3):
+        super(PoseNet, self).__init__()
+        with self.init_scope():
+            self.l1 = L.Convolution2D(None, 16, 3, pad=1)
+            self.l1b = L.BatchNormalization(16)
+            self.l2 = L.Convolution2D(None, 32, 3, pad=1)
+            self.l2b = L.BatchNormalization(32)
+            self.l3 = L.Convolution2D(None, 32, 3, pad=1)
+            self.l3b = L.BatchNormalization(32)
+            self.l4 = L.Convolution2D(None, 64, 3, pad=1)
+            self.l4b = L.BatchNormalization(64)
+
+            self.l5 = L.Deconvolution2D(None, 64, 3, pad=1)
+            self.l5b = L.BatchNormalization(64)
+            self.l6 = L.Deconvolution2D(None, 32, 3, pad=1)
+            self.l6b = L.BatchNormalization(32)
+            self.l7 = L.Deconvolution2D(None, 32, 3, pad=1)
+            self.l7b = L.BatchNormalization(32)
+            self.l8 = L.Deconvolution2D(None, 16, 3, pad=1)
+            self.l8b = L.BatchNormalization(16)
+
+            self.lfin = L.Convolution2D(None, num_of_classes, 1)
+
+    def __call__(self, x):
+        h = self.l1(x)
+        h = F.relu(self.l1b(h))
+        h2 = self.l2(h)
+        h2 = F.relu(self.l2b(h2))
+        h3 = self.l3(h2)
+        h3 = F.relu(self.l3b(h3))
+        h4 = self.l4(h3)
+        h4 = F.relu(self.l4b(h4))
+        h4 = self.l5(h4)
+        h4 = F.relu(self.l5b(h4))
+        h4 = self.l6(h4)
+        h4 = F.relu(self.l6b(h4))
+        h4 = F.add(h3, h4)
+        h4 = self.l7(h4)
+        h4 = F.relu(self.l7b(h4))
+        h4 = F.add(h2, h4)
+        h4 = self.l8(h4)
+        h4 = F.relu(self.l8b(h4))
+        h4 = F.add(h, h4)
+
+        return self.lfin(h4)
 
 class WholeSlideSegmentationUNet:
     def __init__(
@@ -23,7 +75,7 @@ class WholeSlideSegmentationUNet:
             {
                 "name": "Example Integer Param",
                 "type": "int",
-                "value": 256,
+                "value": 224,
                 "suffix": "px",
                 "siPrefix": False,
                 "tip": "Value defines size of something",
@@ -54,18 +106,23 @@ class WholeSlideSegmentationUNet:
 
 
     def init_segmentation(self):
-        # TODO Tady si Ivane nandej, co je třeba udělat jednou před segmentací. Počítam nějaké načtení ze souboru atd.
+        model = PoseNet() #nacteni architektury modelu
+        model_path = './models/' #cesta k ulozenym modelum
+        model_name = 'posenet_highLR' #nazev konkretniho modelu, mozna by slo dat do parametru pri volani
+        serializers.load_npz(model_path + model_name + '.model', model) # nacteni modelu
+
         pass
 
-    def predict_tile(self, view:image.View):
+    def predict_tile(self, model, view:image.View):
         """
         predict image
         :param view:
         :return:
         """
-        # TODO tohle se volá pro každou dlaždici
         grayscale_image = view.get_region_image(as_gray=True)
         # Get parameter value
         sample_weight = float(self.parameters.param("Example Float Param").value())
-
-        return (grayscale_image > 0.5).astype(np.uint8)
+        grayscale_image = grayscale_image/255. #normalizace dlazdice mezi 0 a 1
+        prediction = F.softmax(model(grayscale_image))  # predikce, vraci obrazek o rozmerech 224x224pix s hodnotami 0, 1, 2
+        return prediction
+        # return (grayscale_image > 0.5).astype(np.uint8)
