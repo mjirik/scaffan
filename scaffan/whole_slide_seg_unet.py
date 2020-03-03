@@ -11,8 +11,8 @@ from pathlib import Path
 #
 # The automatic test is in
 # main_test.py: test_testing_slide_segmentation_clf_unet()
-path_to_script = os.path.dirname(os.path.abspath(__file__))
-path_to_scaffan = Path(os.path.join(path_to_script, ".."))
+path_to_script = Path(os.path.dirname(os.path.abspath(__file__)))
+# path_to_scaffan = Path(os.path.join(path_to_script, ".."))
 
 
 class PoseNet(chainer.Chain): #architektura PoseNetu
@@ -112,7 +112,7 @@ class WholeSlideSegmentationUNet:
 
     def init_segmentation(self):
         model = PoseNet() #nacteni architektury modelu
-        model_path = path_to_scaffan / 'scaffan/models/' #cesta k ulozenym modelum
+        model_path = path_to_script / 'models/' #cesta k ulozenym modelum
         model_name = 'posenet_highLR' #nazev konkretniho modelu, mozna by slo dat do parametru pri volani
         serializers.load_npz(model_path / (model_name + '.model'), model) # nacteni modelu
         self.model = model
