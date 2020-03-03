@@ -6,9 +6,14 @@ import chainer
 import chainer.functions as F
 import chainer.links as L
 from chainer import serializers
+import os
+from pathlib import Path
 #
 # The automatic test is in
 # main_test.py: test_testing_slide_segmentation_clf_unet()
+path_to_script = os.path.dirname(os.path.abspath(__file__))
+path_to_scaffan = Path(os.path.join(path_to_script, ".."))
+
 
 class PoseNet(chainer.Chain): #architektura PoseNetu
 
@@ -107,22 +112,26 @@ class WholeSlideSegmentationUNet:
 
     def init_segmentation(self):
         model = PoseNet() #nacteni architektury modelu
-        model_path = './models/' #cesta k ulozenym modelum
+        model_path = path_to_scaffan / 'models/' #cesta k ulozenym modelum
         model_name = 'posenet_highLR' #nazev konkretniho modelu, mozna by slo dat do parametru pri volani
-        serializers.load_npz(model_path + model_name + '.model', model) # nacteni modelu
+        serializers.load_npz(model_path / (model_name + '.model'), model) # nacteni modelu
+        self.model = model
 
         pass
 
-    def predict_tile(self, model, view:image.View):
+    def predict_tile(self, view:image.View):
         """
         predict image
         :param view:
         :return:
         """
-        grayscale_image = view.get_region_image(as_gray=True)
+
+        model = self.model
+
+        grayscale_image = view.get_region_image(as_gray=False)
         # Get parameter value
         sample_weight = float(self.parameters.param("Example Float Param").value())
-        grayscale_image = grayscale_image/255. #normalizace dlazdice mezi 0 a 1
+        # grayscale_image = grayscale_image/255. #normalizace dlazdice mezi 0 a 1
         prediction = F.softmax(model(grayscale_image))  # predikce, vraci obrazek o rozmerech 224x224pix s hodnotami 0, 1, 2
         return prediction
         # return (grayscale_image > 0.5).astype(np.uint8)
