@@ -40,10 +40,16 @@ def test_unet_on_view():
     ann_ids = anim.select_annotations_by_color("#FFFF00")
     # anim.get_views(ann_ids)
     view = anim.get_view(annotation_id=ann_ids[0], size_on_level=[224, 224], pixelsize_mm=[0.01, 0.01])
+    # import matplotlib.pyplot as plt
+    # im = view.get_region_image()
+    # plt.imshow(im)
+    # plt.show()
+    # assert np.array_equal(im.shape, [224, 224, 4])
     wss_unet = scaffan.whole_slide_seg_unet.WholeSlideSegmentationUNet()
     wss_unet.init_segmentation()
     prediction = wss_unet.predict_tile(view)
-    #plt.imshow(prediction)
+    # plt.imshow(prediction)
+    # plt.show()
 
     unq = np.unique(prediction)
     assert 0 in unq, "label 0 should be in prediction"
