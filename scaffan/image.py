@@ -999,7 +999,7 @@ class View:
                 if not np.array_equal(im_resized.shape, req_sz):
                     # Array should be the same size.
                     # Due to numerical error in alpha computation there can be small pixel error
-                    norm = np.linalg.norm(im_resized.shape, req_sz)
+                    norm = np.linalg.norm(im_resized.shape[:2], req_sz)
                     if norm > 3. :
                         logger.error(f"Requested size ({req_sz}) differ "\
                         f"from the real image size ({im_resized.shape}) a lot. Fixing by resize.")
