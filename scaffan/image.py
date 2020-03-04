@@ -777,7 +777,7 @@ class View:
                 margin_px = (size * margin).astype(
                     np.int
                 ) / self.anim.openslide.level_downsamples[level]
-            if size_on_level is None:
+            if (size_on_level is None) and (size_mm is None):
                 size_on_level = (
                         (size / self.anim.openslide.level_downsamples[level]) + 2 * margin_px
                 ).astype(int)

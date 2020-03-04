@@ -332,8 +332,6 @@ class ImageAnnotationTest(unittest.TestCase):
         # view.plot_annotations("obj1")
         # plt.show()
 
-        # assert image.shape[0] > 20
-        # assert image.shape[1] > 20
         assert np.array_equal(image.shape[:2], size_on_level)
 
     def test_select_view_by_loc_mm(self):
@@ -463,3 +461,22 @@ class ImageAnnotationTest(unittest.TestCase):
         # plt.show()
         assert img.shape[0] == size_px
         assert img.shape[1] == size_px
+
+    def test_view_by_size_mm(self):
+        fn = io3d.datasets.join_path(
+            "medical", "orig", "sample_data", "SCP003", "SCP003.ndpi", get_root=True
+        )
+        anim = scaffan.image.AnnotatedImage(fn)
+        ann_ids = anim.select_annotations_by_color("#FFFF00")
+        size_px = 100
+        size_mm = [1, 1]
+        # anim.get_views(ann_ids)
+        view = anim.get_view(
+            annotation_id=ann_ids[0],
+            size_mm=size_mm, pixelsize_mm=[0.01, 0.01])
+        img = view.get_region_image(as_gray=True)
+        # plt.imshow(img)
+        # plt.show()
+        # assert img.shape[0] == size_px
+        # assert img.shape[1] == size_px
+        assert pytest.approx(img.shape[:2], [size_px], abs=2.)
