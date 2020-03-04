@@ -482,13 +482,6 @@ class AnnotatedImage:
         :param show:
         :return:
         """
-        # TODO move this to get_view ?
-        if pixelsize_mm is not None:
-            level = self.get_optimal_level_for_fluent_resize(
-                pixelsize_mm, safety_bound=safety_bound
-            )
-        if level is None:
-            level = 0
 
         views = [None] * len(annotation_ids)
         for i, annotation_id in enumerate(annotation_ids):
@@ -498,6 +491,7 @@ class AnnotatedImage:
                 margin=margin,
                 margin_in_pixels=margin_in_pixels,
                 pixelsize_mm=pixelsize_mm,
+                safety_bound=safety_bound,
             )
             if show:
                 view.region_imshow_annotation(annotation_id)
@@ -743,9 +737,6 @@ class View:
         margin_in_pixels:bool=False,
     ):
         self._requested_size_on_level_when_defined_by_pixelsize = None
-        # if level is None:
-        #     # TODO set level = 0 for some setup and
-        #     pass
         if (level is None) and (pixelsize_mm is None) and (size_on_level is not None):
             raise ValueError(
                 "Parameter 'size_on_level' cannot be used. Define 'level' or 'pixelsize_mm' to fix it."

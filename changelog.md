@@ -2,10 +2,11 @@
 
 ## Unreleased
 
+* [Changed] View implementation slightly changed. All `get_view(s)` functions are now more consistent.
+
 # 0.18
 
 * [Added] Intensity normalization of input data
-* [Changed] View implementation slightly changed. All `get_view(s)` functions are now more consistent.
 
 # 0.17
 
