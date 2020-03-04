@@ -315,7 +315,8 @@ class AnnotatedImage:
     def get_view(
         self,
         center=None,
-        level=0,
+        # level=0, changed
+        level=None,
         size_on_level=None,
         location=None,
         size_mm=None,
@@ -327,17 +328,7 @@ class AnnotatedImage:
         margin=0.5,
         margin_in_pixels=False,
     ) -> "View":
-        if annotation_id is not None:
-            center, size = self.get_annotations_bounds_px(annotation_id)
-            if margin_in_pixels:
-                margin_px = int(margin)
-            else:
-                margin_px = (size * margin).astype(
-                    np.int
-                ) / self.openslide.level_downsamples[level]
-            size_on_level = (
-                (size / self.openslide.level_downsamples[level]) + 2 * margin_px
-            ).astype(int)
+
         view = View(
             anim=self,
             center=center,
@@ -349,6 +340,9 @@ class AnnotatedImage:
             center_mm=center_mm,
             location_mm=location_mm,
             safety_bound=safety_bound,
+            annotation_id=annotation_id,
+            margin=margin,
+            margin_in_pixels=margin_in_pixels
         )
         return view
 
@@ -488,12 +482,14 @@ class AnnotatedImage:
         :param show:
         :return:
         """
+        # TODO move this to get_view ?
         if pixelsize_mm is not None:
             level = self.get_optimal_level_for_fluent_resize(
                 pixelsize_mm, safety_bound=safety_bound
             )
         if level is None:
             level = 0
+
         views = [None] * len(annotation_ids)
         for i, annotation_id in enumerate(annotation_ids):
             view = self.get_view(
@@ -696,7 +692,7 @@ class View:
         self,
         anim: AnnotatedImage,
         center=None,
-        level=0,
+        level:int=0,
         size_on_level=None,
         location=None,
         size_mm=None,
@@ -704,8 +700,14 @@ class View:
         center_mm=None,
         location_mm=None,
         safety_bound=2,
+        annotation_id=None,
+        margin=0.5,
+        margin_in_pixels:bool=False,
     ):
         self.anim: AnnotatedImage = anim
+        self._requested_size_on_level_when_defined_by_pixelsize = None
+        self._is_resized_by_pixelsize = None
+
         self.set_region(
             center=center,
             level=level,
@@ -716,6 +718,9 @@ class View:
             center_mm=center_mm,
             location_mm=location_mm,
             safety_bound=safety_bound,
+            annotation_id=annotation_id,
+            margin=margin,
+            margin_in_pixels=margin_in_pixels
         )
         self.select_outer_annotations = self.anim.select_outer_annotations
         self.select_inner_annotations = self.anim.select_inner_annotations
@@ -725,7 +730,7 @@ class View:
     def set_region(
         self,
         center=None,
-        level=None,
+        level:int=None,
         size_on_level=None,
         location=None,
         size_mm=None,
@@ -733,13 +738,20 @@ class View:
         center_mm=None,
         location_mm=None,
         safety_bound=2,
+        annotation_id=None,
+        margin=0.5,
+        margin_in_pixels:bool=False,
     ):
-        if (level is None) and (size_on_level is not None):
+        self._requested_size_on_level_when_defined_by_pixelsize = None
+        # if level is None:
+        #     # TODO set level = 0 for some setup and
+        #     pass
+        if (level is None) and (pixelsize_mm is None) and (size_on_level is not None):
             raise ValueError(
-                "Parameter 'size_on_level' cannot be used if 'level' is not defined"
+                "Parameter 'size_on_level' cannot be used. Define 'level' or 'pixelsize_mm' to fix it."
             )
         if pixelsize_mm is not None:
-            self.is_resized_by_pixelsize = True
+            self._is_resized_by_pixelsize = True
             if np.isscalar(pixelsize_mm):
                 pixelsize_mm = [pixelsize_mm, pixelsize_mm]
             pixelsize_mm = np.asarray(pixelsize_mm)
@@ -749,16 +761,36 @@ class View:
                 level = self.anim.get_optimal_level_for_fluent_resize(
                     self.region_pixelsize, safety_bound=safety_bound
                 )
+                if size_on_level is not None:
+                    _region_pixelsize, _region_pixelunit = self.get_pixelsize_on_level(
+                        level=level
+                    )
+                    alpha = self.region_pixelsize / _region_pixelsize
+                    self._requested_size_on_level_when_defined_by_pixelsize = size_on_level
+                    size_on_level = size_on_level * alpha
+                    size_on_level = size_on_level.astype(np.int)
 
         else:
             if level is None:
                 level = 0
-            self.is_resized_by_pixelsize = False
+            self._is_resized_by_pixelsize = False
             # self.region_pixelsize = None
             # self.region_pixelunit = "mm"
             self.region_pixelsize, self.region_pixelunit = self.get_pixelsize_on_level(
                 level
             )
+        if annotation_id is not None:
+            center, size = self.anim.get_annotations_bounds_px(annotation_id)
+            if margin_in_pixels:
+                margin_px = int(margin)
+            else:
+                margin_px = (size * margin).astype(
+                    np.int
+                ) / self.anim.openslide.level_downsamples[level]
+            if size_on_level is None:
+                size_on_level = (
+                        (size / self.anim.openslide.level_downsamples[level]) + 2 * margin_px
+                ).astype(int)
 
         if size_mm is not None:
             if np.isscalar(size_mm):
@@ -959,20 +991,32 @@ class View:
             location, level=self.region_level, size=self.region_size_on_level
         )
         im = np.asarray(imcr)
-        image1 = im
         # logger.debug(f"imcr dtype: {image1.dtype}, shape: {image1.shape}, min max: [{np.min(image1[:,:,:3])}, {np.max(image1[:,:,:3])}], mean: {np.mean(image1[:,:,:3])}, min max alpha: [{np.min(image1[:,:,3])}, {np.max(image1[:,:,3])}], mean: {np.mean(image1[:,:,3])}")
 
         if as_gray:
             im = skimage.color.rgb2gray(im)
 
-        if self.is_resized_by_pixelsize:
+        if self._is_resized_by_pixelsize:
             pxsz_level, pxunit_level = self.anim.get_pixel_size(level=self.region_level)
-
             # im1 = imma.image.resize_to_mm(im, pxsz_level, self.region_pixelsize)
             # swap coordinates because openslice output image have swapped image coordinates
-            im = imma.image.resize_to_mm(
+            im_resized = imma.image.resize_to_mm(
                 im, pxsz_level[::-1], self.region_pixelsize[::-1], anti_aliasing=True
             )
+            req_sz = self._requested_size_on_level_when_defined_by_pixelsize
+            if req_sz is not None:
+                if not np.array_equal(im_resized.shape, req_sz):
+                    # Array should be the same size.
+                    # Due to numerical error in alpha computation there can be small pixel error
+                    norm = np.linalg.norm(im_resized.shape, req_sz)
+                    if norm > 3. :
+                        logger.error(f"Requested size ({req_sz}) differ "\
+                        f"from the real image size ({im_resized.shape}) a lot. Fixing by resize.")
+                    # not sure about [::-1]. Not checked too much.
+                    im_resized = imma.image.resize_to_shape(im, req_sz[::-1])
+            im = im_resized
+
+
 
         if self.anim.run_intensity_rescale:
             im = self.anim.intensity_rescaler.rescale_intensity(im)

@@ -212,15 +212,21 @@ class ImageAnnotationTest(unittest.TestCase):
         fn = io3d.datasets.join_path("medical", "orig", "CMU-1.ndpi", get_root=True)
         anim = scim.AnnotatedImage(fn)
         annotation_ids = anim.select_annotations_by_title("obj1")
-        view1 = anim.get_views(annotation_ids, margin=1.0, pixelsize_mm=[0.005, 0.005])[
-            0
-        ]
+        view1 = anim.get_views(
+            annotation_ids,
+            margin=1.0,
+            pixelsize_mm=[0.005, 0.005]
+        )[0]
         image1 = view1.get_region_image()
         # plt.imshow(image1)
         # plt.colorbar()
         # plt.show()
 
-        view2 = anim.get_views(annotation_ids, margin=0.1, pixelsize_mm=[0.05, 0.05])[0]
+        view2 = anim.get_views(
+            annotation_ids,
+            margin=0.1,
+            pixelsize_mm=[0.05, 0.05]
+        )[0]
         image2 = view2.get_region_image()
         # plt.imshow(image2)
         # plt.show()
@@ -280,10 +286,11 @@ class ImageAnnotationTest(unittest.TestCase):
     def test_select_view_by_center_mm(self):
         fn = io3d.datasets.join_path("medical", "orig", "CMU-1.ndpi", get_root=True)
         anim = scim.AnnotatedImage(fn)
+        size_on_level=[100,100]
         view = anim.get_view(
             center_mm=[10, 11],
-            size_on_level=[100, 100],
-            # level=5,
+            size_on_level=size_on_level,
+            level=5,
             # size_mm=[0.1, 0.1]
         )
         image = view.get_region_image()
@@ -293,16 +300,18 @@ class ImageAnnotationTest(unittest.TestCase):
         # view.plot_annotations("obj1")
         # plt.show()
 
-        assert image.shape[0] > 20
-        assert image.shape[1] > 20
+        # assert image.shape[0] > 20
+        # assert image.shape[1] > 20
+        assert np.array_equal(image.shape[:2], size_on_level)
 
     def test_select_view_by_loc_mm(self):
         fn = io3d.datasets.join_path("medical", "orig", "CMU-1.ndpi", get_root=True)
         anim = scim.AnnotatedImage(fn)
+        size_on_level=[100,100]
         view = anim.get_view(
             location_mm=[10, 11],
-            size_on_level=[100, 100],
-            # level=5,
+            size_on_level=size_on_level,
+            level=5,
             # size_mm=[0.1, 0.1]
         )
         image = view.get_region_image()
@@ -312,8 +321,7 @@ class ImageAnnotationTest(unittest.TestCase):
         # view.plot_annotations("obj1")
         # plt.show()
 
-        assert image.shape[0] > 20
-        assert image.shape[1] > 20
+        assert np.array_equal(image.shape[:2], size_on_level)
         # self.assertGreater(image.shape[0], 100)
         # mask = view.get_annotation_region_raster("obj1")
         # self.assertTrue(np.array_equal(mask.shape[:2], image.shape[:2]),
@@ -408,3 +416,18 @@ class ImageAnnotationTest(unittest.TestCase):
             # ann_rasters.append(ann_raster)
             assert np.min(ann_raster) == 0
             assert np.max(ann_raster) > 0
+
+    def test_view_by_pixelsize_and_size_on_level(self):
+        fn = io3d.datasets.join_path(
+            "medical", "orig", "sample_data", "SCP003", "SCP003.ndpi", get_root=True
+        )
+        anim = scaffan.image.AnnotatedImage(fn)
+        ann_ids = anim.select_annotations_by_color("#FFFF00")
+        size_px = 224
+        # anim.get_views(ann_ids)
+        view = anim.get_view(annotation_id=ann_ids[0], size_on_level=[size_px, size_px], pixelsize_mm=[0.01, 0.01])
+        img = view.get_region_image(as_gray=True)
+        # plt.imshow(img)
+        # plt.show()
+        assert img.shape[0] == size_px
+        assert img.shape[1] == size_px
