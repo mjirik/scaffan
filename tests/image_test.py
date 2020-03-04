@@ -131,9 +131,8 @@ class ImageAnnotationTest(unittest.TestCase):
         # plt.show()
         self.assertGreater(np.sum(mask), 20)
         assert image.ndim == 2
-        assert image[0, 0, 0] == pytest.approx(97, 10)
-        assert image[0, 0, 1] == pytest.approx(77, 10)
-        assert image.dtype is np.uint8
+        assert image[0, 0] == pytest.approx(97, 10)
+        assert image.dtype is np.dtype(np.uint8)
 
     def test_anim_region_coords_to_global_and_back(self):
         fn = io3d.datasets.join_path("medical", "orig", "CMU-1.ndpi", get_root=True)
