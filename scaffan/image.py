@@ -79,7 +79,7 @@ def get_image_by_center(imsl, center, level=3, size=None, as_gray=True):
 
 
 def get_region_location_by_center(imsl, center, level, size):
-    size2 = (size / 2).astype(int)
+    size2 = (np.asarray(size) / 2).astype(int)
 
     offset = size2 * imsl.level_downsamples[level]
     location = (np.asarray(center) - offset).astype(np.int)
@@ -87,7 +87,7 @@ def get_region_location_by_center(imsl, center, level, size):
 
 
 def get_region_center_by_location(imsl, location, level, size):
-    size2 = (size / 2).astype(int)
+    size2 = (np.asarray(size) / 2).astype(int)
 
     offset = size2 * imsl.level_downsamples[level]
     center = (np.asarray(location) + offset).astype(np.int)
@@ -654,21 +654,20 @@ class AnnotatedImage:
         plt.imshow(region)
         self.plot_annotations(i)
 
-    def coords_region_px_to_global_px(self, points_view_px):
+    def coords_region_px_to_global_px(self, points_view_px:np.ndarray):
         """
-        :param points_view_px: [[x0, x1, ...], [y0, y1, ...]]
+        :param points_view_px: np.asarray([[x0, x1, ...], [y0, y1, ...]])
         :return:
         """
-
         px_factor = self.openslide.level_downsamples[self.region_level]
         x_px = self.region_location[0] + points_view_px[0] * px_factor
         y_px = self.region_location[1] + points_view_px[1] * px_factor
 
         return x_px, y_px
 
-    def coords_global_px_to_view_px(self, points_glob_px):
+    def coords_global_px_to_view_px(self, points_glob_px:np.ndarray):
         """
-        :param points_glob_px: [[x0, x1, ...], [y0, y1, ...]]
+        :param points_glob_px: np.asarray([[x0, x1, ...], [y0, y1, ...]])
         :return:
         """
 
@@ -943,15 +942,6 @@ class View:
     def get_region_center_by_location(self, location, level, size):
         return get_region_center_by_location(self.anim.openslide, location, level, size)
 
-    # def get_region_image(self, as_gray=False):
-    #     imcr = self.openslide.read_region(
-    #         self.region_location, level=self.region_level, size=self.region_size_on_level
-    #     )
-    #     im = np.asarray(imcr)
-    #     if as_gray:
-    #         im = skimage.color.rgb2gray(im)
-    #     return im
-
     def get_region_image_resolution(
         self, resolution_mm, as_gray=False,
     ):
@@ -1006,8 +996,6 @@ class View:
                     # not sure about [::-1]. Not checked too much.
                     im_resized = imma.image.resize_to_shape(im, req_sz[::-1])
             im = im_resized
-
-
 
         if self.anim.run_intensity_rescale:
             im = self.anim.intensity_rescaler.rescale_intensity(im)

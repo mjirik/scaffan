@@ -68,6 +68,16 @@ class ImageAnnotationTest(unittest.TestCase):
         assert im[0, 0] == pytest.approx(
             0.767964705882353, 0.001
         )  # expected intensity is 0.76
+
+    def test_anim(self):
+        fn = io3d.datasets.join_path("medical", "orig", "CMU-1.ndpi", get_root=True)
+        anim = scim.AnnotatedImage(fn)
+
+        loc = [10000,10000]
+        center = anim.get_region_center_by_location(location=loc, level=2, size=[100, 100])
+        loc_out = anim.get_region_location_by_center(center=center, level=2, size=[100, 100])
+        assert np.array_equal(loc, loc_out)
+
         # assert np.abs(im[0, 0] - 0.767964705882353) < 0.001  # expected intensity is 0.76
 
     def test_anim_intensity_rescale(self):
@@ -101,7 +111,7 @@ class ImageAnnotationTest(unittest.TestCase):
         self.assertEqual(type(msg), str)
         self.assertLess(0, msg.find("mm"))
 
-    def test_region(self):
+    def test_anim_region(self):
         fn = io3d.datasets.join_path("medical", "orig", "CMU-1.ndpi", get_root=True)
         anim = scim.AnnotatedImage(fn)
         anim.set_region_on_annotations(0, 3)
@@ -114,6 +124,28 @@ class ImageAnnotationTest(unittest.TestCase):
         assert image[0, 0, 0] == pytest.approx(97, 10)
         assert image[0, 0, 1] == pytest.approx(77, 10)
         assert image[0, 0, 2] == pytest.approx(114, 10)
+
+        image = anim.get_region_image(as_gray=True, as_unit8=True)
+        plt.imshow(image)
+        plt.contour(mask)
+        # plt.show()
+        self.assertGreater(np.sum(mask), 20)
+        assert image.ndim == 2
+        assert image[0, 0, 0] == pytest.approx(97, 10)
+        assert image[0, 0, 1] == pytest.approx(77, 10)
+        assert image.dtype is np.uint8
+
+    def test_anim_region_coords_to_global_and_back(self):
+        fn = io3d.datasets.join_path("medical", "orig", "CMU-1.ndpi", get_root=True)
+        anim = scim.AnnotatedImage(fn)
+        anim.set_region_on_annotations(0, 3)
+        pts_local = np.asarray([[1000, 1000, 2000], [5000, 6000, 5000]])
+
+        pts_global = anim.coords_region_px_to_global_px(pts_local)
+        pts_local_out = anim.coords_global_px_to_view_px(pts_global)
+
+        assert np.array_equal(pts_local, pts_local_out)
+
 
         # this works on windows
         # assert image[0, 0, 0] == 97
