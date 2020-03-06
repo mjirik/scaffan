@@ -136,5 +136,6 @@ class WholeSlideSegmentationUNet:
         grayscale_image = np.expand_dims(np.expand_dims(grayscale_image, axis = 0), axis=0).astype('float32')
         prediction = F.softmax(model(grayscale_image)) # predikce, vraci obrazek o rozmerech 224x224pix s hodnotami 0, 1, 2
         prediction = np.argmax(prediction.array, axis=1).astype('uint8')
+        prediction = prediction.squeeze(0)
         return prediction
         # return (grayscale_image > 0.5).astype(np.uint8)
