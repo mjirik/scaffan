@@ -32,7 +32,7 @@ import scaffan.whole_slide_seg_unet
 # qapp = QtWidgets.QApplication(sys.argv)
 
 # tohle říká, že test může/musí selhat
-@pytest.mark.xfail
+# @pytest.mark.xfail
 def test_unet_on_view():
     fn = io3d.datasets.join_path(
             "medical", "orig", "sample_data", "SCP003", "SCP003.ndpi", get_root=True
