@@ -86,7 +86,7 @@ class ScanSegmentation:
                 "siPrefix": False,
                 "tip": "Image is processed tile by tile. This value defines size of the tile",
             },
-            {'name': 'Segmentation Method', 'type': 'list', 'values': ["U-Net", "HCTFS"], 'value': "HCTFS"},
+            {'name': 'Segmentation Method', 'type': 'list', 'values': ["U-Net", "HCTFS"], 'value': "U-Net"},
             self._unet.parameters,
             {"name":"HCTFS", 'type':"group", "tip": "Hand-crafter Texture Features based Segmentation parameters",
             'expanded': False,
