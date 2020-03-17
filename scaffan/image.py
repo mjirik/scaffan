@@ -223,12 +223,17 @@ class AnnotatedImage:
         self.run_intensity_rescale = False
 
     def set_intensity_rescale_parameters(
-            self, run_intensity_rescale=False,
-            percentile_range=(5, 95), percentile_map_range=(-0.9, 0.9), sig_slope=1
+        self,
+        run_intensity_rescale=False,
+        percentile_range=(5, 95),
+        percentile_map_range=(-0.9, 0.9),
+        sig_slope=1,
     ):
         self.intensity_rescaler.set_parameters(
-            percentile_range=percentile_range, percentile_map_range=percentile_map_range,
-            sig_slope=sig_slope)
+            percentile_range=percentile_range,
+            percentile_map_range=percentile_map_range,
+            sig_slope=sig_slope,
+        )
 
         self.run_intensity_rescale = run_intensity_rescale
         if self.run_intensity_rescale:
@@ -342,7 +347,7 @@ class AnnotatedImage:
             safety_bound=safety_bound,
             annotation_id=annotation_id,
             margin=margin,
-            margin_in_pixels=margin_in_pixels
+            margin_in_pixels=margin_in_pixels,
         )
         return view
 
@@ -654,7 +659,7 @@ class AnnotatedImage:
         plt.imshow(region)
         self.plot_annotations(i)
 
-    def coords_region_px_to_global_px(self, points_view_px:np.ndarray):
+    def coords_region_px_to_global_px(self, points_view_px: np.ndarray):
         """
         :param points_view_px: np.asarray([[x0, x1, ...], [y0, y1, ...]])
         :return:
@@ -665,7 +670,7 @@ class AnnotatedImage:
 
         return x_px, y_px
 
-    def coords_global_px_to_view_px(self, points_glob_px:np.ndarray):
+    def coords_global_px_to_view_px(self, points_glob_px: np.ndarray):
         """
         :param points_glob_px: np.asarray([[x0, x1, ...], [y0, y1, ...]])
         :return:
@@ -685,7 +690,7 @@ class View:
         self,
         anim: AnnotatedImage,
         center=None,
-        level:int=0,
+        level: int = 0,
         size_on_level=None,
         location=None,
         size_mm=None,
@@ -695,7 +700,7 @@ class View:
         safety_bound=2,
         annotation_id=None,
         margin=0.5,
-        margin_in_pixels:bool=False,
+        margin_in_pixels: bool = False,
     ):
         self.anim: AnnotatedImage = anim
         self._requested_size_on_level_when_defined_by_pixelsize = None
@@ -713,7 +718,7 @@ class View:
             safety_bound=safety_bound,
             annotation_id=annotation_id,
             margin=margin,
-            margin_in_pixels=margin_in_pixels
+            margin_in_pixels=margin_in_pixels,
         )
         self.select_outer_annotations = self.anim.select_outer_annotations
         self.select_inner_annotations = self.anim.select_inner_annotations
@@ -723,7 +728,7 @@ class View:
     def set_region(
         self,
         center=None,
-        level:int=None,
+        level: int = None,
         size_on_level=None,
         location=None,
         size_mm=None,
@@ -733,7 +738,7 @@ class View:
         safety_bound=2,
         annotation_id=None,
         margin=0.5,
-        margin_in_pixels:bool=False,
+        margin_in_pixels: bool = False,
     ):
         self._requested_size_on_level_when_defined_by_pixelsize = None
         if (level is None) and (pixelsize_mm is None) and (size_on_level is not None):
@@ -756,7 +761,9 @@ class View:
                         level=level
                     )
                     alpha = self.region_pixelsize / _region_pixelsize
-                    self._requested_size_on_level_when_defined_by_pixelsize = size_on_level
+                    self._requested_size_on_level_when_defined_by_pixelsize = (
+                        size_on_level
+                    )
                     size_on_level = size_on_level * alpha
                     size_on_level = size_on_level.astype(np.int)
 
@@ -779,7 +786,8 @@ class View:
                 ) / self.anim.openslide.level_downsamples[level]
             if (size_on_level is None) and (size_mm is None):
                 size_on_level = (
-                        (size / self.anim.openslide.level_downsamples[level]) + 2 * margin_px
+                    (size / self.anim.openslide.level_downsamples[level])
+                    + 2 * margin_px
                 ).astype(int)
 
         if size_mm is not None:
@@ -991,9 +999,11 @@ class View:
                     # Array should be the same size.
                     # Due to numerical error in alpha computation there can be small pixel error
                     norm = np.linalg.norm(im_resized.shape[:2] - req_sz)
-                    if norm > 3. :
-                        logger.error(f"Requested size ({req_sz}) differ "\
-                        f"from the real image size ({im_resized.shape}) a lot. Fixing by resize.")
+                    if norm > 3.0:
+                        logger.error(
+                            f"Requested size ({req_sz}) differ "
+                            f"from the real image size ({im_resized.shape}) a lot. Fixing by resize."
+                        )
                     # not sure about [::-1]. Not checked too much.
                     im_resized = imma.image.resize_to_shape(im, req_sz[::-1])
             im = im_resized

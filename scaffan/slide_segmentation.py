@@ -46,9 +46,9 @@ class ScanSegmentation:
         pname="Scan Segmentation",
         ptype="bool",
         pvalue=True,
-        ptip="Run analysis of whole slide before all other processing is perfomed.\n"\
-            + "If automatic lobulus selection is selected, "\
-            + "defined number of biggest lobuli are selected for texture analysis.",
+        ptip="Run analysis of whole slide before all other processing is perfomed.\n"
+        + "If automatic lobulus selection is selected, "
+        + "defined number of biggest lobuli are selected for texture analysis.",
     ):
         """
 
@@ -86,42 +86,50 @@ class ScanSegmentation:
                 "siPrefix": False,
                 "tip": "Image is processed tile by tile. This value defines size of the tile",
             },
-            {'name': 'Segmentation Method', 'type': 'list', 'values': ["U-Net", "HCTFS"], 'value': "U-Net"},
+            {
+                "name": "Segmentation Method",
+                "type": "list",
+                "values": ["U-Net", "HCTFS"],
+                "value": "U-Net",
+            },
             self._unet.parameters,
-            {"name":"HCTFS", 'type':"group", "tip": "Hand-crafter Texture Features based Segmentation parameters",
-            'expanded': False,
-             "children":[
-                 {
-                     "name": "Run Training",
-                     "type": "bool",
-                     "value": False,
-                     "tip": "Use annotated image to train classifier.\n"
-                            + "Red area is extra-lobular tissue.\n"
-                            + "Black area is intra-lobular tissue.\n"
-                            + "Magenta area is empty part of the image.\n",
-                 },
-                 {
-                     "name": "Load Default Classifier",
-                     "type": "bool",
-                     "value": False,
-                     "tip": "Load default classifier before training and prediction.",
-                 },
-                 {
-                     "name": "Clean Before Training",
-                     "type": "bool",
-                     "value": False,
-                     "tip": "Reset classifier before training.",
-                 },
-                 {
-                     "name": "Training Weight",
-                     "type": "float",
-                     "value": 1,
-                     # "suffix": "px",
-                     "siPrefix": False,
-                     "tip": "Weight of training samples given in actual image",
-                 },
-             ]
-             },
+            {
+                "name": "HCTFS",
+                "type": "group",
+                "tip": "Hand-crafter Texture Features based Segmentation parameters",
+                "expanded": False,
+                "children": [
+                    {
+                        "name": "Run Training",
+                        "type": "bool",
+                        "value": False,
+                        "tip": "Use annotated image to train classifier.\n"
+                        + "Red area is extra-lobular tissue.\n"
+                        + "Black area is intra-lobular tissue.\n"
+                        + "Magenta area is empty part of the image.\n",
+                    },
+                    {
+                        "name": "Load Default Classifier",
+                        "type": "bool",
+                        "value": False,
+                        "tip": "Load default classifier before training and prediction.",
+                    },
+                    {
+                        "name": "Clean Before Training",
+                        "type": "bool",
+                        "value": False,
+                        "tip": "Reset classifier before training.",
+                    },
+                    {
+                        "name": "Training Weight",
+                        "type": "float",
+                        "value": 1,
+                        # "suffix": "px",
+                        "siPrefix": False,
+                        "tip": "Weight of training samples given in actual image",
+                    },
+                ],
+            },
             {
                 "name": "Lobulus Number",
                 "type": "int",
@@ -136,8 +144,8 @@ class ScanSegmentation:
                 "value": 0.00015,  # 0.1 mm
                 "suffix": "m",
                 "siPrefix": True,
-                "tip": "Radius of circle seed used as input for individual lobulus segmentation "\
-                       + "when the automatic lobulus selection is prefered ",
+                "tip": "Radius of circle seed used as input for individual lobulus segmentation "
+                + "when the automatic lobulus selection is prefered ",
             },
             # self._inner_texture.parameters,
         ]
@@ -216,7 +224,9 @@ class ScanSegmentation:
         if pixels is None:
             pixels, y = self.prepare_training_pixels()
         if sample_weight is None:
-            sample_weight = float(self.parameters.param("HCTFS", "Training Weight").value())
+            sample_weight = float(
+                self.parameters.param("HCTFS", "Training Weight").value()
+            )
         sample_weight = [sample_weight] * len(y)
 
         if bool(self.parameters.param("HCTFS", "Clean Before Training").value()):
@@ -426,7 +436,6 @@ class ScanSegmentation:
         if str(self.parameters.param("Segmentation Method").value()) == "U-Net":
             self._unet.init_segmentation()
 
-
         #         if self.predicted_tiles is None:
         #             self.predict_tiles()
 
@@ -554,8 +563,10 @@ class ScanSegmentation:
         dist = scipy.ndimage.morphology.distance_transform_edt(mask)
         self.dist = dist
         # report
-        r_m = float(self.parameters.param("Annotation Radius").value()) # * 1000 # mm
-        resolution_m = float(self.parameters.param("Working Resolution").value()) # * 1000
+        r_m = float(self.parameters.param("Annotation Radius").value())  # * 1000 # mm
+        resolution_m = float(
+            self.parameters.param("Working Resolution").value()
+        )  # * 1000
 
         min_distance = int(2 * r_m / resolution_m)
         logger.debug(f"minimum distance [px]: {min_distance}")

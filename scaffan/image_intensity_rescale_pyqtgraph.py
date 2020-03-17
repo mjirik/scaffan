@@ -7,15 +7,14 @@ from . import image
 from loguru import logger
 
 
-class RescaleIntensityPercentilePQG():
+class RescaleIntensityPercentilePQG:
     def __init__(
-            self,
-            pname = "Intensity Normalization",
-            ptype = "bool",
-            pvalue = False,
-            ptip = "A preprocessing of input image. It emphasize important structures.",
-            pexpanded = False,
-
+        self,
+        pname="Intensity Normalization",
+        ptype="bool",
+        pvalue=False,
+        ptip="A preprocessing of input image. It emphasize important structures.",
+        pexpanded=False,
     ):
         # self.rescale_intensity_percentile = image_intensity_rescale.RescaleIntensityPercentile()
         params = [
@@ -25,38 +24,38 @@ class RescaleIntensityPercentilePQG():
             #         "tip": "Do the histogram normalization",
             #         "value": False
             #     },
-                {
-                    "name": "Input Low Percentile",
-                    "type": "int",
-                    "tip": "Input point for intensity mapping",
-                    "value": 5
-                },
-                {
-                    "name": "Input High Percentile",
-                    "type": "int",
-                    # "tip": "Slope of sigmoidal limit function",
-                    "tip": "Input point for intensity mapping",
-                    "value": 95
-                },
-                {
-                    "name": "Low Percentile Mapping",
-                    "type": "float",
-                    # "tip": "",
-                    "value": -0.9
-                },
-                {
-                    "name": "High Percentile Mapping",
-                    "type": "float",
-                    # "tip": "Slope of sigmoidal limit function",
-                    "value": 0.9
-                },
-                {
-                    "name": "Sigmoidal Slope",
-                    "type": "float",
-                    "tip": "Slope of sigmoidal limit function",
-                    "value": 1.0
-                },
-            ]
+            {
+                "name": "Input Low Percentile",
+                "type": "int",
+                "tip": "Input point for intensity mapping",
+                "value": 5,
+            },
+            {
+                "name": "Input High Percentile",
+                "type": "int",
+                # "tip": "Slope of sigmoidal limit function",
+                "tip": "Input point for intensity mapping",
+                "value": 95,
+            },
+            {
+                "name": "Low Percentile Mapping",
+                "type": "float",
+                # "tip": "",
+                "value": -0.9,
+            },
+            {
+                "name": "High Percentile Mapping",
+                "type": "float",
+                # "tip": "Slope of sigmoidal limit function",
+                "value": 0.9,
+            },
+            {
+                "name": "Sigmoidal Slope",
+                "type": "float",
+                "tip": "Slope of sigmoidal limit function",
+                "value": 1.0,
+            },
+        ]
         self.parameters = Parameter.create(
             name=pname,
             type=ptype,
@@ -66,7 +65,7 @@ class RescaleIntensityPercentilePQG():
             expanded=pexpanded,
         )
 
-    def set_anim_params(self, anim:image.AnnotatedImage):
+    def set_anim_params(self, anim: image.AnnotatedImage):
         """
         Set parametetrs of AnnotatedImage to intensity rescale.
         :param anim:
@@ -88,5 +87,5 @@ class RescaleIntensityPercentilePQG():
                 int_norm_params.param("Low Percentile Mapping").value(),
                 int_norm_params.param("High Percentile Mapping").value(),
             ),
-            sig_slope= int_norm_params.param("Sigmoidal Slope").value(),
+            sig_slope=int_norm_params.param("Sigmoidal Slope").value(),
         )

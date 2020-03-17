@@ -17,8 +17,6 @@ import numpy as np
 def test_image_intensity_rescale():
     img = skimage.data.astronaut()
 
-
-
     rescaler = image_intensity_rescale.RescaleIntensityPercentile()
     rescaler.calculate_intensity_dependent_parameters(img)
     img_rescaled = rescaler.rescale_intensity(img)
@@ -39,7 +37,6 @@ def test_image_intensity_rescale():
     # plt.show()
     # the rescaled histogram should be flatter
     assert np.max(hstx) > np.max(hstxr)
-
 
     # imthumb = imsl.get_thumbnail((512, 512))
     # pth = io3d.datasets.join_path(
