@@ -2,11 +2,12 @@
 # -*- coding: utf-8 -*-
 """
 Modul is used for slice image and view processing. It cooperates with openslide.
-There is
-
 
 Be careful because some of coordinates are swapped. It is due to openslide.
 With request subimage with size=[A, B] it will return subimage with shape [B, A]. It is because of visualization.
+
+There are two main structures. AnnotatedImage and View.
+
 
 """
 
@@ -271,6 +272,7 @@ class AnnotatedImage:
     def get_resize_parameters(self, former_level, former_size, new_level):
         """
         Get scale and size of image after resize to other level
+
         :param former_level:
         :param former_size:
         :param new_level:
@@ -478,14 +480,17 @@ class AnnotatedImage:
         safety_bound=2,
     ) -> List["View"]:
         """
+        Prepare list of possible views according to input parameters.
 
-        :param annotation_ids:
+        :param annotation_ids: list of annotation ids
         :param level: If neither level neither pixelsize_mm is set the level is set to 0
-        :param margin: based on "margin_in_pixels" the margin in pixels(accoarding to the requested level) are used or
+        :param margin: based on "margin_in_pixels" the margin in pixels(accoarding to the requested level) are used or\
         margin is proportional to size of annotation object.
         :param margin_in_pixels: bool
         :param show:
-        :return:
+        :return: list of views
+
+
         """
 
         views = [None] * len(annotation_ids)
