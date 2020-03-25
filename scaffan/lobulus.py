@@ -39,13 +39,15 @@ class Lobulus:
         pvalue=True,
         ptip="Select the area for sinusoidal area texture analysis after lobuli selection",
         pexpanded=False,
+        report:Report=None
     ):
         # TODO the segmentation resolution was probably different.
         #  For segmentation was used different level than 2. Probably 3 or 4
         #  The level 2 has been used in detail view
 
         self._inner_texture = scaffan.texture.GLCMTextureMeasurement(
-            "central_vein", texture_label="central_vein"
+            "central_vein", texture_label="central_vein",
+            report = report
         )
         params = [
             # {
@@ -177,7 +179,7 @@ class Lobulus:
             children=params,
             expanded=pexpanded,
         )
-        self.report: Report = None
+        self.report: Report = report
 
     def set_annotated_image_and_id(
         self, anim: scim.AnnotatedImage, annotation_id, level=None
@@ -321,7 +323,7 @@ class Lobulus:
             annotation_id=self.annotation_id,
             lobulus_segmentation=None,
         )
-        self._inner_texture.set_report(self.report)
+        # self._inner_texture.set_report(self.report)
         self._inner_texture.add_cols_to_report = False
         self._inner_texture.run()
         tfeatures = copy.copy(self._inner_texture.measured_features)

@@ -50,16 +50,16 @@ class Scaffan:
 
         import scaffan.texture as satex
 
-        self.glcm_textures = satex.GLCMTextureMeasurement()
-        self.lobulus_processing = scaffan.lobulus.Lobulus(ptype="bool")
+        self.glcm_textures = satex.GLCMTextureMeasurement(report=self.report)
+        self.lobulus_processing = scaffan.lobulus.Lobulus(ptype="bool", report=self.report)
         self.skeleton_analysis = scaffan.skeleton_analysis.SkeletonAnalysis()
         self.evaluation = scaffan.evaluation.Evaluation()
         self.intensity_rescale = RescaleIntensityPercentilePQG()
         self.slide_segmentation = scaffan.slide_segmentation.ScanSegmentation()
         self.slide_segmentation.report = self.report
 
-        self.lobulus_processing.set_report(self.report)
-        self.glcm_textures.set_report(self.report)
+        # self.lobulus_processing.set_report(self.report)
+        # self.glcm_textures.set_report(self.report)
         self.skeleton_analysis.set_report(self.report)
         self.evaluation.report = self.report
         self.win: QtGui.QWidget = None

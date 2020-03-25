@@ -17,6 +17,7 @@ from pyqtgraph.parametertree import Parameter, ParameterTree
 from . import image
 from exsu.report import Report
 import imma.image
+from . import sni_prediction
 
 
 def tile_centers(image_shape, tile_spacing):
@@ -128,6 +129,7 @@ class GLCMTextureMeasurement:
         add_cols_to_report: bool = True,
         report_severity_offset=0,
         glcm_levels=64,
+        report:Report=None,
     ):
         """
 
@@ -141,6 +143,7 @@ class GLCMTextureMeasurement:
         :param tile_size:
         :param tile_spacing:
         """
+        self.sni_predictor = sni_prediction.SniPredictor(report=report, ptype="bool", pvalue=True)
         params = [
             {
                 "name": "Tile Size",
@@ -167,6 +170,7 @@ class GLCMTextureMeasurement:
                 "siPrefix": True,
             },
             {"name": "GLCM Levels", "type": "int", "value": glcm_levels},
+            self.sni_predictor.parameters,
         ]
         self.texture_label = texture_label
 
@@ -178,7 +182,7 @@ class GLCMTextureMeasurement:
             children=params,
             expanded=False,
         )
-        self.report: Report = None
+        self.report: Report = report
         self.filename_label = filename_label
         self.add_cols_to_report: bool = add_cols_to_report
         self.annotation_id = None
@@ -311,11 +315,13 @@ class GLCMTextureMeasurement:
         #     "GLCM Homogenity": np.mean(e1[seg]),
         #     "GLCM Correlation": np.mean(e2[seg]),
         # }
+        self.sni_predictor.predict_area(row)
         if self.report is not None and self.add_cols_to_report:
             self.report.add_cols_to_actual_row(row)
         logger.debug(
             f"GLCM textures for id {self.annotation_id if self.annotation_id is not None else '-'} finished"
         )
+
         # plt.show()
 
 
