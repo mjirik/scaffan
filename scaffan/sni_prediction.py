@@ -10,6 +10,7 @@ from pyqtgraph.parametertree import Parameter
 import os.path
 from pathlib import Path
 import joblib
+import sklearn
 
 from exsu.report import Report
 from . import image
@@ -64,10 +65,9 @@ class SniPredictor:
             report.save = False
             report.show = False
         self.report: Report = report
-        self.init_regressors()
+        # self.init_regressors()
 
-    def init_regressors(self):
-        import sklearn
+    # def init_regressors(self):
         # model = PoseNet()  # nacteni architektury modelu
         self.area_regressor_path = path_to_script / "models/SNI_area_regressor.joblib"
         self.perpixel_regressor_path = path_to_script / "models/SNI_per-pixel_regressor.joblib"
@@ -82,7 +82,8 @@ class SniPredictor:
     def predict_area(self, row:dict):
         X = np.array([[row[feature_name] for feature_name in self.areg_features]])
         sni_area = self.areg.predict(X)
-        self.report.add_cols_to_actual_row({"SNI area prediction":sni_area})
+        if self.report is not None:
+            self.report.add_cols_to_actual_row({"SNI area prediction":sni_area})
 
     def predict_tile(self, view: image.View):
         """
