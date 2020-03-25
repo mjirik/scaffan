@@ -80,6 +80,7 @@ class SniPredictor:
         self.ppreg_features = ppreg["features"]
 
     def predict_area(self, row:dict):
+        logger.debug(f"SNI row keys {row.keys()}")
 
         X = np.array([[row[feature_name] for feature_name in self.areg_features]])
         sni_area = self.areg.predict(X)

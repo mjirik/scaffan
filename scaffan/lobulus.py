@@ -47,7 +47,8 @@ class Lobulus:
 
         self._inner_texture = scaffan.texture.GLCMTextureMeasurement(
             "central_vein", texture_label="central_vein",
-            report = report
+            add_cols_to_report=False,
+            report=report
         )
         params = [
             # {
@@ -196,10 +197,8 @@ class Lobulus:
         self.annotation_id = annotation_id
         self._init_by_annotation_id(annotation_id)
 
-        pass
-
-    def set_report(self, report: Report):
-        self.report: Report = report
+    # def set_report(self, report: Report):
+    #     self.report: Report = report
 
     def _init_by_annotation_id(self, annotation_id):
         if not np.isscalar(annotation_id):

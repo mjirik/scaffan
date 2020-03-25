@@ -38,6 +38,7 @@ import scaffan.evaluation
 import scaffan.slide_segmentation
 from scaffan.pyqt_widgets import BatchFileProcessingParameter
 from scaffan.image_intensity_rescale_pyqtgraph import RescaleIntensityPercentilePQG
+from . import sni_prediction
 
 
 class Scaffan:
@@ -50,7 +51,8 @@ class Scaffan:
 
         import scaffan.texture as satex
 
-        self.glcm_textures = satex.GLCMTextureMeasurement(report=self.report)
+        sni_predictor = sni_prediction.SniPredictor(report=self.report, ptype="bool", pvalue=True)
+        self.glcm_textures = satex.GLCMTextureMeasurement(report=self.report, sni_predictor=sni_predictor)
         self.lobulus_processing = scaffan.lobulus.Lobulus(ptype="bool", report=self.report)
         self.skeleton_analysis = scaffan.skeleton_analysis.SkeletonAnalysis()
         self.evaluation = scaffan.evaluation.Evaluation()
