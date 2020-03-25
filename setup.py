@@ -63,6 +63,9 @@ setup(
         "sample2": ["scaffan/scaffan_icon256.png"],
         "segmentation_model": ["scaffan/segmentation_model.pkl"],
         "segmentation_model_default": ["scaffan/segmentation_model_default.pkl"],
+        "cnn_model": ["scaffan/model/posenet_highLR.model"],
+        "sni_area": ["scaffan/model/SNI_area_regressor.joblib"],
+        "sni_per-pixel": ["scaffan/model/SNI_per-pixel_regressor.joblib"],
     },
     # Although 'package_data' is the preferred approach, in some case you may
     # need to place data files outside of your packages.
