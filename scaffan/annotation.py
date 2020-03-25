@@ -14,7 +14,7 @@ import glob
 import matplotlib.pyplot as plt
 import numpy as np
 
-__version__ = "0.18.4"
+__version__ = "0.19.0"
 
 
 def get_one_annotation(viewstate):
