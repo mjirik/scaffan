@@ -36,7 +36,8 @@ class MainGuiTest(unittest.TestCase):
     # skip_on_local = True
     skip_on_local = False
 
-    @unittest.skipIf(os.environ.get("TRAVIS", skip_on_local), "Skip on Travis-CI")
+    # @unittest.skipIf(os.environ.get("TRAVIS", skip_on_local), "Skip on Travis-CI")
+    @unittest.skip("Skip interactivet test on Travis-CI")
     def test_just_start_gui_interactive_with_predefined_params(self):
         # fn = io3d.datasets.join_path("medical", "orig", "CMU-1.ndpi", get_root=True)
         # fn = io3d.datasets.join_path("medical", "orig", "CMU-1.ndpi", get_root=True)
