@@ -1,8 +1,16 @@
 # Changelog
 
-## Unreleased
+
+# 0.21
+
+* [Added] SNI prediction based on texture analysis added
+* [Added] Important packages version info added to report
+* [Added] Repository commit identifier added to report
+
+# 0.20
 
 * [Changed] View implementation slightly changed. All `get_view(s)` functions are now more consistent.
+* [Added] Whole scan segmentation based on U-Net
 
 # 0.18
 

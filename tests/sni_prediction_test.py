@@ -9,6 +9,8 @@ from typing import List
 import exsu
 import unittest
 from scaffan import sni_prediction
+import numpy as np
+
 
 def test_sni_prediction():
     report = exsu.Report()
@@ -32,5 +34,6 @@ def test_sni_prediction():
         #         'Lobulus Boundary Compactness',
         })
     assert "SNI area prediction" in report.actual_row
+    assert type(report.actual_row["SNI area prediction"]) in [int, float, np.float64, np.float]
 
 

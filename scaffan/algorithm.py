@@ -44,7 +44,7 @@ from . import sni_prediction
 class Scaffan:
     def __init__(self):
 
-        self.report: Report = Report()
+        self.report: Report = Report(repodir=Path(__file__).parent.resolve(), check_version_of=["numpy", "scipy", "skimage"])
         # self.report.level = 50
 
         self.raise_exception_if_color_not_found = True
@@ -516,6 +516,7 @@ class Scaffan:
             }
         )
         self.report.add_cols_to_actual_row(self.parameters_to_dict())
+        self.report.pa
 
     def _run_lobulus(self, annotation_id):
         show = self.parameters.param("Processing", "Show").value()

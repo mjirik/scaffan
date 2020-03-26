@@ -83,7 +83,7 @@ class SniPredictor:
         logger.debug(f"SNI row keys {row.keys()}")
 
         X = np.array([[row[feature_name] for feature_name in self.areg_features]])
-        sni_area = self.areg.predict(X)
+        sni_area = self.areg.predict(X)[0]
         if self.report is not None:
             self.report.add_cols_to_actual_row({"SNI area prediction": sni_area})
         logger.debug("SNI area prediction done for one lobuli")
