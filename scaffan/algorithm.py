@@ -44,16 +44,25 @@ from . import sni_prediction
 class Scaffan:
     def __init__(self):
 
-        self.report: Report = Report(repodir=Path(__file__).parent.resolve(), check_version_of=["numpy", "scipy", "skimage"])
+        self.report: Report = Report(
+            repodir=Path(__file__).parent.resolve(),
+            check_version_of=["numpy", "scipy", "skimage"],
+        )
         # self.report.level = 50
 
         self.raise_exception_if_color_not_found = True
 
         import scaffan.texture as satex
 
-        sni_predictor = sni_prediction.SniPredictor(report=self.report, ptype="bool", pvalue=True)
-        self.glcm_textures = satex.GLCMTextureMeasurement(report=self.report, sni_predictor=sni_predictor)
-        self.lobulus_processing = scaffan.lobulus.Lobulus(ptype="bool", report=self.report)
+        sni_predictor = sni_prediction.SniPredictor(
+            report=self.report, ptype="bool", pvalue=True
+        )
+        self.glcm_textures = satex.GLCMTextureMeasurement(
+            report=self.report, sni_predictor=sni_predictor
+        )
+        self.lobulus_processing = scaffan.lobulus.Lobulus(
+            ptype="bool", report=self.report
+        )
         self.skeleton_analysis = scaffan.skeleton_analysis.SkeletonAnalysis()
         self.evaluation = scaffan.evaluation.Evaluation()
         self.intensity_rescale = RescaleIntensityPercentilePQG()
@@ -338,7 +347,9 @@ class Scaffan:
         fn_spreadsheet = self.parameters.param("Output", "Common Spreadsheet File")
         self.report.additional_spreadsheet_fn = str(fn_spreadsheet.value())
 
-    def set_annotation_color_selection(self, color: str, override_automatic_lobulus_selection=True):
+    def set_annotation_color_selection(
+        self, color: str, override_automatic_lobulus_selection=True
+    ):
         if override_automatic_lobulus_selection:
             self.set_parameter("Input;Automatic Lobulus Selection", False)
         logger.debug(f"color={color}")

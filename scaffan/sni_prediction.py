@@ -14,17 +14,18 @@ import sklearn
 
 from exsu.report import Report
 from . import image
+
 path_to_script = Path(os.path.dirname(os.path.abspath(__file__)))
 
 
 class SniPredictor:
     def __init__(
-            self,
-            report: Report = None,
-            pname="SNI prediction",
-            ptype="group",
-            pvalue=None,
-            ptip="Prediction of SNI based on pre-trained regression from texture features.",
+        self,
+        report: Report = None,
+        pname="SNI prediction",
+        ptype="group",
+        pvalue=None,
+        ptip="Prediction of SNI based on pre-trained regression from texture features.",
     ):
         params = [
             # {
@@ -67,19 +68,21 @@ class SniPredictor:
         self.report: Report = report
         # self.init_regressors()
 
-    # def init_regressors(self):
+        # def init_regressors(self):
         # model = PoseNet()  # nacteni architektury modelu
         self.area_regressor_path = path_to_script / "models/SNI_area_regressor.joblib"
-        self.perpixel_regressor_path = path_to_script / "models/SNI_per-pixel_regressor.joblib"
+        self.perpixel_regressor_path = (
+            path_to_script / "models/SNI_per-pixel_regressor.joblib"
+        )
         areg = joblib.load(self.area_regressor_path)
         ppreg = joblib.load(self.area_regressor_path)
-        self.areg:sklearn.linear_model.LinearRegression = areg["regressor"]
+        self.areg: sklearn.linear_model.LinearRegression = areg["regressor"]
         self.areg_features = areg["features"]
 
-        self.ppreg:sklearn.linear_model.LinearRegression = ppreg["regressor"]
+        self.ppreg: sklearn.linear_model.LinearRegression = ppreg["regressor"]
         self.ppreg_features = ppreg["features"]
 
-    def predict_area(self, row:dict):
+    def predict_area(self, row: dict):
         logger.debug(f"SNI row keys {row.keys()}")
 
         X = np.array([[row[feature_name] for feature_name in self.areg_features]])

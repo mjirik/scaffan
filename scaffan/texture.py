@@ -129,8 +129,8 @@ class GLCMTextureMeasurement:
         add_cols_to_report: bool = True,
         report_severity_offset=0,
         glcm_levels=64,
-        report:Report=None,
-        sni_predictor=None
+        report: Report = None,
+        sni_predictor=None,
     ):
         """
         Make texture description.

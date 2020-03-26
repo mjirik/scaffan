@@ -138,7 +138,9 @@ class MainGuiTest(unittest.TestCase):
         mainapp.set_output_dir("test_run_lobuluses_output_dir")
         # mainapp.init_run()
         # mainapp.set_parameter("Input;Automatic Lobulus Selection", False)
-        mainapp.set_annotation_color_selection("#00FFFF", override_automatic_lobulus_selection=True)
+        mainapp.set_annotation_color_selection(
+            "#00FFFF", override_automatic_lobulus_selection=True
+        )
         mainapp.set_parameter(
             "Processing;Lobulus Segmentation;Manual Segmentation", True
         )
