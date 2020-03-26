@@ -85,7 +85,7 @@ class Scaffan:
                     {
                         "name": "Automatic Lobulus Selection",
                         "type": "bool",
-                        "value": False,
+                        "value": True,
                         "tip": "Skip selection based on annotation color and select lobulus based on Scan Segmentation. ",
                     },
                     {
@@ -338,7 +338,9 @@ class Scaffan:
         fn_spreadsheet = self.parameters.param("Output", "Common Spreadsheet File")
         self.report.additional_spreadsheet_fn = str(fn_spreadsheet.value())
 
-    def set_annotation_color_selection(self, color: str):
+    def set_annotation_color_selection(self, color: str, override_automatic_lobulus_selection=True):
+        if override_automatic_lobulus_selection:
+            self.set_parameter("Input;Automatic Lobulus Selection", False)
         logger.debug(f"color={color}")
         pcolor = self.parameters.param("Input", "Annotation Color")
         color = color.upper()
@@ -516,7 +518,6 @@ class Scaffan:
             }
         )
         self.report.add_cols_to_actual_row(self.parameters_to_dict())
-        self.report.pa
 
     def _run_lobulus(self, annotation_id):
         show = self.parameters.param("Processing", "Show").value()

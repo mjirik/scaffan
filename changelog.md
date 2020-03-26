@@ -6,6 +6,7 @@
 * [Added] SNI prediction based on texture analysis added
 * [Added] Important packages version info added to report
 * [Added] Repository commit identifier added to report
+* [Changed] Automatic lobulus segmentation is default now
 
 # 0.20
 

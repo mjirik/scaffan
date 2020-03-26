@@ -62,6 +62,7 @@ class MainGuiTest(unittest.TestCase):
         mainapp.set_input_file(fn)
         # mainapp.set_annotation_color_selection("#FF00FF")
         # mainapp.set_annotation_color_selection("#FF0000")
+        mainapp.set_parameter("Input;Automatic Lobulus Selection", False)
         mainapp.set_annotation_color_selection("#FFFF00")
         mainapp.set_parameter("Processing;Skeleton Analysis", False)
         mainapp.set_parameter("Processing;Texture Analysis", False)
@@ -104,6 +105,7 @@ class MainGuiTest(unittest.TestCase):
         # mainapp.set_annotation_color_selection("#FF00FF") # magenta -> cyan
         # mainapp.set_annotation_color_selection("#00FFFF")
         # cyan causes memory fail
+        mainapp.set_parameter("Input;Automatic Lobulus Selection", False)
         mainapp.set_annotation_color_selection("#FFFF00")
         mainapp.run_lobuluses()
         self.assertLess(
@@ -135,7 +137,8 @@ class MainGuiTest(unittest.TestCase):
         mainapp.set_input_file(fn)
         mainapp.set_output_dir("test_run_lobuluses_output_dir")
         # mainapp.init_run()
-        mainapp.set_annotation_color_selection("#00FFFF")
+        # mainapp.set_parameter("Input;Automatic Lobulus Selection", False)
+        mainapp.set_annotation_color_selection("#00FFFF", override_automatic_lobulus_selection=True)
         mainapp.set_parameter(
             "Processing;Lobulus Segmentation;Manual Segmentation", True
         )
@@ -263,7 +266,7 @@ class MainGuiTest(unittest.TestCase):
         ]
 
         # TODO Uncomment fallowing line when CNN is done
-        # self._testing_slide_segmentation_clf(fns, segmentation_method="U-Net")
+        self._testing_slide_segmentation_clf(fns, segmentation_method="U-Net")
 
     def _testing_slide_segmentation_clf(self, fns, segmentation_method):
         """

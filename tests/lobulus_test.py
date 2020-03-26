@@ -20,7 +20,7 @@ from pathlib import Path
 
 class LobulusTest(unittest.TestCase):
     def test_run_lobuluses(self):
-        output_dir = Path("test_lobulus_output_dir").absolute()
+        output_dir = Path("test_output/test_lobulus_output_dir").absolute()
         if output_dir.exists():
             shutil.rmtree(output_dir)
             # os.remove(output_dir)
@@ -38,6 +38,7 @@ class LobulusTest(unittest.TestCase):
         mainapp.init_run()
         mainapp.set_report_level(10)
         # Yellow
+        mainapp.set_parameter("Input;Automatic Lobulus Selection", False)
         mainapp.set_annotation_color_selection("#FFFF00")
         # mainapp.parameters.param("Processing", "Show").setValue(True)
         mainapp.run_lobuluses()
