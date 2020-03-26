@@ -13,8 +13,9 @@ import numpy as np
 
 
 def test_sni_prediction():
-    report = exsu.Report()
-    sni_predictor = sni_prediction.SniPredictor(report=report)
+    # report = exsu.Report()
+    sni_predictor = sni_prediction.SniPredictor()
+    report = sni_predictor.report
 
     assert "SNI area prediction" not in report.actual_row
     sni_predictor.predict_area({

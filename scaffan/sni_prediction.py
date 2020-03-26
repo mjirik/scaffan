@@ -27,14 +27,14 @@ class SniPredictor:
             ptip="Prediction of SNI based on pre-trained regression from texture features.",
     ):
         params = [
-            {
-                "name": "Model Name",
-                "type": "str",
-                "value": "posenet_highLR",
-                # "suffix": "px",
-                # "siPrefix": False,
-                "tip": "Name of the used model",
-            },
+            # {
+            #     "name": "Model Name",
+            #     "type": "str",
+            #     "value": "posenet_highLR",
+            #     # "suffix": "px",
+            #     # "siPrefix": False,
+            #     "tip": "Name of the used model",
+            # },
             # {
             #     "name": "Example Integer Param",
             #     "type": "int",
@@ -94,11 +94,12 @@ class SniPredictor:
         :param view:
         :return:
         """
+        pass
 
-        model = self.model
-
-        grayscale_image = view.get_region_image(as_gray=True)
-
-        # Get parameter value
-        # sample_weight = float(self.parameters.param("Example Float Param").value())
-        return (grayscale_image > 0.5).astype(np.uint8)
+        # model = self.model
+        #
+        # grayscale_image = view.get_region_image(as_gray=True)
+        #
+        # # Get parameter value
+        # # sample_weight = float(self.parameters.param("Example Float Param").value())
+        # return (grayscale_image > 0.5).astype(np.uint8)
