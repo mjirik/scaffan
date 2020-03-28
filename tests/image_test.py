@@ -438,13 +438,19 @@ def test_just_outer_annotations(anim_scp003):
         assert np.max(ann_raster) > 0
 
 
-def test_get_all_black_annotations_in_view(anim_scp003):
+def test_get_all_black_annotations_in_view_around_hole(anim_scp003):
+
     anim = anim_scp003
-    ann_ids = anim.select_annotations_by_color("#00FF00")
-    view = anim.get_view(annotation_id=ann_ids[0], level=6)
+    # Find inner hole ids
+    outer_ids, holes_ids = anim.select_just_outer_annotations("#000000")
+
+    #take first hole to get view
+    view = anim.get_view(annotation_id=holes_ids[0][0], level=5)
     ann_raster = view.get_annotation_raster_by_color("#000000")
-    assert np.min(ann_raster) == 0
-    assert np.max(ann_raster) > 0
+    # plt.imshow(ann_raster)
+    # plt.show()
+    assert np.min(ann_raster) == 0, "in the hole there should be 0"
+    assert np.max(ann_raster) > 0, "around the hole there should be 1"
 
 
 def test_view_by_pixelsize_and_size_on_level(anim_scp003):
