@@ -7,6 +7,7 @@ import io3d  # just to get data
 import scaffan.image as scim
 from typing import List
 import exsu
+from matplotlib import pyplot as plt
 
 import scaffan.slide_segmentation
 
@@ -24,5 +25,11 @@ def test_slide_segmentation():
     ann_ids_black = seg.anim.select_annotations_by_color("#000000")
     assert 10 in ann_ids_black
     assert 11 in ann_ids_black
+    seg.run()
+    assert seg.full_raster_image.shape[:2] == seg.full_output_image.shape[:2]
+    # plt.imshow(seg.full_output_image)
+    # plt.show()
+    # plt.imshow(seg.full_raster_image)
+    # plt.show()
     # seg._find_best_level()
     # seg._find_best_level()

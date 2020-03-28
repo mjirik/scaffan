@@ -499,20 +499,38 @@ class ScanSegmentation:
             imsize_on_level,
         ) = self._get_tiles_parameters()
         output_image = np.zeros(output_size, dtype=int)
-        for iy, tile_column in enumerate(self.tiles):
-            for ix, tile in enumerate(tile_column):
-                output_image[
-                    ix * self.tile_size[0] : (ix + 1) * self.tile_size[0],
-                    iy * self.tile_size[1] : (iy + 1) * self.tile_size[1]
-                    #                     int(x0):int(x0 + tile_size_on_level[0]),
-                    #                     int(y0):int(y0 + tile_size_on_level[1])
-                    #                 ] = self.tiles[ix][iy].get_region_image(as_gray=True)
-                ] = self.tiles[iy][ix].get_region_image(as_gray=as_gray)[:, :, :3]
-        #                 ] = self.predicted_tiles[iy][ix]
+        # for iy, tile_column in enumerate(self.tiles):
+        #     for ix, tile in enumerate(tile_column):
+        #         output_image[
+        #             ix * self.tile_size[0] : (ix + 1) * self.tile_size[0],
+        #             iy * self.tile_size[1] : (iy + 1) * self.tile_size[1]
+        #         ] = self.tiles[iy][ix].get_region_image(as_gray=as_gray)[:, :, :3]
+        for iy, ix, sl_x_in, sl_y_in, sl_x_out, sl_y_out in self.tile_iterator():
+            output_image[sl_x_out, sl_y_out] = self.tiles[iy][ix].get_region_image(as_gray=as_gray)[sl_x_in, sl_y_in, :3]
 
         full_image = output_image[: int(imsize_on_level[1]), : int(imsize_on_level[0])]
         self.full_raster_image = full_image
         return full_image
+
+    def tile_iterator(self):
+        for iy, tile_column in enumerate(self.tiles):
+            for ix, tile in enumerate(tile_column):
+                x_start = ix * self.tile_size[0]
+                x_stop = (ix + 1) * self.tile_size[0]
+                y_start = iy * self.tile_size[1]
+                y_stop = (iy + 1) * self.tile_size[1]
+                sl_x_out = slice(x_start, x_stop)
+                sl_y_out = slice(y_start, y_stop)
+                sl_x_in = slice(None, None)
+                sl_y_in = slice(None, None)
+                yield iy, ix, sl_x_in, sl_y_in, sl_x_out, sl_y_out
+
+
+                #                     int(x0):int(x0 + tile_size_on_level[0]),
+                #                     int(y0):int(y0 + tile_size_on_level[1])
+                #                 ] = self.tiles[ix][iy].get_region_image(as_gray=True)
+                # ] = self.tiles[iy][ix].get_region_image(as_gray=as_gray)[:, :, :3]
+
 
     def evaluate(self):
         logger.debug("evaluate")
