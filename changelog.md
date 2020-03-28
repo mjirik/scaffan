@@ -1,5 +1,8 @@
 # Changelog
 
+## new
+
+* [Added] Get all annotation raster with the same color in view
 
 # 0.21
 

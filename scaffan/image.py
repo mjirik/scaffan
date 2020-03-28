@@ -903,6 +903,27 @@ class View:
             ann_raster = ann_raster ^ ann_raster2
         return ann_raster
 
+    def get_annotation_raster_by_color(self, color, make_holes=True):
+        """
+        Prepare raster image with all annotation with the defined color
+        :param color: requested annotation color
+        :param make_holes: make whole if the same annotation label is inside
+        :return:
+        """
+        outer_ids, holes_ids = self.anim.select_just_outer_annotations(color=color)
+        segmentation_one_color = None
+        for outer_id, hole_ids in zip(outer_ids, holes_ids):
+            if make_holes:
+                ann_raster = self.get_annotation_region_raster(
+                    outer_id, holes_ids=hole_ids
+                )
+            else:
+                ann_raster = self.get_annotation_region_raster(outer_id)
+            if segmentation_one_color is None:
+                segmentation_one_color = ann_raster
+            segmentation_one_color += ann_raster
+        return segmentation_one_color
+
     def _get_single_annotation_region_raster(self, annotation_id):
         annotation_id = self.anim.get_annotation_id(annotation_id)
         # Coordinates swap

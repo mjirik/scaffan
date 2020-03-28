@@ -35,6 +35,15 @@ import scaffan
 import scaffan.image as scim
 
 
+@pytest.fixture
+def anim_scp003():
+    fn = io3d.datasets.join_path(
+        "medical", "orig", "sample_data", "SCP003", "SCP003.ndpi", get_root=True
+    )
+    anim = scim.AnnotatedImage(fn)
+    return anim
+
+
 class ImageAnnotationTest(unittest.TestCase):
     def test_get_pixelsize_on_different_levels(self):
         fn = io3d.datasets.join_path("medical", "orig", "CMU-1.ndpi", get_root=True)
@@ -352,129 +361,121 @@ class ImageAnnotationTest(unittest.TestCase):
         #                 "shape of mask should be the same as shape of image")
         # assert image[0, 0, 0] == 202
 
-    def test_outer_and_inner_annotation(self):
-        fn = io3d.datasets.join_path(
-            "medical", "orig", "sample_data", "SCP003", "SCP003.ndpi", get_root=True
-        )
-        anim = scim.AnnotatedImage(fn)
-        ann_ids = anim.select_annotations_by_color("#00FFFF")
-        assert len(ann_ids) > 0
-        assert len(ann_ids) == 2
 
-        # find outer annotation from 0th cyan object
-        outer_id = anim.select_outer_annotations(ann_ids[0])
-        assert len(outer_id) == 1
+def test_outer_and_inner_annotation(anim_scp003):
+    anim = anim_scp003
+    ann_ids = anim.select_annotations_by_color("#00FFFF")
+    assert len(ann_ids) > 0
+    assert len(ann_ids) == 2
 
-        # find inner annotations to outer annotation of 0th object
-        inner_ids = anim.select_inner_annotations(outer_id[0])
-        assert len(inner_ids) == 2
+    # find outer annotation from 0th cyan object
+    outer_id = anim.select_outer_annotations(ann_ids[0])
+    assert len(outer_id) == 1
 
-        # find black inner annotations to outer annotation of 0th object
-        inner_ids = anim.select_inner_annotations(outer_id[0], color="#000000")
-        assert len(inner_ids) == 1
+    # find inner annotations to outer annotation of 0th object
+    inner_ids = anim.select_inner_annotations(outer_id[0])
+    assert len(inner_ids) == 2
 
-        cyan_inner_ids = anim.select_inner_annotations(outer_id[0], color="#00FFFF")
-        assert len(cyan_inner_ids) == 1
-        assert ann_ids[0] == cyan_inner_ids[0]
+    # find black inner annotations to outer annotation of 0th object
+    inner_ids = anim.select_inner_annotations(outer_id[0], color="#000000")
+    assert len(inner_ids) == 1
 
-        black_ann_ids = anim.select_annotations_by_color("#000000")
-        # find black inner annotations to outer annotation of 0th object
-        inner_ids = anim.select_inner_annotations(outer_id[0], ann_ids=black_ann_ids)
-        assert len(inner_ids) == 1
+    cyan_inner_ids = anim.select_inner_annotations(outer_id[0], color="#00FFFF")
+    assert len(cyan_inner_ids) == 1
+    assert ann_ids[0] == cyan_inner_ids[0]
 
-    def test_get_outer_ann(self):
-        fn = io3d.datasets.join_path(
-            "medical", "orig", "sample_data", "SCP003", "SCP003.ndpi", get_root=True
-        )
-        anim = scim.AnnotatedImage(fn)
-        color = "#000000"
-        outer_ids, holes_ids = anim.select_just_outer_annotations(
-            color, return_holes=True
-        )
-        logger.debug(f"outer ids {outer_ids}")
-        logger.debug(f"holes ids {holes_ids}")
-        assert len(outer_ids) > 0
-        assert len(holes_ids) > 0
-        assert len(holes_ids[0]) > 0
-        assert (
-            anim.select_inner_annotations(outer_ids[0], color=color)[0]
-            == holes_ids[0][0]
-        )
+    black_ann_ids = anim.select_annotations_by_color("#000000")
+    # find black inner annotations to outer annotation of 0th object
+    inner_ids = anim.select_inner_annotations(outer_id[0], ann_ids=black_ann_ids)
+    assert len(inner_ids) == 1
 
-    def test_get_annotation_center(self):
-        fn = io3d.datasets.join_path(
-            "medical", "orig", "sample_data", "SCP003", "SCP003.ndpi", get_root=True
-        )
-        anim = scim.AnnotatedImage(fn)
-        center_x, center_y = anim.get_annotation_center_mm(1)
-        # print(anim.annotations[1]["y_mm"])
-        # print(anim.annotations[1]["x_mm"])
-        # for some strange reason the y is usually negative
-        assert center_x > -100
-        assert center_y > -100
-        assert center_x < 100
-        assert center_y < 100
 
-    def test_get_ann_by_color(self):
-        fn = io3d.datasets.join_path(
-            "medical", "orig", "sample_data", "SCP003", "SCP003.ndpi", get_root=True
-        )
-        anim = scim.AnnotatedImage(fn)
-        ann_ids_black = anim.select_annotations_by_color("#000000")
-        assert 10 in ann_ids_black
-        assert 11 in ann_ids_black
+def test_get_outer_ann(anim_scp003):
+    anim = anim_scp003
+    color = "#000000"
+    outer_ids, holes_ids = anim.select_just_outer_annotations(color, return_holes=True)
+    logger.debug(f"outer ids {outer_ids}")
+    logger.debug(f"holes ids {holes_ids}")
+    assert len(outer_ids) > 0
+    assert len(holes_ids) > 0
+    assert len(holes_ids[0]) > 0
+    assert (
+        anim.select_inner_annotations(outer_ids[0], color=color)[0] == holes_ids[0][0]
+    )
 
-    def test_just_outer_annotations(self):
-        fn = io3d.datasets.join_path(
-            "medical", "orig", "sample_data", "SCP003", "SCP003.ndpi", get_root=True
-        )
-        anim = scim.AnnotatedImage(fn)
-        outer_ids, holes_ids = anim.select_just_outer_annotations("#000000")
-        assert 10 in outer_ids
-        assert [11] in holes_ids
 
-        views = anim.get_views(outer_ids, level=6)
-        # ann_rasters = []
-        for id1, id2, view_ann in zip(outer_ids, holes_ids, views):
-            ann_raster = view_ann.get_annotation_raster(id1, holes_ids=id2)
-            # ann_rasters.append(ann_raster)
-            assert np.min(ann_raster) == 0
-            assert np.max(ann_raster) > 0
+def test_get_annotation_center(anim_scp003):
+    anim = anim_scp003
+    center_x, center_y = anim.get_annotation_center_mm(1)
+    # print(anim.annotations[1]["y_mm"])
+    # print(anim.annotations[1]["x_mm"])
+    # for some strange reason the y is usually negative
+    assert center_x > -100
+    assert center_y > -100
+    assert center_x < 100
+    assert center_y < 100
 
-    def test_view_by_pixelsize_and_size_on_level(self):
-        fn = io3d.datasets.join_path(
-            "medical", "orig", "sample_data", "SCP003", "SCP003.ndpi", get_root=True
-        )
-        anim = scaffan.image.AnnotatedImage(fn)
-        ann_ids = anim.select_annotations_by_color("#FFFF00")
-        size_px = 224
-        # anim.get_views(ann_ids)
-        view = anim.get_view(
-            annotation_id=ann_ids[0],
-            size_on_level=[size_px, size_px],
-            pixelsize_mm=[0.01, 0.01],
-        )
-        img = view.get_region_image(as_gray=True)
-        # plt.imshow(img)
-        # plt.show()
-        assert img.shape[0] == size_px
-        assert img.shape[1] == size_px
 
-    def test_view_by_size_mm(self):
-        fn = io3d.datasets.join_path(
-            "medical", "orig", "sample_data", "SCP003", "SCP003.ndpi", get_root=True
-        )
-        anim = scaffan.image.AnnotatedImage(fn)
-        ann_ids = anim.select_annotations_by_color("#FFFF00")
-        size_px = 100
-        size_mm = [1, 1]
-        # anim.get_views(ann_ids)
-        view = anim.get_view(
-            annotation_id=ann_ids[0], size_mm=size_mm, pixelsize_mm=[0.01, 0.01]
-        )
-        img = view.get_region_image(as_gray=True)
-        # plt.imshow(img)
-        # plt.show()
-        # assert img.shape[0] == size_px
-        # assert img.shape[1] == size_px
-        assert pytest.approx(img.shape[:2], [size_px], abs=2.0)
+def test_get_ann_by_color(anim_scp003):
+    anim = anim_scp003
+    ann_ids_black = anim.select_annotations_by_color("#000000")
+    assert 10 in ann_ids_black
+    assert 11 in ann_ids_black
+
+
+def test_just_outer_annotations(anim_scp003):
+    anim = anim_scp003
+    outer_ids, holes_ids = anim.select_just_outer_annotations("#000000")
+    assert 10 in outer_ids
+    assert [11] in holes_ids
+
+    views = anim.get_views(outer_ids, level=6)
+    # ann_rasters = []
+    for id1, id2, view_ann in zip(outer_ids, holes_ids, views):
+        ann_raster = view_ann.get_annotation_raster(id1, holes_ids=id2)
+        # ann_rasters.append(ann_raster)
+        assert np.min(ann_raster) == 0
+        assert np.max(ann_raster) > 0
+
+
+def test_get_all_black_annotations_in_view(anim_scp003):
+    anim = anim_scp003
+    ann_ids = anim.select_annotations_by_color("#00FF00")
+    view = anim.get_view(annotation_id=ann_ids[0], level=6)
+    ann_raster = view.get_annotation_raster_by_color("#000000")
+    assert np.min(ann_raster) == 0
+    assert np.max(ann_raster) > 0
+
+
+def test_view_by_pixelsize_and_size_on_level(anim_scp003):
+    anim = anim_scp003
+    ann_ids = anim.select_annotations_by_color("#FFFF00")
+    size_px = 224
+    # anim.get_views(ann_ids)
+    view = anim.get_view(
+        annotation_id=ann_ids[0],
+        size_on_level=[size_px, size_px],
+        pixelsize_mm=[0.01, 0.01],
+    )
+    img = view.get_region_image(as_gray=True)
+    # plt.imshow(img)
+    # plt.show()
+    assert img.shape[0] == size_px
+    assert img.shape[1] == size_px
+
+
+def test_view_by_size_mm(anim_scp003):
+    anim = anim_scp003
+    ann_ids = anim.select_annotations_by_color("#FFFF00")
+    size_px = 100
+    size_mm = [1, 1]
+    # anim.get_views(ann_ids)
+    view = anim.get_view(
+        annotation_id=ann_ids[0], size_mm=size_mm, pixelsize_mm=[0.01, 0.01]
+    )
+    img = view.get_region_image(as_gray=True)
+    # plt.imshow(img)
+    # plt.show()
+    # assert img.shape[0] == size_px
+    # assert img.shape[1] == size_px
+    assert pytest.approx(img.shape[:2], [size_px], abs=2.0)
