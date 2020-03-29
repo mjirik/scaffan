@@ -131,6 +131,17 @@ class ScanSegmentation:
                 ],
             },
             {
+                "name": "Save Training Labels",
+                "type": "bool",
+                "value": False,
+                # "suffix": "px",
+                "siPrefix": False,
+                "tip": "Training labels from original image are saved to output dir. " +
+                       "There is computation cost when it is turned on. " +
+                       "It is not used in standard processing. " +
+                       "The training labels are: 'unknown', 'background', 'intralobular' and 'interlobular'.",
+            },
+            {
                 "name": "Lobulus Number",
                 "type": "int",
                 "value": 5,
@@ -171,6 +182,7 @@ class ScanSegmentation:
         # self._clf_params = dict(gamma=2, C=1)
         self._clf_object = GaussianNB
         self._clf_params = {}
+        self.whole_slide_training_labels = None
         # self._clf_object = DecisionTreeClassifier # no partial fit :-(
         # self._clf_params = dict(max_depth=5)
 
@@ -429,18 +441,37 @@ class ScanSegmentation:
         img_pred = predicted.reshape(image.shape[0], image.shape[1])
         return img_pred
 
-    # def save_training_labels(self):
-    #     if self.tiles is None:
-    #         self.make_tiles()
-    #     szx = len(self.tiles)
-    #     szy = len(self.tiles[0])
-    #     output_image = np.zeros(self.tile_size * np.asarray([szy, szx]), dtype=int)
-    #     logger.debug("saving training labels")
-    #
-    #
-    #     for sl_x_in, sl_y_in, sl_x_out, sl_y_out, iy, ix  in self.tile_iterator(return_tile_coords=True):
-    #         output_image[sl_x_out, sl_y_out] = self.tiles[iy][ix].get_region_image(as_gray=as_gray)[sl_x_in, sl_y_in, :3]
-    #
+    def save_training_labels(self):
+        if self.tiles is None:
+            self.make_tiles()
+        logger.debug("saving training labels")
+        (
+            imsize,
+            tile_size_on_level0,
+            tile_size_on_level,
+            imsize_on_level,
+        ) = self._get_tiles_parameters()
+        szx = len(self.tiles)
+        szy = len(self.tiles[0])
+        output_image = np.zeros(self.tile_size * np.asarray([szy, szx]), dtype=int)
+
+        for sl_x_in, sl_y_in, sl_x_out, sl_y_out, iy, ix  in self.tile_iterator(return_tile_coords=True):
+            view = self.tiles[iy][ix]
+            seg_black = view.get_annotation_raster_by_color("#000000")
+            seg_magenta = view.get_annotation_raster_by_color("#FF00FF")
+            seg_red = view.get_annotation_raster_by_color("#FF0000")
+            # find overlays
+            overlays = (1 * seg_black + 1 * seg_magenta + 1 * seg_red) > 1
+            segmentation = 2 * seg_black + 1 * seg_magenta + 3 * seg_red
+            # remove overlays
+            segmentation[overlays] = 0
+            output_image[sl_x_out, sl_y_out] = segmentation #.get_region_image(as_gray=as_gray)[sl_x_in, sl_y_in, :3]
+
+        self.whole_slide_training_labels = output_image[: int(imsize_on_level[1]), : int(imsize_on_level[0])]
+        self.report.imsave(
+            "whole_slide_training_labels.png", self.whole_slide_training_labels, level_skimage=20, level_npz=30
+        )
+
 
     def predict_tiles(self):
         if self.tiles is None:
@@ -725,3 +756,5 @@ class ScanSegmentation:
         self.predict()
         logger.debug("evaluate...")
         self.evaluate()
+        if bool(self.parameters.param("Save Training Labels").value()):
+            self.save_training_labels()

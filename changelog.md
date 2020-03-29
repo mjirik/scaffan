@@ -2,6 +2,7 @@
 
 ## new
 
+* [Added] Save training labels image from input annotation
 * [Added] Get all annotation raster with the same color in view
 
 # 0.21

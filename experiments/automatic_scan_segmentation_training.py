@@ -76,6 +76,7 @@ mainapp.set_parameter("Processing;Intensity Normalization", False)
 
 # mainapp.set_parameter("Processing;Skeleton Analysis", False)
 # mainapp.set_parameter("Processing;Texture Analysis", False)
+mainapp.set_parameter("Processing;Scan Segmentation;Save Training Labels", True) # default is 0.000001 (10 um)
 mainapp.set_report_level(10)
 # mainapp.set_parameter("Processing;Lobulus Segmentation;Manual Segmentation", True)
 
