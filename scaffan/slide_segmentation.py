@@ -398,6 +398,23 @@ class ScanSegmentation:
 
             self.tiles.append(column_tiles)
 
+        # todo the iterator is strange the x and y seems to be swapped sometimes
+        # self.tiles2 = []
+        # column_tiles=[]
+        # for iy, ix, x0, y0 in self.tile_iterator(
+        #         return_in_out_coords=False,
+        #         return_tile_coords=True,
+        #         return_level0_coords=True):
+        #     if len(self.tiles2) <= ix:
+        #         column_tiles = []
+        #         self.tiles2.append(column_tiles)
+        #     view = self.anim.get_view(
+        #         location=(x0, y0), size_on_level=size_on_level, level=self.level
+        #     )
+        #     self.tiles2[ix].append(view)
+        pass
+
+
     def predict_on_view(self, view):
         if str(self.parameters.param("Segmentation Method").value()) == "HCTFS":
             return self.predict_on_view_hctfs(view)
@@ -411,6 +428,19 @@ class ScanSegmentation:
         predicted = self.clf.predict(fvs).astype(np.int)
         img_pred = predicted.reshape(image.shape[0], image.shape[1])
         return img_pred
+
+    # def save_training_labels(self):
+    #     if self.tiles is None:
+    #         self.make_tiles()
+    #     szx = len(self.tiles)
+    #     szy = len(self.tiles[0])
+    #     output_image = np.zeros(self.tile_size * np.asarray([szy, szx]), dtype=int)
+    #     logger.debug("saving training labels")
+    #
+    #
+    #     for sl_x_in, sl_y_in, sl_x_out, sl_y_out, iy, ix  in self.tile_iterator(return_tile_coords=True):
+    #         output_image[sl_x_out, sl_y_out] = self.tiles[iy][ix].get_region_image(as_gray=as_gray)[sl_x_in, sl_y_in, :3]
+    #
 
     def predict_tiles(self):
         if self.tiles is None:
@@ -505,16 +535,26 @@ class ScanSegmentation:
         #             ix * self.tile_size[0] : (ix + 1) * self.tile_size[0],
         #             iy * self.tile_size[1] : (iy + 1) * self.tile_size[1]
         #         ] = self.tiles[iy][ix].get_region_image(as_gray=as_gray)[:, :, :3]
-        for iy, ix, sl_x_in, sl_y_in, sl_x_out, sl_y_out in self.tile_iterator():
+        for sl_x_in, sl_y_in, sl_x_out, sl_y_out, iy, ix  in self.tile_iterator(return_tile_coords=True):
             output_image[sl_x_out, sl_y_out] = self.tiles[iy][ix].get_region_image(as_gray=as_gray)[sl_x_in, sl_y_in, :3]
 
         full_image = output_image[: int(imsize_on_level[1]), : int(imsize_on_level[0])]
         self.full_raster_image = full_image
         return full_image
 
-    def tile_iterator(self):
-        for iy, tile_column in enumerate(self.tiles):
-            for ix, tile in enumerate(tile_column):
+    def tile_iterator(self, return_in_out_coords=True, return_level0_coords=False, return_tile_coords=False):
+        (
+            imsize,
+            size_on_level0,
+            size_on_level,
+            imsize_on_level,
+        ) = self._get_tiles_parameters()
+        # TODO fix this strange behaviro - the x is related with 1 and y with 0
+        for ix, x0 in enumerate(range(0, int(imsize[1]), int(size_on_level0[1]))):
+            for iy, y0 in enumerate(range(0, int(imsize[0]), int(size_on_level0[0]))):
+        # for iy, tile_column in enumerate(self.tiles):
+        #     for ix, tile in enumerate(tile_column):
+        # logger.trace(f"processing tile {x0}, {y0}")
                 x_start = ix * self.tile_size[0]
                 x_stop = (ix + 1) * self.tile_size[0]
                 y_start = iy * self.tile_size[1]
@@ -523,7 +563,16 @@ class ScanSegmentation:
                 sl_y_out = slice(y_start, y_stop)
                 sl_x_in = slice(None, None)
                 sl_y_in = slice(None, None)
-                yield iy, ix, sl_x_in, sl_y_in, sl_x_out, sl_y_out
+                out = []
+                if return_in_out_coords:
+                    out.extend([sl_x_in, sl_y_in, sl_x_out, sl_y_out])
+                if return_tile_coords:
+                    out.append(iy)
+                    out.append(ix)
+                if return_level0_coords:
+                    out.append(x0)
+                    out.append(y0)
+                yield tuple(out)
 
 
                 #                     int(x0):int(x0 + tile_size_on_level[0]),

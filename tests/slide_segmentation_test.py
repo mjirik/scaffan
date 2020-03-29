@@ -27,9 +27,9 @@ def test_slide_segmentation():
     assert 11 in ann_ids_black
     seg.run()
     assert seg.full_raster_image.shape[:2] == seg.full_output_image.shape[:2]
-    # plt.imshow(seg.full_output_image)
-    # plt.show()
-    # plt.imshow(seg.full_raster_image)
-    # plt.show()
+    plt.imshow(seg.full_output_image)
+    plt.show()
+    plt.imshow(seg.full_raster_image)
+    plt.show()
     # seg._find_best_level()
     # seg._find_best_level()
