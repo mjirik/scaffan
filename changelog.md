@@ -4,6 +4,7 @@
 
 * [Added] Save training labels image from input annotation
 * [Added] Get all annotation raster with the same color in view
+* [Added] Tiff file format added into reader
 
 # 0.21
 

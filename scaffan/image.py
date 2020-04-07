@@ -23,13 +23,18 @@ import sys
 import os
 import numpy as np
 import skimage.color
+import skimage.io
+import skimage.transform
 from scaffan import annotation as scan
 from scaffan import libfixer
 from scaffan import image_intensity_rescale
 import imma
+from pathlib import Path
 
 from matplotlib.path import Path as mplPath
 from mpl_toolkits.axes_grid1 import make_axes_locatable
+from PIL import Image
+from PIL.TiffTags import TAGS
 
 annotationID = Union[int, str]
 annotationIDs = List[annotationID]
@@ -112,11 +117,15 @@ def get_pixelsize(imsl, level=0, requested_unit="mm"):
     if resolution_unit is None:
         pixelunit = resolution_unit
     elif requested_unit in ("mm"):
-        if resolution_unit in ("cm", "centimeter"):
+        if resolution_unit in ("mm"):
+            pixelunit = resolution_unit
+        elif resolution_unit in ("cm", "centimeter"):
             downsamples = downsamples * 10.0
             pixelunit = "mm"
-        elif resolution_unit in ("mm"):
-            pixelunit = resolution_unit
+        elif resolution_unit in ("m"):
+            downsamples = downsamples * 1000.0
+            pixelunit = "mm"
+
         else:
             raise ValueError(
                 "Cannot covert from {} to {}.".format(
@@ -192,6 +201,92 @@ def get_resize_parameters(imsl, former_level, former_size, new_level):
     new_size = (np.asarray(former_size) * scale_factor).astype(np.int)
     return scale_factor, new_size
 
+class ImageSlide():
+    """
+    Same interface as OpenSlide for images with other format.
+    """
+    def __init__(self, path):
+        self.openslide:openslide.OpenSlide = None
+        self.path = path
+        self.imagedata = None
+        self.properties = None
+        if Path(self.path).suffix in (".tiff", ".tif", ".TIFF", ".TIF"):
+            self.image_type = ".tiff"
+            self.get_thumbnail = self._get_thumbnail
+            self.read_region = self._read_region
+            self._set_tiff_properties()
+            self.level_downsamples = [float(2**i) for i in range(0, 8)]
+            self.level_count = len(self.level_downsamples)
+
+        elif Path(self.path).suffix in (".ndpi"):
+            self.image_type = ".ndpi"
+            imsl = openslide.OpenSlide(path)
+            self.openslide = imsl
+            self.properties = imsl.properties
+            self.level_downsamples = imsl.level_downsamples
+            self.dimensions = imsl.dimensions
+            self.level_count = imsl.level_count
+            self.get_thumbnail = imsl.get_thumbnail
+            self.read_region = imsl.read_region
+
+    def _get_thumbnail(self, size):
+        img = skimage.io.imread(self.path)
+        return skimage.transform.resize(img, size)
+
+    def _get_imagedata(self):
+        if self.imagedata is None:
+            self.imagedata = skimage.io.imread(self.path)
+        return self.imagedata
+
+    def _read_region(self, location, level, size):
+        img = self._get_imagedata()
+        koef = int(2**level)
+        sl0 = slice(location[0], location[0] + (size[0]*koef))
+        sl1 = slice(location[1], location[1] + (size[1]*koef))
+        return skimage.transform.resize(img[sl0, sl1], size)
+
+    def _set_tiff_properties(self):
+        with Image.open(self.path) as img:
+            meta_dict = {TAGS[key]: img.tag[key] for key in img.tag}
+
+        unit_multiplicator = 1
+        if "ImageDescription" in meta_dict:
+            key_value = [couplestring.split("=") for couplestring in meta_dict["ImageDescription"][0].split("\n")]
+            image_description = {kv[0]: kv[1] for kv in key_value if len(kv) > 1}
+
+            if "unit" in image_description:
+                if image_description["unit"] == "micron":
+                    unit_multiplicator = 0.000001
+
+        try:
+            xr = meta_dict["XResolution"]
+            logger.debug(f"xr={xr}")
+            xres = (xr[0][1] / xr[0][0]) * unit_multiplicator
+            self.parameters.param("Input", "Pixel Size X").setValue(xres)
+            yr = meta_dict["YResolution"]
+            logger.debug(f"yr={xr}")
+            yres = (yr[0][1] / yr[0][0]) * unit_multiplicator
+        except Exception as e:
+            logger.warning("Resolution reading failed")
+            xres = 1.0
+            yres = 1.0
+
+        meta_dict["tiff.ResolutionUnit"] = "m"
+        meta_dict["tiff.XResolution"] = xres
+        meta_dict["tiff.YResolution"] = yres
+        meta_dict["hamamatsu.XOffsetFromSlideCentre"] = 0
+        meta_dict["hamamatsu.YOffsetFromSlideCentre"] = 0
+        self.properties = meta_dict
+
+    #     if self.openslide is not None:
+    #         return self.openslide.get_thumbnail(size)
+    #
+    # def read_region(self, location, level, size):
+    #     if self.openslide is not None:
+    #         return self.openslide.get_thumbnail(size)
+
+
+
 
 class AnnotatedImage:
     """
@@ -207,21 +302,57 @@ class AnnotatedImage:
         # pth_encoded = path.encode(fs_enc)
         # path.encode()
         # logger.debug(f"path encoded {pth_encoded}")
-        self.openslide: openslide.OpenSlide = openslide.OpenSlide(path)
+        self.image_type:str = None
+        if Path(self.path).suffix in (".tiff", ".tif", ".TIFF", ".TIF"):
+            self.openslide = None
+            self.image_type = ".tiff"
+        else:
+            self.image_type = ".ndpi"
+        self.openslide: ImageSlide = ImageSlide(path)
         self.region_location = None
         self.region_size = None
         self.region_level = None
         self.region_pixelsize = None
         self.region_pixelunit = None
         self.pixelunit = "mm"
-        self.level_pixelsize = [
-            get_pixelsize(self.openslide, i, requested_unit=self.pixelunit)[0]
-            for i in range(0, self.openslide.level_count)
-        ]
+        self.level_pixelsize:list = None
+        self.level_pixelsize_derived_from_resolution_on_level_0:bool = False
+        self._set_level_pixelsize()
+
         if not skip_read_annotations:
             self.read_annotations()
         self.intensity_rescaler = image_intensity_rescale.RescaleIntensityPercentile()
         self.run_intensity_rescale = False
+
+    def update_pixelsize(self, pixelsize_on_level_0):
+        """
+        Used to change pixelsize from GUI.
+        :param pixelsize_on_level_0:
+        :return:
+        """
+        self._set_level_pixelsize(pixelsize_on_level_0)
+        self.read_annotations()
+
+    def _set_level_pixelsize(self, pixelsize_on_level_0=None):
+        """
+
+        :param pixelsize_on_level_0: list or array of two numbers
+        :return:
+        """
+        if pixelsize_on_level_0 is not None:
+            pixelsize_on_level_0 = np.asarray(pixelsize_on_level_0)
+            self.level_pixelsize = [pixelsize_on_level_0/float(2**i) for i in range(0, 7)]
+            self.level_pixelsize_derived_from_resolution_on_level_0 = True
+        else:
+            self._set_level_pixelsize_with_openslide()
+
+
+    def _set_level_pixelsize_with_openslide(self):
+
+        self.level_pixelsize = [
+            get_pixelsize(self.openslide, i, requested_unit=self.pixelunit)[0]
+            for i in range(0, self.openslide.level_count)
+        ]
 
     def set_intensity_rescale_parameters(
         self,
@@ -307,8 +438,12 @@ class AnnotatedImage:
         :return:
         """
         logger.debug(f"Reading the annotation {self.path}")
-        self.annotations = scan.read_annotations(self.path)
-        self.annotations = scan.annotations_to_px(self.openslide, self.annotations)
+        if self.image_type == ".ndpi":
+            self.annotations = scan.read_annotations(self.path)
+            self.annotations = scan.annotations_to_px(self.openslide, self.annotations)
+        else: #if self.image_type == ".tiff":
+            # TODO maybe add reader of VGG Image Annotator
+            self.annotations = {}
         self.id_by_titles = scan.annotation_titles(self.annotations)
         self.id_by_colors = scan.annotation_colors(self.annotations)
         # self.details = scan.annotation_details(self.annotations)
