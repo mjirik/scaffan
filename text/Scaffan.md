@@ -25,6 +25,15 @@ The packages [Numpy](#numpy), [Scipy](#scipy), [Scikit-image](#sciklimage) are u
 general image processing. The morphsnakes package ([Neila](#neila) and [Avarez](#avares)) 
 are used for segmentation tasks. For machine learning the [Scikit-learn](#sklean) is used.
 
+## Input data
+
+Input data can be stored in Hamamatsu `.ndpi` file format. The OpenSlide library (described in 
+[Analyzing huge pathology images with open source software](anayzing-huge-patology-images-with-open-source-software)
+and 
+[Open source tools for digital microscopy data](open-source-tools-for_digital-microsopy-data)
+)
+is used to read the data. Image data format is described in 
+[OpenSlide Hamamatsu image format](#openslide-hamamatsu-image-format).
 
 
 ## Lobulus segmentation
@@ -84,7 +93,7 @@ Reference-style:
 
 
 
-
+`b`
 
 ## Annotation 
 
@@ -241,3 +250,49 @@ Venue:	INTERNATIONAL JOURNAL OF COMPUTER VISION
 Citations:	3874 - 17 self
 
 https://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.124.5318
+
+
+## OpenSlide Hamamatsu image format
+
+https://openslide.org/formats/hamamatsu/
+
+## Open source tools for digital microscopy data
+
+```bash
+@article{Khushi2013,
+abstract = {Background: Virtual microscopy includes digitisation of histology slides and the use of computer technologies for complex investigation of diseases such as cancer. However, automated image analysis, or website publishing of such digital images, is hampered by their large file sizes.Results: We have developed two Java based open source tools: Snapshot Creator and NDPI-Splitter. Snapshot Creator converts a portion of a large digital slide into a desired quality JPEG image. The image is linked to the patient's clinical and treatment information in a customised open source cancer data management software (Caisis) in use at the Australian Breast Cancer Tissue Bank (ABCTB) and then published on the ABCTB website (http://www.abctb.org.au) using Deep Zoom open source technology. Using the ABCTB online search engine, digital images can be searched by defining various criteria such as cancer type, or biomarkers expressed. NDPI-Splitter splits a large image file into smaller sections of TIFF images so that they can be easily analysed by image analysis software such as Metamorph or Matlab. NDPI-Splitter also has the capacity to filter out empty images.Conclusions: Snapshot Creator and NDPI-Splitter are novel open source Java tools. They convert digital slides into files of smaller size for further processing. In conjunction with other open source tools such as Deep Zoom and Caisis, this suite of tools is used for the management and archiving of digital microscopy images, enabling digitised images to be explored and zoomed online. Our online image repository also has the capacity to be used as a teaching resource. These tools also enable large files to be sectioned for image analysis.Virtual Slides: The virtual slide(s) for this article can be found here: http://www.diagnosticpathology.diagnomx.eu/vs/5330903258483934. {\textcopyright} 2013 Khushi et al.; licensee BioMed Central Ltd.},
+author = {Khushi, Matloob and Edwards, Georgina and de Marcos, Diego Alonso and Carpenter, Jane E. and Graham, J. Dinny and Clarke, Christine L.},
+doi = {10.1186/1746-1596-8-22},
+issn = {17461596},
+journal = {Diagnostic Pathology},
+keywords = {Caisis,Deep Zoom,Digital slides,NDPI-Splitter,Snapshot Creator,Virtual microscopy},
+number = {1},
+pages = {1--7},
+title = {{Open source tools for management and archiving of digital microscopy data to allow integration with patient pathology and treatment information}},
+volume = {8},
+year = {2013}
+}
+
+```
+
+## Analyzing huge pathology images with open source software
+
+```bash
+@article{Deroulers2013,
+abstract = {Background: Digital pathology images are increasingly used both for diagnosis and research, because slide scanners are nowadays broadly available and because the quantitative study of these images yields new insights in systems biology. However, such virtual slides build up a technical challenge since the images occupy often several gigabytes and cannot be fully opened in a computer's memory. Moreover, there is no standard format. Therefore, most common open source tools such as ImageJ fail at treating them, and the others require expensive hardware while still being prohibitively slow.Results: We have developed several cross-platform open source software tools to overcome these limitations. The NDPITools provide a way to transform microscopy images initially in the loosely supported NDPI format into one or several standard TIFF files, and to create mosaics (division of huge images into small ones, with or without overlap) in various TIFF and JPEG formats. They can be driven through ImageJ plugins. The LargeTIFFTools achieve similar functionality for huge TIFF images which do not fit into RAM. We test the performance of these tools on several digital slides and compare them, when applicable, to standard software. A statistical study of the cells in a tissue sample from an oligodendroglioma was performed on an average laptop computer to demonstrate the efficiency of the tools.Conclusions: Our open source software enables dealing with huge images with standard software on average computers. They are cross-platform, independent of proprietary libraries and very modular, allowing them to be used in other open source projects. They have excellent performance in terms of execution speed and RAM requirements. They open promising perspectives both to the clinician who wants to study a single slide and to the research team or data centre who do image analysis of many slides on a computer cluster.Virtual slides: The virtual slide(s) for this article can be found here:. http://www.diagnosticpathology.diagnomx.eu/vs/5955513929846272. {\textcopyright} 2013 Deroulers et al.; licensee BioMed Central Ltd.},
+archivePrefix = {arXiv},
+arxivId = {1709.02293},
+author = {Deroulers, Christophe and Ameisen, David and Badoual, Mathilde and Gerin, Chlo{\'{e}} and Granier, Alexandre and Lartaud, Marc},
+doi = {10.1186/1746-1596-8-92},
+eprint = {1709.02293},
+issn = {17461596},
+journal = {Diagnostic Pathology},
+keywords = {Digital pathology,Image processing,ImageJ,NDPI,Systems biology,Virtual slides},
+number = {1},
+pages = {1--8},
+title = {{Analyzing huge pathology images with open source software}},
+volume = {8},
+year = {2013}
+}
+```
+
