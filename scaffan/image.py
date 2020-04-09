@@ -71,12 +71,13 @@ def fix_location(imsl, location, level):
 
 
 # def
-def get_image_by_center(imsl, center, level=3, size=None, as_gray=True):
+def get_image_by_center(imsl, center, level=3, size=None, as_gray=True, do_fix_location=True):
     if size is None:
         size = np.array([800, 800])
 
     location = get_region_location_by_center(imsl, center, level, size)
-    location = fix_location(imsl, location, level)
+    if do_fix_location:
+        location = fix_location(imsl, location, level)
     imcr = imsl.read_region(location, level=level, size=size)
     im = np.asarray(imcr)
     if as_gray:
@@ -203,22 +204,32 @@ def get_resize_parameters(imsl, former_level, former_size, new_level):
 
 class ImageSlide():
     """
-    Same interface as OpenSlide for images with other format.
+    Same interface as OpenSlide for images with other format (.tiff and .czi).
     """
     def __init__(self, path):
         self.openslide:openslide.OpenSlide = None
         self.path = path
         self.imagedata = None
         self.properties = None
-        if Path(self.path).suffix in (".tiff", ".tif", ".TIFF", ".TIF"):
+        if Path(self.path).suffix.lower() in (".tiff", ".tif"):
             self.image_type = ".tiff"
-            self.get_thumbnail = self._get_thumbnail
-            self.read_region = self._read_region
-            self._set_tiff_properties()
+            self._get_imagedata = self.get_imagedata_tiff
+            self.get_thumbnail = self._get_thumbnail_tiff
+            self.read_region = self._read_region_other_than_ndpi
+            self._set_properties_tiff()
             self.level_downsamples = [float(2**i) for i in range(0, 8)]
             self.level_count = len(self.level_downsamples)
 
-        elif Path(self.path).suffix in (".ndpi"):
+        if Path(self.path).suffix.lower() in (".czi"):
+            self.image_type = ".czi"
+            self.get_thumbnail = self._get_thumbnail_czi
+            self._get_imagedata = self._get_imagedata_czi
+            self.read_region = self._read_region_other_than_ndpi
+            self._set_properties_czi()
+            self.level_downsamples = [float(2 ** i) for i in range(0, 8)]
+            self.level_count = len(self.level_downsamples)
+
+        elif Path(self.path).suffix.lower() in (".ndpi"):
             self.image_type = ".ndpi"
             imsl = openslide.OpenSlide(path)
             self.openslide = imsl
@@ -229,23 +240,70 @@ class ImageSlide():
             self.get_thumbnail = imsl.get_thumbnail
             self.read_region = imsl.read_region
 
-    def _get_thumbnail(self, size):
-        img = skimage.io.imread(self.path)
-        return skimage.transform.resize(img, size)
+    def _get_thumbnail_tiff(self, size):
+        self._get_imagedata_tiff()
+        return skimage.transform.resize(self.imagedata, size)
 
-    def _get_imagedata(self):
+    def _get_imagedata_tiff(self):
         if self.imagedata is None:
             self.imagedata = skimage.io.imread(self.path)
         return self.imagedata
 
-    def _read_region(self, location, level, size):
+    def _get_thumbnail_czi(self, size):
+        self._get_imagedata_czi()
+        return skimage.transform.resize(self.imagedata, size)
+
+    def _get_imagedata_czi(self):
+        from czifile import CziFile
+        if self.imagedata is None:
+            with CziFile(self.path) as czi:
+                image_arrays = czi.asarray()
+                metadata = czi.metadata()
+            img = np.squeeze(image_arrays)
+            if img.ndim != 3:
+                msg = f"Wrong input data dimension. Expected 3, got {img.ndim}."
+                logger.error(msg)
+                raise Exception(msg)
+            self.imagedata = img
+        return self.imagedata
+
+    def _read_region_other_than_ndpi(self, location, level, size):
         img = self._get_imagedata()
         koef = int(2**level)
+        newshape = list(img.shape)
+        newshape[0] = size[0]
+        newshape[1] = size[1]
         sl0 = slice(location[0], location[0] + (size[0]*koef))
         sl1 = slice(location[1], location[1] + (size[1]*koef))
-        return skimage.transform.resize(img[sl0, sl1], size)
+        imcrop = img[sl0, sl1].copy()
+        logger.debug(f"imcrop.shape={imcrop.shape}, newshape={newshape}")
+        out = skimage.transform.resize(imcrop, newshape)
+        return out
 
-    def _set_tiff_properties(self):
+    def _set_properties_czi(self):
+        import xml
+        import xml.etree.ElementTree as ET
+        from czifile import CziFile
+        # from lxml import etree
+
+        with CziFile(self.path) as czi:
+            metadata = czi.metadata()
+        # root = etree.fromstring(metadata)
+        # xres = float(root.xpath('//Distance[@Id="X"]/Value')[0].text)
+        # yres = float(root.xpath('//Distance[@Id="Y"]/Value')[0].text)
+        root = ET.fromstring(metadata)
+        xres = float(root.findall('.//Distance[@Id="X"]/Value')[0].text)
+        yres = float(root.findall('.//Distance[@Id="Y"]/Value')[0].text)
+        meta_dict = {}
+        meta_dict["tiff.ResolutionUnit"] = "m"
+        meta_dict["tiff.XResolution"] = xres
+        meta_dict["tiff.YResolution"] = yres
+        meta_dict["hamamatsu.XOffsetFromSlideCentre"] = 0
+        meta_dict["hamamatsu.YOffsetFromSlideCentre"] = 0
+
+        self.properties = meta_dict
+
+    def _set_properties_tiff(self):
         with Image.open(self.path) as img:
             meta_dict = {TAGS[key]: img.tag[key] for key in img.tag}
 
@@ -302,12 +360,9 @@ class AnnotatedImage:
         # pth_encoded = path.encode(fs_enc)
         # path.encode()
         # logger.debug(f"path encoded {pth_encoded}")
-        self.image_type:str = None
-        if Path(self.path).suffix in (".tiff", ".tif", ".TIFF", ".TIF"):
-            self.openslide = None
+        self.image_type:str = Path(self.path).suffix.lower()
+        if self.image_type in (".tiff", ".tif"):
             self.image_type = ".tiff"
-        else:
-            self.image_type = ".ndpi"
         self.openslide: ImageSlide = ImageSlide(path)
         self.region_location = None
         self.region_size = None
@@ -421,7 +476,10 @@ class AnnotatedImage:
         # return get_pixelsize(self.openslide, level)
 
     def get_image_by_center(self, center, level=3, size=None, as_gray=True):
-        img = get_image_by_center(self.openslide, center, level, size, as_gray)
+        do_fix_location = True if self.image_type == ".ndpi" else False
+        img = get_image_by_center(
+            self.openslide, center, level, size, as_gray,
+            do_fix_location=do_fix_location)
         if self.run_intensity_rescale:
             img = self.intensity_rescaler.rescale_intensity(img)
         return img
@@ -1127,16 +1185,12 @@ class View:
         can be skipped by this.
         :return:
         """
-        # if (level is None) and (pixelsize_mm is not None):
-        #     level = self.anim.get_optimal_parameters_for_fluent_resize(pixelsize_mm, safety_bound=safety_bound)
-        #     size = self.get_size_on_level(level)
-        # else:
-        #     level = self.region_level
-        #     size = self.region_size_on_level
 
-        location = fix_location(
-            self.anim.openslide, self.region_location, self.region_level
-        )
+        location = self.region_location
+        if self.anim.image_type == ".ndpi":
+            location = fix_location(
+                self.anim.openslide, location, self.region_level
+            )
         imcr = self.anim.openslide.read_region(
             location, level=self.region_level, size=self.region_size_on_level
         )
@@ -1148,7 +1202,6 @@ class View:
 
         if self._is_resized_by_pixelsize:
             pxsz_level, pxunit_level = self.anim.get_pixel_size(level=self.region_level)
-            # im1 = imma.image.resize_to_mm(im, pxsz_level, self.region_pixelsize)
             # swap coordinates because openslice output image have swapped image coordinates
             im_resized = imma.image.resize_to_mm(
                 im, pxsz_level[::-1], self.region_pixelsize[::-1], anti_aliasing=True
