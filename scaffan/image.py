@@ -117,7 +117,7 @@ def get_pixelsize(imsl, level=0, requested_unit="mm"):
     resolution_unit = pm.get("tiff.ResolutionUnit")
     resolution_x = pm.get("tiff.XResolution")
     resolution_y = pm.get("tiff.YResolution")
-    #     print("Resolution {}x{} pixels/{}".format(resolution_x, resolution_y, resolution_unit))
+    logger.trace(f"Resolution {resolution_x}x{resolution_y} pixels/{resolution_unit}")
     downsamples = imsl.level_downsamples[level]
 
     input_resolution_unit = resolution_unit
@@ -230,10 +230,20 @@ class ImageSlide():
             self.image_type = ".czi"
             self.get_thumbnail = self._get_thumbnail_czi
             self._get_imagedata = self._get_imagedata_czi
-            self.read_region = self._read_region_other_than_ndpi
+            # self.read_region = self._read_region_other_than_ndpi
+            self.read_region = self._read_region_nzi
             self._set_properties_czi()
             self.level_downsamples = [float(2 ** i) for i in range(0, 8)]
             self.level_count = len(self.level_downsamples)
+
+        # if Path(self.path).suffix.lower() in (".czi"):
+        #     self.image_type = ".czi"
+        #     self.get_thumbnail = self._get_thumbnail_czi
+        #     self._get_imagedata = self._get_imagedata_czi
+        #     self.read_region = self._read_region_other_than_ndpi
+        #     self._set_properties_czi()
+        #     self.level_downsamples = [float(2 ** i) for i in range(0, 8)]
+        #     self.level_count = len(self.level_downsamples)
 
         elif Path(self.path).suffix.lower() in (".ndpi"):
             self.image_type = ".ndpi"
@@ -274,17 +284,41 @@ class ImageSlide():
         return self.imagedata
 
     def _read_region_other_than_ndpi(self, location, level, size):
+        """
+        Works also for small nzi files
+
+        :param location:
+        :param level:
+        :param size:
+        :return:
+        """
         img = self._get_imagedata()
-        koef = int(2**level)
+        factor = int(2**level)
+        # factor = self.level_downsamples[level]
+
         newshape = list(img.shape)
         newshape[0] = size[0]
         newshape[1] = size[1]
-        sl0 = slice(location[0], location[0] + (size[0]*koef))
-        sl1 = slice(location[1], location[1] + (size[1]*koef))
+        sl0 = slice(location[0], location[0] + (size[0]*factor))
+        sl1 = slice(location[1], location[1] + (size[1]*factor))
         imcrop = img[sl0, sl1].copy()
         logger.debug(f"imcrop.shape={imcrop.shape}, newshape={newshape}")
         out = skimage.transform.resize(imcrop, newshape)
         return out
+
+    def _read_region_nzi(self, location, level, size):
+        from czifile import CziFile
+        from . import image_czi
+
+        # factor = int(2**level)
+        factor = self.level_downsamples[level]
+
+        with CziFile(self.path) as czi:
+
+            location_fixed = np.asarray(location) + self._czi_start
+            # self._czi_start = czi.start[-3:-1]
+            output = image_czi.read_region_with_scale(czi, location_fixed, size, downscale_factor=factor)
+        return output
 
     def _set_properties_czi(self):
         import xml
@@ -302,9 +336,10 @@ class ImageSlide():
         xres = float(root.findall('.//Distance[@Id="X"]/Value')[0].text)
         yres = float(root.findall('.//Distance[@Id="Y"]/Value')[0].text)
         meta_dict = {}
+        logger.debug(f"nzi pixelsize  {xres}x{yres} [m]")
         meta_dict["tiff.ResolutionUnit"] = "m"
-        meta_dict["tiff.XResolution"] = xres
-        meta_dict["tiff.YResolution"] = yres
+        meta_dict["tiff.XResolution"] = 1/xres
+        meta_dict["tiff.YResolution"] = 1/yres
         meta_dict["hamamatsu.XOffsetFromSlideCentre"] = 0
         meta_dict["hamamatsu.YOffsetFromSlideCentre"] = 0
 

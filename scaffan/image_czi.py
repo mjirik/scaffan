@@ -32,15 +32,15 @@ def get_py_slices(subb, requested_start, requested_size, output_downscale_factor
     isconj = (r_st + r_sh - s_st > 0).all() and (s_st + s_sh - r_st > 0).all()
     if isconj:
 
-        st_in_s = np.max(np.vstack([r_st - s_st, [0, 0]]), axis=0)
+        st_in_s = np.max(np.vstack([r_st - s_st, [0, 0]]), axis=0).astype(int)
         #         print([r_st - s_st, [0, 0]], f"st_in_s={st_in_s}")
-        sp_in_s = np.min(np.vstack([r_st + r_sh - s_st, s_sh]), axis=0)
+        sp_in_s = np.min(np.vstack([r_st + r_sh - s_st, s_sh]), axis=0).astype(int)
         st_in_r = np.max(np.vstack([(s_st - r_st)/odf, [0, 0]]), axis=0).astype(int)
         sp_in_r = np.min(np.vstack([(s_st - r_st)/odf + s_sh/odf, r_sh/odf]), axis=0).astype(int)
-        if ((s_st - r_st) % odf != [0, 0]).any():
-            logger.warning("Problem with downlscale factor. Indices should be int")
-        if (r_sh % odf != [0, 0]).any():
-            logger.warning("Problem with downlscale factor. Indices should be int")
+        # if ((s_st - r_st) % odf != [0, 0]).any():
+        #     logger.warning("Problem with downlscale factor. Indices should be int")
+        # if (r_sh % odf != [0, 0]).any():
+        #     logger.warning("Problem with downlscale factor. Indices should be int")
         sl_s = (
             slice(st_in_s[0], sp_in_s[0]),
             slice(st_in_s[1], sp_in_s[1])
@@ -61,10 +61,26 @@ def get_py_slices(subb, requested_start, requested_size, output_downscale_factor
     return isconj, sl_s, sl_r, size_r
 
 
-def read_region_level0(czi, location, size, downscale_factor=1):
+def read_region_with_scale(czi, location, size, downscale_factor=1):
+    """
+    Read region from czi file. White color is filled where no pixels are given if the
+    datatype is uint8 or float.
+
+    :param czi: czifile.CziFile(filename) object
+    :param location:  two numbers. It can be negative
+    :param size: size on output resolution given by downscale factor
+    :param downscale_factor: it is di
+    :return:
+    """
     requested_start = location
     requested_size = size
-    output = np.zeros(list(requested_size) + [czi.shape[-1]])
+    value = 0
+    if czi.dtype == np.uint8:
+        value = 255
+    elif czi.dtype == np.float:
+        value = 1
+
+    output = np.full(list(requested_size) + [czi.shape[-1]], fill_value=value, dtype=czi.dtype)
     subbs = []
     for subb in czi.subblocks():
         isconj, sl_s, sl_r, sz_r = get_py_slices(subb, requested_start, requested_size, output_downscale_factor=downscale_factor)
@@ -82,9 +98,9 @@ def read_region_level0(czi, location, size, downscale_factor=1):
             if subb.shape == subb.stored_shape:
                 sd = subb.data()
                 img = sd[..., sl_s[0], sl_s[1], :]
-                logger.debug(img.shape)
+                # logger.debug(img.shape)
                 axlist=tuple(range(img.ndim - 3))
-                logger.debug(axlist)
+                # logger.debug(axlist)
                 img = np.squeeze(img, axis=axlist)
 
                 img_smaller = skimage.transform.resize(
@@ -98,8 +114,8 @@ def read_region_level0(czi, location, size, downscale_factor=1):
                 #     img,
                 #     factors=(downscale_factor, downscale_factor, 1))
                 output[sl_r] = img_smaller
-                print(
-                    f"{subb.start}, {subb.shape}, {subb.stored_shape}, [{sl_s[0].start}:{sl_s[0].stop}, {sl_s[1].start}:{sl_s[1].stop}], [{sl_r[0].start}:{sl_r[0].stop}, {sl_r[1].start}:{sl_r[1].stop}]")
+                # print(
+                #     f"{subb.start}, {subb.shape}, {subb.stored_shape}, [{sl_s[0].start}:{sl_s[0].stop}, {sl_s[1].start}:{sl_s[1].stop}], [{sl_r[0].start}:{sl_r[0].stop}, {sl_r[1].start}:{sl_r[1].stop}]")
     #             break
     #         else:
     #             print(f"{subb.start}, {subb.shape}")
