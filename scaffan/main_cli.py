@@ -30,9 +30,24 @@ CONTEXT_SETTINGS = dict(help_option_names=["-h", "--help"])
 #               help="Create desktop icon"
 #               )
 @click.group(context_settings=CONTEXT_SETTINGS, invoke_without_command=True)
+@click.option(
+    "--log-level",
+    "-ll",
+    # type=,
+    help="Set logging level",
+    default=None,
+)
 @click.pass_context
-def run(ctx, *args, **kwargs):
+def run(ctx, log_level, *args, **kwargs):
+    if log_level is not None:
+        try:
+            log_level = int(log_level)
+        except ValueError as e:
+            log_level = log_level.upper()
+        logger.remove()
+        i = logger.add(sys.stderr, level=log_level, colorize=True)
     if ctx.invoked_subcommand is None:
+
         # click.echo('I was invoked without subcommand')
         ctx.invoke(gui, *args, **kwargs)
         # a.main()
@@ -71,6 +86,13 @@ def set(common_spreadsheet_file=None):
     help='Set parameter. First argument is path to parameter separated by ";". Second is the value.'
     "python -m scaffan gui -p Processing,Show True",
 )
+# @click.option(
+#     "--log-level",
+#     "-ll",
+#     # type=,
+#     help="Set logging level",
+#     default=None,
+# )
 @click.option("--print-params", "-pp", is_flag=True, help="Print parameters")
 def gui(params, print_params):
     mainapp = algorithm.Scaffan()
@@ -137,13 +159,13 @@ def install():
     help="Path to output directory with video files.",
     default=None,
 )
-@click.option(
-    "--log-level",
-    "-ll",
-    # type=,
-    help="Set logging level",
-    default=None,
-)
+# @click.option(
+#     "--log-level",
+#     "-ll",
+#     # type=,
+#     help="Set logging level",
+#     default=None,
+# )
 @click.option(
     "--params",
     "-p",
@@ -153,9 +175,9 @@ def install():
     help='Set parameter. First argument is path to parameter separated by ";". Second is the value.'
     "python -m scaffan gui -p Processing,Show True",
 )
-def nogui(input_path, color, output_path, log_level, params):
-    if log_level is not None:
-        i = logger.add(level=log_level)
+def nogui(input_path, color, output_path, params):
+    # if log_level is not None:
+    #     i = logger.add(level=log_level)
     logger.debug(
         f"input path={input_path} color={color}, output_path={output_path}, params={params}"
     )
