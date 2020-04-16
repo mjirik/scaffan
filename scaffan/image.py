@@ -64,10 +64,16 @@ import_openslide()
 import openslide
 
 
-def fix_location(imsl, location, level):
+def fix_location_ndpi(imsl, location, level):
     return list(
         (location - np.mod(location, imsl.level_downsamples[level])).astype(np.int)
     )
+
+def fix_location_czi(imsl, location, level):
+    return list(np.asarray(location) - imsl._czi_start)
+    # return list(
+    #     (location - np.mod(location, imsl.level_downsamples[level])).astype(np.int)
+    # )
 
 
 # def
@@ -77,7 +83,7 @@ def get_image_by_center(imsl, center, level=3, size=None, as_gray=True, do_fix_l
 
     location = get_region_location_by_center(imsl, center, level, size)
     if do_fix_location:
-        location = fix_location(imsl, location, level)
+        location = fix_location_ndpi(imsl, location, level)
     imcr = imsl.read_region(location, level=level, size=size)
     im = np.asarray(imcr)
     if as_gray:
@@ -213,7 +219,7 @@ class ImageSlide():
         self.properties = None
         if Path(self.path).suffix.lower() in (".tiff", ".tif"):
             self.image_type = ".tiff"
-            self._get_imagedata = self.get_imagedata_tiff
+            self._get_imagedata = self._get_imagedata_tiff
             self.get_thumbnail = self._get_thumbnail_tiff
             self.read_region = self._read_region_other_than_ndpi
             self._set_properties_tiff()
@@ -288,6 +294,7 @@ class ImageSlide():
 
         with CziFile(self.path) as czi:
             metadata = czi.metadata()
+            self._czi_start = czi.start[-3:-1]
         # root = etree.fromstring(metadata)
         # xres = float(root.xpath('//Distance[@Id="X"]/Value')[0].text)
         # yres = float(root.xpath('//Distance[@Id="Y"]/Value')[0].text)
@@ -814,7 +821,7 @@ class AnnotatedImage:
 
     def get_region_image(self, as_gray=False, as_unit8=False):
 
-        location = fix_location(self.openslide, self.region_location, self.region_level)
+        location = fix_location_ndpi(self.openslide, self.region_location, self.region_level)
         imcr = self.openslide.read_region(
             location, level=self.region_level, size=self.region_size
         )
@@ -1188,7 +1195,7 @@ class View:
 
         location = self.region_location
         if self.anim.image_type == ".ndpi":
-            location = fix_location(
+            location = fix_location_ndpi(
                 self.anim.openslide, location, self.region_level
             )
         imcr = self.anim.openslide.read_region(
