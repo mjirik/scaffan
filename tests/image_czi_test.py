@@ -93,7 +93,15 @@ def test_read_czi_per_partes():
     requested_level = 0
 
     with CziFile(fn) as czi:
-        output = image_czi.read_region_level0(czi, requested_start, requested_size)
-    plt.figure()
-    plt.imshow(output.astype(np.uint8))
-    plt.show()
+        output1 = image_czi.read_region_level0(czi, requested_start, size=[400, 500], downscale_factor=2)
+        output0 = image_czi.read_region_level0(czi, requested_start, size=[800, 1000], downscale_factor=1)
+
+    bins = list(range(0, 260, 20))
+    dens0,_ = np.histogram(output0[:], bins=bins, density=True)
+    dens1,_ = np.histogram(output1[:], bins=bins, density=True)
+    assert pytest.approx(dens0, abs=0.1) == dens1, "Relative histograms should be almost equal"
+    # plt.figure()
+    # plt.imshow(output0.astype(np.uint8))
+    # plt.figure()
+    # plt.imshow(output1.astype(np.uint8))
+    # plt.show()
