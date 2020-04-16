@@ -20,23 +20,25 @@ sys.path.insert(0, op.abspath(op.join(path_to_script, "../../imma")))
 # imcut_path =  os.path.join(path_to_script, "../../imcut/")
 # sys.path.insert(0, imcut_path)
 
-import glob
-import os
 import numpy as np
 import matplotlib.pyplot as plt
 
 skip_on_local = False
 
 import scaffan.image as scim
+from scaffan import image_czi
 
 scim.import_openslide()
-import openslide
 import io3d
+from czifile import CziFile
 
 
 def test_read_czi():
 
-    fn = io3d.datasets.join_path("medical/orig/scaffan-analysis-czi/J7_5/J7_5_b.czi", get_root=True)
+    # fn = io3d.datasets.join_path("medical/orig/scaffan-analysis-czi/J7_5/J7_5_b.czi", get_root=True)
+    fn = io3d.datasets.join_path(
+        "medical/orig/scaffan-analysis-czi/Zeiss-scans/01_2019_11_12__RecognizedCode.czi",
+        get_root=True)
     logger.debug("filename {}".format(fn))
     anim = scim.AnnotatedImage(fn)
     size_px = 100
@@ -78,3 +80,20 @@ def test_read_czi():
 
     assert pixelsize2[0] > pixelsize1[0]
     assert pixelsize2[1] > pixelsize1[1]
+
+
+def test_read_czi_per_partes():
+
+    fn = io3d.datasets.join_path(
+        "medical/orig/scaffan-analysis-czi/Zeiss-scans/01_2019_11_12__RecognizedCode.czi",
+        get_root=True)
+    requested_start = [23000, -102000]
+    requested_size = [1000, 1000]
+    # requested_size = [20, 20]
+    requested_level = 0
+
+    with CziFile(fn) as czi:
+        output = image_czi.read_region_level0(czi, requested_start, requested_size)
+    plt.figure()
+    plt.imshow(output.astype(np.uint8))
+    plt.show()
