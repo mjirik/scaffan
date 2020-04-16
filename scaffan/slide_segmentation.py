@@ -12,7 +12,8 @@ from pathlib import Path
 # import sklearn.naive_bayes
 # import sklearn.svm
 from scaffan.image import View, annoatation_px_to_mm
-from sklearn.externals import joblib
+# from sklearn.externals import joblib
+import joblib
 from scipy.ndimage import gaussian_filter
 import skimage
 from sklearn.naive_bayes import GaussianNB
