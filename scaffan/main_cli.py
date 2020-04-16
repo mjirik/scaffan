@@ -35,7 +35,7 @@ CONTEXT_SETTINGS = dict(help_option_names=["-h", "--help"])
     "-ll",
     # type=,
     help="Set logging level",
-    default=None,
+    default="INFO",
 )
 @click.pass_context
 def run(ctx, log_level, *args, **kwargs):
