@@ -145,9 +145,9 @@ def test_read_czi_with_scaffold_data():
     assert pixelsize1[1] > 0
 
     logger.debug(f"pixelsize={pixelsize1}")
-    plt.figure()
-    plt.imshow(im, cmap='gray')
-    plt.show()
+    # plt.figure()
+    # plt.imshow(im, cmap='gray')
+    # plt.show()
 
     pixelsize2, pixelunit2 = scim.get_pixelsize(imsl, level=2)
     assert pixelsize2[0] > 0
