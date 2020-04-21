@@ -15,6 +15,10 @@ import os.path as op
 import os
 import shutil
 from pathlib import Path
+import scaffan.image
+import scaffan.lobulus
+import exsu
+
 
 # def test_run_lobuluses():
 
@@ -76,3 +80,39 @@ class LobulusTest(unittest.TestCase):
             "Central Vein segmentation should have Dice coefficient above some low level",
         )
         # mainapp.start_gui()
+
+
+def test_get_lobulus_mask():
+    # this is hack to fix the problem with non existing report - not useful anymore
+    #
+    # output_dir = Path("test_output/test_lobulus_mask_output_dir").absolute()
+    # if output_dir.exists():
+    #     shutil.rmtree(output_dir)
+    # report = exsu.Report(outputdir=output_dir, show=False)
+
+    fn = io3d.datasets.join_path(
+        "medical", "orig", "sample_data", "SCP003", "SCP003.ndpi", get_root=True
+    )
+    anim = scaffan.image.AnnotatedImage(fn)
+    anns = anim.select_annotations_by_color("#0000FF")
+
+    report = None
+    lob_proc = scaffan.lobulus.Lobulus(report=report)
+    lob_proc.set_annotated_image_and_id(anim, anns[0])
+    lob_proc.run()
+    # there are several useful masks
+    #
+    # lob_proc.annotation_mask
+    # lob_proc.lobulus_mask
+    # lob_proc.central_vein_mask
+    # lob_proc.border_mask
+
+    # import matplotlib.pyplot as plt
+    # plt.imshow(lob_proc.lobulus_mask)
+    # plt.show()
+
+    # this is for testing
+    assert np.sum(lob_proc.annotation_mask) > 100, "segmentation should have more than 100 px"
+    assert np.sum(lob_proc.lobulus_mask) > 100, "segmentation should have more than 100 px"
+    assert np.sum(lob_proc.central_vein_mask) > 0, "segmentation should have more than 0 px"
+    assert np.sum(lob_proc.annotation_mask) < np.sum(lob_proc.lobulus_mask), "annotation should be smaller than lobulus"

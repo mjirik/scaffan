@@ -286,6 +286,8 @@ class GLCMTextureMeasurement:
                 fig,
                 level=60 + self.report_severity_offset,
             )
+        # if close_figs:
+        #     plt.close(fig)
         # plt.savefig("glcm_features_{}.png".format(title))
 
         fig = plt.figure()
@@ -296,6 +298,8 @@ class GLCMTextureMeasurement:
                 fig,
                 level=60 + self.report_severity_offset,
             )
+        # if close_figs:
+        #     plt.close(fig)
 
         e0 = energy[:, :, 0]
         e1 = energy[:, :, 1]

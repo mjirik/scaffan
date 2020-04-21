@@ -463,12 +463,13 @@ class Lobulus:
             )
 
         self.lobulus_mask = (self.central_vein_mask + self.border_mask) == 1
-        self.report.imsave_as_fig(
-            f"lobulus_mask_{self.annotation_id}.png",
-            self.lobulus_mask.astype(np.uint8),
-            level=70,
-            # level_skimage=20, npz_level=30
-        )
+        if self.report:
+            self.report.imsave_as_fig(
+                f"lobulus_mask_{self.annotation_id}.png",
+                self.lobulus_mask.astype(np.uint8),
+                level=70,
+                # level_skimage=20, npz_level=30
+            )
         area_px = np.sum(self.lobulus_mask)
         datarow["Area"] = area_px * np.prod(self.view.region_pixelsize)
         # rprops = skimage.measure.regionprops(self.lobulus_mask)
@@ -487,7 +488,8 @@ class Lobulus:
             self.view.region_pixelsize
         )
         datarow["Area unit"] = self.view.region_pixelunit
-        self.report.add_cols_to_actual_row(datarow)
+        if self.report:
+            self.report.add_cols_to_actual_row(datarow)
         # self.skeleton_analysis(show=show)
 
     def imsave(self, base_fn, arr, k=50):
