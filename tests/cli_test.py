@@ -7,6 +7,8 @@ import pytest
 import scaffan.main_cli
 import io3d
 from pathlib import Path
+import unittest.mock
+from unittest.mock import patch
 
 
 def test_cli():
@@ -22,9 +24,22 @@ def test_cli():
 
     runner = click.testing.CliRunner()
     # runner.invoke(anwa.main_click.nogui, ["-i", str(pth)])
-    runner.invoke(
-        scaffan.main_cli.run,
-        ["nogui", "-i", pth, "-o", expected_pth.parent, "-c", "#FFFF00"],
-    )
+    import scaffan.image
+    original_foo = scaffan.image.AnnotatedImage.select_annotations_by_color
+    with patch.object(scaffan.image.AnnotatedImage, 'select_annotations_by_color') as mock_foo:
+        def side_effect(*args, **kwargs):
+            logger.debug("mocked function select_annotations_by_color()")
+            original_list = original_foo(*args, **kwargs)
+            logger.debug(f"original ann_ids={original_list}")
+            new_list = [original_list[-1]]
+            logger.debug(f"new ann_ids={new_list}")
+            return new_list
+
+        mock_foo.side_effect = side_effect
+
+        runner.invoke(
+            scaffan.main_cli.run,
+            ["nogui", "-i", pth, "-o", expected_pth.parent, "-c", "#FFFF00"],
+        )
 
     assert expected_pth.exists()
