@@ -18,6 +18,8 @@ from pathlib import Path
 import scaffan.image
 import scaffan.lobulus
 import exsu
+from unittest.mock import patch
+path_to_dir = Path(__file__).parent
 
 
 # def test_run_lobuluses():
@@ -25,7 +27,7 @@ import exsu
 
 class LobulusTest(unittest.TestCase):
     def test_run_lobuluses(self):
-        output_dir = Path("test_output/test_lobulus_output_dir").absolute()
+        output_dir = (path_to_dir / "test_output/test_lobulus_output_dir").absolute()
         if output_dir.exists():
             shutil.rmtree(output_dir)
             # os.remove(output_dir)
@@ -37,16 +39,31 @@ class LobulusTest(unittest.TestCase):
         # imsl = openslide.OpenSlide(fn)
         # annotations = scan.read_annotations(fn)
         # scan.annotations_to_px(imsl, annotations)
-        mainapp = scaffan.algorithm.Scaffan()
-        mainapp.set_input_file(fn)
-        mainapp.set_output_dir(str(output_dir))
-        mainapp.init_run()
-        mainapp.set_report_level(10)
         # Yellow
-        mainapp.set_parameter("Input;Automatic Lobulus Selection", False)
-        mainapp.set_annotation_color_selection("#FFFF00")
-        # mainapp.parameters.param("Processing", "Show").setValue(True)
-        mainapp.run_lobuluses()
+
+        original_foo = scaffan.image.AnnotatedImage.select_annotations_by_color
+        with patch.object(scaffan.image.AnnotatedImage, 'select_annotations_by_color', autospec=True) as mock_foo:
+            def side_effect(*args, **kwargs):
+                logger.debug("mocked function select_annotations_by_color()")
+                original_list = original_foo(*args, **kwargs)
+                logger.debug(f"original ann_ids={original_list}")
+                # print(f"original ann_ids={original_list}")
+                new_list = [original_list[-1]]
+                logger.debug(f"new ann_ids={new_list}")
+                # print(f"new ann_ids={new_list}")
+                return new_list
+
+            mock_foo.side_effect = side_effect
+
+            mainapp = scaffan.algorithm.Scaffan()
+            mainapp.set_input_file(fn)
+            mainapp.set_output_dir(str(output_dir))
+            mainapp.init_run()
+            mainapp.set_report_level(10)
+            mainapp.set_parameter("Input;Automatic Lobulus Selection", False)
+            mainapp.set_annotation_color_selection("#FFFF00")
+            # mainapp.parameters.param("Processing", "Show").setValue(True)
+            mainapp.run_lobuluses()
         logger.debug("imgs: ", mainapp.report.imgs)
 
         img = mainapp.report.load_array("lobulus_central_thr_skeleton_7.png")

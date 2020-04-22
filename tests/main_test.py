@@ -10,6 +10,7 @@ import os.path as op
 import sys
 import io3d
 from pathlib import Path
+from unittest.mock import patch
 
 path_to_script = op.dirname(op.abspath(__file__))
 sys.path.insert(0, op.abspath(op.join(path_to_script, "../../exsu")))
@@ -133,18 +134,32 @@ class MainGuiTest(unittest.TestCase):
         # imsl = openslide.OpenSlide(fn)
         # annotations = scan.read_annotations(fn)
         # scan.annotations_to_px(imsl, annotations)
-        mainapp = scaffan.algorithm.Scaffan()
-        mainapp.set_input_file(fn)
-        mainapp.set_output_dir("test_run_lobuluses_output_dir")
+        import scaffan
+        import scaffan.image
         # mainapp.init_run()
         # mainapp.set_parameter("Input;Automatic Lobulus Selection", False)
-        mainapp.set_annotation_color_selection(
-            "#00FFFF", override_automatic_lobulus_selection=True
-        )
-        mainapp.set_parameter(
-            "Processing;Lobulus Segmentation;Manual Segmentation", True
-        )
-        mainapp.run_lobuluses()
+        original_foo = scaffan.image.AnnotatedImage.select_annotations_by_color
+        with patch.object(scaffan.image.AnnotatedImage, 'select_annotations_by_color', autospec=True) as mock_foo:
+            def side_effect(*args, **kwargs):
+                logger.debug("mocked function select_annotations_by_color()")
+                original_list = original_foo(*args, **kwargs)
+                logger.debug(f"original ann_ids={original_list}")
+                new_list = original_list[-2:]
+                logger.debug(f"new ann_ids={new_list}")
+                return new_list
+
+            mock_foo.side_effect = side_effect
+
+            mainapp = scaffan.algorithm.Scaffan()
+            mainapp.set_input_file(fn)
+            mainapp.set_output_dir("test_run_lobuluses_output_dir")
+            mainapp.set_annotation_color_selection(
+                "#00FFFF", override_automatic_lobulus_selection=True
+            )
+            mainapp.set_parameter(
+                "Processing;Lobulus Segmentation;Manual Segmentation", True
+            )
+            mainapp.run_lobuluses()
         self.assertLess(
             0.9,
             mainapp.evaluation.evaluation_history[0]["Lobulus Border Dice"],

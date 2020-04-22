@@ -419,6 +419,23 @@ def test_get_annotation_center(anim_scp003):
 def test_get_ann_by_color(anim_scp003):
     anim = anim_scp003
     ann_ids_black = anim.select_annotations_by_color("#000000")
+    #
+    # import scaffan.image
+    # from unittest.mock import patch
+    # original_foo = scaffan.image.AnnotatedImage.select_annotations_by_color
+    # print("staaaart")
+    # with patch.object(scaffan.image.AnnotatedImage, 'select_annotations_by_color', autospec=True) as mock_foo:
+    #     def side_effect(*args, **kwargs):
+    #         logger.debug("mocked function select_annotations_by_color()")
+    #         original_list = original_foo(*args, **kwargs)
+    #         logger.debug(f"original ann_ids={original_list}")
+    #         print(f"original ann_ids={original_list}")
+    #         new_list = [original_list[-1]]
+    #         logger.debug(f"new ann_ids={new_list}")
+    #         return new_list
+    #
+    #     mock_foo.side_effect = side_effect
+    #     ann_ids_black = anim.select_annotations_by_color("#000000")
     assert 10 in ann_ids_black
     assert 11 in ann_ids_black
 
