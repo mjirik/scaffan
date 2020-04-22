@@ -15,3 +15,4 @@ exsu
 scikit-learn
 scikit-image
 chainer
+czifile
