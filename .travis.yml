@@ -62,7 +62,7 @@ install:
     - conda list -e
     - python -m io3d.datasets -v -gdp
     - python -m io3d.datasets -v -l CMU-1 CMU-1-annotation SCP003
-    - python -m io3d.datasets -v -l biodur_sample
+    - python -m io3d.datasets -v -l biodur_sample J7_5_b czi_scaffold
     - pwd
     - ls ~/data
     - ls ~/data/medical
