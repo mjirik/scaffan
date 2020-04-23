@@ -330,6 +330,7 @@ class ImageSlide():
         with CziFile(self.path) as czi:
             metadata = czi.metadata()
             self._czi_start = czi.start[-3:-1]
+            self._czi_shape = czi.shape[-3:-1]
         # root = etree.fromstring(metadata)
         # xres = float(root.xpath('//Distance[@Id="X"]/Value')[0].text)
         # yres = float(root.xpath('//Distance[@Id="Y"]/Value')[0].text)
@@ -343,6 +344,8 @@ class ImageSlide():
         meta_dict["tiff.YResolution"] = 1/yres
         meta_dict["hamamatsu.XOffsetFromSlideCentre"] = 0
         meta_dict["hamamatsu.YOffsetFromSlideCentre"] = 0
+        meta_dict["openslide.level[0].width"] = self._czi_shape[0]
+        meta_dict["openslide.level[0].height"] = self._czi_shape[1]
 
         self.properties = meta_dict
 
