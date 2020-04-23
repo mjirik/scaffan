@@ -7,6 +7,16 @@
 from loguru import logger
 import numpy as np
 import skimage.transform
+import sys
+import subprocess
+
+def instal_codecs_with_pip():
+    try:
+        import imagecodecs
+    except ImportError as e:
+        package = "imagecodecs"
+        subprocess.check_call([sys.executable, "-m", "pip", "install", package])
+
 
 
 def get_py_slices(subb, requested_start, requested_size, output_downscale_factor:int=1):

@@ -309,6 +309,7 @@ class ImageSlide():
     def _read_region_nzi(self, location, level, size):
         from czifile import CziFile
         from . import image_czi
+        image_czi.instal_codecs_with_pip()
 
         # factor = int(2**level)
         factor = self.level_downsamples[level]
