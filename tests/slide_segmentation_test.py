@@ -26,7 +26,7 @@ def test_slide_segmentation():
     seg.init(anim)
     seg.parameters.param("Segmentation Method").setValue("HCFTS")
     seg.parameters.param("Save Training Labels").setValue(True)
-    ann_ids_black = seg.anim.select_annotations_by_color("#000000")
+    ann_ids_black = seg.anim.get_annotations_by_color("#000000")
     assert 10 in ann_ids_black
     assert 11 in ann_ids_black
     seg.run()

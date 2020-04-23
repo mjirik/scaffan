@@ -43,7 +43,7 @@ def test_unet_on_view():
         "medical", "orig", "sample_data", "SCP003", "SCP003.ndpi", get_root=True
     )
     anim = scaffan.image.AnnotatedImage(fn)
-    ann_ids = anim.select_annotations_by_color("#FFFF00")
+    ann_ids = anim.get_annotations_by_color("#FFFF00")
     # anim.get_views(ann_ids)
     view = anim.get_view(
         annotation_id=ann_ids[0], size_on_level=[224, 224], pixelsize_mm=[0.01, 0.01]

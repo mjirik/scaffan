@@ -138,7 +138,7 @@ class MainGuiTest(unittest.TestCase):
         import scaffan.image
         # mainapp.init_run()
         # mainapp.set_parameter("Input;Automatic Lobulus Selection", False)
-        original_foo = scaffan.image.AnnotatedImage.select_annotations_by_color
+        original_foo = scaffan.image.AnnotatedImage.get_annotations_by_color
         with patch.object(scaffan.image.AnnotatedImage, 'select_annotations_by_color', autospec=True) as mock_foo:
             def side_effect(anim_, annid, *args, **kwargs):
                 logger.debug("mocked function select_annotations_by_color()")

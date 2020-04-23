@@ -364,7 +364,7 @@ class ImageAnnotationTest(unittest.TestCase):
 
 def test_outer_and_inner_annotation(anim_scp003):
     anim = anim_scp003
-    ann_ids = anim.select_annotations_by_color("#00FFFF")
+    ann_ids = anim.get_annotations_by_color("#00FFFF")
     assert len(ann_ids) > 0
     assert len(ann_ids) == 2
 
@@ -384,7 +384,7 @@ def test_outer_and_inner_annotation(anim_scp003):
     assert len(cyan_inner_ids) == 1
     assert ann_ids[0] == cyan_inner_ids[0]
 
-    black_ann_ids = anim.select_annotations_by_color("#000000")
+    black_ann_ids = anim.get_annotations_by_color("#000000")
     # find black inner annotations to outer annotation of 0th object
     inner_ids = anim.select_inner_annotations(outer_id[0], ann_ids=black_ann_ids)
     assert len(inner_ids) == 1
@@ -418,7 +418,7 @@ def test_get_annotation_center(anim_scp003):
 
 def test_get_ann_by_color(anim_scp003):
     anim = anim_scp003
-    ann_ids_black = anim.select_annotations_by_color("#000000")
+    ann_ids_black = anim.get_annotations_by_color("#000000")
     #
     # import scaffan.image
     # from unittest.mock import patch
@@ -472,7 +472,7 @@ def test_get_all_black_annotations_in_view_around_hole(anim_scp003):
 
 def test_view_by_pixelsize_and_size_on_level(anim_scp003):
     anim = anim_scp003
-    ann_ids = anim.select_annotations_by_color("#FFFF00")
+    ann_ids = anim.get_annotations_by_color("#FFFF00")
     size_px = 224
     # anim.get_views(ann_ids)
     view = anim.get_view(
@@ -489,7 +489,7 @@ def test_view_by_pixelsize_and_size_on_level(anim_scp003):
 
 def test_view_by_size_mm(anim_scp003):
     anim = anim_scp003
-    ann_ids = anim.select_annotations_by_color("#FFFF00")
+    ann_ids = anim.get_annotations_by_color("#FFFF00")
     size_px = 100
     size_mm = [1, 1]
     # anim.get_views(ann_ids)

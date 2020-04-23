@@ -41,7 +41,7 @@ class LobulusTest(unittest.TestCase):
         # scan.annotations_to_px(imsl, annotations)
         # Yellow
 
-        original_foo = scaffan.image.AnnotatedImage.select_annotations_by_color
+        original_foo = scaffan.image.AnnotatedImage.get_annotations_by_color
         with patch.object(scaffan.image.AnnotatedImage, 'select_annotations_by_color', autospec=True) as mock_foo:
             def side_effect(sf, annid, *args, **kwargs):
                 logger.debug("mocked function select_annotations_by_color()")
@@ -114,7 +114,7 @@ def test_get_lobulus_mask():
         "medical", "orig", "sample_data", "SCP003", "SCP003.ndpi", get_root=True
     )
     anim = scaffan.image.AnnotatedImage(fn)
-    anns = anim.select_annotations_by_color("#0000FF")
+    anns = anim.get_annotations_by_color("#0000FF")
 
     report = None
     lob_proc = scaffan.lobulus.Lobulus(report=report)

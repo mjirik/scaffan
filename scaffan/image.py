@@ -609,7 +609,7 @@ class AnnotatedImage:
         :return:
         """
         if color is not None:
-            an_ids_sel1 = self.select_annotations_by_color(
+            an_ids_sel1 = self.get_annotations_by_color(
                 color,
                 raise_exception_if_not_found=raise_exception_if_not_found,
                 ann_ids=ann_ids,
@@ -650,7 +650,7 @@ class AnnotatedImage:
         :return:
         """
         if color is not None:
-            an_ids_sel1 = self.select_annotations_by_color(
+            an_ids_sel1 = self.get_annotations_by_color(
                 color,
                 raise_exception_if_not_found=raise_exception_if_not_found,
                 ann_ids=ann_ids,
@@ -688,7 +688,7 @@ class AnnotatedImage:
         :param ann_ids: put inside pre-filtered list of annotations
         :return:
         """
-        ann_ids = self.select_annotations_by_color(color, ann_ids=ann_ids)
+        ann_ids = self.get_annotations_by_color(color, ann_ids=ann_ids)
         ann_pairs = [
             [aid, self.select_inner_annotations(aid, ann_ids=ann_ids)]
             for aid in ann_ids
@@ -772,6 +772,22 @@ class AnnotatedImage:
         )
 
     def select_annotations_by_color(
+            self, id, raise_exception_if_not_found=True, ann_ids=None
+    ):
+        """
+
+        :param id: number or color '#00FF00
+        :param raise_exception_if_not_found:
+        :param ann_ids:
+        :return:
+        """
+        logger.warning("Function select_annotations_by_color is deprecated. Use get_annotations_by_color instead.")
+        self.get_annotations_by_color(
+            id,
+            raise_exception_if_not_found=raise_exception_if_not_found,
+            ann_ids=ann_ids
+        )
+    def get_annotations_by_color(
         self, id, raise_exception_if_not_found=True, ann_ids=None
     ):
         """
