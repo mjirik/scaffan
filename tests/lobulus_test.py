@@ -43,12 +43,15 @@ class LobulusTest(unittest.TestCase):
 
         original_foo = scaffan.image.AnnotatedImage.select_annotations_by_color
         with patch.object(scaffan.image.AnnotatedImage, 'select_annotations_by_color', autospec=True) as mock_foo:
-            def side_effect(*args, **kwargs):
+            def side_effect(sf, annid, *args, **kwargs):
                 logger.debug("mocked function select_annotations_by_color()")
-                original_list = original_foo(*args, **kwargs)
-                logger.debug(f"original ann_ids={original_list}")
+                original_list = original_foo(sf, annid, *args, **kwargs)
+                logger.debug(f"id={annid}, original ann_ids={original_list}")
+                if annid == "#000000":
+                    new_list = original_list
+                else:
+                    new_list = [original_list[0]]
                 # print(f"original ann_ids={original_list}")
-                new_list = [original_list[-1]]
                 logger.debug(f"new ann_ids={new_list}")
                 # print(f"new ann_ids={new_list}")
                 return new_list
