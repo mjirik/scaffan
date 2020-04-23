@@ -25,6 +25,8 @@ logger.debug(f"exsu path: {exsu.__file__}")
 # import openslide
 import scaffan
 import scaffan.algorithm
+# import scaffan
+import scaffan.image
 from PyQt5 import QtWidgets
 import pytest
 from datetime import datetime
@@ -89,7 +91,7 @@ class MainGuiTest(unittest.TestCase):
         mainapp.set_annotation_color_selection("yellow")
         mainapp.start_gui(skip_exec=True, qapp=qapp)
 
-    skip_on_local = True
+    # skip_on_local = True
 
     @unittest.skipIf(os.environ.get("TRAVIS", True), "Skip on Travis-CI")
     def test_run_lobuluses(self):
@@ -126,16 +128,15 @@ class MainGuiTest(unittest.TestCase):
 
     skip_on_local = False
 
-    @unittest.skipIf(os.environ.get("TRAVIS", skip_on_local), "Skip on Travis-CI")
+    @unittest.skipIf(os.environ.get("TRAVIS", False), "Skip on Travis-CI")
     def test_run_lobuluses_manual_segmentation(self):
         fn = io3d.datasets.join_path(
             "medical", "orig", "sample_data", "SCP003", "SCP003.ndpi", get_root=True
         )
+        logger.debug("going to mock")
         # imsl = openslide.OpenSlide(fn)
         # annotations = scan.read_annotations(fn)
         # scan.annotations_to_px(imsl, annotations)
-        import scaffan
-        import scaffan.image
         # mainapp.init_run()
         # mainapp.set_parameter("Input;Automatic Lobulus Selection", False)
         original_foo = scaffan.image.AnnotatedImage.get_annotations_by_color
@@ -152,15 +153,22 @@ class MainGuiTest(unittest.TestCase):
                 return new_list
 
             mock_foo.side_effect = side_effect
-
+            logger.debug("in with statement")
             mainapp = scaffan.algorithm.Scaffan()
             mainapp.set_input_file(fn)
             mainapp.set_output_dir("test_run_lobuluses_output_dir")
             mainapp.set_annotation_color_selection(
                 "#00FFFF", override_automatic_lobulus_selection=True
             )
+            auto = mainapp.get_parameter("Input;Automatic Lobulus Selection")
+            logger.debug(f"auto={auto}")
+            # Use manual annotations
             mainapp.set_parameter(
                 "Processing;Lobulus Segmentation;Manual Segmentation", True
+            )
+            # dont waste time with scan segmentation. It is not used in the test
+            mainapp.set_parameter(
+                "Processing;Scan Segmentation", False
             )
             mainapp.run_lobuluses()
         self.assertLess(

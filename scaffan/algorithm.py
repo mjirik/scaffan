@@ -257,6 +257,12 @@ class Scaffan:
         logger.info("common_spreadsheet_file set to {}".format(path))
         # print("common_spreadsheet_file set to {}".format(path))
 
+    def get_parameter(self, param_path, parse_path=True):
+        if parse_path:
+            param_path = param_path.split(";")
+        fnparam = self.parameters.param(*param_path)
+        return fnparam.value()
+
     def set_parameter(self, param_path, value, parse_path=True):
         """
         Set value to parameter.
@@ -435,17 +441,17 @@ class Scaffan:
         run_slide_segmentation = self.parameters.param(
             "Processing", "Scan Segmentation"
         ).value()
+        automatic_lobulus_selection = self.parameters.param(
+            "Input", "Automatic Lobulus Selection"
+        ).value()
         if run_slide_segmentation:
             fn_input = self.parameters.param("Input", "File Path").value()
             # self.slide_segmentation.init(Path(fn_input))
             self.slide_segmentation.init(self.anim)
             self.slide_segmentation.run()
-        automatic_lobulus_selection = self.parameters.param(
-            "Input", "Automatic Lobulus Selection"
-        ).value()
-        if run_slide_segmentation:
-            self.slide_segmentation.add_biggest_to_annotations()
-            annotation_ids = self.slide_segmentation.ann_biggest_ids
+            if automatic_lobulus_selection:
+                self.slide_segmentation.add_biggest_to_annotations()
+                annotation_ids = self.slide_segmentation.ann_biggest_ids
 
         # Error messages
         if not automatic_lobulus_selection:
