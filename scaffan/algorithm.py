@@ -222,7 +222,8 @@ class Scaffan:
             None,
             "Select Input File",
             directory=default_dir,
-            filter="NanoZoomer Digital Pathology Image(*.ndpi)",
+            filter="Images (*.ndpi *.czi *.tif *.tiff);;NanoZoomer Digital Pathology Image (*.ndpi);;" +
+                   "Zeiss Image format for microscopes (*.czi);;Tiff image (*.tiff *.tif)",
         )
         self.set_input_file(fn)
 
