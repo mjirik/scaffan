@@ -392,17 +392,18 @@ class ScanSegmentation:
         sz = int(self.parameters.param("Working Tile Size").value())
         self.tile_size = [sz, sz]
         (
-            imsize,
+            imsz_on_level0,
             size_on_level0,
             size_on_level,
-            imsize_on_level,
+            imsz_on_level,
         ) = self._get_tiles_parameters()
+        logger.debug(f"level={self.level}, tile size on level={size_on_level}, tile size on level 0={size_on_level0}")
         self.tiles = []
 
-        for x0 in range(0, int(imsize[0]), int(size_on_level0[0])):
+        for x0 in range(0, int(imsz_on_level0[0]), int(size_on_level0[0])):
             column_tiles = []
 
-            for y0 in range(0, int(imsize[1]), int(size_on_level0[1])):
+            for y0 in range(0, int(imsz_on_level0[1]), int(size_on_level0[1])):
                 logger.trace(f"processing tile {x0}, {y0}")
                 view = self.anim.get_view(
                     location=(x0, y0), size_on_level=size_on_level, level=self.level
@@ -432,7 +433,9 @@ class ScanSegmentation:
         if str(self.parameters.param("Segmentation Method").value()) == "HCTFS":
             return self.predict_on_view_hctfs(view)
         elif str(self.parameters.param("Segmentation Method").value()) == "U-Net":
-            pass
+            return self._unet.predict_tile(view)
+        else:
+            raise ValueError("Unknown segmentation method")
 
     def predict_on_view_hctfs(self, view):
         image = self._get_features(view)
@@ -481,10 +484,18 @@ class ScanSegmentation:
         logger.debug("predicting tiles")
         self.predicted_tiles = []
         for i, tile_view_col in enumerate(self.tiles):
+            # logger.trace(f"predicting tiles in {i}-th row")
             predicted_col = []
             for j, tile_view in enumerate(tile_view_col):
+                logger.trace(f"predicting tile {i}, {j}")
                 # self._inner_texture.texture_label = f"slide_segmentation_{i},{j}"
-                predicted_image = self.predict_on_view_hctfs(tile_view)
+                predicted_image = self.predict_on_view(tile_view)
+                # if str(self.parameters.param("Segmentation Method").value()) == "U-Net":
+                #     predicted_image = self._unet.predict_tile(tile_view)
+                # elif str(self.parameters.param("Segmentation Method").value()) == "HCTFS":
+                #     predicted_image = self.predict_on_view_hctfs(tile_view)
+                # else:
+                #     raise ValueError("Unknown segmentation method")
                 predicted_col.append(predicted_image)
             self.predicted_tiles.append(predicted_col)
 
@@ -493,13 +504,13 @@ class ScanSegmentation:
         predict tiles and compose everything together
         """
         logger.debug("predict")
-        if self.predicted_tiles is None:
-            self.predict_tiles()
+        # if self.predicted_tiles is None:
+        #     self.predict_tiles()
         if str(self.parameters.param("Segmentation Method").value()) == "U-Net":
             self._unet.init_segmentation()
 
-        #         if self.predicted_tiles is None:
-        #             self.predict_tiles()
+        if self.predicted_tiles is None:
+            self.predict_tiles()
 
         szx = len(self.tiles)
         szy = len(self.tiles[0])
@@ -612,13 +623,14 @@ class ScanSegmentation:
                 #                 ] = self.tiles[ix][iy].get_region_image(as_gray=True)
                 # ] = self.tiles[iy][ix].get_region_image(as_gray=as_gray)[:, :, :3]
 
-
     def evaluate(self):
         logger.debug("evaluate")
-        _, count = np.unique(self.full_output_image, return_counts=True)
+        labels, count = np.unique(self.full_output_image, return_counts=True)
+        logger.debug(f"whole scan segmentation: labels={labels}, count={count}")
         self.intralobular_ratio = count[1] / (count[1] + count[2])
         #         plt.figure(figsize=(10, 10))
         #         plt.imshow(self.full_output_image)
+        logger.trace("before imsave slice_label.png")
         self.report.imsave(
             "slice_label.png", self.full_output_image, level_skimage=20, level_npz=30
         )

@@ -120,12 +120,14 @@ def get_pixelsize(imsl, level=0, requested_unit="mm"):
     logger.trace(f"Resolution {resolution_x}x{resolution_y} pixels/{resolution_unit}")
     downsamples = imsl.level_downsamples[level]
 
+    pixelunit = None
+
     input_resolution_unit = resolution_unit
     if resolution_unit is None:
         pixelunit = resolution_unit
     elif requested_unit in ("mm"):
-        if resolution_unit in ("mm"):
-            pixelunit = resolution_unit
+        if resolution_unit in ("mm", "milimeters"):
+            pixelunit = "mm"
         elif resolution_unit in ("cm", "centimeter"):
             downsamples = downsamples * 10.0
             pixelunit = "mm"
@@ -151,6 +153,7 @@ def get_pixelsize(imsl, level=0, requested_unit="mm"):
         [downsamples / float(resolution_x), downsamples / float(resolution_y)]
     )
 
+    logger.trace(f"pixelsize={pixelsize}, pixelunit={pixelunit}")
     return pixelsize, pixelunit
 
 
@@ -166,8 +169,10 @@ def get_offset_px(imsl):
     )
     # resolution_unit = pm["tiff.ResolutionUnit"]
     offset_mm = offset * 0.000001
+    if pixelunit is "m":
+        pass
     if pixelunit is not "mm":
-        raise ValueError("Cannot convert pixelunit {} to milimeters".format(pixelunit))
+        raise ValueError(f"Cannot convert pixelunit {pixelunit} to milimeters")
     offset_from_center_px = offset_mm / pixelsize
     im_center_px = np.asarray(imsl.dimensions) / 2.0
     offset_px = im_center_px - offset_from_center_px
@@ -311,14 +316,14 @@ class ImageSlide():
         from . import image_czi
         image_czi.instal_codecs_with_pip()
 
-        # factor = int(2**level)
-        factor = self.level_downsamples[level]
+        factor = int(2**level)
+        # factor = self.level_downsamples[level]
 
         with CziFile(self.path) as czi:
 
             location_fixed = np.asarray(location) + self._czi_start
             # self._czi_start = czi.start[-3:-1]
-            output = image_czi.read_region_with_scale(czi, location_fixed, size, downscale_factor=factor)
+            output = image_czi.read_region_with_scale(czi, location_fixed, size, level=level)
         return output
 
     def _set_properties_czi(self):

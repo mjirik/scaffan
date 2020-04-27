@@ -72,7 +72,7 @@ def get_py_slices(subb, requested_start, requested_size, output_downscale_factor
     return isconj, sl_s, sl_r, size_r
 
 
-def read_region_with_scale(czi, location, size, downscale_factor=1):
+def read_region_with_scale(czi, location, size, level=0):
     """
     Read region from czi file. White color is filled where no pixels are given if the
     datatype is uint8 or float.
@@ -83,6 +83,7 @@ def read_region_with_scale(czi, location, size, downscale_factor=1):
     :param downscale_factor: it is di
     :return:
     """
+    downscale_factor= int(2 ** level)
     requested_start = location
     requested_size = size
     value = 0
@@ -106,7 +107,11 @@ def read_region_with_scale(czi, location, size, downscale_factor=1):
             # there are several blocks covering the location. Their resolution is the same but the size differes.
 
             #             print(f"{subb.start}, {subb.shape}, {subb.stored_shape}, [{sl_s[0].start}:{sl_s[0].stop}, {sl_s[1].start}:{sl_s[1].stop}], [{sl_r[0].start}:{sl_r[0].stop}, {sl_r[1].start}:{sl_r[1].stop}]")
-            if subb.shape == subb.stored_shape:
+
+            # this generates the data with maximal possible resolution. Slow.
+            # if subb.shape == subb.stored_shape:
+            # this is fast
+            if subb.shape[-3:-1] == tuple(np.asarray(subb.stored_shape) * 2**level)[-3:-1]: #subb.stored_shape:
                 sd = subb.data()
                 img = sd[..., sl_s[0], sl_s[1], :]
                 # logger.debug(img.shape)
