@@ -86,7 +86,7 @@ def ndpa_to_json(path):
             _ndpa_file_to_json(fl)
 
 
-def read_annotations(pth):
+def read_annotations(pth) -> list:
     """
     Read the ndpa annotations. Annotation is converted to json if it is not done before. This step
     works on Linux but not on Windows.

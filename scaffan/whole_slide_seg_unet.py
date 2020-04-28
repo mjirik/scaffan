@@ -8,6 +8,7 @@ import chainer.links as L
 from chainer import serializers
 import os
 from pathlib import Path
+import time
 
 #
 # The automatic test is in
@@ -133,12 +134,22 @@ class WholeSlideSegmentationUNet:
         :return:
         """
 
+
         model = self.model
 
+        t0 = time.time()
         grayscale_image = view.get_region_image(as_gray=True)
+        t1 = time.time()
+        if self.report:
+            label = "profile unet cumulative get_region_image time [s]"
+            if label in self.report.actual_row:
+                self.report.actual_row[label] += float(t1 - t0)
+            else:
+                self.report.actual_row[label] = float(t1 - t0)
 
         # Get parameter value
         # sample_weight = float(self.parameters.param("Example Float Param").value())
+        t0 = time.time()
         grayscale_image = np.expand_dims(
             np.expand_dims(grayscale_image, axis=0), axis=0
         ).astype("float32")
@@ -147,5 +158,13 @@ class WholeSlideSegmentationUNet:
         )  # predikce, vraci obrazek o rozmerech 224x224pix s hodnotami 0, 1, 2
         prediction = np.argmax(prediction.array, axis=1).astype("uint8")
         prediction = prediction.squeeze(0)
+        t1 = time.time()
+
+        if self.report:
+            label = "profile unet cumulative prediction time [s]"
+            if label in self.report.actual_row:
+                self.report.actual_row[label] += float(t1 - t0)
+            else:
+                self.report.actual_row[label] = float(t1 - t0)
         return prediction
         # return (grayscale_image > 0.5).astype(np.uint8)

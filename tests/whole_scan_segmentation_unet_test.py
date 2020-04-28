@@ -63,3 +63,40 @@ def test_unet_on_view():
     assert 0 in unq, "label 0 should be in prediction"
     assert 1 in unq, "label 1 should be in prediction"
     # assert 2 in unq, "label 1 should be in prediction"
+
+
+def test_unet_on_view_czi():
+    # fn = io3d.datasets.join_path(
+    #     "medical", "orig", "sample_data", "SCP003", "SCP003.ndpi", get_root=True
+    # )
+    fn = io3d.datasets.join_path(
+        "medical/orig/scaffan-analysis-czi/Zeiss-scans/01_2019_11_12__RecognizedCode.czi",
+        get_root=True)
+    anim = scaffan.image.AnnotatedImage(fn)
+    # ann_ids = anim.get_annotations_by_color("#FFFF00")
+    # anim.get_views(ann_ids)
+    view = anim.get_view(location_mm=[4.0, 4.0], size_on_level=[224, 224], pixelsize_mm=[0.01, 0.01]
+    )
+    import matplotlib.pyplot as plt
+    im = view.get_region_image()
+    # plt.imshow(im)
+    # plt.show()
+    # assert np.array_equal(im.shape, [224, 224, 4])
+    wss_unet = scaffan.whole_slide_seg_unet.WholeSlideSegmentationUNet()
+    wss_unet.init_segmentation()
+    prediction = wss_unet.predict_tile(view)
+    im = view.get_region_image()
+    height0 = anim.openslide.properties["openslide.level[0].height"]
+    width0 = anim.openslide.properties["openslide.level[0].width"]
+    loc = view.region_location
+    logger.debug(f"loc={loc}, size={(height0, width0)}")
+    im = view.get_region_image()
+    plt.imshow(im)
+    plt.contour(prediction)
+    plt.show()
+
+    unq = np.unique(prediction)
+    assert 0 in unq, "label 0 should be in prediction"
+    assert 1 in unq, "label 1 should be in prediction"
+    assert False
+    # assert 2 in unq, "label 1 should be in prediction"

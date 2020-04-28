@@ -240,6 +240,7 @@ class ImageSlide():
             self._set_properties_czi()
             self.level_downsamples = [float(2 ** i) for i in range(0, 8)]
             self.level_count = len(self.level_downsamples)
+            # self.dimensions = asdfimsl.dimensions
 
         # if Path(self.path).suffix.lower() in (".czi"):
         #     self.image_type = ".czi"
@@ -323,7 +324,7 @@ class ImageSlide():
 
             location_fixed = np.asarray(location) + self._czi_start
             # self._czi_start = czi.start[-3:-1]
-            output = image_czi.read_region_with_scale(czi, location_fixed, size, level=level)
+            output = image_czi.read_region_with_level(czi, location_fixed, size, level=level)
         return output
 
     def _set_properties_czi(self):
@@ -336,6 +337,7 @@ class ImageSlide():
             metadata = czi.metadata()
             self._czi_start = czi.start[-3:-1]
             self._czi_shape = czi.shape[-3:-1]
+            self.dimensions = self._czi_shape
         # root = etree.fromstring(metadata)
         # xres = float(root.xpath('//Distance[@Id="X"]/Value')[0].text)
         # yres = float(root.xpath('//Distance[@Id="Y"]/Value')[0].text)
@@ -552,7 +554,7 @@ class AnnotatedImage:
             self.annotations = scan.annotations_to_px(self.openslide, self.annotations)
         else: #if self.image_type == ".tiff":
             # TODO maybe add reader of VGG Image Annotator
-            self.annotations = {}
+            self.annotations = []
         self.id_by_titles = scan.annotation_titles(self.annotations)
         self.id_by_colors = scan.annotation_colors(self.annotations)
         # self.details = scan.annotation_details(self.annotations)

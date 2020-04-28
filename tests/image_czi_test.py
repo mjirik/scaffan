@@ -93,8 +93,8 @@ def test_read_czi_per_partes():
     requested_level = 0
 
     with CziFile(fn) as czi:
-        output1 = image_czi.read_region_with_scale(czi, requested_start, size=[400, 500], downscale_factor=2)
-        output0 = image_czi.read_region_with_scale(czi, requested_start, size=[800, 1000], downscale_factor=1)
+        output1 = image_czi.read_region_with_level(czi, requested_start, size=[400, 500], downscale_factor=2)
+        output0 = image_czi.read_region_with_level(czi, requested_start, size=[800, 1000], downscale_factor=1)
 
     bins = list(range(0, 260, 20))
     dens0,_ = np.histogram(output0[:], bins=bins, density=True)

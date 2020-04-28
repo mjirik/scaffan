@@ -487,7 +487,11 @@ class ScanSegmentation:
             # logger.trace(f"predicting tiles in {i}-th row")
             predicted_col = []
             for j, tile_view in enumerate(tile_view_col):
-                logger.trace(f"predicting tile {i}, {j}")
+                label_r = "profile unet cumulative get_region_image time [s]"
+                label_p = "profile unet cumulative prediction time [s]"
+                t_r = self.report.actual_row[label_r] if label_r in self.report.actual_row else 0
+                t_p = self.report.actual_row[label_p] if label_p in self.report.actual_row else 0
+                logger.trace(f"predicting tile {i}, {j}, loc={tile_view.region_location}, sz={tile_view.region_size_on_level}, t_r={t_r}, t_p={t_p}")
                 # self._inner_texture.texture_label = f"slide_segmentation_{i},{j}"
                 predicted_image = self.predict_on_view(tile_view)
                 # if str(self.parameters.param("Segmentation Method").value()) == "U-Net":
