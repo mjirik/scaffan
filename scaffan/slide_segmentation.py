@@ -373,7 +373,8 @@ class ScanSegmentation:
         height0 = self.anim.openslide.properties["openslide.level[0].height"]
         width0 = self.anim.openslide.properties["openslide.level[0].width"]
 
-        imsize = np.array([int(width0), int(height0)])
+        # imsize = np.array([int(width0), int(height0)])
+        imsize = np.array([int(height0), int(width0)])
         if self.devel_imcrop is not None:
             imsize = self.devel_imcrop
 
@@ -385,7 +386,7 @@ class ScanSegmentation:
             imsize.astype(np.int),
             tile_size_on_level0.astype(np.int),
             tile_size_on_level,
-            imsize_on_level,
+            imsize_on_level.astype(np.int),
         )
 
     def make_tiles(self):
@@ -398,44 +399,47 @@ class ScanSegmentation:
             imsz_on_level,
         ) = self._get_tiles_parameters()
         logger.debug(f"level={self.level}, tile size on level={size_on_level}, tile size on level 0={size_on_level0}")
-        self.tiles = []
+        # self.tiles = []
 
-        for x0 in range(0, int(imsz_on_level0[0]), int(size_on_level0[0])):
-            column_tiles = []
-
-            for y0 in range(0, int(imsz_on_level0[1]), int(size_on_level0[1])):
-                logger.trace(f"processing tile {x0}, {y0}")
-                view = self.anim.get_view(
-                    location=(x0, y0), size_on_level=size_on_level, level=self.level
-                )
-                column_tiles.append(view)
-
-            self.tiles.append(column_tiles)
+        # for x0 in range(0, int(imsz_on_level0[0]), int(size_on_level0[0])):
+        #     column_tiles = []
+        #
+        #     for y0 in range(0, int(imsz_on_level0[1]), int(size_on_level0[1])):
+        #         logger.trace(f"processing tile {x0}, {y0}")
+        #         view = self.anim.get_view(
+        #             location=(x0, y0), size_on_level=size_on_level, level=self.level
+        #         )
+        #         column_tiles.append(view)
+        #
+        #     self.tiles.append(column_tiles)
 
         # todo the iterator is strange the x and y seems to be swapped sometimes
-        # self.tiles2 = []
-        # column_tiles=[]
-        # for iy, ix, x0, y0 in self.tile_iterator(
-        #         return_in_out_coords=False,
-        #         return_tile_coords=True,
-        #         return_level0_coords=True):
-        #     if len(self.tiles2) <= ix:
-        #         column_tiles = []
-        #         self.tiles2.append(column_tiles)
-        #     view = self.anim.get_view(
-        #         location=(x0, y0), size_on_level=size_on_level, level=self.level
-        #     )
-        #     self.tiles2[ix].append(view)
+        self.tiles2 = []
+        column_tiles=[]
+        for tile_params in self.tile_iterator(
+                return_in_out_coords=False,
+                return_tile_coords=True,
+                return_level0_coords=True):
+            sl_tl, sl_gl, (x0, y0) = tile_params
+            # ix, iy, x0, y0 = tile_params
+            # if len(self.tiles2) <= ix:
+            #     column_tiles = []
+            #     self.tiles2.append(column_tiles)
+            view = self.anim.get_view(
+                location=(x0, y0), size_on_level=size_on_level, level=self.level
+            )
+            self.tiles2.append((view, tile_params))
         pass
 
 
     def predict_on_view(self, view):
-        if str(self.parameters.param("Segmentation Method").value()) == "HCTFS":
+        smethod = str(self.parameters.param("Segmentation Method").value())
+        if smethod == "HCTFS":
             return self.predict_on_view_hctfs(view)
-        elif str(self.parameters.param("Segmentation Method").value()) == "U-Net":
+        elif smethod == "U-Net":
             return self._unet.predict_tile(view)
         else:
-            raise ValueError("Unknown segmentation method")
+            raise ValueError(f"Unknown segmentation method '{smethod}'")
 
     def predict_on_view_hctfs(self, view):
         image = self._get_features(view)
@@ -455,12 +459,14 @@ class ScanSegmentation:
             tile_size_on_level,
             imsize_on_level,
         ) = self._get_tiles_parameters()
-        szx = len(self.tiles)
-        szy = len(self.tiles[0])
-        output_image = np.zeros(self.tile_size * np.asarray([szy, szx]), dtype=int)
+        # szx = len(self.tiles)
+        # szy = len(self.tiles[0])
+        output_image = np.zeros(self.tile_size + imsize_on_level, dtype=int)
 
-        for sl_x_in, sl_y_in, sl_x_out, sl_y_out, iy, ix  in self.tile_iterator(return_tile_coords=True):
-            view = self.tiles[iy][ix]
+        # for sl_x_tl, sl_y_tl, sl_x_gl, sl_y_gl, ix, iy  in self.tile_iterator(return_tile_coords=True):
+        for view, tile_params in self.tiles2:
+            # view = self.tiles[ix][iy]
+            sl_tl, sl_gl, loc = tile_params
             seg_black = view.get_annotation_raster_by_color("#000000")
             seg_magenta = view.get_annotation_raster_by_color("#FF00FF")
             seg_red = view.get_annotation_raster_by_color("#FF0000")
@@ -469,9 +475,9 @@ class ScanSegmentation:
             segmentation = 2 * seg_black + 1 * seg_magenta + 3 * seg_red
             # remove overlays
             segmentation[overlays] = 0
-            output_image[sl_x_out, sl_y_out] = segmentation #.get_region_image(as_gray=as_gray)[sl_x_in, sl_y_in, :3]
+            output_image[sl_gl] = segmentation #.get_region_image(as_gray=as_gray)[sl_x_tl, sl_y_tl, :3]
 
-        self.whole_slide_training_labels = output_image[: int(imsize_on_level[1]), : int(imsize_on_level[0])]
+        self.whole_slide_training_labels = output_image[: int(imsize_on_level[0]), : int(imsize_on_level[1])]
         self.report.imsave(
             "whole_slide_training_labels.png", self.whole_slide_training_labels, level_skimage=20, level_npz=30
         )
@@ -483,15 +489,16 @@ class ScanSegmentation:
 
         logger.debug("predicting tiles")
         self.predicted_tiles = []
-        for i, tile_view_col in enumerate(self.tiles):
+        for i, (tile_view, tile_params) in enumerate(self.tiles2):
+        # for i, tile_view_col in enumerate(self.tiles):
             # logger.trace(f"predicting tiles in {i}-th row")
-            predicted_col = []
-            for j, tile_view in enumerate(tile_view_col):
+            # predicted_col = []
+            # for j, tile_view in enumerate(tile_view_col):
                 label_r = "profile unet cumulative get_region_image time [s]"
                 label_p = "profile unet cumulative prediction time [s]"
                 t_r = self.report.actual_row[label_r] if label_r in self.report.actual_row else 0
                 t_p = self.report.actual_row[label_p] if label_p in self.report.actual_row else 0
-                logger.trace(f"predicting tile {i}, {j}, loc={tile_view.region_location}, sz={tile_view.region_size_on_level}, t_r={t_r}, t_p={t_p}")
+                logger.trace(f"predicting tile {i}, loc={tile_view.region_location}, sz={tile_view.region_size_on_level}, t_r={t_r}, t_p={t_p}")
                 # self._inner_texture.texture_label = f"slide_segmentation_{i},{j}"
                 predicted_image = self.predict_on_view(tile_view)
                 # if str(self.parameters.param("Segmentation Method").value()) == "U-Net":
@@ -500,8 +507,7 @@ class ScanSegmentation:
                 #     predicted_image = self.predict_on_view_hctfs(tile_view)
                 # else:
                 #     raise ValueError("Unknown segmentation method")
-                predicted_col.append(predicted_image)
-            self.predicted_tiles.append(predicted_col)
+                self.predicted_tiles.append(predicted_image)
 
     def predict(self):
         """
@@ -516,8 +522,8 @@ class ScanSegmentation:
         if self.predicted_tiles is None:
             self.predict_tiles()
 
-        szx = len(self.tiles)
-        szy = len(self.tiles[0])
+        # szx = len(self.tiles)
+        # szy = len(self.tiles[0])
         #         print(f"size x={szx} y={szy}")
 
         (
@@ -526,14 +532,17 @@ class ScanSegmentation:
             tile_size_on_level,
             imsize_on_level,
         ) = self._get_tiles_parameters()
-        output_image = np.zeros(self.tile_size * np.asarray([szy, szx]), dtype=int)
+        output_image = np.zeros(self.tile_size + np.asarray(imsize_on_level), dtype=int)
         logger.debug("composing predicted image")
-        for iy, tile_column in enumerate(self.tiles):
-            for ix, tile in enumerate(tile_column):
-                output_image[
-                    ix * self.tile_size[0] : (ix + 1) * self.tile_size[0],
-                    iy * self.tile_size[1] : (iy + 1) * self.tile_size[1],
-                ] = self.predicted_tiles[iy][ix]
+        # for iy, tile_column in enumerate(self.tiles):
+            # for ix, tile in enumerate(tile_column):
+        for (view, tile_params), predicted_tile in zip(self.tiles2, self.predicted_tiles):
+            sl_tl, sl_gl, loc = tile_params
+            output_image[
+                    # ix * self.tile_size[0] : (ix + 1) * self.tile_size[0],
+                    # iy * self.tile_size[1] : (iy + 1) * self.tile_size[1],
+                    sl_gl
+                ] = predicted_tile
 
         full_image = output_image[: int(imsize_on_level[1]), : int(imsize_on_level[0])]
         self.full_prefilter_image = full_image
@@ -561,11 +570,12 @@ class ScanSegmentation:
     def get_raster_image(self, as_gray=False):
         if self.tiles is None:
             self.make_tiles()
-        szx = len(self.tiles)
-        szy = len(self.tiles[0])
+        # szx = len(self.tiles)
+        # szy = len(self.tiles[0])
         #         print(f"size x={szx} y={szy}")
 
-        output_size = self.tile_size * np.asarray([szy, szx])
+        _,_,_, imsize_on_level = self._get_tiles_parameters()
+        output_size = imsize_on_level + self.tile_size
         if not as_gray:
             output_size = np.asarray([output_size[0], output_size[1], 3])
 
@@ -582,8 +592,14 @@ class ScanSegmentation:
         #             ix * self.tile_size[0] : (ix + 1) * self.tile_size[0],
         #             iy * self.tile_size[1] : (iy + 1) * self.tile_size[1]
         #         ] = self.tiles[iy][ix].get_region_image(as_gray=as_gray)[:, :, :3]
-        for sl_x_in, sl_y_in, sl_x_out, sl_y_out, iy, ix  in self.tile_iterator(return_tile_coords=True):
-            output_image[sl_x_out, sl_y_out] = self.tiles[iy][ix].get_region_image(as_gray=as_gray)[sl_x_in, sl_y_in, :3]
+        # for sl_x_tl, sl_y_tl, sl_x_gl, sl_y_gl, iy, ix  in self.tile_iterator(return_tile_coords=True):
+        #     output_image[sl_x_gl, sl_y_gl] = self.tiles[iy][ix].get_region_image(as_gray=as_gray)[sl_x_tl, sl_y_tl, :3]
+
+        for view, tile_params in self.tiles2:
+            (sl_x_tl, sl_y_tl), sl_gl, loc = tile_params
+
+            output_image[sl_gl] = view.get_region_image(as_gray=as_gray)[sl_x_tl, sl_y_tl, :3]
+
 
         full_image = output_image[: int(imsize_on_level[1]), : int(imsize_on_level[0])]
         self.full_raster_image = full_image
@@ -597,8 +613,8 @@ class ScanSegmentation:
             imsize_on_level,
         ) = self._get_tiles_parameters()
         # TODO fix this strange behaviro - the x is related with 1 and y with 0
-        for ix, x0 in enumerate(range(0, int(imsize[1]), int(size_on_level0[1]))):
-            for iy, y0 in enumerate(range(0, int(imsize[0]), int(size_on_level0[0]))):
+        for ix, x0 in enumerate(range(0, int(imsize[0]), int(size_on_level0[0]))):
+            for iy, y0 in enumerate(range(0, int(imsize[1]), int(size_on_level0[1]))):
         # for iy, tile_column in enumerate(self.tiles):
         #     for ix, tile in enumerate(tile_column):
         # logger.trace(f"processing tile {x0}, {y0}")
@@ -606,20 +622,20 @@ class ScanSegmentation:
                 x_stop = (ix + 1) * self.tile_size[0]
                 y_start = iy * self.tile_size[1]
                 y_stop = (iy + 1) * self.tile_size[1]
-                sl_x_out = slice(x_start, x_stop)
-                sl_y_out = slice(y_start, y_stop)
-                sl_x_in = slice(None, None)
-                sl_y_in = slice(None, None)
-                out = []
-                if return_in_out_coords:
-                    out.extend([sl_x_in, sl_y_in, sl_x_out, sl_y_out])
-                if return_tile_coords:
-                    out.append(iy)
-                    out.append(ix)
-                if return_level0_coords:
-                    out.append(x0)
-                    out.append(y0)
-                yield tuple(out)
+                sl_x_gl = slice(x_start, x_stop)
+                sl_y_gl = slice(y_start, y_stop)
+                sl_x_tl = slice(None, None)
+                sl_y_tl = slice(None, None)
+                yield (sl_x_tl, sl_y_tl), (sl_x_gl, sl_y_gl), (y0, x0)
+                # if return_in_out_coords:
+                #     out.extend()
+                # if return_tile_coords:
+                #     out.append(ix)
+                #     out.append(iy)
+                # if return_level0_coords:
+                #     out.append(x0)
+                #     out.append(y0)
+                # yield tuple(out)
 
 
                 #                     int(x0):int(x0 + tile_size_on_level[0]),

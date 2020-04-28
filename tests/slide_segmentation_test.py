@@ -9,22 +9,29 @@ from typing import List
 import exsu
 from matplotlib import pyplot as plt
 import numpy as np
+from pathlib import Path
 # file_path = Path()
 
 import scaffan.slide_segmentation
 
 
 def test_slide_segmentation():
+    odir = Path("./tests/slide_seg_test_output/")
+    logger.debug(f"report dir={odir.absolute()}")
+    print(f"report dir={odir.absolute()}")
+
     fn = io3d.datasets.join_path(
         "medical", "orig", "sample_data", "SCP003", "SCP003.ndpi", get_root=True
     )
-    report = exsu.Report(outputdir="./tests/slide_seg_test_output/")
+
+
+    report = exsu.Report(outputdir=odir)
     seg = scaffan.slide_segmentation.ScanSegmentation(report=report)
     # dir(seg)
     anim = scaffan.image.AnnotatedImage(fn)
 
     seg.init(anim)
-    seg.parameters.param("Segmentation Method").setValue("HCFTS")
+    seg.parameters.param("Segmentation Method").setValue("HCTFS")
     seg.parameters.param("Save Training Labels").setValue(True)
     ann_ids_black = seg.anim.get_annotations_by_color("#000000")
     assert 10 in ann_ids_black
