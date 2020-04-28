@@ -477,7 +477,7 @@ class ScanSegmentation:
             segmentation[overlays] = 0
             output_image[sl_gl] = segmentation #.get_region_image(as_gray=as_gray)[sl_x_tl, sl_y_tl, :3]
 
-        self.whole_slide_training_labels = output_image[: int(imsize_on_level[0]), : int(imsize_on_level[1])]
+        self.whole_slide_training_labels = output_image[self._full_image_crop_slice()]
         self.report.imsave(
             "whole_slide_training_labels.png", self.whole_slide_training_labels, level_skimage=20, level_npz=30
         )
@@ -544,13 +544,24 @@ class ScanSegmentation:
                     sl_gl
                 ] = predicted_tile
 
-        full_image = output_image[: int(imsize_on_level[1]), : int(imsize_on_level[0])]
+        # full_image = output_image[: int(imsize_on_level[0]), : int(imsize_on_level[1])]
+
+        full_image = output_image[self._full_image_crop_slice()]
         self.full_prefilter_image = full_image
         if str(self.parameters.param("Segmentation Method").value()) == "HCTFS":
             self.full_output_image = self._labeling_filtration(full_image)
         else:
             self.full_output_image = full_image
         return self.full_output_image
+
+    def _full_image_crop_slice(self):
+        (
+            imsize,
+            tile_size_on_level0,
+            tile_size_on_level,
+            imsize_on_level,
+        ) = self._get_tiles_parameters()
+        return slice(None, int(imsize_on_level[0])), slice(None, int(imsize_on_level[1]))
 
     def _labeling_filtration(self, full_image):
         """
@@ -579,12 +590,12 @@ class ScanSegmentation:
         if not as_gray:
             output_size = np.asarray([output_size[0], output_size[1], 3])
 
-        (
-            imsize,
-            tile_size_on_level0,
-            tile_size_on_level,
-            imsize_on_level,
-        ) = self._get_tiles_parameters()
+        # (
+        #     imsize,
+        #     tile_size_on_level0,
+        #     tile_size_on_level,
+        #     imsize_on_level,
+        # ) = self._get_tiles_parameters()
         output_image = np.zeros(output_size, dtype=int)
         # for iy, tile_column in enumerate(self.tiles):
         #     for ix, tile in enumerate(tile_column):
@@ -601,7 +612,7 @@ class ScanSegmentation:
             output_image[sl_gl] = view.get_region_image(as_gray=as_gray)[sl_x_tl, sl_y_tl, :3]
 
 
-        full_image = output_image[: int(imsize_on_level[1]), : int(imsize_on_level[0])]
+        full_image = output_image[self._full_image_crop_slice()]
         self.full_raster_image = full_image
         return full_image
 
