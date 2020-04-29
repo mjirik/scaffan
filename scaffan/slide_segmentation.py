@@ -178,7 +178,7 @@ class ScanSegmentation:
         self.anim: AnnotatedImage = None
         self.tile_size = None
         self.level = None
-        self.tiles: List[List["View"]] = None
+        self.tiles: List["View"] = None
         # self._clf_object = SVC
         # self._clf_params = dict(gamma=2, C=1)
         self._clf_object = GaussianNB
@@ -414,7 +414,7 @@ class ScanSegmentation:
         #     self.tiles.append(column_tiles)
 
         # todo the iterator is strange the x and y seems to be swapped sometimes
-        self.tiles2 = []
+        self.tiles = []
         column_tiles=[]
         for tile_params in self.tile_iterator(
                 return_in_out_coords=False,
@@ -428,7 +428,7 @@ class ScanSegmentation:
             view = self.anim.get_view(
                 location=(x0, y0), size_on_level=size_on_level, level=self.level
             )
-            self.tiles2.append((view, tile_params))
+            self.tiles.append((view, tile_params))
         pass
 
 
@@ -464,7 +464,7 @@ class ScanSegmentation:
         output_image = np.zeros(self.tile_size + imsize_on_level, dtype=int)
 
         # for sl_x_tl, sl_y_tl, sl_x_gl, sl_y_gl, ix, iy  in self.tile_iterator(return_tile_coords=True):
-        for view, tile_params in self.tiles2:
+        for view, tile_params in self.tiles:
             # view = self.tiles[ix][iy]
             sl_tl, sl_gl, loc = tile_params
             seg_black = view.get_annotation_raster_by_color("#000000")
@@ -489,7 +489,7 @@ class ScanSegmentation:
 
         logger.debug("predicting tiles")
         self.predicted_tiles = []
-        for i, (tile_view, tile_params) in enumerate(self.tiles2):
+        for i, (tile_view, tile_params) in enumerate(self.tiles):
         # for i, tile_view_col in enumerate(self.tiles):
             # logger.trace(f"predicting tiles in {i}-th row")
             # predicted_col = []
@@ -536,7 +536,7 @@ class ScanSegmentation:
         logger.debug("composing predicted image")
         # for iy, tile_column in enumerate(self.tiles):
             # for ix, tile in enumerate(tile_column):
-        for (view, tile_params), predicted_tile in zip(self.tiles2, self.predicted_tiles):
+        for (view, tile_params), predicted_tile in zip(self.tiles, self.predicted_tiles):
             sl_tl, sl_gl, loc = tile_params
             output_image[
                     # ix * self.tile_size[0] : (ix + 1) * self.tile_size[0],
@@ -606,7 +606,7 @@ class ScanSegmentation:
         # for sl_x_tl, sl_y_tl, sl_x_gl, sl_y_gl, iy, ix  in self.tile_iterator(return_tile_coords=True):
         #     output_image[sl_x_gl, sl_y_gl] = self.tiles[iy][ix].get_region_image(as_gray=as_gray)[sl_x_tl, sl_y_tl, :3]
 
-        for view, tile_params in self.tiles2:
+        for view, tile_params in self.tiles:
             (sl_x_tl, sl_y_tl), sl_gl, loc = tile_params
 
             output_image[sl_gl] = view.get_region_image(as_gray=as_gray)[sl_x_tl, sl_y_tl, :3]
@@ -746,7 +746,7 @@ class ScanSegmentation:
     def add_biggest_to_annotations(self):
         points_px = self._find_biggest_lobuli()
         # view_corner = self.tiles[0][0]
-        view_corner, _ = self.tiles2[0]
+        view_corner, _ = self.tiles[0]
         pts_glob_px = view_corner.coords_view_px_to_glob_px(
             points_px[:, 1], points_px[:, 0]
         )
