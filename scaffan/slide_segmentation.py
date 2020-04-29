@@ -745,7 +745,8 @@ class ScanSegmentation:
 
     def add_biggest_to_annotations(self):
         points_px = self._find_biggest_lobuli()
-        view_corner = self.tiles[0][0]
+        # view_corner = self.tiles[0][0]
+        view_corner, _ = self.tiles2[0]
         pts_glob_px = view_corner.coords_view_px_to_glob_px(
             points_px[:, 1], points_px[:, 0]
         )
