@@ -98,5 +98,5 @@ def test_unet_on_view_czi():
     unq = np.unique(prediction)
     assert 0 in unq, "label 0 should be in prediction"
     assert 1 in unq, "label 1 should be in prediction"
-    assert False
+    # assert False
     # assert 2 in unq, "label 1 should be in prediction"
