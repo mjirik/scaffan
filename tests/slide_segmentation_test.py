@@ -15,27 +15,39 @@ from pathlib import Path
 import scaffan.slide_segmentation
 
 
-def test_slide_segmentation():
-    odir = Path("./tests/slide_seg_test_output/")
-    logger.debug(f"report dir={odir.absolute()}")
+def test_slide_segmentation_hamamatsu():
+    odir = Path("./tests/slide_seg_SCP003_test_output/")
     print(f"report dir={odir.absolute()}")
 
     fn = io3d.datasets.join_path(
         "medical", "orig", "sample_data", "SCP003", "SCP003.ndpi", get_root=True
     )
+    run_slide_seg(odir, Path(fn), margin=0.3)
 
+def test_slide_segmentation_zeiss():
+    odir = Path("./tests/slide_seg_Recog_test_output/")
+    fn = io3d.datasets.join_path(
+        "medical/orig/scaffan-analysis-czi/Zeiss-scans/01_2019_11_12__RecognizedCode.czi",
+        get_root=True)
+    run_slide_seg(odir, Path(fn), margin=0.3)
+
+
+def run_slide_seg(odir:Path, fn:Path, margin:float, check_black_ids=False):
+    logger.debug(f"report dir={odir.absolute()}")
+    fn = str(fn)
 
     report = exsu.Report(outputdir=odir)
     seg = scaffan.slide_segmentation.ScanSegmentation(report=report)
     # dir(seg)
     anim = scaffan.image.AnnotatedImage(fn)
 
-    seg.init(anim)
+    seg.init(anim.get_full_view(margin=margin))
     seg.parameters.param("Segmentation Method").setValue("HCTFS")
     seg.parameters.param("Save Training Labels").setValue(True)
-    ann_ids_black = seg.anim.get_annotations_by_color("#000000")
-    assert 10 in ann_ids_black
-    assert 11 in ann_ids_black
+    if check_black_ids:
+        ann_ids_black = seg.anim.get_annotations_by_color("#000000")
+        assert 10 in ann_ids_black
+        assert 11 in ann_ids_black
     seg.run()
     assert type(seg.full_output_image) == np.ndarray
     assert type(seg.full_raster_image) == np.ndarray

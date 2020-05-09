@@ -47,14 +47,12 @@ def run(ctx, log_level, *args, **kwargs):
         logger.remove()
         i = logger.add(sys.stderr, level=log_level, colorize=True)
     if ctx.invoked_subcommand is None:
-
-        # click.echo('I was invoked without subcommand')
+        click.echo("I am about to invoke GUI")
         ctx.invoke(gui, *args, **kwargs)
-        # a.main()
     else:
-        pass
         click.echo("I am about to invoke %s" % ctx.invoked_subcommand)
-    pass
+        # next command is useless. It is invoked automatically
+        # ctx.invoke(ctx.invoked_subcommand, *args, **kwargs)
 
 
 @run.command(context_settings=CONTEXT_SETTINGS, help="Set persistent values")

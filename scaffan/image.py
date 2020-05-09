@@ -565,6 +565,32 @@ class AnnotatedImage:
         ann = self.annotations[ann_id]
         return (np.mean(ann["x_mm"]), np.mean(ann["y_mm"]))
 
+    def get_full_view(
+            self,
+            level=0,
+            pixelsize_mm=None,
+            safety_bound=2,
+            margin=0.0,
+            margin_in_pixels=False,
+            # annotation_id=None,
+            # margin=0.5,
+            # margin_in_pixels=False,
+            ) -> "View":
+
+        height0 = self.openslide.properties["openslide.level[0].height"]
+        width0 = self.openslide.properties["openslide.level[0].width"]
+        size_on_level = np.array([int(height0), int(width0)])
+        return self.get_view(
+            location=[0,0],
+            level=level,
+            size_on_level=size_on_level,
+            pixelsize_mm=pixelsize_mm,
+            safety_bound=safety_bound,
+            margin=margin,
+            margin_in_pixels=margin_in_pixels,
+        )
+
+
     def get_view(
         self,
         center=None,
@@ -578,7 +604,7 @@ class AnnotatedImage:
         location_mm=None,
         safety_bound=2,
         annotation_id=None,
-        margin=0.5,
+        margin=0.0,
         margin_in_pixels=False,
     ) -> "View":
 
@@ -719,7 +745,8 @@ class AnnotatedImage:
         self,
         annotation_ids=None,
         level=None,
-        margin=0.5,
+        # margin=0.5,
+        margin=0.0,
         margin_in_pixels: bool = False,
         show=False,
         pixelsize_mm=None,
@@ -966,7 +993,7 @@ class View:
         location_mm=None,
         safety_bound=2,
         annotation_id=None,
-        margin=0.5,
+        margin=0.0,
         margin_in_pixels: bool = False,
     ):
         self.anim: AnnotatedImage = anim
@@ -1004,7 +1031,8 @@ class View:
         location_mm=None,
         safety_bound=2,
         annotation_id=None,
-        margin=0.5,
+            # margin=0.5,
+        margin=0.0,
         margin_in_pixels: bool = False,
     ):
         self._requested_size_on_level_when_defined_by_pixelsize = None
@@ -1044,18 +1072,9 @@ class View:
                 level
             )
         if annotation_id is not None:
-            center, size = self.anim.get_annotations_bounds_px(annotation_id)
-            if margin_in_pixels:
-                margin_px = int(margin)
-            else:
-                margin_px = (size * margin).astype(
-                    np.int
-                ) / self.anim.openslide.level_downsamples[level]
-            if (size_on_level is None) and (size_mm is None):
-                size_on_level = (
-                    (size / self.anim.openslide.level_downsamples[level])
-                    + 2 * margin_px
-                ).astype(int)
+            center, size_on_level0 = self.anim.get_annotations_bounds_px(annotation_id)
+            if size_on_level is None and size_mm is None:
+                size_on_level = (size_on_level0 / self.anim.openslide.level_downsamples[level]).astype(np.int)
 
         if size_mm is not None:
             if np.isscalar(size_mm):
@@ -1067,10 +1086,16 @@ class View:
                 size_mm / self.get_pixelsize_on_level(level)[0]
             ).astype(np.int)
 
+
         if size_on_level is None:
             size_on_level = [256, 256]
 
         size_on_level = np.asarray(size_on_level)
+
+        ## every size is now converted to size_on_level
+        size_on_level, margin_px_on_level = self._calculate_size_based_on_margin(size_on_level, margin, margin_in_pixels)
+
+
         self.region_level = level
         self.region_size_on_level = size_on_level
 
@@ -1091,6 +1116,12 @@ class View:
                 np.int
             )
 
+        # now we have location and center (all _mm variants are not used any more)
+        # if there is some margin, convert to center view
+        if (center is None) and (margin_px_on_level != 0).any():
+            location = location + margin_px_on_level
+            # center = self.get_region_center_by_location(location, level, size_on_level)
+
         if location is None:
             location = self.get_region_location_by_center(center, level, size_on_level)
         else:
@@ -1108,6 +1139,26 @@ class View:
         scan.adjust_annotation_to_image_view(
             self.anim.openslide, self.annotations, center, level, size_on_level
         )
+    def _get_margin_px(self, size_on_level, margin, margin_in_pixels:bool):
+        if margin_in_pixels:
+            margin_px = int(margin)
+        else:
+            margin_px = (size_on_level * margin).astype(
+                np.int
+            ) # / self.anim.openslide.level_downsamples[level]
+        return margin_px
+
+    def _calculate_size_based_on_margin(self, size_on_level, margin, margin_in_pixels:bool):
+        margin_px_on_level = self._get_margin_px(size_on_level, margin, margin_in_pixels)
+        # if (size_on_level is None) and (size_mm is None):
+        # if (size_on_level is None) and (size_mm is None):
+        size_on_level = (size_on_level
+                    # (size_on_level0 / self.anim.openslide.level_downsamples[level])
+                    + 2 * margin_px_on_level
+        ).astype(int)
+        return size_on_level, margin_px_on_level
+
+
 
     def get_pixelsize_on_level(self, level=None):
         if level is None:
@@ -1387,6 +1438,25 @@ class View:
 
         img_copy[sl] = resized_other_img
         return img_copy
+
+    def get_full_view(
+            self,
+            level=None,
+            pixelsize_mm=None,
+            safety_bound=2,
+            margin=0.0,
+            margin_in_pixels=False,
+            # annotation_id=None,
+            # margin=0.5,
+            # margin_in_pixels=False,
+    ) -> "View":
+        self.anim.get_full_view(
+            level=level,
+            pixelsize_mm=pixelsize_mm,
+            safety_bound=safety_bound,
+            margin=margin,
+            margin_in_pixels=margin_in_pixels,
+        )
 
 
 class ColorError(Exception):

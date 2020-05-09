@@ -2,6 +2,7 @@
 
 ## new
 
+* [Changed] Margin calculation is available not only for views given by annotation.
 * [ADded] Zeiss `.czi` image format support added
 * [Added] Save training labels image from input annotation
 * [Added] Get all annotation raster with the same color in view

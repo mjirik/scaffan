@@ -221,8 +221,14 @@ class ScanSegmentation:
         self.sinusoidal_area_mm = None
         self.alternative_get_features = None
 
-    def init(self, anim: scim.AnnotatedImage):
-        self.anim = anim
+    # def init(self, anim: scim.AnnotatedImage):
+    def init(self, view: scim.View):
+        """
+        :param view: full view can be extracted by anim.get_full_view
+        :return:
+        """
+        self.set_view(view)
+        # self.anim = anim # is set in set_view()
         # self.anim = scim.AnnotatedImage(str(fn))
         self.level = self._find_best_level()
         self.tiles = None
@@ -369,21 +375,30 @@ class ScanSegmentation:
 
         return closest_i
 
+    def set_view(self, view:View):
+        self.view = view.to_level(0)
+        self.anim = view.anim
+
     def _get_tiles_parameters(self):
-        height0 = self.anim.openslide.properties["openslide.level[0].height"]
-        width0 = self.anim.openslide.properties["openslide.level[0].width"]
+        sp_height0, sp_width0 = self.view.get_size_on_level(0)
+        st_height0, st_width0 = self.view.region_location
+        height0 = sp_height0 - st_height0
+        width0 = sp_width0 - st_width0
+
+        # height_check = self.anim.openslide.properties["openslide.level[0].height"]
+        # width_check = self.anim.openslide.properties["openslide.level[0].width"]
 
         # imsize = np.array([int(width0), int(height0)])
-        imsize = np.array([int(height0), int(width0)])
+        imsize_on_level0 = np.array([int(height0), int(width0)])
         if self.devel_imcrop is not None:
-            imsize = self.devel_imcrop
+            imsize_on_level0 = self.devel_imcrop
 
         tile_size_on_level = np.array(self.tile_size)
         downsamples = self.anim.openslide.level_downsamples[self.level]
-        imsize_on_level = imsize / downsamples
+        imsize_on_level = imsize_on_level0 / downsamples
         tile_size_on_level0 = tile_size_on_level * downsamples
         return (
-            imsize.astype(np.int),
+            imsize_on_level0.astype(np.int),
             tile_size_on_level0.astype(np.int),
             tile_size_on_level,
             imsize_on_level.astype(np.int),
@@ -618,14 +633,18 @@ class ScanSegmentation:
 
     def tile_iterator(self, return_in_out_coords=True, return_level0_coords=False, return_tile_coords=False):
         (
-            imsize,
+            imsize_on_level0,
             size_on_level0,
             size_on_level,
             imsize_on_level,
         ) = self._get_tiles_parameters()
+        # sp_height0, sp_width0 = self.view.get_size_on_level(0)
+        st_height0, st_width0 = self.view.region_location
+        # height0 = sp_height0 - st_height0
+        # width0 = sp_width0 - st_width0
         # TODO fix this strange behaviro - the x is related with 1 and y with 0
-        for ix, x0 in enumerate(range(0, int(imsize[0]), int(size_on_level0[0]))):
-            for iy, y0 in enumerate(range(0, int(imsize[1]), int(size_on_level0[1]))):
+        for ix, x0 in enumerate(range(st_height0, int(imsize_on_level0[0]), int(size_on_level0[0]))):
+            for iy, y0 in enumerate(range(st_width0, int(imsize_on_level0[1]), int(size_on_level0[1]))):
         # for iy, tile_column in enumerate(self.tiles):
         #     for ix, tile in enumerate(tile_column):
         # logger.trace(f"processing tile {x0}, {y0}")
@@ -658,7 +677,8 @@ class ScanSegmentation:
         logger.debug("evaluate")
         labels, count = np.unique(self.full_output_image, return_counts=True)
         logger.debug(f"whole scan segmentation: labels={labels}, count={count}")
-        self.intralobular_ratio = count[1] / (count[1] + count[2])
+        countd = { 0:0, 1:0 , 2:0}
+        countd.update(dict(zip(labels, count)))
         #         plt.figure(figsize=(10, 10))
         #         plt.imshow(self.full_output_image)
         logger.trace("before imsave slice_label.png")
@@ -680,10 +700,11 @@ class ScanSegmentation:
         self.report.imsave(
             "slice_raster.png", img.astype(np.uint8), level_skimage=20, level_npz=30
         )
+        self.intralobular_ratio = countd[1] / (countd[1] + countd[2])
         logger.debug(f"real_pixel_size={self.used_pixelsize_mm}")
-        self.empty_area_mm = np.prod(self.used_pixelsize_mm) * count[0]
-        self.sinusoidal_area_mm = np.prod(self.used_pixelsize_mm) * count[1]
-        self.septum_area_mm = np.prod(self.used_pixelsize_mm) * count[2]
+        self.empty_area_mm = np.prod(self.used_pixelsize_mm) * countd[0]
+        self.sinusoidal_area_mm = np.prod(self.used_pixelsize_mm) * countd[1]
+        self.septum_area_mm = np.prod(self.used_pixelsize_mm) * countd[2]
         logger.debug(f"empty_area_mm={self.empty_area_mm}")
         self.report.set_persistent_cols(
             {

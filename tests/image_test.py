@@ -193,7 +193,7 @@ class ImageAnnotationTest(unittest.TestCase):
         fn = io3d.datasets.join_path("medical", "orig", "CMU-1.ndpi", get_root=True)
         anim = scim.AnnotatedImage(fn)
         annotation_ids = anim.select_annotations_by_title("obj1")
-        view = anim.get_views(annotation_ids)[0]
+        view = anim.get_views(annotation_ids, margin=0.5)[0]
         image = view.get_region_image()
         plt.imshow(image)
         view.plot_annotations("obj1")
@@ -210,7 +210,7 @@ class ImageAnnotationTest(unittest.TestCase):
         fn = io3d.datasets.join_path("medical", "orig", "CMU-1.ndpi", get_root=True)
         anim = scim.AnnotatedImage(fn)
         annotation_ids = anim.select_annotations_by_title("obj1")
-        view = anim.get_views(annotation_ids)[0]
+        view = anim.get_views(annotation_ids, margin=0.5)[0]
         pxsize, pxunit = view.get_pixelsize_on_level()
         image = view.get_region_image()
         plt.subplot(221)
@@ -312,6 +312,13 @@ class ImageAnnotationTest(unittest.TestCase):
             "Boundary adds 2*margin*size of image to the image size",
         )
 
+        # import matplotlib.pyplot as plt
+        # plt.figure()
+        # plt.imshow(img1)
+        # plt.figure()
+        # plt.imshow(img2)
+        # plt.show()
+
         # test that everything is still pixel-precise
         assert img1[0, 0] == pytest.approx(
             0.47553590, 0.001
@@ -326,6 +333,7 @@ class ImageAnnotationTest(unittest.TestCase):
             center_mm=[10, 11],
             size_on_level=size_on_level,
             level=5,
+            margin=0,
             # size_mm=[0.1, 0.1]
         )
         image = view.get_region_image()
@@ -350,7 +358,7 @@ class ImageAnnotationTest(unittest.TestCase):
         image = view.get_region_image()
         logger.debug(f"location: {view.region_location}")
         logger.debug(f"pixelsize: {view.region_pixelsize}")
-        plt.imshow(image)
+        # plt.imshow(image)
         # view.plot_annotations("obj1")
         # plt.show()
 
@@ -479,6 +487,7 @@ def test_view_by_pixelsize_and_size_on_level(anim_scp003):
         annotation_id=ann_ids[0],
         size_on_level=[size_px, size_px],
         pixelsize_mm=[0.01, 0.01],
+        margin=0
     )
     img = view.get_region_image(as_gray=True)
     # plt.imshow(img)

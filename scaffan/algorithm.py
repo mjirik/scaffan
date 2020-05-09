@@ -448,7 +448,7 @@ class Scaffan:
         if run_slide_segmentation:
             fn_input = self.parameters.param("Input", "File Path").value()
             # self.slide_segmentation.init(Path(fn_input))
-            self.slide_segmentation.init(self.anim)
+            self.slide_segmentation.init(self.anim.get_full_view())
             self.slide_segmentation.run()
             if automatic_lobulus_selection:
                 self.slide_segmentation.add_biggest_to_annotations()
