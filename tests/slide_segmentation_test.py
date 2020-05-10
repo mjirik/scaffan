@@ -16,20 +16,20 @@ import scaffan.slide_segmentation
 
 
 def test_slide_segmentation_hamamatsu():
-    odir = Path("./tests/slide_seg_SCP003_test_output/")
+    odir = Path(__file__).parent / "slide_seg_SCP003_test_output/"
     print(f"report dir={odir.absolute()}")
 
     fn = io3d.datasets.join_path(
         "medical", "orig", "sample_data", "SCP003", "SCP003.ndpi", get_root=True
     )
-    run_slide_seg(odir, Path(fn), margin=0.3)
+    run_slide_seg(odir, Path(fn), margin=0.1)
 
 def test_slide_segmentation_zeiss():
-    odir = Path("./tests/slide_seg_Recog_test_output/")
+    odir = Path(__file__).parent / "slide_seg_Recog_test_output/"
     fn = io3d.datasets.join_path(
         "medical/orig/scaffan-analysis-czi/Zeiss-scans/01_2019_11_12__RecognizedCode.czi",
         get_root=True)
-    run_slide_seg(odir, Path(fn), margin=0.3)
+    run_slide_seg(odir, Path(fn), margin=0.0)
 
 
 def run_slide_seg(odir:Path, fn:Path, margin:float, check_black_ids=False):

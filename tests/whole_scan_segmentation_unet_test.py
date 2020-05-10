@@ -91,9 +91,10 @@ def test_unet_on_view_czi():
     loc = view.region_location
     logger.debug(f"loc={loc}, size={(height0, width0)}")
     im = view.get_region_image()
+    plt.figure()
     plt.imshow(im)
     plt.contour(prediction)
-    plt.show()
+    # plt.show()
 
     unq = np.unique(prediction)
     assert 0 in unq, "label 0 should be in prediction"

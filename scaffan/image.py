@@ -351,8 +351,8 @@ class ImageSlide():
         meta_dict["tiff.YResolution"] = 1/yres
         meta_dict["hamamatsu.XOffsetFromSlideCentre"] = 0
         meta_dict["hamamatsu.YOffsetFromSlideCentre"] = 0
-        meta_dict["openslide.level[0].width"] = self._czi_shape[0]
-        meta_dict["openslide.level[0].height"] = self._czi_shape[1]
+        meta_dict["openslide.level[0].height"] = self._czi_shape[0]
+        meta_dict["openslide.level[0].width"] = self._czi_shape[1]
 
         self.properties = meta_dict
 
@@ -716,7 +716,8 @@ class AnnotatedImage:
         return ids
 
     def select_just_outer_annotations(
-        self, color, return_holes=True, ann_ids: List[int] = None
+        self, color, return_holes=True, ann_ids: List[int] = None,
+            raise_exception_if_not_found=True
     ) -> List:
         """
         Select outer annotation and skip all inner annotations with same color. Put inner annotations to list of holes.
@@ -725,13 +726,17 @@ class AnnotatedImage:
         :param ann_ids: put inside pre-filtered list of annotations
         :return:
         """
-        ann_ids = self.get_annotations_by_color(color, ann_ids=ann_ids)
-        ann_pairs = [
-            [aid, self.select_inner_annotations(aid, ann_ids=ann_ids)]
-            for aid in ann_ids
-            if len(self.select_outer_annotations(aid, ann_ids=ann_ids)) == 0
-        ]
-        outer_inds, holes = zip(*ann_pairs)
+        ann_ids = self.get_annotations_by_color(color, ann_ids=ann_ids, raise_exception_if_not_found=raise_exception_if_not_found)
+        if len(ann_ids) > 0:
+            ann_pairs = [
+                [aid, self.select_inner_annotations(aid, ann_ids=ann_ids)]
+                for aid in ann_ids
+                if len(self.select_outer_annotations(aid, ann_ids=ann_ids)) == 0
+            ]
+            outer_inds, holes = zip(*ann_pairs)
+        else:
+            outer_inds = []
+            holes = []
         if return_holes:
             return list(outer_inds), list(holes)
         else:
@@ -1216,24 +1221,32 @@ class View:
             ann_raster = ann_raster ^ ann_raster2
         return ann_raster
 
-    def get_annotation_raster_by_color(self, color, make_holes=True):
+    def get_annotation_raster_by_color(self, color, make_holes=True, raise_exception_if_not_found:bool=False):
         """
         Prepare raster image with all annotation with the defined color
         :param color: requested annotation color
         :param make_holes: make whole if the same annotation label is inside
+        :param raise_exception_if_not_found: control the exception. It is raised if the color is not found.
         :return:
         """
-        outer_ids, holes_ids = self.anim.select_just_outer_annotations(color=color)
-        segmentation_one_color = None
+        outer_ids, holes_ids = self.anim.select_just_outer_annotations(color=color, raise_exception_if_not_found=raise_exception_if_not_found)
+        # segmentation_one_color = None
+        # polygon_x = self.annotations[annotation_id]["region_x_px"] * self.zoom[0]
+        # polygon_y = self.annotations[annotation_id]["region_y_px"] * self.zoom[1]
+        segmentation_one_color = np.zeros(
+            [self.region_size_on_pixelsize_mm[1],self.region_size_on_pixelsize_mm[0]],
+            dtype=np.uint8
+
+        )
         for outer_id, hole_ids in zip(outer_ids, holes_ids):
             if make_holes:
-                ann_raster = self.get_annotation_region_raster(
+                ann_raster = self.get_annotation_raster(
                     outer_id, holes_ids=hole_ids
                 )
             else:
-                ann_raster = self.get_annotation_region_raster(outer_id)
-            if segmentation_one_color is None:
-                segmentation_one_color = ann_raster
+                ann_raster = self.get_annotation_raster(outer_id)
+            # if segmentation_one_color is None:
+            #     segmentation_one_color = ann_raster
             segmentation_one_color += ann_raster
         return segmentation_one_color
 
