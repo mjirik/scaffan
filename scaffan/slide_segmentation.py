@@ -162,6 +162,7 @@ class ScanSegmentation:
             # self._inner_texture.parameters,
         ]
 
+
         self.parameters = Parameter.create(
             name=pname,
             type=ptype,
@@ -184,6 +185,7 @@ class ScanSegmentation:
         self._clf_object = GaussianNB
         self._clf_params = {}
         self.whole_slide_training_labels = None
+        self.compatible_with_openslide = True
         # self._clf_object = DecisionTreeClassifier # no partial fit :-(
         # self._clf_params = dict(max_depth=5)
 
@@ -642,7 +644,7 @@ class ScanSegmentation:
         st_height0, st_width0 = self.view.region_location
         # height0 = sp_height0 - st_height0
         # width0 = sp_width0 - st_width0
-        # TODO fix this strange behaviro - the x is related with 1 and y with 0
+        # strange behavior is given by openslide. It swaps x and y. The read_region([y,x]).
         for ix, x0 in enumerate(range(st_height0, int(imsize_on_level0[0]), int(size_on_level0[0]))):
             for iy, y0 in enumerate(range(st_width0, int(imsize_on_level0[1]), int(size_on_level0[1]))):
         # for iy, tile_column in enumerate(self.tiles):
@@ -656,8 +658,11 @@ class ScanSegmentation:
                 sl_y_gl = slice(y_start, y_stop)
                 sl_x_tl = slice(None, None)
                 sl_y_tl = slice(None, None)
-                # yield (sl_x_tl, sl_y_tl), (sl_x_gl, sl_y_gl), (y0, x0) # hamamatsu ok, zeiss wrong
-                yield (sl_x_tl, sl_y_tl), (sl_x_gl, sl_y_gl), (x0, y0)
+
+                if self.compatible_with_openslide:
+                    yield (sl_x_tl, sl_y_tl), (sl_x_gl, sl_y_gl), (y0, x0) # hamamatsu ok, zeiss wrong
+                else:
+                    yield (sl_x_tl, sl_y_tl), (sl_x_gl, sl_y_gl), (x0, y0)
                 # if return_in_out_coords:
                 #     out.extend()
                 # if return_tile_coords:

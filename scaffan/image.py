@@ -222,6 +222,7 @@ class ImageSlide():
         self.path = path
         self.imagedata = None
         self.properties = None
+        self.compatible_with_openslide = True
         if Path(self.path).suffix.lower() in (".tiff", ".tif"):
             self.image_type = ".tiff"
             self._get_imagedata = self._get_imagedata_tiff
@@ -317,6 +318,11 @@ class ImageSlide():
         from . import image_czi
         image_czi.instal_codecs_with_pip()
 
+        # This swap make all the behavior compatible with OpenSlide
+        if self.compatible_with_openslide:
+            # swap axes
+            location = [location[1], location[0]]
+
         factor = int(2**level)
         # factor = self.level_downsamples[level]
 
@@ -353,7 +359,6 @@ class ImageSlide():
         meta_dict["hamamatsu.YOffsetFromSlideCentre"] = 0
         meta_dict["openslide.level[0].height"] = self._czi_shape[0]
         meta_dict["openslide.level[0].width"] = self._czi_shape[1]
-
         self.properties = meta_dict
 
     def _set_properties_tiff(self):

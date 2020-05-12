@@ -22,7 +22,7 @@ def test_slide_segmentation_hamamatsu():
     fn = io3d.datasets.join_path(
         "medical", "orig", "sample_data", "SCP003", "SCP003.ndpi", get_root=True
     )
-    run_slide_seg(odir, Path(fn), margin=0.1)
+    run_slide_seg(odir, Path(fn), margin=0.0)
 
 def test_slide_segmentation_zeiss():
     odir = Path(__file__).parent / "slide_seg_Recog_test_output/"
