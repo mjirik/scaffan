@@ -1129,7 +1129,7 @@ class View:
         # now we have location and center (all _mm variants are not used any more)
         # if there is some margin, convert to center view
         if (center is None) and (margin_px_on_level != 0).any():
-            location = location + margin_px_on_level
+            location = location - margin_px_on_level
             # center = self.get_region_center_by_location(location, level, size_on_level)
 
         if location is None:

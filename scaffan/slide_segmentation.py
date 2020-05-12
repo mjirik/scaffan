@@ -382,10 +382,11 @@ class ScanSegmentation:
         self.anim = view.anim
 
     def _get_tiles_parameters(self):
-        # sp_height0, sp_width0 = self.view.get_size_on_level(0)
-        # st_height0, st_width0 = self.view.region_location
-        # height0 = sp_height0 - st_height0
-        # width0 = sp_width0 - st_width0
+        sp_height0, sp_width0 = self.view.get_size_on_level(0)
+        st_height0, st_width0 = self.view.region_location # pozor, tady je to prohozený
+
+        imcrop_height0 = sp_height0 + 1*st_height0
+        imcrop_width0 = sp_width0 + 1*st_width0
         height0, width0 = self.view.get_size_on_level(0)
 
         # height_check = self.anim.openslide.properties["openslide.level[0].height"]
@@ -393,6 +394,7 @@ class ScanSegmentation:
 
         # imsize = np.array([int(width0), int(height0)])
         imsize_on_level0 = np.array([int(height0), int(width0)])
+        cr_sp_on_level0 = np.array([int(imcrop_height0), int(imcrop_width0)])
         if self.devel_imcrop is not None:
             imsize_on_level0 = self.devel_imcrop
 
@@ -400,6 +402,18 @@ class ScanSegmentation:
         downsamples = self.anim.openslide.level_downsamples[self.level]
         imsize_on_level = imsize_on_level0 / downsamples
         tile_size_on_level0 = tile_size_on_level * downsamples
+        self._imsize_on_level = imsize_on_level
+        self._imsize_on_level0 = imsize_on_level0.astype(np.int)
+        self._tile_size_on_level0 = tile_size_on_level0.astype(np.int)
+        self._tile_size_on_level = tile_size_on_level.astype(np.int)
+        self._sl_sz_on_level = imsize_on_level.astype(np.int)
+        self._cr_sp_on_level0 = cr_sp_on_level0.astype(np.int)
+        self._cr_sp_on_level = (cr_sp_on_level0 / downsamples).astype(np.int)
+        self._cr_st_on_level0 = np.asarray([st_height0, st_width0], dtype=np.int)
+        self._cr_st_on_level = (self._cr_st_on_level0 / downsamples).astype(np.int)
+        self._cr_sz_on_level = self._cr_sp_on_level - self._cr_st_on_level
+        self._cr_sz_on_level0 = self._cr_sp_on_level0 - self._cr_st_on_level0
+
         return (
             imsize_on_level0.astype(np.int),
             tile_size_on_level0.astype(np.int),
@@ -471,12 +485,18 @@ class ScanSegmentation:
         if self.tiles is None:
             self.make_tiles()
         logger.debug("saving training labels")
-        (
-            imsize,
-            tile_size_on_level0,
-            tile_size_on_level,
-            imsize_on_level,
-        ) = self._get_tiles_parameters()
+        # (
+        #     imsize,
+        #     tile_size_on_level0,
+        #     tile_size_on_level,
+        #     imsize_on_level,
+        # ) = self._get_tiles_parameters()
+        # (
+        imsize = self._imsize_on_level0
+        tile_size_on_level0 = self._tile_size_on_level0
+        tile_size_on_level = self._tile_size_on_level
+        imsize_on_level = self._sl_sz_on_level
+        # ) = self._get_tiles_parameters()
         # szx = len(self.tiles)
         # szy = len(self.tiles[0])
         output_image = np.zeros(self.tile_size + imsize_on_level, dtype=int)
@@ -563,6 +583,7 @@ class ScanSegmentation:
 
         # full_image = output_image[: int(imsize_on_level[0]), : int(imsize_on_level[1])]
 
+        logger.debug(f"output_image.shape={output_image.shape}")
         full_image = output_image[self._full_image_crop_slice()]
         self.full_prefilter_image = full_image
         if str(self.parameters.param("Segmentation Method").value()) == "HCTFS":
@@ -572,13 +593,15 @@ class ScanSegmentation:
         return self.full_output_image
 
     def _full_image_crop_slice(self):
-        (
-            imsize,
-            tile_size_on_level0,
-            tile_size_on_level,
-            imsize_on_level,
-        ) = self._get_tiles_parameters()
-        return slice(None, int(imsize_on_level[0])), slice(None, int(imsize_on_level[1]))
+        # (
+        #     imsize,
+        #     tile_size_on_level0,
+        #     tile_size_on_level,
+        #     imsize_on_level,
+        # ) = self._get_tiles_parameters()
+        # self._cr_sz_on_level
+        logger.debug(f"cr size on level = {self._cr_sz_on_level}")
+        return slice(None, self._cr_sz_on_level[0]), slice(None, self._cr_sz_on_level[1])
 
     def _labeling_filtration(self, full_image):
         """
@@ -636,20 +659,21 @@ class ScanSegmentation:
     def tile_iterator(self, return_in_out_coords=True, return_level0_coords=False, return_tile_coords=False):
         (
             imsize_on_level0,
-            size_on_level0,
+            tile_size_on_level0,
             size_on_level,
             imsize_on_level,
         ) = self._get_tiles_parameters()
         # sp_height0, sp_width0 = self.view.get_size_on_level(0)
-        st_height0, st_width0 = self.view.region_location
+        # st_height0, st_width0 = self.view.region_location
+        st_height0, st_width0 = self._cr_st_on_level0
         # height0 = sp_height0 - st_height0
         # width0 = sp_width0 - st_width0
         # strange behavior is given by openslide. It swaps x and y. The read_region([y,x]).
-        for ix, x0 in enumerate(range(st_height0, int(imsize_on_level0[0]), int(size_on_level0[0]))):
-            for iy, y0 in enumerate(range(st_width0, int(imsize_on_level0[1]), int(size_on_level0[1]))):
-        # for iy, tile_column in enumerate(self.tiles):
-        #     for ix, tile in enumerate(tile_column):
-        # logger.trace(f"processing tile {x0}, {y0}")
+        for ix, x0 in enumerate(range(st_height0, int(self._cr_sp_on_level0[0]), int(tile_size_on_level0[0]))):
+            for iy, y0 in enumerate(range(st_width0, int(self._cr_sp_on_level0[1]), int(tile_size_on_level0[1]))):
+        # for ix, x0 in enumerate(range(st_height0, int(imsize_on_level0[0]), int(size_on_level0[0]))):
+        #     for iy, y0 in enumerate(range(st_width0, int(imsize_on_level0[1]), int(size_on_level0[1]))):
+                # logger.trace(f"processing tile {x0}, {y0}")
                 x_start = ix * self.tile_size[0]
                 x_stop = (ix + 1) * self.tile_size[0]
                 y_start = iy * self.tile_size[1]
@@ -811,7 +835,8 @@ class ScanSegmentation:
         # self._inner_texture.set_report(self.report)
         # self._inner_texture.add_cols_to_report = False
 
-        if str(self.parameters.param("Segmentation Method").value()) == "HCTFS":
+        method = str(self.parameters.param("Segmentation Method").value())
+        if method == "HCTFS":
             if bool(self.parameters.param("HCTFS", "Load Default Classifier").value()):
                 if self.clf_default_fn.exists():
                     logger.debug(
@@ -830,3 +855,10 @@ class ScanSegmentation:
         self.evaluate()
         if bool(self.parameters.param("Save Training Labels").value()):
             self.save_training_labels()
+
+        res = list(self.anim.get_pixel_size(self.level))
+        logger.debug(f"slide segmentation resolution = {res}")
+        self.report.set_persistent_cols({
+            "slide segmentation method": method,
+            "slide segmentation resolution": str(res)
+        })

@@ -22,14 +22,17 @@ def test_slide_segmentation_hamamatsu():
     fn = io3d.datasets.join_path(
         "medical", "orig", "sample_data", "SCP003", "SCP003.ndpi", get_root=True
     )
-    run_slide_seg(odir, Path(fn), margin=0.0)
+    run_slide_seg(odir, Path(fn), margin=-0.2)
+    # assert False
 
 def test_slide_segmentation_zeiss():
     odir = Path(__file__).parent / "slide_seg_Recog_test_output/"
     fn = io3d.datasets.join_path(
-        "medical/orig/scaffan-analysis-czi/Zeiss-scans/01_2019_11_12__RecognizedCode.czi",
+        # "medical/orig/scaffan-analysis-czi/Zeiss-scans/01_2019_11_12__RecognizedCode.czi",
+        "medical/orig/scaffan-analysis-czi/Zeiss-scans/05_2019_11_12__-1-2.czi",
         get_root=True)
-    run_slide_seg(odir, Path(fn), margin=0.0)
+    seg = run_slide_seg(odir, Path(fn), margin=-0.2)
+    seg.add_biggest_to_annotations()
 
 
 def run_slide_seg(odir:Path, fn:Path, margin:float, check_black_ids=False):
@@ -42,7 +45,8 @@ def run_slide_seg(odir:Path, fn:Path, margin:float, check_black_ids=False):
     anim = scaffan.image.AnnotatedImage(fn)
 
     seg.init(anim.get_full_view(margin=margin))
-    seg.parameters.param("Segmentation Method").setValue("HCTFS")
+    # seg.parameters.param("Segmentation Method").setValue("HCTFS")
+    seg.parameters.param("Segmentation Method").setValue("U-Net")
     seg.parameters.param("Save Training Labels").setValue(True)
     if check_black_ids:
         ann_ids_black = seg.anim.get_annotations_by_color("#000000")
@@ -54,6 +58,7 @@ def run_slide_seg(odir:Path, fn:Path, margin:float, check_black_ids=False):
     assert type(seg.whole_slide_training_labels) == np.ndarray
     assert seg.full_raster_image.shape[:2] == seg.full_output_image.shape[:2]
     assert seg.whole_slide_training_labels.shape[:2] == seg.full_output_image.shape[:2]
+    return seg
     # plt.imshow(seg.full_output_image)
     # plt.show()
     # plt.imshow(seg.full_raster_image)
