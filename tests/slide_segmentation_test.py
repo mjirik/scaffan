@@ -22,7 +22,7 @@ def test_slide_segmentation_hamamatsu():
     fn = io3d.datasets.join_path(
         "medical", "orig", "sample_data", "SCP003", "SCP003.ndpi", get_root=True
     )
-    run_slide_seg(odir, Path(fn), margin=-0.3, add_biggest=True)
+    run_slide_seg(odir, Path(fn), margin=-0.35, add_biggest=True)
     # assert False
 
 def test_slide_segmentation_zeiss():
@@ -31,7 +31,7 @@ def test_slide_segmentation_zeiss():
         # "medical/orig/scaffan-analysis-czi/Zeiss-scans/01_2019_11_12__RecognizedCode.czi",
         "medical/orig/scaffan-analysis-czi/Zeiss-scans/05_2019_11_12__-1-2.czi",
         get_root=True)
-    seg = run_slide_seg(odir, Path(fn), margin=-0.3)
+    seg = run_slide_seg(odir, Path(fn), margin=-0.4)
 
 
 def run_slide_seg(odir:Path, fn:Path, margin:float, check_black_ids=False, add_biggest=False):

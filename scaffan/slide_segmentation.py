@@ -778,8 +778,9 @@ class ScanSegmentation:
         # max_point_inds = point_dist.argsort()[-n_max:][::-1]
         sorted_point_inds = point_dist.argsort()[::-1]
         sorted_points = coordinates[sorted_point_inds]
+        centers_filtered = kick_close_points(sorted_points, min_distance=min_distance)
 
-        max_points = kick_close_points(sorted_points, min_distance=min_distance)[:n_max]
+        max_points = centers_filtered[:min(n_max, len(centers_filtered))]
         self.centers_all = coordinates
         self.centers_max = max_points
 
@@ -920,7 +921,7 @@ def kick_close_points(coords, min_distance):
     selected = []
     for i in range(coords.shape[0] - 1):
         dists = np.linalg.norm((coords[i + 1:, :] - coords[i, :]), axis=1)
-        print(dists)
+        # print(dists)
         if (dists > min_distance).all():
             selected.append(coords[i, :])
         else:
