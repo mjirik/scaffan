@@ -148,13 +148,13 @@ class MainGuiTest(unittest.TestCase):
                 if annid == "#000000":
                     new_list = original_list
                 else:
-                    new_list = original_list[:2]
+                    new_list = original_list[:1]
                 logger.debug(f"new ann_ids={new_list}")
                 return new_list
 
             mock_foo.side_effect = side_effect
             logger.debug("in with statement")
-            mainapp = scaffan.algorithm.Scaffan()
+            mainapp = scaffan.algorithm.Scaffan(whole_scan_margin=-0.2)
             mainapp.set_input_file(fn)
             mainapp.set_output_dir("test_run_lobuluses_output_dir")
             mainapp.set_annotation_color_selection(
