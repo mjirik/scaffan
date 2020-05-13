@@ -1,10 +1,10 @@
 import matplotlib
 import matplotlib.pyplot as plt
-import scaffan.scaffan.image as scim
+import scaffan.image as scim
 import pandas as pd
 import cv2
 import numpy as np
-from scaffan.scaffan import lobulus
+from scaffan import lobulus
 import tkinter
 
 FILE_NAME = "PIG-002_J-18-0091_HE.ndpi"
