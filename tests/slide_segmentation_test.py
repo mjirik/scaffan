@@ -22,7 +22,7 @@ def test_slide_segmentation_hamamatsu():
     fn = io3d.datasets.join_path(
         "medical", "orig", "sample_data", "SCP003", "SCP003.ndpi", get_root=True
     )
-    run_slide_seg(odir, Path(fn), margin=-0.2)
+    run_slide_seg(odir, Path(fn), margin=-0.3, add_biggest=True)
     # assert False
 
 def test_slide_segmentation_zeiss():
@@ -31,15 +31,17 @@ def test_slide_segmentation_zeiss():
         # "medical/orig/scaffan-analysis-czi/Zeiss-scans/01_2019_11_12__RecognizedCode.czi",
         "medical/orig/scaffan-analysis-czi/Zeiss-scans/05_2019_11_12__-1-2.czi",
         get_root=True)
-    seg = run_slide_seg(odir, Path(fn), margin=-0.2)
-    seg.add_biggest_to_annotations()
+    seg = run_slide_seg(odir, Path(fn), margin=-0.3)
 
 
-def run_slide_seg(odir:Path, fn:Path, margin:float, check_black_ids=False):
+def run_slide_seg(odir:Path, fn:Path, margin:float, check_black_ids=False, add_biggest=False):
     logger.debug(f"report dir={odir.absolute()}")
     fn = str(fn)
 
-    report = exsu.Report(outputdir=odir)
+    report = exsu.Report(outputdir=odir,
+                         show=False
+                         # additional_spreadsheet_fn=odir/"report.xlsx"
+                         )
     seg = scaffan.slide_segmentation.ScanSegmentation(report=report)
     # dir(seg)
     anim = scaffan.image.AnnotatedImage(fn)
@@ -58,6 +60,10 @@ def run_slide_seg(odir:Path, fn:Path, margin:float, check_black_ids=False):
     assert type(seg.whole_slide_training_labels) == np.ndarray
     assert seg.full_raster_image.shape[:2] == seg.full_output_image.shape[:2]
     assert seg.whole_slide_training_labels.shape[:2] == seg.full_output_image.shape[:2]
+    if add_biggest:
+        seg.add_biggest_to_annotations()
+    seg.report.finish_actual_row()
+    seg.report.dump()
     return seg
     # plt.imshow(seg.full_output_image)
     # plt.show()
@@ -65,3 +71,22 @@ def run_slide_seg(odir:Path, fn:Path, margin:float, check_black_ids=False):
     # plt.show()
     # plt.imshow(seg.whole_slide_training_labels)
     # plt.show()
+
+def test_get_biggest_lobuli():
+    odir = Path(__file__).parent / "slide_seg_SCP003_test_output/"
+    print(f"report dir={odir.absolute()}")
+
+    fn = io3d.datasets.join_path(
+        "medical", "orig", "sample_data", "SCP003", "SCP003.ndpi", get_root=True
+    )
+    logger.debug(f"report dir={odir.absolute()}")
+    fn = str(fn)
+
+    report = exsu.Report(outputdir=odir,
+                         show=False
+                         # additional_spreadsheet_fn=odir/"report.xlsx"
+                         )
+    seg = scaffan.slide_segmentation.ScanSegmentation(report=report)
+    # dir(seg)
+    anim = scaffan.image.AnnotatedImage(fn)
+    seg.init(anim.get_full_view(margin=-0.4))

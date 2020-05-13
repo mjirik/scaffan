@@ -42,7 +42,15 @@ from . import sni_prediction
 
 
 class Scaffan:
-    def __init__(self):
+    def __init__(
+            self,
+            whole_scan_margin=0
+    ):
+        """
+
+        :param whole_scan_margin: negative value makes the the area for automatic lobuli selection smaller. It is used in
+        tests and debugging.
+        """
 
         self.report: Report = Report(
             repodir=Path(__file__).parent.resolve(),
@@ -63,6 +71,7 @@ class Scaffan:
         self.lobulus_processing = scaffan.lobulus.Lobulus(
             ptype="bool", report=self.report
         )
+        self.whole_scan_margin = whole_scan_margin
         self.skeleton_analysis = scaffan.skeleton_analysis.SkeletonAnalysis()
         self.evaluation = scaffan.evaluation.Evaluation()
         self.intensity_rescale = RescaleIntensityPercentilePQG()
@@ -448,7 +457,7 @@ class Scaffan:
         if run_slide_segmentation:
             fn_input = self.parameters.param("Input", "File Path").value()
             # self.slide_segmentation.init(Path(fn_input))
-            self.slide_segmentation.init(self.anim.get_full_view())
+            self.slide_segmentation.init(self.anim.get_full_view(margin=self.whole_scan_margin))
             self.slide_segmentation.run()
             if automatic_lobulus_selection:
                 self.slide_segmentation.add_biggest_to_annotations()

@@ -789,7 +789,10 @@ class ScanSegmentation:
         )
         plt.axis("off")
         self.report.savefig_and_show(
-            "sinusoidal_tissue_local_centers.pdf", fig, level=55
+            "sinusoidal_tissue_local_centers.png", fig, level=55
+        )
+        self.report.savefig_and_show(
+            "sinusoidal_tissue_local_centers.png", fig, level=55
         )
 
         return max_points
