@@ -753,7 +753,12 @@ class ScanSegmentation:
         """
         n_max = int(self.parameters.param("Lobulus Number").value())
         mask = self.full_output_image == 1
+
+        import time
+        # t0 = time.time()
         dist = scipy.ndimage.morphology.distance_transform_edt(mask)
+        lab = skimage.morphology.label(mask)
+
         self.dist = dist
         # report
         r_m = float(self.parameters.param("Annotation Radius").value())  # * 1000 # mm
@@ -764,16 +769,30 @@ class ScanSegmentation:
         min_distance = int(2 * r_m / resolution_m)
         logger.debug(f"minimum distance [px]: {min_distance}")
 
+
         # image_max = scipy.ndimage.maximum_filter(dist, size=min_distance, mode="constant")
         # Comparison between image_max and im to find the coordinates of local maxima
         coordinates = peak_local_max(dist, min_distance=min_distance)
         point_dist = dist[list(zip(*coordinates))]
         # display(point_dist)
         # max_point_inds = point_dist.argsort()[-n_max:][::-1]
-        max_point_inds = point_dist.argsort()[::-1][:n_max]
-        max_points = coordinates[max_point_inds]
+        sorted_point_inds = point_dist.argsort()[::-1]
+        sorted_points = coordinates[sorted_point_inds]
+
+        max_points = kick_close_points(sorted_points, min_distance=min_distance)[:n_max]
         self.centers_all = coordinates
         self.centers_max = max_points
+
+        # t1 = time.time()
+        # ta = t1 - t0
+        # # alternative calculation
+        #
+        # dists, coords = find_maxdist_in_labeled_image(mask)
+        # coords_max = coords[:n_max]
+        # t2 = time.time()
+        # tb = t2 - t1
+        # coordinates=coords
+        # max_points = coords_max
 
         #     report
         fig = plt.figure(figsize=(10, 10))
@@ -789,11 +808,11 @@ class ScanSegmentation:
         )
         plt.axis("off")
         self.report.savefig_and_show(
-            "sinusoidal_tissue_local_centers.png", fig, level=55
+            "sinusoidal_tissue_local_centers.pdf", fig, level=55
         )
-        self.report.savefig_and_show(
-            "sinusoidal_tissue_local_centers.png", fig, level=55
-        )
+        # self.report.savefig_and_show(
+        #     "sinusoidal_tissue_local_centers.png", fig, level=55
+        # )
 
         return max_points
 
@@ -865,3 +884,48 @@ class ScanSegmentation:
             "slide segmentation method": method,
             "slide segmentation resolution": str(res)
         })
+
+
+# def find_maxdist_in_labeled_image(mask:np.ndarray):
+#     """
+#     Find biggest labeled areas in sense of distance from the border
+#     :param lab:
+#     :return: dists, coords
+#     """
+#
+#     lab = skimage.morphology.label(mask)
+#     dist = scipy.ndimage.morphology.distance_transform_edt(mask)
+#     mxs = [None] * (np.max(lab)-1)
+#     for l in range(1, np.max(lab)):
+#         dist_i = dist.copy()
+#         dist_i[lab != l] = 0
+#         # if l == 0:
+#         #     mxs[l] = (l, ())
+#         #     continue
+#         # dist_i = scipy.ndimage.morphology.distance_transform_edt(lab == l)
+#         mx = np.max(dist_i)
+#         xyz = np.unravel_index(np.argmax(dist_i), shape=lab.shape)
+#         mxs[l-1] = (mx, xyz)
+#
+#
+#     mxs.sort(key=lambda x:x[0], reverse=True)
+#
+#     dists, coords = zip(*mxs)
+#     dists = np.asarray(dists)
+#     coords = np.asarray(coords)
+#     return dists, coords
+
+
+def kick_close_points(coords, min_distance):
+    selected = []
+    for i in range(coords.shape[0] - 1):
+        dists = np.linalg.norm((coords[i + 1:, :] - coords[i, :]), axis=1)
+        print(dists)
+        if (dists > min_distance).all():
+            selected.append(coords[i, :])
+        else:
+            print(f"kicked {coords[i, :]}")
+
+    selected = np.asarray(selected)
+    selected
+    return selected
