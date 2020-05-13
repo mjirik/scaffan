@@ -100,6 +100,7 @@ def test_get_lobulus_mask():
     # lob_proc.border_mask
 
     matplotlib.use('TkAgg')
+    plt.figure()
     plt.imshow(lob_proc.lobulus_mask.astype(int))
     plt.show()
 
