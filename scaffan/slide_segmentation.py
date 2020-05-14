@@ -925,8 +925,7 @@ def kick_close_points(coords, min_distance):
         if (dists > min_distance).all():
             selected.append(coords[i, :])
         else:
-            print(f"kicked {coords[i, :]}")
+            logger.debug(f"kicked {coords[i, :]}")
 
     selected = np.asarray(selected)
-    selected
     return selected

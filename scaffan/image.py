@@ -322,6 +322,7 @@ class ImageSlide():
         if self.compatible_with_openslide:
             # swap axes
             location = [location[1], location[0]]
+            size = [size[1], size[0]]
 
         factor = int(2**level)
         # factor = self.level_downsamples[level]
