@@ -63,7 +63,7 @@ install:
     - pip install imagecodecs
     - python -m io3d.datasets -v -gdp
     - python -m io3d.datasets -v -l CMU-1 CMU-1-annotation SCP003
-    - python -m io3d.datasets -v -l biodur_sample J7_5_b czi_scaffold
+    - python -m io3d.datasets -v -l biodur_sample J7_5_b czi_scaffold czi_scaffold01
     - pwd
     - ls ~/data
     - ls ~/data/medical

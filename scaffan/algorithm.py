@@ -44,7 +44,7 @@ from . import sni_prediction
 class Scaffan:
     def __init__(
             self,
-            whole_scan_margin=0
+            whole_scan_margin=-0.1
     ):
         """
 
@@ -105,6 +105,12 @@ class Scaffan:
                         "type": "bool",
                         "value": True,
                         "tip": "Skip selection based on annotation color and select lobulus based on Scan Segmentation. ",
+                    },
+                    {
+                        "name": "Whole Scan Margin",
+                        "type": "float",
+                        "value": self.whole_scan_margin,
+                        "tip": "Negative value will crop the whole scan image",
                     },
                     {
                         "name": "Annotation Color",
@@ -455,9 +461,12 @@ class Scaffan:
             "Input", "Automatic Lobulus Selection"
         ).value()
         if run_slide_segmentation:
-            fn_input = self.parameters.param("Input", "File Path").value()
-            # self.slide_segmentation.init(Path(fn_input))
-            self.slide_segmentation.init(self.anim.get_full_view(margin=self.whole_scan_margin))
+            # fn_input = self.parameters.param("Input", "File Path").value()
+
+            # TODO remove when whole scan will work fine
+            # wsm = self.whole_scan_margin
+            wsm = self.parameters.param("Input", "Whole Scan Margin").value()
+            self.slide_segmentation.init(self.anim.get_full_view(margin=wsm))
             self.slide_segmentation.run()
             if automatic_lobulus_selection:
                 self.slide_segmentation.add_biggest_to_annotations()
