@@ -8,47 +8,63 @@ from numpy import load
 from matplotlib import pyplot as plt
 from tensorflow.keras import datasets
 
-IMAGES_SAVE_FILE = 'D:\\FAV\\Scaffold\\data\\images.npy'
-HOMOS_SAVE_FILE = 'D:\\FAV\\Scaffold\\data\\homos.npy'
+TRAIN_DATA_SAVE_FILE = 'D:\\FAV\\Scaffold\\data\\train_data.npy'
+LABELS_SAVE_FILE = 'D:\\FAV\\Scaffold\\data\\labels.npy'
+DISPLAY_SIZE = 80
+
+BATCH_SIZE = 8
+EPOCHS = 30
 
 
 def load_data():
-    # (train_images, train_labels), (test_images, test_labels) = datasets.cifar10.load_data()
+    train_data = load(TRAIN_DATA_SAVE_FILE)
+    labels = load(LABELS_SAVE_FILE)
+    data_count = labels.shape[-1]
 
-    images = load(IMAGES_SAVE_FILE)
-    homos = load(HOMOS_SAVE_FILE)
-    return images.reshape((288, 300, 300, 1)), homos.reshape(288, 5)
+    hom = labels[0, :]
+    sni = labels[1, :].reshape(data_count, 1)
+
+    return train_data.reshape((data_count, DISPLAY_SIZE, DISPLAY_SIZE, 1)), sni, hom
 
 
 def create_model():
     model = Sequential()
-    model.add(Conv2D(32, (3, 3), activation='relu', input_shape=(300, 300, 1)))
+    model.add(Conv2D(32, (3, 3), activation='relu', input_shape=(DISPLAY_SIZE, DISPLAY_SIZE, 1)))
     model.add(MaxPool2D((2, 2)))
     model.add(Conv2D(64, (3, 3), activation='relu'))
     model.add(MaxPool2D((2, 2)))
     model.add(Conv2D(64, (3, 3), activation='relu'))
     model.add(Flatten())
     model.add(Dense(64, activation='relu'))
-    model.add(Dense(5, activation='softmax', use_bias=False)) # 1 neuron bez aktivace
+    model.add(Dense(1, activation=None, use_bias=False))
 
     return model
 
 
 if __name__ == '__main__':
-    x, y = load_data()
+    x, y, hom = load_data()
 
     print(x.shape)
 
     model = create_model()
     model.summary()
     model.compile(optimizer='adam',
-                  loss='categorical_crossentropy', # mean square error
-                  metrics=['accuracy'])
+                  loss='mean_squared_error',
+                  metrics=['mean_squared_error'])
 
-    history = model.fit(x, y, epochs=5, batch_size=5)
+    history = model.fit(x, y, epochs=EPOCHS, batch_size=BATCH_SIZE, sample_weight=hom)
 
-    plt.plot(history.history['accuracy'], label='accuracy')
+    # serialize model to JSON
+    model_json = model.to_json()
+    with open("model.json", "w") as json_file:
+        json_file.write(model_json)
+    # serialize weights to HDF5
+    model.save_weights("weights.h5")
+    print("Saved model to disk")
+
+    plt.figure()
+    plt.plot(history.history['mean_squared_error'], label='mean_squared_error')
     plt.xlabel('Epoch')
-    plt.ylabel('Accuracy')
-    plt.ylim([0.5, 1])
-    plt.legend(loc='lower right')
+    plt.legend(['MSE '])
+    plt.show()
+
