@@ -47,10 +47,11 @@ def run(ctx, log_level, *args, **kwargs):
         logger.remove()
         i = logger.add(sys.stderr, level=log_level, colorize=True)
     if ctx.invoked_subcommand is None:
-        click.echo("I am about to invoke GUI")
+        # click.echo("I am about to invoke GUI")
         ctx.invoke(gui, *args, **kwargs)
     else:
-        click.echo("I am about to invoke %s" % ctx.invoked_subcommand)
+        pass
+        # click.echo("I am about to invoke %s" % ctx.invoked_subcommand)
         # next command is useless. It is invoked automatically
         # ctx.invoke(ctx.invoked_subcommand, *args, **kwargs)
 
@@ -199,3 +200,55 @@ def nogui(input_path, color, output_path, params):
 
 
 # def install():
+def create_icon(
+        app_name: str, icon_filename=None, conda_env_name=None, package_name=None
+):
+    """
+
+    :param app_name: Used for desktop icon name
+    :param icon_filename: absolute path to icon usually:
+        pathlib.Path(__file__).parent / pathlib.Path("app_icon512.ico")
+    :param conda_env_name: conda environment. The app_name is used if conda_env_name is set to None.
+    :param package_name: in `conda -m 'package_name'` . The app_name is used if conda_env_name is set to None.
+    :return:
+    """
+    import platform
+
+    # print(platform.system)
+    if conda_env_name is None:
+        conda_env_name = app_name
+
+    # if icon_filename is None:
+    #     icon_filename = app_name
+
+    if Path(icon_filename).suffix == "":
+        icon_filename += ".ico"
+
+    if package_name is None:
+        package_name = app_name
+
+    if platform.system() == "Windows":
+
+        # logo_fn2 = pathlib.Path(__file__).parent / pathlib.Path("scaffan_icon512.ico")
+
+        # logo_fn = op.join(op.dirname(__file__), icon_filename)
+        logo_fn = icon_filename
+        import win32com.client
+
+        shell = win32com.client.Dispatch("WScript.Shell")
+
+        pth = Path.home()
+        pth = pth / "Desktop" / Path(f"{app_name}.lnk")
+        shortcut = shell.CreateShortcut(str(pth))
+        # cmd
+        # ln =  "call activate scaffan; {} -m scaffan".format(sys.executable)
+        # C:\Windows\System32\cmd.exe /C "call activate anwaapp & pause &  python -m anwa & pause"
+        # shortcut.TargetPath = sys.executable
+        # shortcut.Arguments = f"-m {app_name}"
+        shortcut.TargetPath = "cmd"
+        # C:\Windows\System32\cmd.exe /C "call activate anwaapp & pause &  python -m anwa & pause"
+        shortcut.Arguments = (
+            f'/C "call activate {conda_env_name} & python -m {package_name} & pause" '
+        )
+        shortcut.IconLocation = "{},0".format(logo_fn)
+        shortcut.Save()
