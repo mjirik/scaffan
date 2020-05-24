@@ -39,7 +39,7 @@ class ProcessJsonAnnotationTest(unittest.TestCase):
     def test_read_annotations(self):
         fn = io3d.datasets.join_path("medical", "orig", "CMU-1.ndpi", get_root=True)
         imsl = openslide.OpenSlide(fn)
-        annotations = scan.read_annotations(fn)
+        annotations = scan.read_annotations_ndpa(fn)
         scan.annotations_to_px(imsl, annotations)
 
 

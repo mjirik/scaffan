@@ -187,7 +187,7 @@ def annoatation_px_to_mm(imsl: openslide.OpenSlide, annotation: dict) -> dict:
     :return:
     """
     offset_px = get_offset_px(imsl)
-    pixelsize, pixelunit = get_pixelsize(imsl)
+    pixelsize, pixelunit = get_pixelsize(imsl, requested_unit="mm")
     x_px = np.asarray(annotation["x_px"])
     y_px = np.asarray(annotation["y_px"])
     x_mm = pixelsize[0] * (x_px - offset_px[0])
@@ -534,6 +534,12 @@ class AnnotatedImage:
         return self.level_pixelsize[level], self.pixelunit
         # return get_pixelsize(self.openslide, level)
 
+    def get_slide_size(self):
+        height0 = self.openslide.properties["openslide.level[0].height"]
+        width0 = self.openslide.properties["openslide.level[0].width"]
+        size_on_level0 = np.array([int(height0), int(width0)])
+        return size_on_level0
+
     def get_image_by_center(self, center, level=3, size=None, as_gray=True):
         do_fix_location = True if self.image_type == ".ndpi" else False
         img = get_image_by_center(
@@ -556,11 +562,13 @@ class AnnotatedImage:
         """
         logger.debug(f"Reading the annotation {self.path}")
         if self.image_type == ".ndpi":
-            self.annotations = scan.read_annotations(self.path)
+            self.annotations = scan.read_annotations_ndpa(self.path)
             self.annotations = scan.annotations_to_px(self.openslide, self.annotations)
         else: #if self.image_type == ".tiff":
-            # TODO maybe add reader of VGG Image Annotator
-            self.annotations = []
+            slide_size = self.get_slide_size()
+            # pxsz, unit = self.get_pixel_size(0)
+            self.annotations = scan.read_annotations_imagej(self.path, slide_size=slide_size)
+            self.annotations = scan.annotations_to_px(self.openslide, self.annotations)
         self.id_by_titles = scan.annotation_titles(self.annotations)
         self.id_by_colors = scan.annotation_colors(self.annotations)
         # self.details = scan.annotation_details(self.annotations)
@@ -959,7 +967,7 @@ class AnnotatedImage:
         mask = mask.reshape(self.region_size[::-1])
         return mask
 
-    def region_imshow_annotation(self, i):
+    def region_imshow_annotation(self, i=None):
         region = self.get_region_image()
         plt.imshow(region)
         self.plot_annotations(i)
@@ -1278,7 +1286,7 @@ class View:
         mask = mask.reshape(self.region_size_on_pixelsize_mm[::-1])
         return mask
 
-    def region_imshow_annotation(self, i):
+    def region_imshow_annotation(self, i=None):
         region = self.get_region_image()
         plt.imshow(region)
         self.plot_annotations(i)

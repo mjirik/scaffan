@@ -13,6 +13,9 @@ import os.path as op
 import glob
 import matplotlib.pyplot as plt
 import numpy as np
+import re
+import math
+from read_roi import read_roi_zip
 
 __version__ = "0.21.3"
 
@@ -86,7 +89,67 @@ def ndpa_to_json(path):
             _ndpa_file_to_json(fl)
 
 
-def read_annotations(pth) -> list:
+def get_imsize_from_imagej_roi(rois):
+    width = 0
+    height = 0
+    rect = False
+    for roikey in rois:
+        roi = rois[roikey]
+        #         print(roi["type"])
+        if roi["type"] == "rectangle":
+
+            widthi = roi["width"]
+            heighti = roi["height"]
+            if widthi > width:
+                width = widthi
+            if heighti > height:
+                height = heighti
+
+            rect = True
+        if not rect:
+            raise Exception("There should be rectangle in ROI file to define image size.")
+    return np.array([height, width])
+
+
+def read_annotations_imagej(path, slide_size) -> list:
+    """
+    :param path: Path to original image file. The ROI file name is derived from by adding .roi.zip
+    :param slide_size:
+    :return:
+    """
+    # import io3d
+    # import numpy as np
+    fn = path + ".roi.zip"
+    logger.debug("Looking for ROI file {fn}")
+    anns = []
+    if op.exists(fn):
+        # def read_annotations_imagej(, slide_size=slide_size):
+            rois = read_roi_zip(fn)
+            roi_size = get_imsize_from_imagej_roi(rois)
+            ratio = np.asarray(slide_size) / roi_size
+            if not math.isclose(ratio[0], ratio[1], rel_tol=0.01):
+                logger.warning(f"ROI size ratio is different from image data. Image size={slide_size}, ROI size={roi_size}")
+            logger.debug(f"ratio={ratio}")
+            for roi_key in rois:
+                one = rois[roi_key]
+                if one["type"] == "polygon":
+
+                    an_title = one["name"]
+                    m = re.search(r"#[0-9a-fA-F]{6}", one["name"])
+                    if m is None:
+                        an_color = "#FFFFFF"
+                    else:
+                        an_color = m.group(0)
+                    # swap
+                    an_x = np.asarray(one["y"]) * ratio[0]
+                    an_y = np.asarray(one["x"]) * ratio[1]
+                    an_details = ""
+                    one_ann = dict(title=an_title, color=an_color, x=an_x, y=an_y, details=an_details)
+                    anns.append(one_ann)
+    return anns
+
+
+def read_annotations_ndpa(pth) -> list:
     """
     Read the ndpa annotations. Annotation is converted to json if it is not done before. This step
     works on Linux but not on Windows.
@@ -176,7 +239,7 @@ def annotations_to_px(imsl, annotations):
     from scaffan.image import get_offset_px, get_pixelsize
 
     offset_px = get_offset_px(imsl)
-    pixelsize, pixelunit = get_pixelsize(imsl)
+    pixelsize, pixelunit = get_pixelsize(imsl, requested_unit="mm")
     for annotation in annotations:
         x_nm = np.asarray(annotation["x"])
         y_nm = np.asarray(annotation["y"])

@@ -730,6 +730,13 @@ class ScanSegmentation:
         self.report.imsave(
             "slice_raster.png", img.astype(np.uint8), level_skimage=20, level_npz=30
         )
+        fig = plt.figure()
+        # plt.imshow(img)
+        self.view.region_imshow_annotation(i=None)
+        # self.view.imshow()
+        self.report.savefig("slice_raster_with_annotation.png", level=45)
+        plt.close(fig)
+        # fig.ax
         self.intralobular_ratio = countd[1] / (countd[1] + countd[2])
         logger.debug(f"real_pixel_size={self.used_pixelsize_mm}")
         self.empty_area_mm = np.prod(self.used_pixelsize_mm) * countd[0]

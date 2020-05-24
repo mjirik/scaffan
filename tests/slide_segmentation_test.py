@@ -39,8 +39,9 @@ def run_slide_seg(odir:Path, fn:Path, margin:float, check_black_ids=False, add_b
     fn = str(fn)
 
     report = exsu.Report(outputdir=odir,
-                         show=False
+                         show=False,
                          # additional_spreadsheet_fn=odir/"report.xlsx"
+                         level=10
                          )
     seg = scaffan.slide_segmentation.ScanSegmentation(report=report)
     # dir(seg)

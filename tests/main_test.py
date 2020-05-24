@@ -93,38 +93,6 @@ class MainGuiTest(unittest.TestCase):
 
     # skip_on_local = True
 
-    @unittest.skipIf(os.environ.get("TRAVIS", True), "Skip on Travis-CI")
-    def test_run_lobuluses(self):
-        fn = io3d.datasets.join_path(
-            "medical", "orig", "sample_data", "SCP003", "SCP003.ndpi", get_root=True
-        )
-        # imsl = openslide.OpenSlide(fn)
-        # annotations = scan.read_annotations(fn)
-        # scan.annotations_to_px(imsl, annotations)
-        mainapp = scaffan.algorithm.Scaffan()
-        mainapp.set_input_file(fn)
-        mainapp.set_output_dir("test_run_lobuluses_output_dir")
-        # mainapp.init_run()
-        # mainapp.set_annotation_color_selection("#FF00FF") # magenta -> cyan
-        # mainapp.set_annotation_color_selection("#00FFFF")
-        # cyan causes memory fail
-        mainapp.set_parameter("Input;Automatic Lobulus Selection", False)
-        mainapp.set_annotation_color_selection("#FFFF00")
-        mainapp.run_lobuluses()
-        self.assertLess(
-            0.6,
-            mainapp.evaluation.evaluation_history[0]["Lobulus Border Dice"],
-            "Lobulus segmentation should have Dice coefficient above some low level",
-        )
-        # self.assertLess(0.6, mainapp.evaluation.evaluation_history[1]["Lobulus Border Dice"],
-        #                 "Lobulus segmentation should have Dice coefficient above some low level")
-        self.assertLess(
-            0.2,
-            mainapp.evaluation.evaluation_history[0]["Central Vein Dice"],
-            "Central Vein segmentation should have Dice coefficient above some low level",
-        )
-        # self.assertLess(0.5, mainapp.evaluation.evaluation_history[1]["Central Vein Dice"],
-        #                 "Central Vein should have Dice coefficient above some low level")
 
     skip_on_local = False
 
@@ -472,3 +440,39 @@ class MainGuiTest(unittest.TestCase):
         # modtime1 = datetime.fromtimestamp(clf_fn.stat().st_mtime)
         # logger.debug(f"classificator prior modification time: {modtime1}")
         # assert modtime0 == modtime1, "We are not changing the pretrained classifier file"
+
+# @pytest.mark.parametrize("fn_yellow")
+
+@unittest.skipIf(os.environ.get("TRAVIS", True), "Skip on Travis-CI")
+def test_run_lobuluses():
+    fn = io3d.datasets.join_path(
+        "medical", "orig", "sample_data", "SCP003", "SCP003.ndpi", get_root=True
+    )
+    run_on_yellow(fn)
+
+def test_run_lobuluses():
+    fn = io3d.datasets.join_path(
+        "medical/orig/scaffan-analysis-czi/Zeiss-scans/05_2019_11_12__-1-2.czi", get_root=True
+    )
+    run_on_yellow(fn)
+
+def run_on_yellow(fn_yellow):
+    # imsl = openslide.OpenSlide(fn)
+    # annotations = scan.read_annotations(fn)
+    # scan.annotations_to_px(imsl, annotations)
+    mainapp = scaffan.algorithm.Scaffan()
+    mainapp.set_input_file(fn_yellow)
+    mainapp.set_output_dir("test_run_lobuluses_output_dir")
+    # mainapp.init_run()
+    # mainapp.set_annotation_color_selection("#FF00FF") # magenta -> cyan
+    # mainapp.set_annotation_color_selection("#00FFFF")
+    # cyan causes memory fail
+    mainapp.set_parameter("Input;Automatic Lobulus Selection", False)
+    mainapp.set_annotation_color_selection("#FFFF00")
+    mainapp.run_lobuluses()
+    assert 0.6 < mainapp.evaluation.evaluation_history[0]["Lobulus Border Dice"], "Lobulus segmentation should have Dice coefficient above some low level"
+    # self.assertLess(0.6, mainapp.evaluation.evaluation_history[1]["Lobulus Border Dice"],
+    #                 "Lobulus segmentation should have Dice coefficient above some low level")
+    assert 0.2 < mainapp.evaluation.evaluation_history[0]["Central Vein Dice"], "Central Vein segmentation should have Dice coefficient above some low level"
+    # self.assertLess(0.5, mainapp.evaluation.evaluation_history[1]["Central Vein Dice"],
+    #                 "Central Vein should have Dice coefficient above some low level")
