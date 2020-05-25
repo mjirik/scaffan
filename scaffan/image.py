@@ -179,22 +179,7 @@ def get_offset_px(imsl):
     return offset_px
 
 
-def annoatation_px_to_mm(imsl: openslide.OpenSlide, annotation: dict) -> dict:
-    """
-    Calculate x,y in mm from xy in pixels
-    :param imsl:
-    :param annotation:
-    :return:
-    """
-    offset_px = get_offset_px(imsl)
-    pixelsize, pixelunit = get_pixelsize(imsl, requested_unit="mm")
-    x_px = np.asarray(annotation["x_px"])
-    y_px = np.asarray(annotation["y_px"])
-    x_mm = pixelsize[0] * (x_px - offset_px[0])
-    y_mm = pixelsize[1] * (y_px - offset_px[1])
-    annotation["x_mm"] = x_mm
-    annotation["y_mm"] = y_mm
-    return annotation
+# def annoatation_px_to_mm(imsl: openslide.OpenSlide, annotation: dict) -> dict:
 
 
 def get_resize_parameters(imsl, former_level, former_size, new_level):
@@ -356,10 +341,12 @@ class ImageSlide():
         meta_dict["tiff.ResolutionUnit"] = "m"
         meta_dict["tiff.XResolution"] = 1/xres
         meta_dict["tiff.YResolution"] = 1/yres
-        meta_dict["hamamatsu.XOffsetFromSlideCentre"] = 0
-        meta_dict["hamamatsu.YOffsetFromSlideCentre"] = 0
         meta_dict["openslide.level[0].height"] = self._czi_shape[0]
         meta_dict["openslide.level[0].width"] = self._czi_shape[1]
+        meta_dict["hamamatsu.XOffsetFromSlideCentre"] = -int(self._czi_shape[0] / 2)
+        meta_dict["hamamatsu.YOffsetFromSlideCentre"] = -int(self._czi_shape[1] / 2)
+        # meta_dict["hamamatsu.XOffsetFromSlideCentre"] = 0
+        # meta_dict["hamamatsu.YOffsetFromSlideCentre"] = 0
         self.properties = meta_dict
 
     def _set_properties_tiff(self):
@@ -568,7 +555,9 @@ class AnnotatedImage:
             slide_size = self.get_slide_size()
             # pxsz, unit = self.get_pixel_size(0)
             self.annotations = scan.read_annotations_imagej(self.path, slide_size=slide_size)
-            self.annotations = scan.annotations_to_px(self.openslide, self.annotations)
+            self.annotations = scan.annotations_px_to_mm(self.openslide, self.annotations)
+
+            # self.annotations = scan.annotations(self.openslide, self.annotations)
         self.id_by_titles = scan.annotation_titles(self.annotations)
         self.id_by_colors = scan.annotation_colors(self.annotations)
         # self.details = scan.annotation_details(self.annotations)
@@ -1104,7 +1093,6 @@ class View:
             size_on_level = np.ceil(
                 size_mm / self.get_pixelsize_on_level(level)[0]
             ).astype(np.int)
-
 
         if size_on_level is None:
             size_on_level = [256, 256]

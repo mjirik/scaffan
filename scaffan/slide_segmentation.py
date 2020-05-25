@@ -11,7 +11,8 @@ from pathlib import Path
 # import sklearn.cluster
 # import sklearn.naive_bayes
 # import sklearn.svm
-from scaffan.image import View, annoatation_px_to_mm
+from scaffan.image import View
+from scaffan.annotation import annotation_px_to_mm
 # from sklearn.externals import joblib
 import joblib
 from scipy.ndimage import gaussian_filter
@@ -853,7 +854,7 @@ class ScanSegmentation:
                 "color": "#00FF88",
                 "details": "",
             }
-            ann = annoatation_px_to_mm(self.anim.openslide, ann)
+            ann = annotation_px_to_mm(self.anim.openslide, ann)
             newid = len(self.anim.annotations)
             self.anim.annotations.append(ann)
             self.ann_biggest_ids.append(newid)

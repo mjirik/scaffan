@@ -2,6 +2,8 @@
 
 ## new
 
+* [Added] Annotations from ImageJ are readed. The file with annotations is expected to be in the same dir and same name
+ with file extension `.roi.zip` 
 * [Fixed] Automatic selection of multiple points in the same lobule
 * [Changed] Margin calculation is available not only for views given by annotation.
 * [Added] Zeiss `.czi` image format support added

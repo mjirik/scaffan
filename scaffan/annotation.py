@@ -141,10 +141,10 @@ def read_annotations_imagej(path, slide_size) -> list:
                     else:
                         an_color = m.group(0)
                     # swap
-                    an_x = np.asarray(one["y"]) * ratio[0]
-                    an_y = np.asarray(one["x"]) * ratio[1]
+                    an_x = np.asarray(one["x"]) * ratio[0]
+                    an_y = np.asarray(one["y"]) * ratio[1]
                     an_details = ""
-                    one_ann = dict(title=an_title, color=an_color, x=an_x, y=an_y, details=an_details)
+                    one_ann = dict(title=an_title, color=an_color, x_px=an_x, y_px=an_y, details=an_details)
                     anns.append(one_ann)
     return anns
 
@@ -233,6 +233,42 @@ def adjust_annotation_to_image_view(imsl, annotations, center, level, size):
         output.append(ann_out)
 
     return output
+
+def annotation_px_to_mm(imsl: "openslide.OpenSlide", annotation: dict) -> dict:
+    """
+    Calculate x,y in mm from xy in pixels
+    :param imsl:
+    :param annotation:
+    :return:
+    """
+    imsl.level_downsamples
+    from scaffan.image import get_offset_px, get_pixelsize
+    offset_px = get_offset_px(imsl)
+    pixelsize, pixelunit = get_pixelsize(imsl, requested_unit="mm")
+    x_px = np.asarray(annotation["x_px"])
+    y_px = np.asarray(annotation["y_px"])
+    x_mm = pixelsize[0] * (x_px - offset_px[0])
+    y_mm = pixelsize[1] * (y_px - offset_px[1])
+    annotation["x_mm"] = x_mm
+    annotation["y_mm"] = y_mm
+    return annotation
+
+def annotations_px_to_mm(imsl, annotations):
+    """
+    Add x_mm and y_mm based on x_px and y_px into annotation list
+    :param imsl:
+    :param annotations:
+    :return:
+    """
+    from scaffan.image import get_offset_px, get_pixelsize
+
+    offset_px = get_offset_px(imsl)
+    pixelsize, pixelunit = get_pixelsize(imsl, requested_unit="mm")
+    for annotation in annotations:
+        annotation_px_to_mm(imsl, annotation)
+
+    return annotations
+
 
 
 def annotations_to_px(imsl, annotations):

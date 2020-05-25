@@ -31,6 +31,7 @@ def test_slide_segmentation_zeiss():
         # "medical/orig/scaffan-analysis-czi/Zeiss-scans/01_2019_11_12__RecognizedCode.czi",
         "medical/orig/scaffan-analysis-czi/Zeiss-scans/05_2019_11_12__-1-2.czi",
         get_root=True)
+    # seg = run_slide_seg(odir, Path(fn), margin=-0.4)
     seg = run_slide_seg(odir, Path(fn), margin=-0.4)
 
 
