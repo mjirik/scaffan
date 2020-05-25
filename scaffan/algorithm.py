@@ -26,6 +26,10 @@ from PyQt5 import QtGui
 
 # print("start 5")
 from pyqtgraph.parametertree import Parameter, ParameterTree
+import matplotlib
+import matplotlib.pyplot as plt
+import numpy as np
+# matplotlib.use('Qt5Agg')
 
 # print("start 6")
 
@@ -102,10 +106,22 @@ class Scaffan:
                     {"name": "Data Info", "type": "str", "readonly": True},
                     {
                         "name": "Automatic Lobulus Selection",
-                        "type": "bool",
-                        "value": True,
-                        "tip": "Skip selection based on annotation color and select lobulus based on Scan Segmentation. ",
+                        "type": "list",
+                        "value": "Manual",
+
+                        "values": {
+                            "Color": "Color",
+                            "Manual": "Manual",
+                            "Auto": "Auto",
+                        },
+                        "tip": "Auto: select lobulus based on Scan Segmentation. Color: based on annotation color. Manual: manually pick the lobule",
                     },
+                    # {
+                    #     "name": "Automatic Lobulus Selection",
+                    #     "type": "bool",
+                    #     "value": True,
+                    #     "tip": "Skip selection based on annotation color and select lobulus based on Scan Segmentation. ",
+                    # },
                     {
                         "name": "Whole Scan Margin",
                         "type": "float",
@@ -373,7 +389,7 @@ class Scaffan:
         self, color: str, override_automatic_lobulus_selection=True
     ):
         if override_automatic_lobulus_selection:
-            self.set_parameter("Input;Automatic Lobulus Selection", False)
+            self.set_parameter("Input;Automatic Lobulus Selection", "Color")
         logger.debug(f"color={color}")
         pcolor = self.parameters.param("Input", "Annotation Color")
         color = color.upper()
@@ -415,7 +431,7 @@ class Scaffan:
             # mainapp.set_annotation_color_selection("#FF00FF")
             # mainapp.set_annotation_color_selection("#FF0000")
             #             mainapp.set_annotation_color_selection("#FFFF00")
-            self.set_parameter("Input;Automatic Lobulus Selection", True)
+            self.set_parameter("Input;Automatic Lobulus Selection", "Auto")
             self.set_parameter("Processing;Skeleton Analysis", False)
             self.set_parameter("Processing;Texture Analysis", False)
             self.set_parameter("Processing;Lobulus Segmentation", False)
@@ -436,6 +452,7 @@ class Scaffan:
 
     def run_lobuluses(self, event=None):
         self.init_run()
+        annotation_ids = None
         # if color is None:
         pcolor = self.parameters.param("Input", "Annotation Color")
         color = pcolor.value()
@@ -460,6 +477,15 @@ class Scaffan:
         automatic_lobulus_selection = self.parameters.param(
             "Input", "Automatic Lobulus Selection"
         ).value()
+        logger.debug(f"Lobulus Selection={automatic_lobulus_selection}")
+        if automatic_lobulus_selection == "Color":
+            annotation_ids = self.anim.get_annotations_by_color(
+                color,
+                raise_exception_if_not_found=self.raise_exception_if_color_not_found,
+            )
+        # elif automatic_lobulus_selection and not run_slide_segmentation:
+        if automatic_lobulus_selection == "Manual":
+            annotation_ids = self.manual_select()
         if run_slide_segmentation:
             # fn_input = self.parameters.param("Input", "File Path").value()
 
@@ -468,19 +494,13 @@ class Scaffan:
             wsm = self.parameters.param("Input", "Whole Scan Margin").value()
             self.slide_segmentation.init(self.anim.get_full_view(margin=wsm))
             self.slide_segmentation.run()
-            if automatic_lobulus_selection:
+            if automatic_lobulus_selection == "Auto":
                 self.slide_segmentation.add_biggest_to_annotations()
                 annotation_ids = self.slide_segmentation.ann_biggest_ids
 
-        # Error messages
-        if not automatic_lobulus_selection:
-            annotation_ids = self.anim.get_annotations_by_color(
-                color,
-                raise_exception_if_not_found=self.raise_exception_if_color_not_found,
-            )
-        elif automatic_lobulus_selection and not run_slide_segmentation:
-            raise NoLobulusSelectionUsedError
 
+        if annotation_ids is None:
+            raise NoLobulusSelectionUsedError
         logger.debug("Annotation IDs: {}".format(annotation_ids))
         run_lob = self.parameters.param("Processing", "Lobulus Segmentation").value()
         if run_lob:
@@ -620,6 +640,34 @@ class Scaffan:
         self.evaluation.run()
         # Copy all parameters to table
         self.report.finish_actual_row()
+
+    def manual_select(self):
+        logger.debug("Manual selection")
+        # full_view = self.anim.get_full_view()
+        full_view = self.anim.get_view(location=[0,0], level=0, size_on_level=self.anim.get_slide_size()[::-1])
+        view = full_view.to_pixelsize(pixelsize_mm=[0.02, 0.02])
+        logger.debug(f"Manual selection1, view.loc={full_view.region_location}, view.size={full_view.region_size_on_level}, pxsz={full_view.region_pixelsize}")
+        logger.debug(f"Manual selection2, view.loc={view.region_location}, view.size={view.region_size_on_level}, pxsz={view.region_pixelsize}")
+        img = view.get_region_image(as_gray=False)
+        plt.ioff()
+        fig = plt.figure()
+        logger.debug(f"Manual selection2 backend={matplotlib.get_backend()}, ion={matplotlib.is_interactive()}, img.shape={img.shape}, img.max={np.max(img)}")
+        plt.imshow(img)
+        # plt.ginput(1)
+        # plt.axis("image")
+        # fig.ax
+        # fig.axes[0].imshow(img)
+        logger.debug("Manual selection3")
+        # logger.debug("Manual selection4")
+        centers_px = plt.ginput(1)
+        logger.debug("Manual selection5")
+
+
+        # centers_px = list(zip(*pts_glob_px))
+        r_mm = float(self.get_parameter("Processing;Scan Segmentation;Annotation Radius")) * 1000
+        ann_ids = scaffan.slide_segmentation.add_circle_annotation(view, centers_px, annotations=self.anim.annotations, r_mm=r_mm)
+        return ann_ids
+
 
     def set_persistent_cols(self, dct: dict):
         """

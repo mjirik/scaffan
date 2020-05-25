@@ -834,31 +834,11 @@ class ScanSegmentation:
         )
         centers_px = list(zip(*pts_glob_px))
         r_mm = float(self.parameters.param("Annotation Radius").value()) * 1000
-        # r_mm = 0.1
-        t = np.linspace(0, 2 * np.pi, 30)
+        biggest_ids = add_circle_annotation(view_corner, centers_px, r_mm, self.anim.annotations)
 
-        logger.debug(f"Automatic selection centers_px={centers_px}")
-        for center_px in centers_px:
-            r_px = view_corner.mm_to_px(r_mm)
-            #     print(f"r_px={r_px}")
-            r_px_glob = view_corner.coords_view_px_to_glob_px(
-                np.array([r_px[0]]), np.array([r_px[1]])
-            )
-            x_px = r_px_glob[0] * np.sin(t) + center_px[0]
-            y_px = r_px_glob[1] * np.cos(t) + center_px[1]
+        # self.anim.annotations.extend(anns)
+        self.ann_biggest_ids.extend(biggest_ids)
 
-            ann = {
-                "title": "Automatic Selection",
-                "x_px": x_px,
-                "y_px": y_px,
-                "color": "#00FF88",
-                "details": "",
-            }
-            ann = annotation_px_to_mm(self.anim.openslide, ann)
-            newid = len(self.anim.annotations)
-            self.anim.annotations.append(ann)
-            self.ann_biggest_ids.append(newid)
-        # self.ann_biggest_ids = new_ann_ids
 
     def run(self):
         logger.debug("run...")
@@ -937,3 +917,36 @@ def kick_close_points(coords, min_distance):
 
     selected = np.asarray(selected)
     return selected
+
+
+def add_circle_annotation(view_corner:scim.View, centers_px, r_mm, annotations):
+
+    # r_mm = 0.1
+    t = np.linspace(0, 2 * np.pi, 30)
+
+    anns = []
+    biggest_ids = []
+    logger.debug(f"Automatic selection centers_px={centers_px}")
+    for center_px in centers_px:
+        r_px = view_corner.mm_to_px(r_mm)
+        #     print(f"r_px={r_px}")
+        r_px_glob = view_corner.coords_view_px_to_glob_px(
+            np.array([r_px[0]]), np.array([r_px[1]])
+        )
+        x_px = r_px_glob[0] * np.sin(t) + center_px[0]
+        y_px = r_px_glob[1] * np.cos(t) + center_px[1]
+
+        ann = {
+            "title": "Automatic Selection",
+            "x_px": x_px,
+            "y_px": y_px,
+            "color": "#00FF88",
+            "details": "",
+        }
+        ann = annotation_px_to_mm(view_corner.anim.openslide, ann)
+        newid = len(annotations)
+        annotations.append(ann)
+        biggest_ids.append(newid)
+
+    return biggest_ids
+    # self.ann_biggest_ids = new_ann_ids

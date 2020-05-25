@@ -65,7 +65,7 @@ class MainGuiTest(unittest.TestCase):
         mainapp.set_input_file(fn)
         # mainapp.set_annotation_color_selection("#FF00FF")
         # mainapp.set_annotation_color_selection("#FF0000")
-        mainapp.set_parameter("Input;Automatic Lobulus Selection", False)
+        mainapp.set_parameter("Input;Automatic Lobulus Selection", "Color")
         mainapp.set_annotation_color_selection("#FFFF00")
         mainapp.set_parameter("Processing;Skeleton Analysis", False)
         mainapp.set_parameter("Processing;Texture Analysis", False)
@@ -106,7 +106,7 @@ class MainGuiTest(unittest.TestCase):
         # annotations = scan.read_annotations(fn)
         # scan.annotations_to_px(imsl, annotations)
         # mainapp.init_run()
-        # mainapp.set_parameter("Input;Automatic Lobulus Selection", False)
+        # mainapp.set_parameter("Input;Automatic Lobulus Selection", "Color")
         original_foo = scaffan.image.AnnotatedImage.get_annotations_by_color
         with patch.object(scaffan.image.AnnotatedImage, 'select_annotations_by_color', autospec=True) as mock_foo:
             def side_effect(anim_, annid, *args, **kwargs):
@@ -128,7 +128,7 @@ class MainGuiTest(unittest.TestCase):
             mainapp.set_annotation_color_selection(
                 "#00FFFF", override_automatic_lobulus_selection=True
             )
-            auto = mainapp.get_parameter("Input;Automatic Lobulus Selection")
+            auto = mainapp.get_parameter("Input;Automatic Lobulus Selection") == "Auto"
             logger.debug(f"auto={auto}")
             # Use manual annotations
             mainapp.set_parameter(
@@ -294,7 +294,7 @@ class MainGuiTest(unittest.TestCase):
             # mainapp.set_annotation_color_selection("#FF00FF")
             # mainapp.set_annotation_color_selection("#FF0000")
             mainapp.set_annotation_color_selection("#FFFF00")
-            mainapp.set_parameter("Input;Automatic Lobulus Selection", True)
+            mainapp.set_parameter("Input;Automatic Lobulus Selection", "Auto")
             mainapp.set_parameter("Processing;Skeleton Analysis", False)
             mainapp.set_parameter("Processing;Texture Analysis", False)
             mainapp.set_parameter("Processing;Open output dir", False)
@@ -360,7 +360,7 @@ class MainGuiTest(unittest.TestCase):
         #     # mainapp.set_annotation_color_selection("#FF00FF")
         #     # mainapp.set_annotation_color_selection("#FF0000")
         #     mainapp.set_annotation_color_selection("#FFFF00")
-        #     mainapp.set_parameter("Input;Automatic Lobulus Selection", True)
+        #     mainapp.set_parameter("Input;Automatic Lobulus Selection", "Auto")
         #     mainapp.set_parameter("Processing;Skeleton Analysis", False)
         #     mainapp.set_parameter("Processing;Texture Analysis", False)
         #     if i == 0:
@@ -405,7 +405,7 @@ class MainGuiTest(unittest.TestCase):
         #     # mainapp.set_annotation_color_selection("#FF00FF")
         #     # mainapp.set_annotation_color_selection("#FF0000")
         #     mainapp.set_annotation_color_selection("#FFFF00")
-        #     mainapp.set_parameter("Input;Automatic Lobulus Selection", True)
+        #     mainapp.set_parameter("Input;Automatic Lobulus Selection", "Auto")
         #     mainapp.set_parameter("Processing;Skeleton Analysis", False)
         #     mainapp.set_parameter("Processing;Texture Analysis", False)
         #     mainapp.set_parameter("Processing;Open output dir", False)
@@ -467,7 +467,7 @@ def run_on_yellow(fn_yellow):
     # mainapp.set_annotation_color_selection("#FF00FF") # magenta -> cyan
     # mainapp.set_annotation_color_selection("#00FFFF")
     # cyan causes memory fail
-    mainapp.set_parameter("Input;Automatic Lobulus Selection", False)
+    mainapp.set_parameter("Input;Automatic Lobulus Selection", "Color")
     mainapp.set_annotation_color_selection("#FFFF00")
     mainapp.run_lobuluses()
     assert 0.6 < mainapp.evaluation.evaluation_history[0]["Lobulus Border Dice"], "Lobulus segmentation should have Dice coefficient above some low level"
