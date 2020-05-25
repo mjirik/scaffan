@@ -17,7 +17,7 @@ import re
 import math
 from read_roi import read_roi_zip
 
-__version__ = "0.21.3"
+__version__ = "0.22.0"
 
 
 def get_one_annotation(viewstate):
