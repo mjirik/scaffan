@@ -1,50 +1,49 @@
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense
+from tensorflow.keras.layers import Conv2D
+from tensorflow.keras.layers import MaxPool2D
+from tensorflow.keras.layers import Flatten
+from tensorflow.keras.layers import Dropout
+from tensorflow.keras.layers import BatchNormalization
+from numpy import load
+from matplotlib import pyplot as plt
+from tensorflow.keras import datasets
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
 import matplotlib
 import numpy as np
-from matplotlib import pyplot as plt
-from numpy import load
 from tensorflow import saved_model
-from tensorflow.keras.layers import BatchNormalization
-from tensorflow.keras.layers import Conv2D
-from tensorflow.keras.layers import Dense
-from tensorflow.keras.layers import Dropout
-from tensorflow.keras.layers import Flatten
-from tensorflow.keras.layers import MaxPool2D
-from tensorflow.keras.models import Sequential
 
-TRAIN_DATA_SAVE_FILE = 'D:\\FAV\\Scaffold\\data\\lobulus_data.npy'
-TRAIN_LABELS_SAVE_FILE = 'D:\\FAV\\Scaffold\\data\\lobulus_labels.npy'
-TEST_DATA_SAVE_FILE = 'D:\\FAV\\Scaffold\\data\\lobulus_data.npy'
-TEST_LABELS_SAVE_FILE = 'D:\\FAV\\Scaffold\\data\\lobulus_labels.npy'
+TRAIN_DATA_SAVE_FILE = 'D:\\FAV\\Scaffold\\data\\train_data.npy'
+TRAIN_LABELS_SAVE_FILE = 'D:\\FAV\\Scaffold\\data\\train_labels.npy'
+TEST_DATA_SAVE_FILE = 'D:\\FAV\\Scaffold\\data\\test_data.npy'
+TEST_LABELS_SAVE_FILE = 'D:\\FAV\\Scaffold\\data\\test_labels.npy'
 
 DISPLAY_SIZE = 80
 
 BATCH_SIZE = 64
 EPOCHS = 10
 
-def compute_sample_weights(labels, hom):
+def categorize_labels(labels):
     data_count = labels.shape[0]
     sample_weights = np.zeros((data_count,))
 
     lbls = labels.reshape((data_count,))
 
+
     label_values = list(set(lbls))
-    label_value_counts = np.zeros((len(label_values),))
-    label_value_weights = np.zeros((len(label_values),))
 
-    for i, label_value in enumerate(label_values):
-        for j in range(data_count):
-            if abs(lbls[j] - label_value) < 0.001:
-                label_value_counts[i] = label_value_counts[i] + 1
+    print('Label categories: ' + str(label_values))
 
-    for i in range(len(label_values)):
-        label_value_weights[i] = 1/(label_value_counts[i]/data_count)
+    # labels = np.zeros((labels.shape[0], len(label_values)))
 
     for i in range(data_count):
         for j, label_value in enumerate(label_values):
             if abs(lbls[i] - label_value) < 0.001:
-                sample_weights[i] = hom[i] * label_value_weights[j]
+                cat_label = np.zeros(len(label_values))
+                cat_label[j] = 1
+                labels[i, :] = j
 
-    return sample_weights
+    return labels.astype(int)
 
 
 def load_data():
@@ -68,7 +67,8 @@ def load_data():
     test_data = test_data.swapaxes(0, 2)
     test_data = test_data.reshape((test_data_count, DISPLAY_SIZE, DISPLAY_SIZE, 1))
 
-    # sample_weights = compute_sample_weights(train_sni, train_hom)
+    train_sni = categorize_labels(train_sni)
+    test_sni = categorize_labels(test_sni)
 
     return train_data, train_sni, train_hom, test_data, test_sni, test_hom
 
@@ -93,7 +93,7 @@ def create_model():
         Dropout(0.2),
         Dense(128, activation='relu'),
         Dropout(0.2),
-        Dense(1, activation=None, use_bias=False)
+        Dense(6, activation='softmax', use_bias=False)
     ])
 
     return model
@@ -102,11 +102,17 @@ def create_model():
 if __name__ == '__main__':
     train_x, train_y, train_weights, test_x, test_y, test_weights = load_data()
 
+    # train_y.reshape((train_y.shape[0], train_y.shape[1], 1))
+    # test_y.reshape((test_y.shape[0], test_y.shape[1], 1))
+
+    # train_y = np.swapaxes(train_y, 0, 1)
+    # test_y = np.swapaxes(test_y, 0, 1)
+
     model = create_model()
     model.summary()
     model.compile(optimizer='adam',
-                  loss='mean_squared_error',
-                  metrics=['mean_squared_error'])
+                  loss='sparse_categorical_crossentropy',
+                  metrics=['accuracy'])
 
     history = model.fit(train_x, train_y,
                         epochs=EPOCHS,
@@ -114,15 +120,13 @@ if __name__ == '__main__':
                         sample_weight=train_weights,
                         validation_data=(test_x, test_y, test_weights))
 
-    saved_model.save(model, "export_lobulus/")
+    saved_model.save(model, "export_categorical/")
 
     matplotlib.use('TkAgg')
     plt.figure()
-    plt.plot(history.history['mean_squared_error'], label='MSE')
-    plt.plot(history.history['val_mean_squared_error'], label='val MSE')
+    plt.plot(history.history['accuracy'], label='accuracy')
+    plt.plot(history.history['val_accuracy'], label='val accuracy')
     plt.xlabel('Epoch')
-    plt.legend(['MSE', 'val MSE'])
+    plt.legend(['accuracy', 'val accuracy'])
     plt.show()
-
-    print('halo')
 
