@@ -39,7 +39,7 @@ def manual_validation_1():
     y_test = labels[1, :].reshape(data_count, 1)
 
     data_count = y_test.shape[0]
-    loaded_model = load_model("export/")
+    loaded_model = load_model("export_categorical/")
 
     score = loaded_model.evaluate(x_test, y_test, verbose=0)
 
@@ -53,7 +53,7 @@ def manual_validation_1():
 
         prediction = loaded_model.predict(testing_image.reshape(1, DISPLAY_SIZE, DISPLAY_SIZE, 1), verbose=0)
 
-        print('Guess:' + str(prediction))
+        print('Guess:' + str(np.round(prediction, 3)))
         print('Real value:' + str(y_test[test_index]))
 
         plt.imshow(testing_image)
@@ -61,7 +61,7 @@ def manual_validation_1():
         plt.show()
 
 def evaluate_annotation(file_path, ann_id, visual=False):
-    loaded_model = load_model("export/")
+    loaded_model = load_model("export_categorical/")
     anim = scim.AnnotatedImage(file_path)
     lobulus = load_lobulus(anim, ann_id)
     cuts = cut_the_image(lobulus, False)
@@ -99,4 +99,3 @@ if __name__ == '__main__':
     matplotlib.use('TkAgg')
 
     manual_validation_1()
-    # evaluate_annotation('D:\\FAV\\Scaffold\\Scaffan-analysis\\PIG-002_J-18-0091_HE.ndpi', 3, True)
