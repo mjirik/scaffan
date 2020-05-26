@@ -732,8 +732,9 @@ class ScanSegmentation:
             "slice_raster.png", img.astype(np.uint8), level_skimage=20, level_npz=30
         )
         fig = plt.figure()
-        # plt.imshow(img)
-        self.view.region_imshow_annotation(i=None)
+        plt.imshow(img)
+        self.view.plot_annotations(None)
+        # self.view.region_imshow_annotation(i=None)
         # self.view.imshow()
         self.report.savefig("slice_raster_with_annotation.png", level=45)
         plt.close(fig)

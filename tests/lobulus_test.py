@@ -20,12 +20,14 @@ import scaffan.lobulus
 import exsu
 from unittest.mock import patch
 path_to_dir = Path(__file__).parent
+import pytest
 
 
 # def test_run_lobuluses():
 
 
 class LobulusTest(unittest.TestCase):
+    @pytest.mark.slow
     def test_run_lobuluses(self):
         output_dir = (path_to_dir / "test_output/test_lobulus_output_dir").absolute()
         if output_dir.exists():
@@ -102,6 +104,7 @@ class LobulusTest(unittest.TestCase):
         # mainapp.start_gui()
 
 
+@pytest.mark.slow
 def test_get_lobulus_mask():
     # this is hack to fix the problem with non existing report - not useful anymore
     #

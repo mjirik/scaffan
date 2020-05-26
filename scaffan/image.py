@@ -157,26 +157,6 @@ def get_pixelsize(imsl, level=0, requested_unit="mm"):
     return pixelsize, pixelunit
 
 
-def get_offset_px(imsl):
-
-    pm = imsl.properties
-    pixelsize, pixelunit = get_pixelsize(imsl)
-    offset = np.asarray(
-        (
-            int(pm["hamamatsu.XOffsetFromSlideCentre"]),
-            int(pm["hamamatsu.YOffsetFromSlideCentre"]),
-        )
-    )
-    # resolution_unit = pm["tiff.ResolutionUnit"]
-    offset_mm = offset * 0.000001
-    if pixelunit is "m":
-        pass
-    if pixelunit is not "mm":
-        raise ValueError(f"Cannot convert pixelunit {pixelunit} to milimeters")
-    offset_from_center_px = offset_mm / pixelsize
-    im_center_px = np.asarray(imsl.dimensions) / 2.0
-    offset_px = im_center_px - offset_from_center_px
-    return offset_px
 
 
 # def annoatation_px_to_mm(imsl: openslide.OpenSlide, annotation: dict) -> dict:
@@ -375,11 +355,14 @@ class ImageSlide():
             xres = 1.0
             yres = 1.0
 
+        self.dimensions = [meta_dict["ImageLength"][0], meta_dict["ImageWidth"][0]]
         meta_dict["tiff.ResolutionUnit"] = "m"
         meta_dict["tiff.XResolution"] = xres
         meta_dict["tiff.YResolution"] = yres
         meta_dict["hamamatsu.XOffsetFromSlideCentre"] = 0
         meta_dict["hamamatsu.YOffsetFromSlideCentre"] = 0
+        meta_dict["openslide.level[0].height"] = self.dimensions[0]
+        meta_dict["openslide.level[0].width"] = self.dimensions[1]
         self.properties = meta_dict
 
     #     if self.openslide is not None:
@@ -574,7 +557,7 @@ class AnnotatedImage:
             pixelsize_mm=None,
             safety_bound=2,
             margin=0.0,
-            margin_in_pixels=False,
+            # margin_in_pixels=False,
             # annotation_id=None,
             # margin=0.5,
             # margin_in_pixels=False,
@@ -583,15 +566,24 @@ class AnnotatedImage:
         height0 = self.openslide.properties["openslide.level[0].height"]
         width0 = self.openslide.properties["openslide.level[0].width"]
         size_on_level = np.array([int(height0), int(width0)])
-        return self.get_view(
+        # size_on_level = np.array([int(width0), int(height0)])
+        view_level0 =  self.get_view(
             location=[0,0],
-            level=level,
+            level=0,
             size_on_level=size_on_level,
-            pixelsize_mm=pixelsize_mm,
-            safety_bound=safety_bound,
             margin=margin,
-            margin_in_pixels=margin_in_pixels,
+            margin_in_pixels=False,
         )
+        if pixelsize_mm is not None:
+            view = view_level0.to_pixelsize(
+                pixelsize_mm=pixelsize_mm,
+                safety_bound=safety_bound,
+            )
+        elif level is not None:
+            view = view_level0.to_level(level)
+        else:
+            view = view_level0
+        return view
 
 
     def get_view(
@@ -948,12 +940,14 @@ class AnnotatedImage:
         poly_path = mplPath(polygon)
 
         x, y = np.mgrid[: self.region_size[1], : self.region_size[0]]
+        # x, y = np.mgrid[: self.region_size[0], : self.region_size[1]] # TODO swap
         coors = np.hstack(
             (x.reshape(-1, 1), y.reshape(-1, 1))
         )  # coors.shape is (4000000,2)
 
         mask = poly_path.contains_points(coors)
         mask = mask.reshape(self.region_size[::-1])
+        # mask = mask.reshape(self.region_size) # TODO swap
         return mask
 
     def region_imshow_annotation(self, i=None):
@@ -1235,6 +1229,7 @@ class View:
         # segmentation_one_color = None
         # polygon_x = self.annotations[annotation_id]["region_x_px"] * self.zoom[0]
         # polygon_y = self.annotations[annotation_id]["region_y_px"] * self.zoom[1]
+        # TODO swap axes
         segmentation_one_color = np.zeros(
             [self.region_size_on_pixelsize_mm[1],self.region_size_on_pixelsize_mm[0]],
             dtype=np.uint8
@@ -1261,7 +1256,7 @@ class View:
         polygon = list(zip(polygon_y, polygon_x))
         poly_path = mplPath(polygon)
 
-        # coordinates are swapped also here
+        # coordinates are swapped also here TODO
         # x, y = np.mgrid[: self.region_size_on_level[1], : self.region_size_on_level[0]]
         x, y = np.mgrid[
             : self.region_size_on_pixelsize_mm[1], : self.region_size_on_pixelsize_mm[0]
@@ -1271,6 +1266,7 @@ class View:
         )  # coors.shape is (4000000,2)
 
         mask = poly_path.contains_points(coors)
+        # swap TODO
         mask = mask.reshape(self.region_size_on_pixelsize_mm[::-1])
         return mask
 
@@ -1484,3 +1480,25 @@ def imshow_with_colorbar(*args, **kwargs):
     divider = make_axes_locatable(ax)
     cax = divider.append_axes("right", size="5%", pad=0.05)
     plt.colorbar(im, cax=cax)
+
+
+def get_offset_px(imsl:ImageSlide):
+
+    pm = imsl.properties
+    pixelsize, pixelunit = get_pixelsize(imsl)
+    offset = np.asarray(
+        (
+            int(pm["hamamatsu.XOffsetFromSlideCentre"]),
+            int(pm["hamamatsu.YOffsetFromSlideCentre"]),
+        )
+    )
+    # resolution_unit = pm["tiff.ResolutionUnit"]
+    offset_mm = offset * 0.000001
+    if pixelunit is "m":
+        pass
+    if pixelunit is not "mm":
+        raise ValueError(f"Cannot convert pixelunit {pixelunit} to milimeters")
+    offset_from_center_px = offset_mm / pixelsize
+    im_center_px = np.asarray(imsl.dimensions) / 2.0
+    offset_px = im_center_px - offset_from_center_px
+    return offset_px

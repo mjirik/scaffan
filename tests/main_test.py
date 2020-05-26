@@ -97,6 +97,7 @@ class MainGuiTest(unittest.TestCase):
     skip_on_local = False
 
     @unittest.skipIf(os.environ.get("TRAVIS", False), "Skip on Travis-CI")
+    @pytest.mark.slow
     def test_run_lobuluses_manual_segmentation(self):
         fn = io3d.datasets.join_path(
             "medical", "orig", "sample_data", "SCP003", "SCP003.ndpi", get_root=True
@@ -208,6 +209,8 @@ class MainGuiTest(unittest.TestCase):
         ]
         self._slide_segmentation_train_clf(fns)
 
+    @pytest.mark.slow
+    @pytest.mark.slow
     def test_training_small_slide_segmentation_clf(self):
 
         fns = [
@@ -450,7 +453,7 @@ def test_run_lobuluses():
     )
     run_on_yellow(fn)
 
-def test_run_lobuluses():
+def test_run_lobuluses_czi():
     fn = io3d.datasets.join_path(
         "medical/orig/scaffan-analysis-czi/Zeiss-scans/05_2019_11_12__-1-2.czi", get_root=True
     )

@@ -12,6 +12,7 @@ from unittest.mock import patch
 path_to_script = Path(__file__).parent
 
 
+@pytest.mark.slow
 def test_cli():
     pth = io3d.datasets.join_path(
         "medical", "orig", "sample_data", "SCP003", "SCP003.ndpi", get_root=True
