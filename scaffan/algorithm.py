@@ -655,7 +655,7 @@ class Scaffan:
         img = view_corner.get_region_image(as_gray=False)
         plt.ioff()
         fig = plt.figure(figsize=(12, 8))
-        # fig.set_window_title("Select")
+        fig.canvas.set_window_title("Select lobules. Left/Middle/Right Mouse Button: add/quit/remove")
         logger.debug(f"Manual selection2 backend={matplotlib.get_backend()}, ion={matplotlib.is_interactive()}, img.shape={img.shape}, img.max={np.max(img)}")
         plt.imshow(img)
         # plt.ginput(1)
@@ -691,7 +691,7 @@ class Scaffan:
         ann_ids, _ = scaffan.slide_segmentation.add_circle_annotation(view_corner, centers_px, annotations=self.anim.annotations, r_mm=r_mm)
         view_corner.set_annotations(self.anim.annotations)
         view_corner.adjust_annotation_to_image_view()
-        logger.debug(f"annotations={self.anim.annotations}")
+        # logger.debug(f"annotations={self.anim.annotations}")
 
         logger.debug("annotation selected")
         fig = plt.figure()
@@ -701,7 +701,6 @@ class Scaffan:
         plt.draw()
         plt.close(fig)
         return ann_ids
-
 
     def set_persistent_cols(self, dct: dict):
         """
