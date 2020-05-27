@@ -835,7 +835,7 @@ class ScanSegmentation:
         )
         centers_px = list(zip(*pts_glob_px))
         r_mm = float(self.parameters.param("Annotation Radius").value()) * 1000
-        biggest_ids = add_circle_annotation(view_corner, centers_px, r_mm, self.anim.annotations)
+        biggest_ids,_ = add_circle_annotation(view_corner, centers_px, r_mm, self.anim.annotations)
 
         # self.anim.annotations.extend(anns)
         self.ann_biggest_ids.extend(biggest_ids)
@@ -920,15 +920,15 @@ def kick_close_points(coords, min_distance):
     return selected
 
 
-def add_circle_annotation(view_corner:scim.View, centers_px, r_mm, annotations):
+def add_circle_annotation(view_corner:scim.View, centers_px_global, r_mm, annotations):
 
     # r_mm = 0.1
     t = np.linspace(0, 2 * np.pi, 30)
 
     anns = []
     biggest_ids = []
-    logger.debug(f"Automatic selection centers_px={centers_px}")
-    for center_px in centers_px:
+    logger.debug(f"Automatic selection centers_px={centers_px_global}")
+    for center_px in centers_px_global:
         r_px = view_corner.mm_to_px(r_mm)
         #     print(f"r_px={r_px}")
         r_px_glob = view_corner.coords_view_px_to_glob_px(
@@ -949,5 +949,5 @@ def add_circle_annotation(view_corner:scim.View, centers_px, r_mm, annotations):
         annotations.append(ann)
         biggest_ids.append(newid)
 
-    return biggest_ids
+    return biggest_ids, annotations
     # self.ann_biggest_ids = new_ann_ids

@@ -109,11 +109,11 @@ class Scaffan:
                         "type": "list",
                         "value": "Manual",
 
-                        "values": {
-                            "Color": "Color",
-                            "Manual": "Manual",
-                            "Auto": "Auto",
-                        },
+                        "values": ["Color","Manual", "Auto"],
+                            # "Color": "Color",
+                            # "Manual": "Manual",
+                            # "Auto": "Auto",
+                        # },
                         "tip": "Auto: select lobulus based on Scan Segmentation. Color: based on annotation color. Manual: manually pick the lobule",
                     },
                     # {
@@ -289,11 +289,14 @@ class Scaffan:
         logger.info("common_spreadsheet_file set to {}".format(path))
         # print("common_spreadsheet_file set to {}".format(path))
 
-    def get_parameter(self, param_path, parse_path=True):
+    def get_parameter(self, param_path, parse_path=True, return_value=True):
         if parse_path:
             param_path = param_path.split(";")
         fnparam = self.parameters.param(*param_path)
-        return fnparam.value()
+        if return_value:
+            return fnparam.value()
+        else:
+            return fnparam
 
     def set_parameter(self, param_path, value, parse_path=True):
         """
@@ -389,6 +392,7 @@ class Scaffan:
         self, color: str, override_automatic_lobulus_selection=True
     ):
         if override_automatic_lobulus_selection:
+            logger.debug("forced to use color selection")
             self.set_parameter("Input;Automatic Lobulus Selection", "Color")
         logger.debug(f"color={color}")
         pcolor = self.parameters.param("Input", "Annotation Color")
@@ -645,27 +649,57 @@ class Scaffan:
         logger.debug("Manual selection")
         # full_view = self.anim.get_full_view()
         full_view = self.anim.get_view(location=[0,0], level=0, size_on_level=self.anim.get_slide_size()[::-1])
-        view = full_view.to_pixelsize(pixelsize_mm=[0.02, 0.02])
+        view_corner = full_view.to_pixelsize(pixelsize_mm=[0.02, 0.02])
         logger.debug(f"Manual selection1, view.loc={full_view.region_location}, view.size={full_view.region_size_on_level}, pxsz={full_view.region_pixelsize}")
-        logger.debug(f"Manual selection2, view.loc={view.region_location}, view.size={view.region_size_on_level}, pxsz={view.region_pixelsize}")
-        img = view.get_region_image(as_gray=False)
+        logger.debug(f"Manual selection2, view.loc={view_corner.region_location}, view.size={view_corner.region_size_on_level}, pxsz={view_corner.region_pixelsize}")
+        img = view_corner.get_region_image(as_gray=False)
         plt.ioff()
-        fig = plt.figure()
+        fig = plt.figure(figsize=(12, 8))
+        # fig.set_window_title("Select")
         logger.debug(f"Manual selection2 backend={matplotlib.get_backend()}, ion={matplotlib.is_interactive()}, img.shape={img.shape}, img.max={np.max(img)}")
         plt.imshow(img)
         # plt.ginput(1)
         # plt.axis("image")
         # fig.ax
         # fig.axes[0].imshow(img)
-        logger.debug("Manual selection3")
         # logger.debug("Manual selection4")
-        centers_px = plt.ginput(1)
-        logger.debug("Manual selection5")
+        points_px = np.asarray(plt.ginput(-1))
+        plt.close(fig)
+        logger.debug(f"Manual selection5, centers_px={points_px}")
 
 
+
+        # points_px = np.asarray(centers_px)
+        from scaffan.image import get_offset_px, get_pixelsize
+
+        # offset_px = get_offset_px(self.anim)
+        # pixelsize, pixelunit = get_pixelsize(self.anim, requested_unit="mm")
+        x_px_view =  points_px[:,0].flatten()
+        y_px_view =  points_px[:,1].flatten()
+        # x_px = (x_px_view*view_corner.zoom[0] + offset_px[0])
+        # y_px = (y_px_view*view_corner.zoom[1] + offset_px[1])
+        # pts_glob_px = [x_px, y_px]
+
+        pts_glob_px = view_corner.coords_view_px_to_glob_px(
+            x_px_view, y_px_view
+        )
+        centers_px = list(zip(*pts_glob_px))
+        logger.debug(f"Manual selection5, centers_px_global={centers_px}")
         # centers_px = list(zip(*pts_glob_px))
         r_mm = float(self.get_parameter("Processing;Scan Segmentation;Annotation Radius")) * 1000
-        ann_ids = scaffan.slide_segmentation.add_circle_annotation(view, centers_px, annotations=self.anim.annotations, r_mm=r_mm)
+
+        ann_ids, _ = scaffan.slide_segmentation.add_circle_annotation(view_corner, centers_px, annotations=self.anim.annotations, r_mm=r_mm)
+        view_corner.set_annotations(self.anim.annotations)
+        view_corner.adjust_annotation_to_image_view()
+        logger.debug(f"annotations={self.anim.annotations}")
+
+        logger.debug("annotation selected")
+        fig = plt.figure()
+        plt.imshow(img)
+        view_corner.plot_annotations(None)
+        centers_px = plt.ginput(1)
+        plt.draw()
+        plt.close(fig)
         return ann_ids
 
 

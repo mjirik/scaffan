@@ -805,8 +805,15 @@ class AnnotatedImage:
             )[0]
             for i in range(0, self.openslide.level_count)
         ]
+        self._adjust_annotation_to_image_view()
+
+    def _adjust_annotation_to_image_view(self):
+        """
+        Recalculate annotation from global (level=0) coordinates x_px, y_px to local coordinates
+        :return:
+        """
         scan.adjust_annotation_to_image_view(
-            self.openslide, self.annotations, center, level, size
+            self.openslide, self.annotations, self.region_center, self.region_level, self.region_size
         )
 
     def select_annotations_by_color(
@@ -1099,6 +1106,7 @@ class View:
 
         self.region_level = level
         self.region_size_on_level = size_on_level
+        self.zoom:np.ndarray # additional zoom to size on level
 
         if pixelsize_mm is not None:
             pxsz = self.get_pixelsize_on_level(level)[0]
@@ -1134,12 +1142,25 @@ class View:
         self.region_location = location
         self.region_center = center
 
-        import copy
+        self.set_annotations(self.anim.annotations)
 
-        self.annotations = copy.deepcopy(self.anim.annotations)
+        # scan.adjust_annotation_to_image_view(
+        #     self.anim.openslide, self.annotations, center, level, size_on_level
+        # )
+    def set_annotations(self, annotations):
+        import copy
+        self.annotations = copy.deepcopy(annotations)
+        self.adjust_annotation_to_image_view()
+
+    def adjust_annotation_to_image_view(self):
+        """
+        Recalculate annotation from global (level=0) coordinates x_px, y_px to local coordinates
+        :return:
+        """
         scan.adjust_annotation_to_image_view(
-            self.anim.openslide, self.annotations, center, level, size_on_level
+            self.anim.openslide, self.annotations, self.region_center, self.region_level, self.region_size_on_level
         )
+
     def _get_margin_px(self, size_on_level, margin, margin_in_pixels:bool):
         if margin_in_pixels:
             margin_px = int(margin)
@@ -1167,7 +1188,10 @@ class View:
         return self.anim.get_pixel_size(level)
 
     def mm_to_px(self, mm):
-        pxsz, unit = self.get_pixelsize_on_level()
+        pxsz = self.region_pixelsize
+        # pxsz, unit = self.get_pixelsize_on_level(level=level)
+        # if unit is not "mm":
+        #     raise Exception(f"Wrong unit. Expected 'mm', given '{unit}'.")
         return mm / pxsz
 
     def region_imshow_annotation(self, i):
@@ -1190,10 +1214,11 @@ class View:
         :param y_view_px: [y0, y1, ...]]
         :return:
         """
-        px_factor = self.anim.openslide.level_downsamples[self.region_level]
+        px_factor = self.region_pixelsize / self.get_pixelsize_on_level(0)[0]
+        # px_factor = self.anim.openslide.level_downsamples[self.region_level]
         # print(px_factor)
-        x_px = self.region_location[0] + x_view_px * px_factor
-        y_px = self.region_location[1] + y_view_px * px_factor
+        x_px = self.region_location[0] + x_view_px * px_factor[0]
+        y_px = self.region_location[1] + y_view_px * px_factor[1]
 
         return x_px, y_px
 
@@ -1485,7 +1510,7 @@ def imshow_with_colorbar(*args, **kwargs):
 def get_offset_px(imsl:ImageSlide):
 
     pm = imsl.properties
-    pixelsize, pixelunit = get_pixelsize(imsl)
+    pixelsize, pixelunit = get_pixelsize(imsl, requested_unit="mm")
     offset = np.asarray(
         (
             int(pm["hamamatsu.XOffsetFromSlideCentre"]),
@@ -1494,8 +1519,6 @@ def get_offset_px(imsl:ImageSlide):
     )
     # resolution_unit = pm["tiff.ResolutionUnit"]
     offset_mm = offset * 0.000001
-    if pixelunit is "m":
-        pass
     if pixelunit is not "mm":
         raise ValueError(f"Cannot convert pixelunit {pixelunit} to milimeters")
     offset_from_center_px = offset_mm / pixelsize
