@@ -48,7 +48,7 @@ from . import sni_prediction
 class Scaffan:
     def __init__(
             self,
-            whole_scan_margin=-0.1
+            whole_scan_margin=-0.0
     ):
         """
 
