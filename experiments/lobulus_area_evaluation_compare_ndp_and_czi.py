@@ -76,13 +76,13 @@ def set_same(mainapp, fn):
     # mainapp.set_parameter("Processing;Lobulus Segmentation;Manual Segmentation", True)
 
 fns = [
-    "medical/orig/Scaffan-analysis/PIG-001_J-17-0571_LM central_HE.ndpi",
-    "medical/orig/Scaffan-analysis/PIG-002_J-18-0091_HE.ndpi",
-    "medical/orig/Scaffan-analysis/PIG-002_J-18-0092_HE.ndpi",
+    # "medical/orig/Scaffan-analysis/PIG-001_J-17-0571_LM central_HE.ndpi",
+    # "medical/orig/Scaffan-analysis/PIG-002_J-18-0091_HE.ndpi",
+    # "medical/orig/Scaffan-analysis/PIG-002_J-18-0092_HE.ndpi",
     "medical/orig/Scaffan-analysis/PIG-003_J-18-0165_HE.ndpi",
-    "medical/orig/Scaffan-analysis/PIG-003_J-18-0166_HE.ndpi",
-    "medical/orig/Scaffan-analysis/PIG-004_BBJ-004-4_HE_parenchyme.ndpi",
-    "medical/orig/Scaffan-analysis/PIG-004_BBJ-004-2 _HE_parenchyme.ndpi"
+    # "medical/orig/Scaffan-analysis/PIG-003_J-18-0166_HE.ndpi",
+    # "medical/orig/Scaffan-analysis/PIG-004_BBJ-004-4_HE_parenchyme.ndpi",
+    # "medical/orig/Scaffan-analysis/PIG-004_BBJ-004-2 _HE_parenchyme.ndpi"
     "medical/orig/scaffan-analysis-czi/Zeiss-scans/05_2019_11_12__-1-2.czi"
 
 ]

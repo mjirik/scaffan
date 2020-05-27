@@ -114,7 +114,14 @@ class Scaffan:
                             # "Manual": "Manual",
                             # "Auto": "Auto",
                         # },
-                        "tip": "Auto: select lobulus based on Scan Segmentation. Color: based on annotation color. Manual: manually pick the lobule",
+                        "tip": "Auto: select lobulus based on Scan Segmentation.\n"
+                               "Color: based on annotation color.\n"
+                               "Manual: manually pick the lobule. \n\n" +
+                       "The annotations from `.ndpi` files are automatically imported.\n " +
+                       "The annotattion for other image format are expected to be done in ImageJ ROI Manager.\n"
+                       "File with annotations for is expected to be in the same dir and same name "
+                       "with file extension `.roi.zip`. \n"
+                       "Color of segmentation can be part of the polyon name ('my annotation #00FF00')"
                     },
                     # {
                     #     "name": "Lobulus Selection Method",
@@ -125,7 +132,9 @@ class Scaffan:
                     {
                         "name": "Annotation Color",
                         "type": "list",
-                        "tip": "Select lobulus based on annotation color. Skipped if Lobulus Selection Method is used.",
+                        "tip": "Select lobulus based on annotation color. "
+                               "Color of the annotation from ImageJ is expected to be part of the polyon name ('my annotation #00FF00')"
+                               "Skipped if Automatic Lobulus Selection Method is used.",
                         "values": {
                             "None": None,
                             "White": "#FFFFFF",

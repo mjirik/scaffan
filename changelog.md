@@ -1,10 +1,13 @@
 # Changelog
 
-## new
+# 0.23
 
 * [Added] Manual lobuli selection from GUI added
 * [Added] Annotations from ImageJ are readed. The file with annotations is expected to be in the same dir and same name
- with file extension `.roi.zip` 
+ with file extension `.roi.zip`. Color of segmentation can be part of the polyon name ("name #00FF00")
+ 
+# 0.22
+
 * [Fixed] Automatic selection of multiple points in the same lobule
 * [Changed] Margin calculation is available not only for views given by annotation.
 * [Added] Zeiss `.czi` image format support added
