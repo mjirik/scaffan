@@ -105,9 +105,9 @@ class Scaffan:
                     {"name": "Select", "type": "action"},
                     {"name": "Data Info", "type": "str", "readonly": True},
                     {
-                        "name": "Automatic Lobulus Selection",
+                        "name": "Lobulus Selection Method",
                         "type": "list",
-                        "value": "Manual",
+                        "value": "Auto",
 
                         "values": ["Color","Manual", "Auto"],
                             # "Color": "Color",
@@ -117,21 +117,15 @@ class Scaffan:
                         "tip": "Auto: select lobulus based on Scan Segmentation. Color: based on annotation color. Manual: manually pick the lobule",
                     },
                     # {
-                    #     "name": "Automatic Lobulus Selection",
+                    #     "name": "Lobulus Selection Method",
                     #     "type": "bool",
                     #     "value": True,
                     #     "tip": "Skip selection based on annotation color and select lobulus based on Scan Segmentation. ",
                     # },
                     {
-                        "name": "Whole Scan Margin",
-                        "type": "float",
-                        "value": self.whole_scan_margin,
-                        "tip": "Negative value will crop the whole scan image",
-                    },
-                    {
                         "name": "Annotation Color",
                         "type": "list",
-                        "tip": "Select lobulus based on annotation color. Skipped if Automatic Lobulus Selection is used.",
+                        "tip": "Select lobulus based on annotation color. Skipped if Lobulus Selection Method is used.",
                         "values": {
                             "None": None,
                             "White": "#FFFFFF",
@@ -222,6 +216,20 @@ class Scaffan:
                     self.lobulus_processing.parameters,
                     self.skeleton_analysis.parameters,
                     self.glcm_textures.parameters,
+                    {
+                        "name": "Whole Scan Margin",
+                        "type": "float",
+                        "value": self.whole_scan_margin,
+                        "tip": "Negative value will crop the whole scan image",
+                    },
+                    {
+                        "name": "Preview Pixelsize",
+                        "type": "float",
+                        "value": 0.00002,  # 0.02 mm
+                        "suffix": "m",
+                        "siPrefix": True,
+                        "tip": "Pixelsize used for manual lobuli selection. ",
+                    },
                     {
                         "name": "Report Level",
                         "type": "int",
@@ -393,7 +401,7 @@ class Scaffan:
     ):
         if override_automatic_lobulus_selection:
             logger.debug("forced to use color selection")
-            self.set_parameter("Input;Automatic Lobulus Selection", "Color")
+            self.set_parameter("Input;Lobulus Selection Method", "Color")
         logger.debug(f"color={color}")
         pcolor = self.parameters.param("Input", "Annotation Color")
         color = color.upper()
@@ -435,7 +443,7 @@ class Scaffan:
             # mainapp.set_annotation_color_selection("#FF00FF")
             # mainapp.set_annotation_color_selection("#FF0000")
             #             mainapp.set_annotation_color_selection("#FFFF00")
-            self.set_parameter("Input;Automatic Lobulus Selection", "Auto")
+            self.set_parameter("Input;Lobulus Selection Method", "Auto")
             self.set_parameter("Processing;Skeleton Analysis", False)
             self.set_parameter("Processing;Texture Analysis", False)
             self.set_parameter("Processing;Lobulus Segmentation", False)
@@ -479,7 +487,7 @@ class Scaffan:
             "Processing", "Scan Segmentation"
         ).value()
         automatic_lobulus_selection = self.parameters.param(
-            "Input", "Automatic Lobulus Selection"
+            "Input", "Lobulus Selection Method"
         ).value()
         logger.debug(f"Lobulus Selection={automatic_lobulus_selection}")
         if automatic_lobulus_selection == "Color":
@@ -495,7 +503,7 @@ class Scaffan:
 
             # TODO remove when whole scan will work fine
             # wsm = self.whole_scan_margin
-            wsm = self.parameters.param("Input", "Whole Scan Margin").value()
+            wsm = self.parameters.param("Processing", "Whole Scan Margin").value()
             self.slide_segmentation.init(self.anim.get_full_view(margin=wsm))
             self.slide_segmentation.run()
             if automatic_lobulus_selection == "Auto":
@@ -649,7 +657,8 @@ class Scaffan:
         logger.debug("Manual selection")
         # full_view = self.anim.get_full_view()
         full_view = self.anim.get_view(location=[0,0], level=0, size_on_level=self.anim.get_slide_size()[::-1])
-        view_corner = full_view.to_pixelsize(pixelsize_mm=[0.02, 0.02])
+        pxsz_mm = float(self.get_parameter("Processing;Preview Pixelsize")) * 1000
+        view_corner = full_view.to_pixelsize(pixelsize_mm=[pxsz_mm, pxsz_mm])
         logger.debug(f"Manual selection1, view.loc={full_view.region_location}, view.size={full_view.region_size_on_level}, pxsz={full_view.region_pixelsize}")
         logger.debug(f"Manual selection2, view.loc={view_corner.region_location}, view.size={view_corner.region_size_on_level}, pxsz={view_corner.region_pixelsize}")
         img = view_corner.get_region_image(as_gray=False)
@@ -698,6 +707,8 @@ class Scaffan:
         plt.imshow(img)
         view_corner.plot_annotations(None)
         centers_px = plt.ginput(1)
+        plt.draw()
+        plt.show()
         plt.draw()
         plt.close(fig)
         return ann_ids

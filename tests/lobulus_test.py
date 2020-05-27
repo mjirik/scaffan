@@ -65,7 +65,7 @@ class LobulusTest(unittest.TestCase):
             mainapp.set_output_dir(str(output_dir))
             mainapp.init_run()
             mainapp.set_report_level(10)
-            mainapp.set_parameter("Input;Automatic Lobulus Selection", "Color")
+            mainapp.set_parameter("Input;Lobulus Selection Method", "Color")
             mainapp.set_annotation_color_selection("#FFFF00")
             # mainapp.parameters.param("Processing", "Show").setValue(True)
             mainapp.run_lobuluses()

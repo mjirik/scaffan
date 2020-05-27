@@ -197,7 +197,7 @@ def read_annotations_ndpa(pth) -> list:
     return data
 
 
-def plot_annotations(annotations, x_key="x", y_key="y", in_region=False, factor=[1, 1]):
+def plot_annotations(annotations, x_key="x", y_key="y", in_region=False, factor=[1, 1], show_id=True):
     if type(annotations) is dict:
         annotations = [annotations]
 
@@ -205,11 +205,16 @@ def plot_annotations(annotations, x_key="x", y_key="y", in_region=False, factor=
         x_key = "region_x_px"
         y_key = "region_y_px"
 
-    for annotation in annotations:
+    for i, annotation in enumerate(annotations):
         x = np.asarray(annotation[x_key]) * factor[0]
         y = np.asarray(annotation[y_key]) * factor[1]
         # plt.hold(True)
         plt.plot(x, y, c=annotation["color"])
+        if show_id:
+            plt.text(np.min(x), np.min(y), str(i),
+                     c=annotation["color"],
+                     fontsize="x-small"
+                     )
 
 
 def adjust_xy_to_image_view(imsl, x_px, y_px, center, level, size):
