@@ -15,36 +15,27 @@ You may want to use it with [Hamamatsu NDP Viewer](https://www.hamamatsu.com/eu/
 # Install
 
 
-
-# Linux
-
-```commandline
-conda install -c mjirik -c bioconda -c conda-forge openslide-python scaffan
-```
-
-## Install dependencies
-
-```commandline
-conda install -c mjirik -c bioconda -c conda-forge openslide-python lxml imma io3d
-```
-
-# Windows
+## Windows
 
 [Install Conda](https://conda.io/miniconda.html) and check "Add Anaconda to my PATH environment variable" 
 
 Run in terminal:
 ```commandline
 
-conda create -n scaffan -c mjirik -c bioconda -c conda-forge pip scaffan
+conda create -n scaffan -c mjirik -c bioconda -c conda-forge pip scaffan pywin32
 activate scaffan
-pip install openslide-python keras tensorflow
+pip install openslide-python
+python -m scaffan install
+python -m scaffan
 ```
 
-### Create icon
+The `pywin32` is used for icon installation. It can be skipped.
 
-```bash
-activate scaffan
-python -m scaffan install
+
+## Linux
+
+```commandline
+conda install -c mjirik -c bioconda -c conda-forge openslide-python scaffan
 ```
 
 ## Update
@@ -58,11 +49,11 @@ conda install -c mjirik -c bioconda -c conda-forge -y scaffan
 
 ```commandline
 activate scaffan
-python -m scaffan gui
+python -m scaffan
 ```
 
 
-## Known issues
+# Known issues
 
 There are two problems with `openslide` (not with `openslide-python`) package on windows. 
 * The package is not in conda channel. This is solved by automatic download of the dll binaries.
