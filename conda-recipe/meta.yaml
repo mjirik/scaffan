@@ -68,7 +68,8 @@ requirements:
     - {{ pin_compatible('pandas', max_pin='x', min_pin="x.x") }}
 #    - openpyxl
     - {{ pin_compatible('openpyxl', max_pin='x', min_pin="x.x") }}
-    - morphsnakes
+    - {{ pin_compatible('morphsnakes', max_pin='x', min_pin="x.x") }}
+#    - morphsnakes
 #    - pyqt>=5.0
     - {{ pin_compatible('pyqt', max_pin='x', min_pin="x.x") }}
     - {{ pin_compatible('exsu', max_pin='x', min_pin="x.x") }}
@@ -77,17 +78,21 @@ requirements:
 #    - {{ pin_compatible('pyqtgraph', max_pin='x', min_pin="x.x") }}
 #    - {{ pin_compatible('pyqtgraph', max_pin='x.x') }}
 #    - click
-    - {{ pin_compatible('click', max_pin='x') }}
+    - {{ pin_compatible('click', max_pin='x.x') }}
+    - {{ pin_compatible('read-roi', max_pin='x.x') }}
     - pywin32 # [win]
     # - numpy
     # - pyqt 4.11.*
 #    - xlwings
     - xlrd
-    - loguru
+    - {{ pin_compatible('loguru', max_pin='x.x') }}
+#    - loguru
     - openslide-python # [not win]
-    - scikit-image
-    - scikit-learn
-    - chainer
+    - {{ pin_compatible('scikit-image', max_pin='x.x') }}
+    - {{ pin_compatible('scikit-learn', max_pin='x.x') }}
+    - {{ pin_compatible('chainer', max_pin='x.x') }}
+#    - scikit-image
+#    - scikit-learn
 
 test:
   # Python imports
