@@ -52,6 +52,12 @@ activate scaffan
 python -m scaffan
 ```
 
+## Uninstall
+
+```comandline
+conda remove --name scaffan --all
+```
+
 
 # Known issues
 
