@@ -59,18 +59,18 @@ setup(
     # have to be included in MANIFEST.in as well.
     package_data={
         "sample1": ["scaffan_icon256.png"],
-        "": ["*.png", "*.ico"],
+        "": ["*.png", "*.ico", "*.joblib", "*.pkl"],
         "sample2": ["scaffan/scaffan_icon256.png"],
         "segmentation_model": ["segmentation_model.pkl"],
         "segmentation_model_not_working": ["scaffan/segmentation_model.pkl"],
-        "cnn_model": ["models/posenet_highLR.model"],
-        "sni_area": ["models/SNI_area_regressor.joblib"],
+        "cnn_model": ["posenet_highLR.model"],
+        "sni_area": ["SNI_area_regressor.joblib"],
         "segmentation_model_default": ["segmentation_model_default.pkl"],
         "segmentation_model_default_not_working": ["scaffan/segmentation_model_default.pkl"],
-        "cnn_model_not_working": ["scaffan/models/posenet_highLR.model"],
-        "sni_area_not_working": ["scaffan/models/SNI_area_regressor.joblib"],
-        "sni_per-pixel": ["models/SNI_per-pixel_regressor.joblib"],
-        "sni_per-pixel_not_working": ["scaffan/models/SNI_per-pixel_regressor.joblib"],
+        "cnn_model_not_working": ["scaffan/posenet_highLR.model"],
+        "sni_area_not_working": ["scaffan/SNI_area_regressor.joblib"],
+        "sni_per-pixel": ["SNI_per-pixel_regressor.joblib"],
+        "sni_per-pixel_not_working": ["scaffan/SNI_per-pixel_regressor.joblib"],
     },
     # Although 'package_data' is the preferred approach, in some case you may
     # need to place data files outside of your packages.

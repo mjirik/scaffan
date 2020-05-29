@@ -64,17 +64,22 @@ mainapp.set_report_level(10)
 # mainapp.set_parameter("Processing;Texture Analysis", False)
 mainapp.set_parameter("Processing;Lobulus Segmentation;Manual Segmentation", True)
 
-def set_same(mainapp, fn):
+def set_same(mainapp, fn, color):
     logger.debug(f"fn exists {Path(fn).exists()}, fn: {fn}")
     mainapp.set_input_file(fn)
     odir = experiment_dir / Path(fn).stem
     mainapp.set_output_dir(odir)
     logger.debug(f"output dir: {str(odir)}")
     # mainapp.set_annotation_color_selection("#0000FF") # Blue is used for unlabeled
-    mainapp.set_annotation_color_selection("#00FF00")
+    mainapp.set_annotation_color_selection(color)
     # mainapp.parameters.param("Processing", "Lobulus Segmentation", "Central Vein Segmentation", "Threshold").setValue(0.20)
     # mainapp.set_parameter("Processing;Lobulus Segmentation;Manual Segmentation", True)
 
+colors = [
+    # "#0000FF",
+    # "#00FFFF",
+    "#00FF00"
+]
 fns = [
     "medical/orig/Scaffan-analysis/PIG-001_J-17-0571_LM central_HE.ndpi",
     "medical/orig/Scaffan-analysis/PIG-002_J-18-0091_HE.ndpi",
@@ -88,9 +93,10 @@ fns = [
 ]
 
 # P001
-for fn in fns:
-    set_same(mainapp, io3d.datasets.join_path(fn, get_root=True))
-    mainapp.run_lobuluses(None)
+for color in colors:
+    for fn in fns:
+        set_same(mainapp, io3d.datasets.join_path(fn, get_root=True), color)
+        mainapp.run_lobuluses(None)
 
 # # P002
 # fn = io3d.datasets.join_path(

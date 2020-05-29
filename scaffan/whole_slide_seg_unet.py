@@ -117,7 +117,8 @@ class WholeSlideSegmentationUNet:
 
     def init_segmentation(self):
         model = PoseNet()  # nacteni architektury modelu
-        model_path = path_to_script / "models/"  # cesta k ulozenym modelum
+        # model_path = path_to_script / "models/"  # cesta k ulozenym modelum
+        model_path = path_to_script  # cesta k ulozenym modelum
         # model_name = 'posenet_highLR' #nazev konkretniho modelu, mozna by slo dat do parametru pri volani
         model_name = str(self.parameters.param("Model Name").value())
         serializers.load_npz(

@@ -51,8 +51,10 @@ requirements:
     - pywin32 # [win]
     - loguru
     - exsu
+    - chainer
     - scikit-image
     - scikit-learn
+    - read-roi
 
   run:
     - python>=3.6

@@ -70,9 +70,11 @@ class SniPredictor:
 
         # def init_regressors(self):
         # model = PoseNet()  # nacteni architektury modelu
-        self.area_regressor_path = path_to_script / "models/SNI_area_regressor.joblib"
+        # self.area_regressor_path = path_to_script / "models/SNI_area_regressor.joblib"
+        self.area_regressor_path = path_to_script / "SNI_area_regressor.joblib"
         self.perpixel_regressor_path = (
-            path_to_script / "models/SNI_per-pixel_regressor.joblib"
+            # path_to_script / "models/SNI_per-pixel_regressor.joblib"
+            path_to_script / "SNI_per-pixel_regressor.joblib"
         )
         areg = joblib.load(self.area_regressor_path)
         ppreg = joblib.load(self.area_regressor_path)
