@@ -69,7 +69,8 @@ setup(
         "segmentation_model_default_not_working": ["scaffan/segmentation_model_default.pkl"],
         "cnn_model_not_working": ["scaffan/models/posenet_highLR.model"],
         "sni_area_not_working": ["scaffan/models/SNI_area_regressor.joblib"],
-        "sni_per-pixel": ["scaffan/models/SNI_per-pixel_regressor.joblib"],
+        "sni_per-pixel": ["models/SNI_per-pixel_regressor.joblib"],
+        "sni_per-pixel_not_working": ["scaffan/models/SNI_per-pixel_regressor.joblib"],
     },
     # Although 'package_data' is the preferred approach, in some case you may
     # need to place data files outside of your packages.
