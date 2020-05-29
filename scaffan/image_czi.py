@@ -19,6 +19,7 @@ def instal_codecs_with_pip():
         logger.info("Installing imagecodecs with pip")
         package = "imagecodecs"
         subprocess.check_call([sys.executable, "-m", "pip", "install", package])
+        import imagecodecs
 
 
 

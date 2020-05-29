@@ -97,6 +97,7 @@ requirements:
     - chainer
     - scikit-image
     - scikit-learn
+    - czifile
 
 test:
   # Python imports
