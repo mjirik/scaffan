@@ -16,4 +16,4 @@ copy scaffan_build_vystup.txt "%PREFIX%"\
 if errorlevel 1 exit 1
 
 mkdir -p "$PREFIX%"\scaffan
-copy "%RECIPE_DIR%"\scaffan\scaffan_icon512.png "%PREFIX%"\scaffan\
+echo "copy "%RECIPE_DIR%"\scaffan\scaffan_icon512.png "%PREFIX%"\scaffan\"
