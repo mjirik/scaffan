@@ -107,7 +107,7 @@ class MainGuiTest(unittest.TestCase):
         self, error_threshold=0.05, iterations1=10, iterations2=10, view_border=20
     ):
         """
-        Check texture analysis. Limit snake iterations and the size of view to increase performace.
+        Test multiple lobules processing. Limit snake iterations and the size of view to increase performace.
         :param error_threshold:
         :param iterations1:
         :param iterations2:
@@ -144,8 +144,8 @@ class MainGuiTest(unittest.TestCase):
             "Processing;Lobulus Segmentation;Annotation Margin", view_border
         )  # add 20%
         mainapp.set_parameter("Processing;Scan Segmentation", False)
-        mainapp.set_parameter("Processing;Skeleton Analysis", True)
-        mainapp.set_parameter("Processing;Texture Analysis", True)
+        mainapp.set_parameter("Processing;Skeleton Analysis", False)
+        mainapp.set_parameter("Processing;Texture Analysis", False)
         original_foo = scaffan.image.AnnotatedImage.get_annotations_by_color
         # with patch.object(scaffan.image.AnnotatedImage, 'select_annotations_by_color', autospec=True) as mock_foo:
         #     def side_effect(anim_, annid, *args, **kwargs):
@@ -161,9 +161,10 @@ class MainGuiTest(unittest.TestCase):
         #
         #     mock_foo.side_effect = side_effect
         mainapp.run_lobuluses()
-        self.assert_dice_in_first_evaluated_data(mainapp, error_threshold)
+        self.assert_dice_in_first_evaluated_data(mainapp, error_threshold, i=0)
+        self.assert_dice_in_first_evaluated_data(mainapp, error_threshold, i=1)
 
-    def test_run_lobuluses_manual_segmentation(self, error_threshold=0.9):
+    def test_run_lobuluses_manual_segmentation_with_texture_and_skeleton_analysis(self, error_threshold=0.9):
         """
         Just check the manual segmentation
         :param error_threshold:
@@ -172,7 +173,7 @@ class MainGuiTest(unittest.TestCase):
         fn = io3d.datasets.join_path(
             "medical", "orig", "sample_data", "SCP003", "SCP003.ndpi", get_root=True
         )
-        original_foo = scaffan.image.AnnotatedImage.get_annotations_by_color
+        # original_foo = scaffan.image.AnnotatedImage.get_annotations_by_color
         # with patch.object(scaffan.image.AnnotatedImage, 'select_annotations_by_color', autospec=True) as mock_foo:
         #     def side_effect(anim_, annid, *args, **kwargs):
         #         logger.debug("mocked function select_annotations_by_color()")
@@ -191,7 +192,7 @@ class MainGuiTest(unittest.TestCase):
         mainapp.set_input_file(fn)
         mainapp.set_output_dir("test_run_lobuluses_output_dir")
         mainapp.set_annotation_color_selection(
-            "#00FFFF", override_automatic_lobulus_selection=True
+            "#FFFF00", override_automatic_lobulus_selection=True
         )
         # auto = mainapp.get_parameter("Input;Lobulus Selection Method") == "Color"
         # logger.debug(f"auto={auto}")
@@ -205,33 +206,23 @@ class MainGuiTest(unittest.TestCase):
         )
         # dont waste time with scan segmentation. It is not used in the test
         mainapp.set_parameter("Processing;Scan Segmentation", False)
-        mainapp.set_parameter("Processing;Skeleton Analysis", False)
-        mainapp.set_parameter("Processing;Texture Analysis", False)
+        mainapp.set_parameter("Processing;Skeleton Analysis", True)
+        mainapp.set_parameter("Processing;Texture Analysis", True)
 
         mainapp.run_lobuluses()
-        self.assert_dice_in_first_evaluated_data(mainapp, error_threshold)
+        self.assert_dice_in_first_evaluated_data(mainapp, error_threshold, i=0)
         assert mainapp.evaluation.evaluation_history[0]
 
-    def assert_dice_in_first_evaluated_data(self, mainapp, error_threshold):
+    def assert_dice_in_first_evaluated_data(self, mainapp, error_threshold, i=0):
         self.assertLess(
             error_threshold,
-            mainapp.evaluation.evaluation_history[0]["Lobulus Border Dice"],
+            mainapp.evaluation.evaluation_history[i]["Lobulus Border Dice"],
             "Lobulus segmentation should have Dice coefficient above some low level",
         )
         self.assertLess(
             error_threshold,
-            mainapp.evaluation.evaluation_history[1]["Lobulus Border Dice"],
-            "Lobulus segmentation should have Dice coefficient above some low level",
-        )
-        self.assertLess(
-            error_threshold,
-            mainapp.evaluation.evaluation_history[0]["Central Vein Dice"],
+            mainapp.evaluation.evaluation_history[i]["Central Vein Dice"],
             "Central Vein segmentation should have Dice coefficient above some low level",
-        )
-        self.assertLess(
-            error_threshold,
-            mainapp.evaluation.evaluation_history[1]["Central Vein Dice"],
-            "Central Vein should have Dice coefficient above some low level",
         )
 
     def test_start_gui_no_exec(self):
@@ -340,8 +331,7 @@ class MainGuiTest(unittest.TestCase):
             ),
         ]
 
-        # TODO Uncomment fallowing line when CNN is done
-        self._testing_slide_segmentation_clf(fns, segmentation_method="U-Net", whole_scan_margin=-0.2)
+        self._testing_slide_segmentation_clf(fns, segmentation_method="U-Net", whole_scan_margin=-0.3)
 
     def _testing_slide_segmentation_clf(self, fns, segmentation_method, whole_scan_margin=0.0):
         """
@@ -538,29 +528,34 @@ def test_parameters():
 
 
 
-@unittest.skipIf(os.environ.get("TRAVIS", True), "Skip on Travis-CI")
+# @unittest.skipIf(os.environ.get("TRAVIS", True), "Skip on Travis-CI")
+@pytest.mark.slow
 def test_run_lobuluses():
     fn = io3d.datasets.join_path(
         "medical", "orig", "sample_data", "SCP003", "SCP003.ndpi", get_root=True
     )
-    run_on_yellow(fn)
+    mainapp = scaffan.algorithm.Scaffan()
+    mainapp.set_parameter("Processing;Scan Segmentation", False)
+    run_on_yellow(mainapp, fn)
 
 
-@unittest.skip("Skip it is somehow broken")
+# @unittest.skip("Skip it is somehow broken")
+@pytest.mark.slow
 def test_run_lobuluses_czi():
     # TODO fix test
     fn = io3d.datasets.join_path(
         "medical/orig/scaffan-analysis-czi/Zeiss-scans/05_2019_11_12__-1-2.czi",
         get_root=True,
     )
-    run_on_yellow(fn)
+    mainapp = scaffan.algorithm.Scaffan()
+    mainapp.set_parameter("Processing;Scan Segmentation", False)
+    run_on_yellow(mainapp, fn)
 
 
-def run_on_yellow(fn_yellow):
+def run_on_yellow(mainapp, fn_yellow):
     # imsl = openslide.OpenSlide(fn)
     # annotations = scan.read_annotations(fn)
     # scan.annotations_to_px(imsl, annotations)
-    mainapp = scaffan.algorithm.Scaffan()
     mainapp.set_input_file(fn_yellow)
     mainapp.set_output_dir("test_run_lobuluses_output_dir")
     # mainapp.init_run()
