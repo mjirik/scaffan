@@ -10,6 +10,7 @@ import exsu
 from matplotlib import pyplot as plt
 import numpy as np
 from pathlib import Path
+
 # file_path = Path()
 
 import scaffan.slide_segmentation
@@ -25,25 +26,30 @@ def test_slide_segmentation_hamamatsu():
     run_slide_seg(odir, Path(fn), margin=-0.35, add_biggest=True)
     # assert False
 
+
 def test_slide_segmentation_zeiss():
     odir = Path(__file__).parent / "slide_seg_Recog_test_output/"
     fn = io3d.datasets.join_path(
         # "medical/orig/scaffan-analysis-czi/Zeiss-scans/01_2019_11_12__RecognizedCode.czi",
         "medical/orig/scaffan-analysis-czi/Zeiss-scans/05_2019_11_12__-1-2.czi",
-        get_root=True)
+        get_root=True,
+    )
     # seg = run_slide_seg(odir, Path(fn), margin=-0.4)
     seg = run_slide_seg(odir, Path(fn), margin=-0.4)
 
 
-def run_slide_seg(odir:Path, fn:Path, margin:float, check_black_ids=False, add_biggest=False):
+def run_slide_seg(
+    odir: Path, fn: Path, margin: float, check_black_ids=False, add_biggest=False
+):
     logger.debug(f"report dir={odir.absolute()}")
     fn = str(fn)
 
-    report = exsu.Report(outputdir=odir,
-                         show=False,
-                         # additional_spreadsheet_fn=odir/"report.xlsx"
-                         level=10
-                         )
+    report = exsu.Report(
+        outputdir=odir,
+        show=False,
+        # additional_spreadsheet_fn=odir/"report.xlsx"
+        level=10,
+    )
     seg = scaffan.slide_segmentation.ScanSegmentation(report=report)
     # dir(seg)
     anim = scaffan.image.AnnotatedImage(fn)
@@ -74,6 +80,7 @@ def run_slide_seg(odir:Path, fn:Path, margin:float, check_black_ids=False, add_b
     # plt.imshow(seg.whole_slide_training_labels)
     # plt.show()
 
+
 def test_get_biggest_lobuli():
     odir = Path(__file__).parent / "slide_seg_SCP003_test_output/"
     print(f"report dir={odir.absolute()}")
@@ -84,10 +91,11 @@ def test_get_biggest_lobuli():
     logger.debug(f"report dir={odir.absolute()}")
     fn = str(fn)
 
-    report = exsu.Report(outputdir=odir,
-                         show=False
-                         # additional_spreadsheet_fn=odir/"report.xlsx"
-                         )
+    report = exsu.Report(
+        outputdir=odir,
+        show=False
+        # additional_spreadsheet_fn=odir/"report.xlsx"
+    )
     seg = scaffan.slide_segmentation.ScanSegmentation(report=report)
     # dir(seg)
     anim = scaffan.image.AnnotatedImage(fn)

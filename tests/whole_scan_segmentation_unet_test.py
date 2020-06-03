@@ -71,13 +71,16 @@ def test_unet_on_view_czi():
     # )
     fn = io3d.datasets.join_path(
         "medical/orig/scaffan-analysis-czi/Zeiss-scans/01_2019_11_12__RecognizedCode.czi",
-        get_root=True)
+        get_root=True,
+    )
     anim = scaffan.image.AnnotatedImage(fn)
     # ann_ids = anim.get_annotations_by_color("#FFFF00")
     # anim.get_views(ann_ids)
-    view = anim.get_view(location_mm=[4.0, 4.0], size_on_level=[224, 224], pixelsize_mm=[0.01, 0.01]
+    view = anim.get_view(
+        location_mm=[4.0, 4.0], size_on_level=[224, 224], pixelsize_mm=[0.01, 0.01]
     )
     import matplotlib.pyplot as plt
+
     im = view.get_region_image()
     # plt.imshow(im)
     # plt.show()

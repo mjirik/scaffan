@@ -13,6 +13,7 @@ from pathlib import Path
 # import sklearn.svm
 from scaffan.image import View
 from scaffan.annotation import annotation_px_to_mm
+
 # from sklearn.externals import joblib
 import joblib
 from scipy.ndimage import gaussian_filter
@@ -138,10 +139,10 @@ class ScanSegmentation:
                 "value": False,
                 # "suffix": "px",
                 "siPrefix": False,
-                "tip": "Training labels from original image are saved to output dir. " +
-                       "There is computation cost when it is turned on. " +
-                       "It is not used in standard processing. " +
-                       "The training labels are: 'unknown', 'background', 'intralobular' and 'interlobular'.",
+                "tip": "Training labels from original image are saved to output dir. "
+                + "There is computation cost when it is turned on. "
+                + "It is not used in standard processing. "
+                + "The training labels are: 'unknown', 'background', 'intralobular' and 'interlobular'.",
             },
             {
                 "name": "Lobulus Number",
@@ -162,7 +163,6 @@ class ScanSegmentation:
             },
             # self._inner_texture.parameters,
         ]
-
 
         self.parameters = Parameter.create(
             name=pname,
@@ -378,16 +378,16 @@ class ScanSegmentation:
 
         return closest_i
 
-    def set_view(self, view:View):
+    def set_view(self, view: View):
         self.view = view.to_level(0)
         self.anim = view.anim
 
     def _get_tiles_parameters(self):
         sp_height0, sp_width0 = self.view.get_size_on_level(0)
-        st_height0, st_width0 = self.view.region_location # pozor, tady je to prohozený
+        st_height0, st_width0 = self.view.region_location  # pozor, tady je to prohozený
 
-        imcrop_height0 = sp_height0 + 1*st_height0
-        imcrop_width0 = sp_width0 + 1*st_width0
+        imcrop_height0 = sp_height0 + 1 * st_height0
+        imcrop_width0 = sp_width0 + 1 * st_width0
         height0, width0 = self.view.get_size_on_level(0)
 
         # height_check = self.anim.openslide.properties["openslide.level[0].height"]
@@ -431,7 +431,9 @@ class ScanSegmentation:
             size_on_level,
             imsz_on_level,
         ) = self._get_tiles_parameters()
-        logger.debug(f"level={self.level}, tile size on level={size_on_level}, tile size on level 0={size_on_level0}")
+        logger.debug(
+            f"level={self.level}, tile size on level={size_on_level}, tile size on level 0={size_on_level0}"
+        )
         # self.tiles = []
 
         # for x0 in range(0, int(imsz_on_level0[0]), int(size_on_level0[0])):
@@ -448,11 +450,12 @@ class ScanSegmentation:
 
         # todo the iterator is strange the x and y seems to be swapped sometimes
         self.tiles = []
-        column_tiles=[]
+        column_tiles = []
         for tile_params in self.tile_iterator(
-                return_in_out_coords=False,
-                return_tile_coords=True,
-                return_level0_coords=True):
+            return_in_out_coords=False,
+            return_tile_coords=True,
+            return_level0_coords=True,
+        ):
             sl_tl, sl_gl, (x0, y0) = tile_params
             # ix, iy, x0, y0 = tile_params
             # if len(self.tiles2) <= ix:
@@ -463,7 +466,6 @@ class ScanSegmentation:
             )
             self.tiles.append((view, tile_params))
         pass
-
 
     def predict_on_view(self, view):
         smethod = str(self.parameters.param("Segmentation Method").value())
@@ -506,19 +508,30 @@ class ScanSegmentation:
         for view, tile_params in self.tiles:
             # view = self.tiles[ix][iy]
             sl_tl, sl_gl, loc = tile_params
-            seg_black = view.get_annotation_raster_by_color("#000000", raise_exception_if_not_found=False)
-            seg_magenta = view.get_annotation_raster_by_color("#FF00FF", raise_exception_if_not_found=False)
-            seg_red = view.get_annotation_raster_by_color("#FF0000", raise_exception_if_not_found=False)
+            seg_black = view.get_annotation_raster_by_color(
+                "#000000", raise_exception_if_not_found=False
+            )
+            seg_magenta = view.get_annotation_raster_by_color(
+                "#FF00FF", raise_exception_if_not_found=False
+            )
+            seg_red = view.get_annotation_raster_by_color(
+                "#FF0000", raise_exception_if_not_found=False
+            )
             # find overlays
             overlays = (1 * seg_black + 1 * seg_magenta + 1 * seg_red) > 1
             segmentation = 2 * seg_black + 1 * seg_magenta + 3 * seg_red
             # remove overlays
             segmentation[overlays] = 0
-            output_image[sl_gl] = segmentation #.get_region_image(as_gray=as_gray)[sl_x_tl, sl_y_tl, :3]
+            output_image[
+                sl_gl
+            ] = segmentation  # .get_region_image(as_gray=as_gray)[sl_x_tl, sl_y_tl, :3]
 
         self.whole_slide_training_labels = output_image[self._full_image_crop_slice()]
         self.report.imsave(
-            "whole_slide_training_labels.png", self.whole_slide_training_labels, level_skimage=20, level_npz=30
+            "whole_slide_training_labels.png",
+            self.whole_slide_training_labels,
+            level_skimage=20,
+            level_npz=30,
         )
 
     def predict_tiles(self):
@@ -528,24 +541,34 @@ class ScanSegmentation:
         logger.debug("predicting tiles")
         self.predicted_tiles = []
         for i, (tile_view, tile_params) in enumerate(self.tiles):
-        # for i, tile_view_col in enumerate(self.tiles):
+            # for i, tile_view_col in enumerate(self.tiles):
             # logger.trace(f"predicting tiles in {i}-th row")
             # predicted_col = []
             # for j, tile_view in enumerate(tile_view_col):
-                label_r = "profile unet cumulative get_region_image time [s]"
-                label_p = "profile unet cumulative prediction time [s]"
-                t_r = self.report.actual_row[label_r] if label_r in self.report.actual_row else 0
-                t_p = self.report.actual_row[label_p] if label_p in self.report.actual_row else 0
-                logger.trace(f"predicting tile {i}, loc={tile_view.region_location}, sz={tile_view.region_size_on_level}, t_r={t_r}, t_p={t_p}")
-                # self._inner_texture.texture_label = f"slide_segmentation_{i},{j}"
-                predicted_image = self.predict_on_view(tile_view)
-                # if str(self.parameters.param("Segmentation Method").value()) == "U-Net":
-                #     predicted_image = self._unet.predict_tile(tile_view)
-                # elif str(self.parameters.param("Segmentation Method").value()) == "HCTFS":
-                #     predicted_image = self.predict_on_view_hctfs(tile_view)
-                # else:
-                #     raise ValueError("Unknown segmentation method")
-                self.predicted_tiles.append(predicted_image)
+            label_r = "profile unet cumulative get_region_image time [s]"
+            label_p = "profile unet cumulative prediction time [s]"
+            t_r = (
+                self.report.actual_row[label_r]
+                if label_r in self.report.actual_row
+                else 0
+            )
+            t_p = (
+                self.report.actual_row[label_p]
+                if label_p in self.report.actual_row
+                else 0
+            )
+            logger.trace(
+                f"predicting tile {i}, loc={tile_view.region_location}, sz={tile_view.region_size_on_level}, t_r={t_r}, t_p={t_p}"
+            )
+            # self._inner_texture.texture_label = f"slide_segmentation_{i},{j}"
+            predicted_image = self.predict_on_view(tile_view)
+            # if str(self.parameters.param("Segmentation Method").value()) == "U-Net":
+            #     predicted_image = self._unet.predict_tile(tile_view)
+            # elif str(self.parameters.param("Segmentation Method").value()) == "HCTFS":
+            #     predicted_image = self.predict_on_view_hctfs(tile_view)
+            # else:
+            #     raise ValueError("Unknown segmentation method")
+            self.predicted_tiles.append(predicted_image)
 
     def predict(self):
         """
@@ -573,14 +596,16 @@ class ScanSegmentation:
         output_image = np.zeros(self.tile_size + np.asarray(imsize_on_level), dtype=int)
         logger.debug("composing predicted image")
         # for iy, tile_column in enumerate(self.tiles):
-            # for ix, tile in enumerate(tile_column):
-        for (view, tile_params), predicted_tile in zip(self.tiles, self.predicted_tiles):
+        # for ix, tile in enumerate(tile_column):
+        for (view, tile_params), predicted_tile in zip(
+            self.tiles, self.predicted_tiles
+        ):
             sl_tl, sl_gl, loc = tile_params
             output_image[
-                    # ix * self.tile_size[0] : (ix + 1) * self.tile_size[0],
-                    # iy * self.tile_size[1] : (iy + 1) * self.tile_size[1],
-                    sl_gl
-                ] = predicted_tile
+                # ix * self.tile_size[0] : (ix + 1) * self.tile_size[0],
+                # iy * self.tile_size[1] : (iy + 1) * self.tile_size[1],
+                sl_gl
+            ] = predicted_tile
 
         # full_image = output_image[: int(imsize_on_level[0]), : int(imsize_on_level[1])]
 
@@ -602,7 +627,10 @@ class ScanSegmentation:
         # ) = self._get_tiles_parameters()
         # self._cr_sz_on_level
         logger.debug(f"cr size on level = {self._cr_sz_on_level}")
-        return slice(None, self._cr_sz_on_level[0]), slice(None, self._cr_sz_on_level[1])
+        return (
+            slice(None, self._cr_sz_on_level[0]),
+            slice(None, self._cr_sz_on_level[1]),
+        )
 
     def _labeling_filtration(self, full_image):
         """
@@ -626,7 +654,7 @@ class ScanSegmentation:
         # szy = len(self.tiles[0])
         #         print(f"size x={szx} y={szy}")
 
-        _,_,_, imsize_on_level = self._get_tiles_parameters()
+        _, _, _, imsize_on_level = self._get_tiles_parameters()
         output_size = imsize_on_level + self.tile_size
         if not as_gray:
             output_size = np.asarray([output_size[0], output_size[1], 3])
@@ -650,14 +678,20 @@ class ScanSegmentation:
         for view, tile_params in self.tiles:
             (sl_x_tl, sl_y_tl), sl_gl, loc = tile_params
 
-            output_image[sl_gl] = view.get_region_image(as_gray=as_gray)[sl_x_tl, sl_y_tl, :3]
-
+            output_image[sl_gl] = view.get_region_image(as_gray=as_gray)[
+                sl_x_tl, sl_y_tl, :3
+            ]
 
         full_image = output_image[self._full_image_crop_slice()]
         self.full_raster_image = full_image
         return full_image
 
-    def tile_iterator(self, return_in_out_coords=True, return_level0_coords=False, return_tile_coords=False):
+    def tile_iterator(
+        self,
+        return_in_out_coords=True,
+        return_level0_coords=False,
+        return_tile_coords=False,
+    ):
         (
             imsize_on_level0,
             tile_size_on_level0,
@@ -670,10 +704,20 @@ class ScanSegmentation:
         # height0 = sp_height0 - st_height0
         # width0 = sp_width0 - st_width0
         # strange behavior is given by openslide. It swaps x and y. The read_region([y,x]).
-        for ix, x0 in enumerate(range(st_height0, int(self._cr_sp_on_level0[0]), int(tile_size_on_level0[0]))):
-            for iy, y0 in enumerate(range(st_width0, int(self._cr_sp_on_level0[1]), int(tile_size_on_level0[1]))):
-        # for ix, x0 in enumerate(range(st_height0, int(imsize_on_level0[0]), int(size_on_level0[0]))):
-        #     for iy, y0 in enumerate(range(st_width0, int(imsize_on_level0[1]), int(size_on_level0[1]))):
+        for ix, x0 in enumerate(
+            range(
+                st_height0, int(self._cr_sp_on_level0[0]), int(tile_size_on_level0[0])
+            )
+        ):
+            for iy, y0 in enumerate(
+                range(
+                    st_width0,
+                    int(self._cr_sp_on_level0[1]),
+                    int(tile_size_on_level0[1]),
+                )
+            ):
+                # for ix, x0 in enumerate(range(st_height0, int(imsize_on_level0[0]), int(size_on_level0[0]))):
+                #     for iy, y0 in enumerate(range(st_width0, int(imsize_on_level0[1]), int(size_on_level0[1]))):
                 # logger.trace(f"processing tile {x0}, {y0}")
                 x_start = ix * self.tile_size[0]
                 x_stop = (ix + 1) * self.tile_size[0]
@@ -685,7 +729,10 @@ class ScanSegmentation:
                 sl_y_tl = slice(None, None)
 
                 if self.compatible_with_openslide:
-                    yield (sl_x_tl, sl_y_tl), (sl_x_gl, sl_y_gl), (y0, x0) # hamamatsu ok, zeiss wrong
+                    yield (sl_x_tl, sl_y_tl), (sl_x_gl, sl_y_gl), (
+                        y0,
+                        x0,
+                    )  # hamamatsu ok, zeiss wrong
                 else:
                     yield (sl_x_tl, sl_y_tl), (sl_x_gl, sl_y_gl), (x0, y0)
                 # if return_in_out_coords:
@@ -698,7 +745,6 @@ class ScanSegmentation:
                 #     out.append(y0)
                 # yield tuple(out)
 
-
                 #                     int(x0):int(x0 + tile_size_on_level[0]),
                 #                     int(y0):int(y0 + tile_size_on_level[1])
                 #                 ] = self.tiles[ix][iy].get_region_image(as_gray=True)
@@ -708,7 +754,7 @@ class ScanSegmentation:
         logger.debug("evaluate")
         labels, count = np.unique(self.full_output_image, return_counts=True)
         logger.debug(f"whole scan segmentation: labels={labels}, count={count}")
-        countd = { 0:0, 1:0 , 2:0}
+        countd = {0: 0, 1: 0, 2: 0}
         countd.update(dict(zip(labels, count)))
         #         plt.figure(figsize=(10, 10))
         #         plt.imshow(self.full_output_image)
@@ -764,6 +810,7 @@ class ScanSegmentation:
         mask = self.full_output_image == 1
 
         import time
+
         # t0 = time.time()
         dist = scipy.ndimage.morphology.distance_transform_edt(mask)
         lab = skimage.morphology.label(mask)
@@ -778,7 +825,6 @@ class ScanSegmentation:
         min_distance = int(2 * r_m / resolution_m)
         logger.debug(f"minimum distance [px]: {min_distance}")
 
-
         # image_max = scipy.ndimage.maximum_filter(dist, size=min_distance, mode="constant")
         # Comparison between image_max and im to find the coordinates of local maxima
         coordinates = peak_local_max(dist, min_distance=min_distance)
@@ -789,7 +835,7 @@ class ScanSegmentation:
         sorted_points = coordinates[sorted_point_inds]
         centers_filtered = kick_close_points(sorted_points, min_distance=min_distance)
 
-        max_points = centers_filtered[:min(n_max, len(centers_filtered))]
+        max_points = centers_filtered[: min(n_max, len(centers_filtered))]
         self.centers_all = coordinates
         self.centers_max = max_points
 
@@ -835,11 +881,12 @@ class ScanSegmentation:
         )
         centers_px = list(zip(*pts_glob_px))
         r_mm = float(self.parameters.param("Annotation Radius").value()) * 1000
-        biggest_ids,_ = add_circle_annotation(view_corner, centers_px, r_mm, self.anim.annotations)
+        biggest_ids, _ = add_circle_annotation(
+            view_corner, centers_px, r_mm, self.anim.annotations
+        )
 
         # self.anim.annotations.extend(anns)
         self.ann_biggest_ids.extend(biggest_ids)
-
 
     def run(self):
         logger.debug("run...")
@@ -870,10 +917,12 @@ class ScanSegmentation:
 
         res = list(self.anim.get_pixel_size(self.level))
         logger.debug(f"slide segmentation resolution = {res}")
-        self.report.set_persistent_cols({
-            "slide segmentation method": method,
-            "slide segmentation resolution": str(res)
-        })
+        self.report.set_persistent_cols(
+            {
+                "slide segmentation method": method,
+                "slide segmentation resolution": str(res),
+            }
+        )
 
 
 # def find_maxdist_in_labeled_image(mask:np.ndarray):
@@ -909,7 +958,7 @@ class ScanSegmentation:
 def kick_close_points(coords, min_distance):
     selected = []
     for i in range(coords.shape[0] - 1):
-        dists = np.linalg.norm((coords[i + 1:, :] - coords[i, :]), axis=1)
+        dists = np.linalg.norm((coords[i + 1 :, :] - coords[i, :]), axis=1)
         # print(dists)
         if (dists > min_distance).all():
             selected.append(coords[i, :])
@@ -920,7 +969,7 @@ def kick_close_points(coords, min_distance):
     return selected
 
 
-def add_circle_annotation(view_corner:scim.View, centers_px_global, r_mm, annotations):
+def add_circle_annotation(view_corner: scim.View, centers_px_global, r_mm, annotations):
 
     # r_mm = 0.1
     t = np.linspace(0, 2 * np.pi, 30)

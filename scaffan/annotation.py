@@ -107,7 +107,9 @@ def get_imsize_from_imagej_roi(rois):
 
             rect = True
         if not rect:
-            raise Exception("There should be rectangle in ROI file to define image size.")
+            raise Exception(
+                "There should be rectangle in ROI file to define image size."
+            )
     return np.array([height, width])
 
 
@@ -124,28 +126,36 @@ def read_annotations_imagej(path, slide_size) -> list:
     anns = []
     if op.exists(fn):
         # def read_annotations_imagej(, slide_size=slide_size):
-            rois = read_roi_zip(fn)
-            roi_size = get_imsize_from_imagej_roi(rois)
-            ratio = np.asarray(slide_size) / roi_size
-            if not math.isclose(ratio[0], ratio[1], rel_tol=0.01):
-                logger.warning(f"ROI size ratio is different from image data. Image size={slide_size}, ROI size={roi_size}")
-            logger.debug(f"ratio={ratio}")
-            for roi_key in rois:
-                one = rois[roi_key]
-                if one["type"] == "polygon":
+        rois = read_roi_zip(fn)
+        roi_size = get_imsize_from_imagej_roi(rois)
+        ratio = np.asarray(slide_size) / roi_size
+        if not math.isclose(ratio[0], ratio[1], rel_tol=0.01):
+            logger.warning(
+                f"ROI size ratio is different from image data. Image size={slide_size}, ROI size={roi_size}"
+            )
+        logger.debug(f"ratio={ratio}")
+        for roi_key in rois:
+            one = rois[roi_key]
+            if one["type"] == "polygon":
 
-                    an_title = one["name"]
-                    m = re.search(r"#[0-9a-fA-F]{6}", one["name"])
-                    if m is None:
-                        an_color = "#FFFFFF"
-                    else:
-                        an_color = m.group(0)
-                    # swap
-                    an_x = np.asarray(one["x"]) * ratio[0]
-                    an_y = np.asarray(one["y"]) * ratio[1]
-                    an_details = ""
-                    one_ann = dict(title=an_title, color=an_color, x_px=an_x, y_px=an_y, details=an_details)
-                    anns.append(one_ann)
+                an_title = one["name"]
+                m = re.search(r"#[0-9a-fA-F]{6}", one["name"])
+                if m is None:
+                    an_color = "#FFFFFF"
+                else:
+                    an_color = m.group(0)
+                # swap
+                an_x = np.asarray(one["x"]) * ratio[0]
+                an_y = np.asarray(one["y"]) * ratio[1]
+                an_details = ""
+                one_ann = dict(
+                    title=an_title,
+                    color=an_color,
+                    x_px=an_x,
+                    y_px=an_y,
+                    details=an_details,
+                )
+                anns.append(one_ann)
     return anns
 
 
@@ -197,7 +207,9 @@ def read_annotations_ndpa(pth) -> list:
     return data
 
 
-def plot_annotations(annotations, x_key="x", y_key="y", in_region=False, factor=[1, 1], show_id=True):
+def plot_annotations(
+    annotations, x_key="x", y_key="y", in_region=False, factor=[1, 1], show_id=True
+):
     if type(annotations) is dict:
         annotations = [annotations]
 
@@ -211,10 +223,9 @@ def plot_annotations(annotations, x_key="x", y_key="y", in_region=False, factor=
         # plt.hold(True)
         plt.plot(x, y, c=annotation["color"])
         if show_id:
-            plt.text(np.min(x), np.min(y), str(i),
-                     c=annotation["color"],
-                     fontsize="x-small"
-                     )
+            plt.text(
+                np.min(x), np.min(y), str(i), c=annotation["color"], fontsize="x-small"
+            )
 
 
 def adjust_xy_to_image_view(imsl, x_px, y_px, center, level, size):
@@ -239,6 +250,7 @@ def adjust_annotation_to_image_view(imsl, annotations, center, level, size):
 
     return output
 
+
 def annotation_px_to_mm(imsl: "openslide.OpenSlide", annotation: dict) -> dict:
     """
     Calculate x,y in mm from xy in pixels
@@ -248,6 +260,7 @@ def annotation_px_to_mm(imsl: "openslide.OpenSlide", annotation: dict) -> dict:
     """
     imsl.level_downsamples
     from scaffan.image import get_offset_px, get_pixelsize
+
     offset_px = get_offset_px(imsl)
     pixelsize, pixelunit = get_pixelsize(imsl, requested_unit="mm")
     x_px = np.asarray(annotation["x_px"])
@@ -257,6 +270,7 @@ def annotation_px_to_mm(imsl: "openslide.OpenSlide", annotation: dict) -> dict:
     annotation["x_mm"] = x_mm
     annotation["y_mm"] = y_mm
     return annotation
+
 
 def annotations_px_to_mm(imsl, annotations):
     """
@@ -273,7 +287,6 @@ def annotations_px_to_mm(imsl, annotations):
         annotation_px_to_mm(imsl, annotation)
 
     return annotations
-
 
 
 def annotations_to_px(imsl, annotations):

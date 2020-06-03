@@ -35,7 +35,9 @@ from czifile import CziFile
 
 def test_read_czi():
 
-    fn = io3d.datasets.join_path("medical/orig/scaffan-analysis-czi/J7_5/J7_5_b.czi", get_root=True)
+    fn = io3d.datasets.join_path(
+        "medical/orig/scaffan-analysis-czi/J7_5/J7_5_b.czi", get_root=True
+    )
     # fn = io3d.datasets.join_path(
     #     "medical/orig/scaffan-analysis-czi/Zeiss-scans/01_2019_11_12__RecognizedCode.czi",
     #     get_root=True)
@@ -86,32 +88,41 @@ def test_read_czi_per_partes():
 
     fn = io3d.datasets.join_path(
         "medical/orig/scaffan-analysis-czi/Zeiss-scans/01_2019_11_12__RecognizedCode.czi",
-        get_root=True)
+        get_root=True,
+    )
     requested_start = [23000, -102000]
     requested_size = [1000, 1000]
     # requested_size = [20, 20]
     requested_level = 0
 
     with CziFile(fn) as czi:
-        output1 = image_czi.read_region_with_level(czi, requested_start, size=[400, 500], level=2)
-        output0 = image_czi.read_region_with_level(czi, requested_start, size=[800, 1000], level=1)
+        output1 = image_czi.read_region_with_level(
+            czi, requested_start, size=[400, 500], level=2
+        )
+        output0 = image_czi.read_region_with_level(
+            czi, requested_start, size=[800, 1000], level=1
+        )
 
     bins = list(range(0, 260, 20))
-    dens0,_ = np.histogram(output0[:], bins=bins, density=True)
-    dens1,_ = np.histogram(output1[:], bins=bins, density=True)
-    assert pytest.approx(dens0, abs=0.1) == dens1, "Relative histograms should be almost equal"
+    dens0, _ = np.histogram(output0[:], bins=bins, density=True)
+    dens1, _ = np.histogram(output1[:], bins=bins, density=True)
+    assert (
+        pytest.approx(dens0, abs=0.1) == dens1
+    ), "Relative histograms should be almost equal"
     # plt.figure()
     # plt.imshow(output0.astype(np.uint8))
     # plt.figure()
     # plt.imshow(output1.astype(np.uint8))
     # plt.show()
 
+
 def test_read_czi_with_scaffold_data():
 
     # fn = io3d.datasets.join_path("medical/orig/scaffan-analysis-czi/J7_5/J7_5_b.czi", get_root=True)
     fn = io3d.datasets.join_path(
         "medical/orig/scaffan-analysis-czi/Zeiss-scans/01_2019_11_12__RecognizedCode.czi",
-        get_root=True)
+        get_root=True,
+    )
     logger.debug("filename {}".format(fn))
     anim = scim.AnnotatedImage(fn)
     size_px = 1000

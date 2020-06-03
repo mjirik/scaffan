@@ -25,6 +25,7 @@ logger.debug(f"exsu path: {exsu.__file__}")
 # import openslide
 import scaffan
 import scaffan.algorithm
+
 # import scaffan
 import scaffan.image
 from PyQt5 import QtWidgets
@@ -67,7 +68,9 @@ class MainGuiTest(unittest.TestCase):
         # mainapp.set_annotation_color_selection("#FF0000")
         # mainapp.set_parameter("Input;Lobulus Selection Method", "Color")
         # mainapp.set_parameter("Input;Lobulus Selection Method", 1)
-        mainapp.set_annotation_color_selection("#FFFF00", override_automatic_lobulus_selection=True)
+        mainapp.set_annotation_color_selection(
+            "#FFFF00", override_automatic_lobulus_selection=True
+        )
         mainapp.set_parameter("Processing;Skeleton Analysis", False)
         mainapp.set_parameter("Processing;Texture Analysis", False)
         mainapp.set_parameter("Processing;Scan Segmentation;HCTFS;Run Training", True)
@@ -79,7 +82,6 @@ class MainGuiTest(unittest.TestCase):
         ls = mainapp.get_parameter("Input;Lobulus Selection Method", return_value=False)
         logger.debug(f"lobulus selection={ls}")
         mainapp.start_gui(qapp=qapp)
-
 
     def test_just_start_app(self):
         # fn = io3d.datasets.join_path("medical", "orig", "CMU-1.ndpi", get_root=True)
@@ -101,8 +103,9 @@ class MainGuiTest(unittest.TestCase):
 
     # skip_on_local = True
 
-
-    def test_iteration_limited_snakes_and_texture_analysis(self, error_threshold=0.05, iterations1=10, iterations2=10, view_border=20):
+    def test_iteration_limited_snakes_and_texture_analysis(
+        self, error_threshold=0.05, iterations1=10, iterations2=10, view_border=20
+    ):
         """
         Check texture analysis. Limit snake iterations and the size of view to increase performace.
         :param error_threshold:
@@ -124,17 +127,25 @@ class MainGuiTest(unittest.TestCase):
         # auto = mainapp.get_parameter("Input;Lobulus Selection Method") == "Auto"
         # logger.debug(f"auto={auto}")
         if iterations1:
-            mainapp.set_parameter("Processing;Lobulus Segmentation;Border Segmentation;Iterations", iterations1)
+            mainapp.set_parameter(
+                "Processing;Lobulus Segmentation;Border Segmentation;Iterations",
+                iterations1,
+            )
         if iterations2:
-            mainapp.set_parameter("Processing;Lobulus Segmentation;Central Vein Segmentation;Iterations", iterations2)
+            mainapp.set_parameter(
+                "Processing;Lobulus Segmentation;Central Vein Segmentation;Iterations",
+                iterations2,
+            )
         mainapp.set_parameter(
             "Processing;Lobulus Segmentation;Manual Segmentation", False
         )
         # dont waste time with scan segmentation. It is not used in the test
-        mainapp.set_parameter("Processing;Lobulus Segmentation;Annotation Margin", view_border) # add 20%
-        mainapp.set_parameter( "Processing;Scan Segmentation", False )
-        mainapp.set_parameter( "Processing;Skeleton Analysis", True)
-        mainapp.set_parameter( "Processing;Texture Analysis", True)
+        mainapp.set_parameter(
+            "Processing;Lobulus Segmentation;Annotation Margin", view_border
+        )  # add 20%
+        mainapp.set_parameter("Processing;Scan Segmentation", False)
+        mainapp.set_parameter("Processing;Skeleton Analysis", True)
+        mainapp.set_parameter("Processing;Texture Analysis", True)
         original_foo = scaffan.image.AnnotatedImage.get_annotations_by_color
         # with patch.object(scaffan.image.AnnotatedImage, 'select_annotations_by_color', autospec=True) as mock_foo:
         #     def side_effect(anim_, annid, *args, **kwargs):
@@ -189,11 +200,13 @@ class MainGuiTest(unittest.TestCase):
         # if iterations2:
         #     mainapp.set_parameter("Processing;Lobulus Segmentation;Central Vein Segmentation;Iterations", iterations2)
         # Use manual annotations
-        mainapp.set_parameter("Processing;Lobulus Segmentation;Manual Segmentation", True)
+        mainapp.set_parameter(
+            "Processing;Lobulus Segmentation;Manual Segmentation", True
+        )
         # dont waste time with scan segmentation. It is not used in the test
-        mainapp.set_parameter( "Processing;Scan Segmentation", False )
-        mainapp.set_parameter( "Processing;Skeleton Analysis", False )
-        mainapp.set_parameter( "Processing;Texture Analysis", False )
+        mainapp.set_parameter("Processing;Scan Segmentation", False)
+        mainapp.set_parameter("Processing;Skeleton Analysis", False)
+        mainapp.set_parameter("Processing;Texture Analysis", False)
 
         mainapp.run_lobuluses()
         self.assert_dice_in_first_evaluated_data(mainapp, error_threshold)
@@ -504,7 +517,9 @@ class MainGuiTest(unittest.TestCase):
         # logger.debug(f"classificator prior modification time: {modtime1}")
         # assert modtime0 == modtime1, "We are not changing the pretrained classifier file"
 
+
 # @pytest.mark.parametrize("fn_yellow")
+
 
 @unittest.skipIf(os.environ.get("TRAVIS", True), "Skip on Travis-CI")
 def test_run_lobuluses():
@@ -518,9 +533,11 @@ def test_run_lobuluses():
 def test_run_lobuluses_czi():
     # TODO fix test
     fn = io3d.datasets.join_path(
-        "medical/orig/scaffan-analysis-czi/Zeiss-scans/05_2019_11_12__-1-2.czi", get_root=True
+        "medical/orig/scaffan-analysis-czi/Zeiss-scans/05_2019_11_12__-1-2.czi",
+        get_root=True,
     )
     run_on_yellow(fn)
+
 
 def run_on_yellow(fn_yellow):
     # imsl = openslide.OpenSlide(fn)
@@ -536,9 +553,13 @@ def run_on_yellow(fn_yellow):
     mainapp.set_parameter("Input;Lobulus Selection Method", "Color")
     mainapp.set_annotation_color_selection("#FFFF00")
     mainapp.run_lobuluses()
-    assert 0.6 < mainapp.evaluation.evaluation_history[0]["Lobulus Border Dice"], "Lobulus segmentation should have Dice coefficient above some low level"
+    assert (
+        0.6 < mainapp.evaluation.evaluation_history[0]["Lobulus Border Dice"]
+    ), "Lobulus segmentation should have Dice coefficient above some low level"
     # self.assertLess(0.6, mainapp.evaluation.evaluation_history[1]["Lobulus Border Dice"],
     #                 "Lobulus segmentation should have Dice coefficient above some low level")
-    assert 0.2 < mainapp.evaluation.evaluation_history[0]["Central Vein Dice"], "Central Vein segmentation should have Dice coefficient above some low level"
+    assert (
+        0.2 < mainapp.evaluation.evaluation_history[0]["Central Vein Dice"]
+    ), "Central Vein segmentation should have Dice coefficient above some low level"
     # self.assertLess(0.5, mainapp.evaluation.evaluation_history[1]["Central Vein Dice"],
     #                 "Central Vein should have Dice coefficient above some low level")

@@ -19,6 +19,7 @@ import scaffan.image
 import scaffan.lobulus
 import exsu
 from unittest.mock import patch
+
 path_to_dir = Path(__file__).parent
 import pytest
 
@@ -44,7 +45,10 @@ class LobulusTest(unittest.TestCase):
         # Yellow
 
         original_foo = scaffan.image.AnnotatedImage.get_annotations_by_color
-        with patch.object(scaffan.image.AnnotatedImage, 'select_annotations_by_color', autospec=True) as mock_foo:
+        with patch.object(
+            scaffan.image.AnnotatedImage, "select_annotations_by_color", autospec=True
+        ) as mock_foo:
+
             def side_effect(sf, annid, *args, **kwargs):
                 logger.debug("mocked function select_annotations_by_color()")
                 original_list = original_foo(sf, annid, *args, **kwargs)
@@ -135,7 +139,15 @@ def test_get_lobulus_mask():
     # plt.show()
 
     # this is for testing
-    assert np.sum(lob_proc.annotation_mask) > 100, "segmentation should have more than 100 px"
-    assert np.sum(lob_proc.lobulus_mask) > 100, "segmentation should have more than 100 px"
-    assert np.sum(lob_proc.central_vein_mask) > 0, "segmentation should have more than 0 px"
-    assert np.sum(lob_proc.annotation_mask) < np.sum(lob_proc.lobulus_mask), "annotation should be smaller than lobulus"
+    assert (
+        np.sum(lob_proc.annotation_mask) > 100
+    ), "segmentation should have more than 100 px"
+    assert (
+        np.sum(lob_proc.lobulus_mask) > 100
+    ), "segmentation should have more than 100 px"
+    assert (
+        np.sum(lob_proc.central_vein_mask) > 0
+    ), "segmentation should have more than 0 px"
+    assert np.sum(lob_proc.annotation_mask) < np.sum(
+        lob_proc.lobulus_mask
+    ), "annotation should be smaller than lobulus"

@@ -29,6 +29,7 @@ from pyqtgraph.parametertree import Parameter, ParameterTree
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
+
 # matplotlib.use('Qt5Agg')
 
 # print("start 6")
@@ -46,10 +47,7 @@ from . import sni_prediction
 
 
 class Scaffan:
-    def __init__(
-            self,
-            whole_scan_margin=-0.0
-    ):
+    def __init__(self, whole_scan_margin=-0.0):
         """
 
         :param whole_scan_margin: negative value makes the the area for automatic lobuli selection smaller. It is used in
@@ -79,7 +77,9 @@ class Scaffan:
         self.skeleton_analysis = scaffan.skeleton_analysis.SkeletonAnalysis()
         self.evaluation = scaffan.evaluation.Evaluation()
         self.intensity_rescale = RescaleIntensityPercentilePQG()
-        self.slide_segmentation = scaffan.slide_segmentation.ScanSegmentation(report=self.report)
+        self.slide_segmentation = scaffan.slide_segmentation.ScanSegmentation(
+            report=self.report
+        )
         # self.slide_segmentation.report = self.report
 
         # self.lobulus_processing.set_report(self.report)
@@ -108,20 +108,19 @@ class Scaffan:
                         "name": "Lobulus Selection Method",
                         "type": "list",
                         "value": "Auto",
-
-                        "values": ["Color","Manual", "Auto"],
-                            # "Color": "Color",
-                            # "Manual": "Manual",
-                            # "Auto": "Auto",
+                        "values": ["Color", "Manual", "Auto"],
+                        # "Color": "Color",
+                        # "Manual": "Manual",
+                        # "Auto": "Auto",
                         # },
                         "tip": "Auto: select lobulus based on Scan Segmentation.\n"
-                               "Color: based on annotation color.\n"
-                               "Manual: manually pick the lobule. \n\n" +
-                       "The annotations from `.ndpi` files are automatically imported.\n " +
-                       "The annotattion for other image format are expected to be done in ImageJ ROI Manager.\n"
-                       "File with annotations for is expected to be in the same dir and same name "
-                       "with file extension `.roi.zip`. \n"
-                       "Color of segmentation can be part of the polyon name ('my annotation #00FF00')"
+                        "Color: based on annotation color.\n"
+                        "Manual: manually pick the lobule. \n\n"
+                        + "The annotations from `.ndpi` files are automatically imported.\n "
+                        + "The annotattion for other image format are expected to be done in ImageJ ROI Manager.\n"
+                        "File with annotations for is expected to be in the same dir and same name "
+                        "with file extension `.roi.zip`. \n"
+                        "Color of segmentation can be part of the polyon name ('my annotation #00FF00')",
                     },
                     # {
                     #     "name": "Lobulus Selection Method",
@@ -133,8 +132,8 @@ class Scaffan:
                         "name": "Annotation Color",
                         "type": "list",
                         "tip": "Select lobulus based on annotation color. "
-                               "Color of the annotation from ImageJ is expected to be part of the polyon name ('my annotation #00FF00')"
-                               "Skipped if Automatic Lobulus Selection Method is used.",
+                        "Color of the annotation from ImageJ is expected to be part of the polyon name ('my annotation #00FF00')"
+                        "Skipped if Automatic Lobulus Selection Method is used.",
                         "values": {
                             "None": None,
                             "White": "#FFFFFF",
@@ -270,8 +269,8 @@ class Scaffan:
             None,
             "Select Input File",
             directory=default_dir,
-            filter="Images (*.ndpi *.czi *.tif *.tiff);;NanoZoomer Digital Pathology Image (*.ndpi);;" +
-                   "Zeiss Image format for microscopes (*.czi);;Tiff image (*.tiff *.tif)",
+            filter="Images (*.ndpi *.czi *.tif *.tiff);;NanoZoomer Digital Pathology Image (*.ndpi);;"
+            + "Zeiss Image format for microscopes (*.czi);;Tiff image (*.tiff *.tif)",
         )
         self.set_input_file(fn)
 
@@ -519,7 +518,6 @@ class Scaffan:
                 self.slide_segmentation.add_biggest_to_annotations()
                 annotation_ids = self.slide_segmentation.ann_biggest_ids
 
-
         if annotation_ids is None:
             raise NoLobulusSelectionUsedError
         logger.debug("Annotation IDs: {}".format(annotation_ids))
@@ -665,16 +663,26 @@ class Scaffan:
     def manual_select(self):
         logger.debug("Manual selection")
         # full_view = self.anim.get_full_view()
-        full_view = self.anim.get_view(location=[0,0], level=0, size_on_level=self.anim.get_slide_size()[::-1])
+        full_view = self.anim.get_view(
+            location=[0, 0], level=0, size_on_level=self.anim.get_slide_size()[::-1]
+        )
         pxsz_mm = float(self.get_parameter("Processing;Preview Pixelsize")) * 1000
         view_corner = full_view.to_pixelsize(pixelsize_mm=[pxsz_mm, pxsz_mm])
-        logger.debug(f"Manual selection1, view.loc={full_view.region_location}, view.size={full_view.region_size_on_level}, pxsz={full_view.region_pixelsize}")
-        logger.debug(f"Manual selection2, view.loc={view_corner.region_location}, view.size={view_corner.region_size_on_level}, pxsz={view_corner.region_pixelsize}")
+        logger.debug(
+            f"Manual selection1, view.loc={full_view.region_location}, view.size={full_view.region_size_on_level}, pxsz={full_view.region_pixelsize}"
+        )
+        logger.debug(
+            f"Manual selection2, view.loc={view_corner.region_location}, view.size={view_corner.region_size_on_level}, pxsz={view_corner.region_pixelsize}"
+        )
         img = view_corner.get_region_image(as_gray=False)
         plt.ioff()
         fig = plt.figure(figsize=(12, 8))
-        fig.canvas.set_window_title("Select lobules. Left/Middle/Right Mouse Button: add/quit/remove")
-        logger.debug(f"Manual selection2 backend={matplotlib.get_backend()}, ion={matplotlib.is_interactive()}, img.shape={img.shape}, img.max={np.max(img)}")
+        fig.canvas.set_window_title(
+            "Select lobules. Left/Middle/Right Mouse Button: add/quit/remove"
+        )
+        logger.debug(
+            f"Manual selection2 backend={matplotlib.get_backend()}, ion={matplotlib.is_interactive()}, img.shape={img.shape}, img.max={np.max(img)}"
+        )
         plt.imshow(img)
         # plt.ginput(1)
         # plt.axis("image")
@@ -685,28 +693,29 @@ class Scaffan:
         plt.close(fig)
         logger.debug(f"Manual selection5, centers_px={points_px}")
 
-
-
         # points_px = np.asarray(centers_px)
         from scaffan.image import get_offset_px, get_pixelsize
 
         # offset_px = get_offset_px(self.anim)
         # pixelsize, pixelunit = get_pixelsize(self.anim, requested_unit="mm")
-        x_px_view =  points_px[:,0].flatten()
-        y_px_view =  points_px[:,1].flatten()
+        x_px_view = points_px[:, 0].flatten()
+        y_px_view = points_px[:, 1].flatten()
         # x_px = (x_px_view*view_corner.zoom[0] + offset_px[0])
         # y_px = (y_px_view*view_corner.zoom[1] + offset_px[1])
         # pts_glob_px = [x_px, y_px]
 
-        pts_glob_px = view_corner.coords_view_px_to_glob_px(
-            x_px_view, y_px_view
-        )
+        pts_glob_px = view_corner.coords_view_px_to_glob_px(x_px_view, y_px_view)
         centers_px = list(zip(*pts_glob_px))
         logger.debug(f"Manual selection5, centers_px_global={centers_px}")
         # centers_px = list(zip(*pts_glob_px))
-        r_mm = float(self.get_parameter("Processing;Scan Segmentation;Annotation Radius")) * 1000
+        r_mm = (
+            float(self.get_parameter("Processing;Scan Segmentation;Annotation Radius"))
+            * 1000
+        )
 
-        ann_ids, _ = scaffan.slide_segmentation.add_circle_annotation(view_corner, centers_px, annotations=self.anim.annotations, r_mm=r_mm)
+        ann_ids, _ = scaffan.slide_segmentation.add_circle_annotation(
+            view_corner, centers_px, annotations=self.anim.annotations, r_mm=r_mm
+        )
         view_corner.set_annotations(self.anim.annotations)
         view_corner.adjust_annotation_to_image_view()
         # logger.debug(f"annotations={self.anim.annotations}")

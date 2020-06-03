@@ -135,7 +135,6 @@ class WholeSlideSegmentationUNet:
         :return:
         """
 
-
         model = self.model
 
         t0 = time.time()

@@ -469,7 +469,7 @@ def test_get_all_black_annotations_in_view_around_hole(anim_scp003):
     # Find inner hole ids
     outer_ids, holes_ids = anim.select_just_outer_annotations("#000000")
 
-    #take first hole to get view
+    # take first hole to get view
     view = anim.get_view(annotation_id=holes_ids[0][0], level=5)
     ann_raster = view.get_annotation_raster_by_color("#000000")
     # plt.imshow(ann_raster)
@@ -487,7 +487,7 @@ def test_view_by_pixelsize_and_size_on_level(anim_scp003):
         annotation_id=ann_ids[0],
         size_on_level=[size_px, size_px],
         pixelsize_mm=[0.01, 0.01],
-        margin=0
+        margin=0,
     )
     img = view.get_region_image(as_gray=True)
     # plt.imshow(img)

@@ -69,6 +69,7 @@ def fix_location_ndpi(imsl, location, level):
         (location - np.mod(location, imsl.level_downsamples[level])).astype(np.int)
     )
 
+
 def fix_location_czi(imsl, location, level):
     return list(np.asarray(location) - imsl._czi_start)
     # return list(
@@ -77,7 +78,9 @@ def fix_location_czi(imsl, location, level):
 
 
 # def
-def get_image_by_center(imsl, center, level=3, size=None, as_gray=True, do_fix_location=True):
+def get_image_by_center(
+    imsl, center, level=3, size=None, as_gray=True, do_fix_location=True
+):
     if size is None:
         size = np.array([800, 800])
 
@@ -157,8 +160,6 @@ def get_pixelsize(imsl, level=0, requested_unit="mm"):
     return pixelsize, pixelunit
 
 
-
-
 # def annoatation_px_to_mm(imsl: openslide.OpenSlide, annotation: dict) -> dict:
 
 
@@ -178,12 +179,14 @@ def get_resize_parameters(imsl, former_level, former_size, new_level):
     new_size = (np.asarray(former_size) * scale_factor).astype(np.int)
     return scale_factor, new_size
 
-class ImageSlide():
+
+class ImageSlide:
     """
     Same interface as OpenSlide for images with other format (.tiff and .czi).
     """
+
     def __init__(self, path):
-        self.openslide:openslide.OpenSlide = None
+        self.openslide: openslide.OpenSlide = None
         self.path = path
         self.imagedata = None
         self.properties = None
@@ -194,7 +197,7 @@ class ImageSlide():
             self.get_thumbnail = self._get_thumbnail_tiff
             self.read_region = self._read_region_other_than_ndpi
             self._set_properties_tiff()
-            self.level_downsamples = [float(2**i) for i in range(0, 8)]
+            self.level_downsamples = [float(2 ** i) for i in range(0, 8)]
             self.level_count = len(self.level_downsamples)
 
         if Path(self.path).suffix.lower() in (".czi"):
@@ -243,6 +246,7 @@ class ImageSlide():
 
     def _get_imagedata_czi(self):
         from czifile import CziFile
+
         if self.imagedata is None:
             with CziFile(self.path) as czi:
                 image_arrays = czi.asarray()
@@ -265,14 +269,14 @@ class ImageSlide():
         :return:
         """
         img = self._get_imagedata()
-        factor = int(2**level)
+        factor = int(2 ** level)
         # factor = self.level_downsamples[level]
 
         newshape = list(img.shape)
         newshape[0] = size[0]
         newshape[1] = size[1]
-        sl0 = slice(location[0], location[0] + (size[0]*factor))
-        sl1 = slice(location[1], location[1] + (size[1]*factor))
+        sl0 = slice(location[0], location[0] + (size[0] * factor))
+        sl1 = slice(location[1], location[1] + (size[1] * factor))
         imcrop = img[sl0, sl1].copy()
         logger.debug(f"imcrop.shape={imcrop.shape}, newshape={newshape}")
         out = skimage.transform.resize(imcrop, newshape)
@@ -281,6 +285,7 @@ class ImageSlide():
     def _read_region_nzi(self, location, level, size):
         from czifile import CziFile
         from . import image_czi
+
         image_czi.instal_codecs_with_pip()
 
         # This swap make all the behavior compatible with OpenSlide
@@ -289,20 +294,23 @@ class ImageSlide():
             location = [location[1], location[0]]
             size = [size[1], size[0]]
 
-        factor = int(2**level)
+        factor = int(2 ** level)
         # factor = self.level_downsamples[level]
 
         with CziFile(self.path) as czi:
 
             location_fixed = np.asarray(location) + self._czi_start
             # self._czi_start = czi.start[-3:-1]
-            output = image_czi.read_region_with_level(czi, location_fixed, size, level=level)
+            output = image_czi.read_region_with_level(
+                czi, location_fixed, size, level=level
+            )
         return output
 
     def _set_properties_czi(self):
         import xml
         import xml.etree.ElementTree as ET
         from czifile import CziFile
+
         # from lxml import etree
 
         with CziFile(self.path) as czi:
@@ -319,8 +327,8 @@ class ImageSlide():
         meta_dict = {}
         logger.debug(f"nzi pixelsize  {xres}x{yres} [m]")
         meta_dict["tiff.ResolutionUnit"] = "m"
-        meta_dict["tiff.XResolution"] = 1/xres
-        meta_dict["tiff.YResolution"] = 1/yres
+        meta_dict["tiff.XResolution"] = 1 / xres
+        meta_dict["tiff.YResolution"] = 1 / yres
         meta_dict["openslide.level[0].height"] = self._czi_shape[0]
         meta_dict["openslide.level[0].width"] = self._czi_shape[1]
         meta_dict["hamamatsu.XOffsetFromSlideCentre"] = -int(self._czi_shape[0] / 2)
@@ -335,7 +343,10 @@ class ImageSlide():
 
         unit_multiplicator = 1
         if "ImageDescription" in meta_dict:
-            key_value = [couplestring.split("=") for couplestring in meta_dict["ImageDescription"][0].split("\n")]
+            key_value = [
+                couplestring.split("=")
+                for couplestring in meta_dict["ImageDescription"][0].split("\n")
+            ]
             image_description = {kv[0]: kv[1] for kv in key_value if len(kv) > 1}
 
             if "unit" in image_description:
@@ -373,8 +384,6 @@ class ImageSlide():
     #         return self.openslide.get_thumbnail(size)
 
 
-
-
 class AnnotatedImage:
     """
     Read the image and the annotation. The
@@ -389,7 +398,7 @@ class AnnotatedImage:
         # pth_encoded = path.encode(fs_enc)
         # path.encode()
         # logger.debug(f"path encoded {pth_encoded}")
-        self.image_type:str = Path(self.path).suffix.lower()
+        self.image_type: str = Path(self.path).suffix.lower()
         if self.image_type in (".tiff", ".tif"):
             self.image_type = ".tiff"
         self.openslide: ImageSlide = ImageSlide(path)
@@ -399,8 +408,8 @@ class AnnotatedImage:
         self.region_pixelsize = None
         self.region_pixelunit = None
         self.pixelunit = "mm"
-        self.level_pixelsize:list = None
-        self.level_pixelsize_derived_from_resolution_on_level_0:bool = False
+        self.level_pixelsize: list = None
+        self.level_pixelsize_derived_from_resolution_on_level_0: bool = False
         self._set_level_pixelsize()
 
         if not skip_read_annotations:
@@ -425,11 +434,12 @@ class AnnotatedImage:
         """
         if pixelsize_on_level_0 is not None:
             pixelsize_on_level_0 = np.asarray(pixelsize_on_level_0)
-            self.level_pixelsize = [pixelsize_on_level_0/float(2**i) for i in range(0, 7)]
+            self.level_pixelsize = [
+                pixelsize_on_level_0 / float(2 ** i) for i in range(0, 7)
+            ]
             self.level_pixelsize_derived_from_resolution_on_level_0 = True
         else:
             self._set_level_pixelsize_with_openslide()
-
 
     def _set_level_pixelsize_with_openslide(self):
 
@@ -513,8 +523,13 @@ class AnnotatedImage:
     def get_image_by_center(self, center, level=3, size=None, as_gray=True):
         do_fix_location = True if self.image_type == ".ndpi" else False
         img = get_image_by_center(
-            self.openslide, center, level, size, as_gray,
-            do_fix_location=do_fix_location)
+            self.openslide,
+            center,
+            level,
+            size,
+            as_gray,
+            do_fix_location=do_fix_location,
+        )
         if self.run_intensity_rescale:
             img = self.intensity_rescaler.rescale_intensity(img)
         return img
@@ -534,11 +549,15 @@ class AnnotatedImage:
         if self.image_type == ".ndpi":
             self.annotations = scan.read_annotations_ndpa(self.path)
             self.annotations = scan.annotations_to_px(self.openslide, self.annotations)
-        else: #if self.image_type == ".tiff":
+        else:  # if self.image_type == ".tiff":
             slide_size = self.get_slide_size()
             # pxsz, unit = self.get_pixel_size(0)
-            self.annotations = scan.read_annotations_imagej(self.path, slide_size=slide_size)
-            self.annotations = scan.annotations_px_to_mm(self.openslide, self.annotations)
+            self.annotations = scan.read_annotations_imagej(
+                self.path, slide_size=slide_size
+            )
+            self.annotations = scan.annotations_px_to_mm(
+                self.openslide, self.annotations
+            )
 
             # self.annotations = scan.annotations(self.openslide, self.annotations)
         self.id_by_titles = scan.annotation_titles(self.annotations)
@@ -552,23 +571,23 @@ class AnnotatedImage:
         return (np.mean(ann["x_mm"]), np.mean(ann["y_mm"]))
 
     def get_full_view(
-            self,
-            level=0,
-            pixelsize_mm=None,
-            safety_bound=2,
-            margin=0.0,
-            # margin_in_pixels=False,
-            # annotation_id=None,
-            # margin=0.5,
-            # margin_in_pixels=False,
-            ) -> "View":
+        self,
+        level=0,
+        pixelsize_mm=None,
+        safety_bound=2,
+        margin=0.0,
+        # margin_in_pixels=False,
+        # annotation_id=None,
+        # margin=0.5,
+        # margin_in_pixels=False,
+    ) -> "View":
 
         height0 = self.openslide.properties["openslide.level[0].height"]
         width0 = self.openslide.properties["openslide.level[0].width"]
         size_on_level = np.array([int(height0), int(width0)])
         # size_on_level = np.array([int(width0), int(height0)])
-        view_level0 =  self.get_view(
-            location=[0,0],
+        view_level0 = self.get_view(
+            location=[0, 0],
             level=0,
             size_on_level=size_on_level,
             margin=margin,
@@ -576,15 +595,13 @@ class AnnotatedImage:
         )
         if pixelsize_mm is not None:
             view = view_level0.to_pixelsize(
-                pixelsize_mm=pixelsize_mm,
-                safety_bound=safety_bound,
+                pixelsize_mm=pixelsize_mm, safety_bound=safety_bound,
             )
         elif level is not None:
             view = view_level0.to_level(level)
         else:
             view = view_level0
         return view
-
 
     def get_view(
         self,
@@ -711,8 +728,11 @@ class AnnotatedImage:
         return ids
 
     def select_just_outer_annotations(
-        self, color, return_holes=True, ann_ids: List[int] = None,
-            raise_exception_if_not_found=True
+        self,
+        color,
+        return_holes=True,
+        ann_ids: List[int] = None,
+        raise_exception_if_not_found=True,
     ) -> List:
         """
         Select outer annotation and skip all inner annotations with same color. Put inner annotations to list of holes.
@@ -721,7 +741,11 @@ class AnnotatedImage:
         :param ann_ids: put inside pre-filtered list of annotations
         :return:
         """
-        ann_ids = self.get_annotations_by_color(color, ann_ids=ann_ids, raise_exception_if_not_found=raise_exception_if_not_found)
+        ann_ids = self.get_annotations_by_color(
+            color,
+            ann_ids=ann_ids,
+            raise_exception_if_not_found=raise_exception_if_not_found,
+        )
         if len(ann_ids) > 0:
             ann_pairs = [
                 [aid, self.select_inner_annotations(aid, ann_ids=ann_ids)]
@@ -813,11 +837,15 @@ class AnnotatedImage:
         :return:
         """
         scan.adjust_annotation_to_image_view(
-            self.openslide, self.annotations, self.region_center, self.region_level, self.region_size
+            self.openslide,
+            self.annotations,
+            self.region_center,
+            self.region_level,
+            self.region_size,
         )
 
     def select_annotations_by_color(
-            self, id, raise_exception_if_not_found=True, ann_ids=None
+        self, id, raise_exception_if_not_found=True, ann_ids=None
     ):
         """
 
@@ -826,12 +854,15 @@ class AnnotatedImage:
         :param ann_ids:
         :return:
         """
-        logger.warning("Function select_annotations_by_color is deprecated. Use get_annotations_by_color instead.")
+        logger.warning(
+            "Function select_annotations_by_color is deprecated. Use get_annotations_by_color instead."
+        )
         self.get_annotations_by_color(
             id,
             raise_exception_if_not_found=raise_exception_if_not_found,
-            ann_ids=ann_ids
+            ann_ids=ann_ids,
         )
+
     def get_annotations_by_color(
         self, id, raise_exception_if_not_found=True, ann_ids=None
     ):
@@ -917,7 +948,9 @@ class AnnotatedImage:
 
     def get_region_image(self, as_gray=False, as_unit8=False):
 
-        location = fix_location_ndpi(self.openslide, self.region_location, self.region_level)
+        location = fix_location_ndpi(
+            self.openslide, self.region_location, self.region_level
+        )
         imcr = self.openslide.read_region(
             location, level=self.region_level, size=self.region_size
         )
@@ -1040,7 +1073,7 @@ class View:
         location_mm=None,
         safety_bound=2,
         annotation_id=None,
-            # margin=0.5,
+        # margin=0.5,
         margin=0.0,
         margin_in_pixels: bool = False,
     ):
@@ -1083,7 +1116,9 @@ class View:
         if annotation_id is not None:
             center, size_on_level0 = self.anim.get_annotations_bounds_px(annotation_id)
             if size_on_level is None and size_mm is None:
-                size_on_level = (size_on_level0 / self.anim.openslide.level_downsamples[level]).astype(np.int)
+                size_on_level = (
+                    size_on_level0 / self.anim.openslide.level_downsamples[level]
+                ).astype(np.int)
 
         if size_mm is not None:
             if np.isscalar(size_mm):
@@ -1101,12 +1136,13 @@ class View:
         size_on_level = np.asarray(size_on_level)
 
         ## every size is now converted to size_on_level
-        size_on_level, margin_px_on_level = self._calculate_size_based_on_margin(size_on_level, margin, margin_in_pixels)
-
+        size_on_level, margin_px_on_level = self._calculate_size_based_on_margin(
+            size_on_level, margin, margin_in_pixels
+        )
 
         self.region_level = level
         self.region_size_on_level = size_on_level
-        self.zoom:np.ndarray # additional zoom to size on level
+        self.zoom: np.ndarray  # additional zoom to size on level
 
         if pixelsize_mm is not None:
             pxsz = self.get_pixelsize_on_level(level)[0]
@@ -1147,8 +1183,10 @@ class View:
         # scan.adjust_annotation_to_image_view(
         #     self.anim.openslide, self.annotations, center, level, size_on_level
         # )
+
     def set_annotations(self, annotations):
         import copy
+
         self.annotations = copy.deepcopy(annotations)
         self.adjust_annotation_to_image_view()
 
@@ -1158,29 +1196,36 @@ class View:
         :return:
         """
         scan.adjust_annotation_to_image_view(
-            self.anim.openslide, self.annotations, self.region_center, self.region_level, self.region_size_on_level
+            self.anim.openslide,
+            self.annotations,
+            self.region_center,
+            self.region_level,
+            self.region_size_on_level,
         )
 
-    def _get_margin_px(self, size_on_level, margin, margin_in_pixels:bool):
+    def _get_margin_px(self, size_on_level, margin, margin_in_pixels: bool):
         if margin_in_pixels:
             margin_px = int(margin)
         else:
             margin_px = (size_on_level * margin).astype(
                 np.int
-            ) # / self.anim.openslide.level_downsamples[level]
+            )  # / self.anim.openslide.level_downsamples[level]
         return margin_px
 
-    def _calculate_size_based_on_margin(self, size_on_level, margin, margin_in_pixels:bool):
-        margin_px_on_level = self._get_margin_px(size_on_level, margin, margin_in_pixels)
+    def _calculate_size_based_on_margin(
+        self, size_on_level, margin, margin_in_pixels: bool
+    ):
+        margin_px_on_level = self._get_margin_px(
+            size_on_level, margin, margin_in_pixels
+        )
         # if (size_on_level is None) and (size_mm is None):
         # if (size_on_level is None) and (size_mm is None):
-        size_on_level = (size_on_level
-                    # (size_on_level0 / self.anim.openslide.level_downsamples[level])
-                    + 2 * margin_px_on_level
+        size_on_level = (
+            size_on_level
+            # (size_on_level0 / self.anim.openslide.level_downsamples[level])
+            + 2 * margin_px_on_level
         ).astype(int)
         return size_on_level, margin_px_on_level
-
-
 
     def get_pixelsize_on_level(self, level=None):
         if level is None:
@@ -1242,7 +1287,9 @@ class View:
             ann_raster = ann_raster ^ ann_raster2
         return ann_raster
 
-    def get_annotation_raster_by_color(self, color, make_holes=True, raise_exception_if_not_found:bool=False):
+    def get_annotation_raster_by_color(
+        self, color, make_holes=True, raise_exception_if_not_found: bool = False
+    ):
         """
         Prepare raster image with all annotation with the defined color
         :param color: requested annotation color
@@ -1250,21 +1297,20 @@ class View:
         :param raise_exception_if_not_found: control the exception. It is raised if the color is not found.
         :return:
         """
-        outer_ids, holes_ids = self.anim.select_just_outer_annotations(color=color, raise_exception_if_not_found=raise_exception_if_not_found)
+        outer_ids, holes_ids = self.anim.select_just_outer_annotations(
+            color=color, raise_exception_if_not_found=raise_exception_if_not_found
+        )
         # segmentation_one_color = None
         # polygon_x = self.annotations[annotation_id]["region_x_px"] * self.zoom[0]
         # polygon_y = self.annotations[annotation_id]["region_y_px"] * self.zoom[1]
         # TODO swap axes
         segmentation_one_color = np.zeros(
-            [self.region_size_on_pixelsize_mm[1],self.region_size_on_pixelsize_mm[0]],
-            dtype=np.uint8
-
+            [self.region_size_on_pixelsize_mm[1], self.region_size_on_pixelsize_mm[0]],
+            dtype=np.uint8,
         )
         for outer_id, hole_ids in zip(outer_ids, holes_ids):
             if make_holes:
-                ann_raster = self.get_annotation_raster(
-                    outer_id, holes_ids=hole_ids
-                )
+                ann_raster = self.get_annotation_raster(outer_id, holes_ids=hole_ids)
             else:
                 ann_raster = self.get_annotation_raster(outer_id)
             # if segmentation_one_color is None:
@@ -1476,15 +1522,15 @@ class View:
         return img_copy
 
     def get_full_view(
-            self,
-            level=None,
-            pixelsize_mm=None,
-            safety_bound=2,
-            margin=0.0,
-            margin_in_pixels=False,
-            # annotation_id=None,
-            # margin=0.5,
-            # margin_in_pixels=False,
+        self,
+        level=None,
+        pixelsize_mm=None,
+        safety_bound=2,
+        margin=0.0,
+        margin_in_pixels=False,
+        # annotation_id=None,
+        # margin=0.5,
+        # margin_in_pixels=False,
     ) -> "View":
         self.anim.get_full_view(
             level=level,
@@ -1507,7 +1553,7 @@ def imshow_with_colorbar(*args, **kwargs):
     plt.colorbar(im, cax=cax)
 
 
-def get_offset_px(imsl:ImageSlide):
+def get_offset_px(imsl: ImageSlide):
 
     pm = imsl.properties
     pixelsize, pixelunit = get_pixelsize(imsl, requested_unit="mm")

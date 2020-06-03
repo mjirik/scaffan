@@ -201,7 +201,7 @@ def nogui(input_path, color, output_path, params):
 
 # def install():
 def create_icon(
-        app_name: str, icon_filename=None, conda_env_name=None, package_name=None
+    app_name: str, icon_filename=None, conda_env_name=None, package_name=None
 ):
     """
 

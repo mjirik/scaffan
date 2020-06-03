@@ -17,10 +17,10 @@ import numpy as np
 def test_image_intensity_rescale():
     # img = skimage.data.astronaut()
     # img = skimage.data.chelsea()
-    img = np.random.rand(*[120,80,3])
-    img[10:30, 30:50,:] += 0.4
+    img = np.random.rand(*[120, 80, 3])
+    img[10:30, 30:50, :] += 0.4
     img[50:70, 10:40, 0] += 0.6
-    img = (img*255).astype(np.uint8)
+    img = (img * 255).astype(np.uint8)
 
     rescaler = image_intensity_rescale.RescaleIntensityPercentile()
     rescaler.calculate_intensity_dependent_parameters(img)

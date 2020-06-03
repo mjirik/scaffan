@@ -9,6 +9,7 @@ import io3d
 from pathlib import Path
 import unittest.mock
 from unittest.mock import patch
+
 path_to_script = Path(__file__).parent
 
 
@@ -28,8 +29,12 @@ def test_cli():
     runner = click.testing.CliRunner()
     # runner.invoke(anwa.main_click.nogui, ["-i", str(pth)])
     import scaffan.image
+
     original_foo = scaffan.image.AnnotatedImage.get_annotations_by_color
-    with patch.object(scaffan.image.AnnotatedImage, 'select_annotations_by_color', autospec=True) as mock_foo:
+    with patch.object(
+        scaffan.image.AnnotatedImage, "select_annotations_by_color", autospec=True
+    ) as mock_foo:
+
         def side_effect(*args, **kwargs):
             logger.debug("mocked function select_annotations_by_color()")
             original_list = original_foo(*args, **kwargs)

@@ -22,8 +22,9 @@ def instal_codecs_with_pip():
         import imagecodecs
 
 
-
-def get_py_slices(subb, requested_start, requested_size_on_level0, output_downscale_factor:int=1):
+def get_py_slices(
+    subb, requested_start, requested_size_on_level0, output_downscale_factor: int = 1
+):
     """
 
 
@@ -53,37 +54,26 @@ def get_py_slices(subb, requested_start, requested_size_on_level0, output_downsc
 
         st_in_s = np.max(np.vstack([r_st - s_st, [0, 0]]), axis=0).astype(int)
         sp_in_s = np.min(np.vstack([r_st + r_sh - s_st, s_sh]), axis=0).astype(int)
-        st_in_sn= np.max(np.vstack([(r_st - s_st)/odf, [0, 0]]), axis=0).astype(int)
-        sp_in_sn= np.min(np.vstack([(r_st + r_sh - s_st)/odf, s_sh/odf]), axis=0).astype(int)
-        st_in_r = np.max(np.vstack([(s_st - r_st)/odf, [0, 0]]), axis=0).astype(int)
-        sp_in_r = np.min(np.vstack([(s_st - r_st + s_sh)/odf, r_sh/odf]), axis=0).astype(int)
+        st_in_sn = np.max(np.vstack([(r_st - s_st) / odf, [0, 0]]), axis=0).astype(int)
+        sp_in_sn = np.min(
+            np.vstack([(r_st + r_sh - s_st) / odf, s_sh / odf]), axis=0
+        ).astype(int)
+        st_in_r = np.max(np.vstack([(s_st - r_st) / odf, [0, 0]]), axis=0).astype(int)
+        sp_in_r = np.min(
+            np.vstack([(s_st - r_st + s_sh) / odf, r_sh / odf]), axis=0
+        ).astype(int)
         # if ((s_st - r_st) % odf != [0, 0]).any():
         #     logger.warning("Problem with downlscale factor. Indices should be int")
         # if (r_sh % odf != [0, 0]).any():
         #     logger.warning("Problem with downlscale factor. Indices should be int")
-        sl_s = (
-            slice(st_in_s[0], sp_in_s[0]),
-            slice(st_in_s[1], sp_in_s[1])
-        )
-        sl_r = (
-            slice(st_in_r[0], sp_in_r[0]),
-            slice(st_in_r[1], sp_in_r[1])
-        )
-        size_r = (
-            -(st_in_r[0] - sp_in_r[0]),
-            -(st_in_r[1] - sp_in_r[1])
-        )
-        sl_sn = (
-            slice(st_in_sn[0], sp_in_sn[0]),
-            slice(st_in_sn[1], sp_in_sn[1])
-        )
-        size_rn = (
-            -(st_in_sn[0] - sp_in_sn[0]),
-            -(st_in_sn[1] - sp_in_sn[1])
-        )
+        sl_s = (slice(st_in_s[0], sp_in_s[0]), slice(st_in_s[1], sp_in_s[1]))
+        sl_r = (slice(st_in_r[0], sp_in_r[0]), slice(st_in_r[1], sp_in_r[1]))
+        size_r = (-(st_in_r[0] - sp_in_r[0]), -(st_in_r[1] - sp_in_r[1]))
+        sl_sn = (slice(st_in_sn[0], sp_in_sn[0]), slice(st_in_sn[1], sp_in_sn[1]))
+        size_rn = (-(st_in_sn[0] - sp_in_sn[0]), -(st_in_sn[1] - sp_in_sn[1]))
         sl_rn = (
             slice(st_in_r[0], st_in_r[0] + size_rn[0]),
-            slice(st_in_r[1], st_in_r[1] + size_rn[1])
+            slice(st_in_r[1], st_in_r[1] + size_rn[1]),
         )
         # output slice subb no resize
 
@@ -108,7 +98,7 @@ def read_region_with_level(czi, location, size, level=0, report=None):
     :param downscale_factor: it is di
     :return:
     """
-    downscale_factor= int(2 ** level)
+    downscale_factor = int(2 ** level)
     requested_start = location
     requested_size = size
     value = 0
@@ -117,14 +107,21 @@ def read_region_with_level(czi, location, size, level=0, report=None):
     elif czi.dtype == np.float:
         value = 1
 
-    t_res = 0.
-    t_slices = 0.
+    t_res = 0.0
+    t_slices = 0.0
     t0 = time.time()
-    output = np.full(list(requested_size) + [czi.shape[-1]], fill_value=value, dtype=czi.dtype)
+    output = np.full(
+        list(requested_size) + [czi.shape[-1]], fill_value=value, dtype=czi.dtype
+    )
     # subbs = []
     for subb in czi.subblocks():
         t00 = time.time()
-        isconj, sl_s, sl_r, sz_r, sl_sn, sz_sn, sl_rn = get_py_slices(subb, requested_start, requested_size, output_downscale_factor=downscale_factor)
+        isconj, sl_s, sl_r, sz_r, sl_sn, sz_sn, sl_rn = get_py_slices(
+            subb,
+            requested_start,
+            requested_size,
+            output_downscale_factor=downscale_factor,
+        )
         t01 = time.time()
         t_slices += float(t01 - t00)
 
@@ -142,13 +139,16 @@ def read_region_with_level(czi, location, size, level=0, report=None):
             # this generates the data with maximal possible resolution. Slow.
             # if subb.shape == subb.stored_shape:
             # this is fast
-            if subb.shape[-3:-1] == tuple(np.asarray(subb.stored_shape) * 2**level)[-3:-1]: #subb.stored_shape:
+            if (
+                subb.shape[-3:-1]
+                == tuple(np.asarray(subb.stored_shape) * 2 ** level)[-3:-1]
+            ):  # subb.stored_shape:
                 sd = subb.data(resize=False)
                 img = sd[..., sl_sn[0], sl_sn[1], :]
                 # sd = subb.data()
                 # img_old = sd[..., sl_s[0], sl_s[1], :]
                 # logger.debug(img.shape)
-                axlist=tuple(range(img.ndim - 3))
+                axlist = tuple(range(img.ndim - 3))
                 # logger.debug(axlist)
                 img = np.squeeze(img, axis=axlist)
                 output[sl_rn] = img
@@ -185,5 +185,7 @@ def read_region_with_level(czi, location, size, level=0, report=None):
     #         else:
     #             print(f"{subb.start}, {subb.shape}")
     t1 = time.time()
-    logger.trace(f"time to get region={t1-t0}, cumulative resize time={t_res}, cumulative get slices time={t_slices}")
+    logger.trace(
+        f"time to get region={t1-t0}, cumulative resize time={t_res}, cumulative get slices time={t_slices}"
+    )
     return output
