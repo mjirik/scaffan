@@ -451,10 +451,11 @@ class Scaffan:
             # mainapp.set_annotation_color_selection("#FF00FF")
             # mainapp.set_annotation_color_selection("#FF0000")
             #             mainapp.set_annotation_color_selection("#FFFF00")
-            self.set_parameter("Input;Lobulus Selection Method", "Auto")
+            self.set_parameter("Input;Lobulus Selection Method", "None")
             self.set_parameter("Processing;Skeleton Analysis", False)
             self.set_parameter("Processing;Texture Analysis", False)
             self.set_parameter("Processing;Lobulus Segmentation", False)
+            self.set_parameter("Processing;Scan Segmentation;Run Prediction", False)
             if i == 0:
                 if clean_before_training is not None:
                     self.set_parameter(
@@ -505,7 +506,11 @@ class Scaffan:
             )
         # elif automatic_lobulus_selection and not run_slide_segmentation:
         if automatic_lobulus_selection == "Manual":
+            # on training we dont want to do the prediction and we set
             annotation_ids = self.manual_select()
+        if automatic_lobulus_selection == "None":
+            annotation_ids = []
+
         if run_slide_segmentation:
             # fn_input = self.parameters.param("Input", "File Path").value()
 

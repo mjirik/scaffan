@@ -131,6 +131,14 @@ class ScanSegmentation:
                         "siPrefix": False,
                         "tip": "Weight of training samples given in actual image",
                     },
+                    {
+                        "name": "Training Stride",
+                        "type": "int",
+                        "value": 1,
+                        "suffix": "px",
+                        "siPrefix": False,
+                        "tip": "Every n-th pixel is used for training. Push down the computation expences. Usefull on debug.",
+                    },
                 ],
             },
             {
@@ -160,6 +168,15 @@ class ScanSegmentation:
                 "siPrefix": True,
                 "tip": "Radius of circle seed used as input for individual lobulus segmentation "
                 + "when the automatic lobulus selection is prefered ",
+            },
+            {
+                "name": "Run Prediction",
+                "type": "bool",
+                "value": True,
+                # "suffix": "px",
+                "siPrefix": False,
+                "tip": "Per-pixel prediction (segmentation) is the key step in slide segmentation.\n" +
+                "It can be skipped during the training phase or for debug reasons."
             },
             # self._inner_texture.parameters,
         ]
@@ -303,7 +320,8 @@ class ScanSegmentation:
             #             plt.imshow(ann_raster)
             #             plt.show()
             img = self._get_features(view_ann)
-            pixels = img[ann_raster]
+            stride = int(self.parameters.param("HCTFS", "Training Stride").value())
+            pixels = img[ann_raster][::stride]
             pixels_list.append(pixels)
         pixels_all = np.concatenate(pixels_list, axis=0)
         return pixels_all
@@ -908,10 +926,11 @@ class ScanSegmentation:
         if bool(self.parameters.param("HCTFS", "Run Training").value()):
             self.train_classifier()
             self.save_classifier()
-        logger.debug("predict...")
-        self.predict()
-        logger.debug("evaluate...")
-        self.evaluate()
+        if bool(self.parameters.param("Run Prediction").value()):
+            logger.debug("predict...")
+            self.predict()
+            logger.debug("evaluate...")
+            self.evaluate()
         if bool(self.parameters.param("Save Training Labels").value()):
             self.save_training_labels()
 

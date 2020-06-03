@@ -282,16 +282,19 @@ class MainGuiTest(unittest.TestCase):
         ]
         self._slide_segmentation_train_clf(fns)
 
-    @pytest.mark.slow
-    @pytest.mark.slow
+    # @pytest.mark.slow
     def test_training_small_slide_segmentation_clf(self):
+        """
+        Do the training. Use just one training data and use just every n-th pixel for training.
+        :return:
+        """
 
         fns = [
             io3d.datasets.join_path(
                 "medical", "orig", "sample_data", "SCP003", "SCP003.ndpi", get_root=True
             ),
         ]
-        self._slide_segmentation_train_clf(fns, clf_fn=".temp_clf.pkl")
+        self._slide_segmentation_train_clf(fns, clf_fn=".temp_clf.pkl", stride=1000)
 
     @pytest.mark.dataset
     @pytest.mark.slow
@@ -416,7 +419,7 @@ class MainGuiTest(unittest.TestCase):
             modtime0 == modtime1
         ), "We are not changing the pretrained classifier file"
 
-    def _slide_segmentation_train_clf(self, fns, clf_fn=None):
+    def _slide_segmentation_train_clf(self, fns, clf_fn=None, stride=None):
         mainapp = scaffan.algorithm.Scaffan()
         if clf_fn is not None:
             mainapp.slide_segmentation.clf_fn = clf_fn
@@ -427,6 +430,9 @@ class MainGuiTest(unittest.TestCase):
         else:
             modtime0 = ""
         logger.debug(f"classificator prior modification time: {modtime0}")
+        if stride:
+            logger.debug(f"setting stride {stride}")
+            mainapp.set_parameter("Processing;Scan Segmentation;HCTFS;Training Stride", stride)
         mainapp.train_scan_segmentation(fns)
 
         # for i, fn in enumerate(fns):
@@ -440,7 +446,6 @@ class MainGuiTest(unittest.TestCase):
         #     mainapp.set_parameter("Processing;Skeleton Analysis", False)
         #     mainapp.set_parameter("Processing;Texture Analysis", False)
         #     if i == 0:
-        #         mainapp.set_parameter("Processing;Scan Segmentation;HCTFS;Clean Before Training", True)
         #     else:
         #         mainapp.set_parameter("Processing;Scan Segmentation;HCTFS;Clean Before Training", False)
         #     mainapp.set_parameter("Processing;Scan Segmentation;HCTFS;Run Training", True)
