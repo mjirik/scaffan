@@ -520,6 +520,17 @@ class MainGuiTest(unittest.TestCase):
 
 # @pytest.mark.parametrize("fn_yellow")
 
+def test_parameters():
+    fn_cssf= "pokus.xlsx"
+    mainapp = scaffan.algorithm.Scaffan()
+    fn_cssf_orig = mainapp.get_parameter("Output;Common Spreadsheet File")
+    mainapp.set_common_spreadsheet_file(fn_cssf)
+    fn_csfn_read = mainapp.get_parameter("Output;Common Spreadsheet File")
+    mainapp.set_common_spreadsheet_file(fn_cssf_orig)
+    assert fn_csfn_read == fn_cssf
+
+
+
 
 @unittest.skipIf(os.environ.get("TRAVIS", True), "Skip on Travis-CI")
 def test_run_lobuluses():
