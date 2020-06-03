@@ -1,5 +1,11 @@
 # Changelog
 
+# 0.24 
+
+* [Added] More debug options
+* [Changed] Increased efectivity during training step by removing prediction
+* [Changed] Reset parameters after training
+
 # 0.23
 
 * [Added] Manual lobuli selection from GUI added

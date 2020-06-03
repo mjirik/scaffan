@@ -451,11 +451,22 @@ class Scaffan:
             # mainapp.set_annotation_color_selection("#FF00FF")
             # mainapp.set_annotation_color_selection("#FF0000")
             #             mainapp.set_annotation_color_selection("#FFFF00")
-            self.set_parameter("Input;Lobulus Selection Method", "None")
-            self.set_parameter("Processing;Skeleton Analysis", False)
-            self.set_parameter("Processing;Texture Analysis", False)
-            self.set_parameter("Processing;Lobulus Segmentation", False)
-            self.set_parameter("Processing;Scan Segmentation;Run Prediction", False)
+            paramlist = [
+                ("Input;Lobulus Selection Method", "None"),
+                ("Processing;Skeleton Analysis", False),
+                ("Processing;Texture Analysis", False),
+                ("Processing;Lobulus Segmentation", False),
+                ("Processing;Scan Segmentation;Run Prediction", False)
+            ]
+            prev_values = []
+            for key, val in paramlist:
+                prev_values.append(self.get_parameter(key))
+                self.set_parameter(key, val)
+
+            # self.set_parameter("Processing;Skeleton Analysis", False)
+            # self.set_parameter("Processing;Texture Analysis", False)
+            # self.set_parameter("Processing;Lobulus Segmentation", False)
+            # self.set_parameter("Processing;Scan Segmentation;Run Prediction", False)
             if i == 0:
                 if clean_before_training is not None:
                     self.set_parameter(
@@ -470,6 +481,11 @@ class Scaffan:
             #             mainapp.set_parameter("Processing;Slide Segmentation;Lobulus Number", 0)
             # mainapp.start_gui(qapp=qapp)
             self.run_lobuluses()
+
+            # reset values to prev values before function run
+            for wanted, val in zip(paramlist, prev_values):
+                key, wanted_val = wanted
+                self.set_parameter(key, val)
 
     def run_lobuluses(self, event=None):
         self.init_run()

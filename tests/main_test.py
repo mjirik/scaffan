@@ -341,9 +341,9 @@ class MainGuiTest(unittest.TestCase):
         ]
 
         # TODO Uncomment fallowing line when CNN is done
-        self._testing_slide_segmentation_clf(fns, segmentation_method="U-Net")
+        self._testing_slide_segmentation_clf(fns, segmentation_method="U-Net", whole_scan_margin=-0.2)
 
-    def _testing_slide_segmentation_clf(self, fns, segmentation_method):
+    def _testing_slide_segmentation_clf(self, fns, segmentation_method, whole_scan_margin=0.0):
         """
         Run whole slide segmentation on all input files and check whether all three labels are
         represented in the output labeling.
@@ -389,6 +389,7 @@ class MainGuiTest(unittest.TestCase):
             # Set some Unet parameter here. It is used if the U-Net Segmentation method is used.
             # mainapp.set_parameter("Processing;Scan Segmentation;U-Net;Some Parameter", False)
             mainapp.set_parameter("Processing;Scan Segmentation;Lobulus Number", 0)
+            mainapp.set_parameter("Processing;Whole Scan Margin", whole_scan_margin)
             # mainapp.start_gui(qapp=qapp)
             mainapp.run_lobuluses()
 
