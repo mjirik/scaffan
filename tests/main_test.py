@@ -80,6 +80,7 @@ class MainGuiTest(unittest.TestCase):
         logger.debug(f"lobulus selection={ls}")
         mainapp.start_gui(qapp=qapp)
 
+
     def test_just_start_app(self):
         # fn = io3d.datasets.join_path("medical", "orig", "CMU-1.ndpi", get_root=True)
         # fn = io3d.datasets.join_path("medical", "orig", "CMU-1.ndpi", get_root=True)
@@ -101,69 +102,121 @@ class MainGuiTest(unittest.TestCase):
     # skip_on_local = True
 
 
-    skip_on_local = False
-
-    @unittest.skipIf(os.environ.get("TRAVIS", False), "Skip on Travis-CI")
-    @pytest.mark.slow
-    def test_run_lobuluses_manual_segmentation(self):
+    def test_iteration_limited_snakes_and_texture_analysis(self, error_threshold=0.05, iterations1=10, iterations2=10, view_border=20):
+        """
+        Check texture analysis. Limit snake iterations and the size of view to increase performace.
+        :param error_threshold:
+        :param iterations1:
+        :param iterations2:
+        :return:
+        """
         fn = io3d.datasets.join_path(
             "medical", "orig", "sample_data", "SCP003", "SCP003.ndpi", get_root=True
         )
-        logger.debug("going to mock")
-        # imsl = openslide.OpenSlide(fn)
-        # annotations = scan.read_annotations(fn)
-        # scan.annotations_to_px(imsl, annotations)
-        # mainapp.init_run()
-        # mainapp.set_parameter("Input;Lobulus Selection Method", "Color")
-        original_foo = scaffan.image.AnnotatedImage.get_annotations_by_color
-        with patch.object(scaffan.image.AnnotatedImage, 'select_annotations_by_color', autospec=True) as mock_foo:
-            def side_effect(anim_, annid, *args, **kwargs):
-                logger.debug("mocked function select_annotations_by_color()")
-                original_list = original_foo(anim_, annid, *args, **kwargs)
-                logger.debug(f"id={annid}, original ann_ids={original_list}")
-                if annid == "#000000":
-                    new_list = original_list
-                else:
-                    new_list = original_list[:1]
-                logger.debug(f"new ann_ids={new_list}")
-                return new_list
 
-            mock_foo.side_effect = side_effect
-            logger.debug("in with statement")
-            mainapp = scaffan.algorithm.Scaffan(whole_scan_margin=-0.2)
-            mainapp.set_input_file(fn)
-            mainapp.set_output_dir("test_run_lobuluses_output_dir")
-            mainapp.set_annotation_color_selection(
-                "#00FFFF", override_automatic_lobulus_selection=True
-            )
-            auto = mainapp.get_parameter("Input;Lobulus Selection Method") == "Auto"
-            logger.debug(f"auto={auto}")
-            # Use manual annotations
-            mainapp.set_parameter(
-                "Processing;Lobulus Segmentation;Manual Segmentation", True
-            )
-            # dont waste time with scan segmentation. It is not used in the test
-            mainapp.set_parameter(
-                "Processing;Scan Segmentation", False
-            )
-            mainapp.run_lobuluses()
+        logger.debug("in with statement")
+        mainapp = scaffan.algorithm.Scaffan(whole_scan_margin=-0.2)
+        mainapp.set_input_file(fn)
+        mainapp.set_output_dir("test_iteration_limited_snake_and_texture_analysis")
+        mainapp.set_annotation_color_selection(
+            "#00FFFF", override_automatic_lobulus_selection=True
+        )
+        # auto = mainapp.get_parameter("Input;Lobulus Selection Method") == "Auto"
+        # logger.debug(f"auto={auto}")
+        if iterations1:
+            mainapp.set_parameter("Processing;Lobulus Segmentation;Border Segmentation;Iterations", iterations1)
+        if iterations2:
+            mainapp.set_parameter("Processing;Lobulus Segmentation;Central Vein Segmentation;Iterations", iterations2)
+        mainapp.set_parameter(
+            "Processing;Lobulus Segmentation;Manual Segmentation", False
+        )
+        # dont waste time with scan segmentation. It is not used in the test
+        mainapp.set_parameter("Processing;Lobulus Segmentation;Annotation Margin", view_border) # add 20%
+        mainapp.set_parameter( "Processing;Scan Segmentation", False )
+        mainapp.set_parameter( "Processing;Skeleton Analysis", True)
+        mainapp.set_parameter( "Processing;Texture Analysis", True)
+        original_foo = scaffan.image.AnnotatedImage.get_annotations_by_color
+        # with patch.object(scaffan.image.AnnotatedImage, 'select_annotations_by_color', autospec=True) as mock_foo:
+        #     def side_effect(anim_, annid, *args, **kwargs):
+        #         logger.debug("mocked function select_annotations_by_color()")
+        #         original_list = original_foo(anim_, annid, *args, **kwargs)
+        #         logger.debug(f"id={annid}, original ann_ids={original_list}")
+        #         if annid == "#000000":
+        #             new_list = original_list
+        #         else:
+        #             new_list = original_list[:1]
+        #         logger.debug(f"new ann_ids={new_list}")
+        #         return new_list
+        #
+        #     mock_foo.side_effect = side_effect
+        mainapp.run_lobuluses()
+        self.assert_dice_in_first_evaluated_data(mainapp, error_threshold)
+
+    def test_run_lobuluses_manual_segmentation(self, error_threshold=0.9):
+        """
+        Just check the manual segmentation
+        :param error_threshold:
+        :return:
+        """
+        fn = io3d.datasets.join_path(
+            "medical", "orig", "sample_data", "SCP003", "SCP003.ndpi", get_root=True
+        )
+        original_foo = scaffan.image.AnnotatedImage.get_annotations_by_color
+        # with patch.object(scaffan.image.AnnotatedImage, 'select_annotations_by_color', autospec=True) as mock_foo:
+        #     def side_effect(anim_, annid, *args, **kwargs):
+        #         logger.debug("mocked function select_annotations_by_color()")
+        #         original_list = original_foo(anim_, annid, *args, **kwargs)
+        #         logger.debug(f"id={annid}, original ann_ids={original_list}")
+        #         if annid == "#000000":
+        #             new_list = original_list
+        #         else:
+        #             new_list = original_list[:0]
+        #         logger.debug(f"new ann_ids={new_list}")
+        #         return new_list
+        #     logger.debug("in with statement")
+        #     mock_foo.side_effect = side_effect
+
+        mainapp = scaffan.algorithm.Scaffan(whole_scan_margin=-0.2)
+        mainapp.set_input_file(fn)
+        mainapp.set_output_dir("test_run_lobuluses_output_dir")
+        mainapp.set_annotation_color_selection(
+            "#00FFFF", override_automatic_lobulus_selection=True
+        )
+        # auto = mainapp.get_parameter("Input;Lobulus Selection Method") == "Color"
+        # logger.debug(f"auto={auto}")
+        # if iterations1:
+        #     mainapp.set_parameter("Processing;Lobulus Segmentation;Border Segmentation;Iterations", iterations1)
+        # if iterations2:
+        #     mainapp.set_parameter("Processing;Lobulus Segmentation;Central Vein Segmentation;Iterations", iterations2)
+        # Use manual annotations
+        mainapp.set_parameter("Processing;Lobulus Segmentation;Manual Segmentation", True)
+        # dont waste time with scan segmentation. It is not used in the test
+        mainapp.set_parameter( "Processing;Scan Segmentation", False )
+        mainapp.set_parameter( "Processing;Skeleton Analysis", False )
+        mainapp.set_parameter( "Processing;Texture Analysis", False )
+
+        mainapp.run_lobuluses()
+        self.assert_dice_in_first_evaluated_data(mainapp, error_threshold)
+        assert mainapp.evaluation.evaluation_history[0]
+
+    def assert_dice_in_first_evaluated_data(self, mainapp, error_threshold):
         self.assertLess(
-            0.9,
+            error_threshold,
             mainapp.evaluation.evaluation_history[0]["Lobulus Border Dice"],
             "Lobulus segmentation should have Dice coefficient above some low level",
         )
         self.assertLess(
-            0.9,
+            error_threshold,
             mainapp.evaluation.evaluation_history[1]["Lobulus Border Dice"],
             "Lobulus segmentation should have Dice coefficient above some low level",
         )
         self.assertLess(
-            0.9,
+            error_threshold,
             mainapp.evaluation.evaluation_history[0]["Central Vein Dice"],
             "Central Vein segmentation should have Dice coefficient above some low level",
         )
         self.assertLess(
-            0.9,
+            error_threshold,
             mainapp.evaluation.evaluation_history[1]["Central Vein Dice"],
             "Central Vein should have Dice coefficient above some low level",
         )
