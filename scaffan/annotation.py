@@ -232,7 +232,7 @@ def read_annotations_ndpa(pth) -> list:
             logger.debug(f"Command {' '.join(command)}")
             logger.debug(f"Command '{e.cmd}' returned with code {e.returncode}")
             logger.debug(f"Output of command 1: \n{str(e.output)}")
-            logger.debug(f"Output of command 2: \n{e.output.decode()}")
+            # logger.debug(f"Output of command 2: \n{e.output.decode()}")
             exit(e.returncode)
             # raise RuntimeError("command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))
 
