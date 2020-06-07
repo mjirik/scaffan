@@ -19,41 +19,84 @@ from read_roi import read_roi_zip
 
 __version__ = "0.23.7"
 
+# def get_one_annotation(viewstate):
+#     titles_list = viewstate.xpath(".//title/text()")
+#     if len(titles_list) == 0:
+#         an_title = ""
+#     elif len(titles_list) == 1:
+#         an_title = titles_list[0]
+#     else:
+#         raise ValueError("More than one title in viewstate")
+#     details_list = viewstate.xpath(".//details/text()")
+#     if len(details_list) == 0:
+#         an_details = ""
+#     elif len(details_list) == 1:
+#         an_details = details_list[0]
+#     else:
+#         raise ValueError("More than one details in viewstate")
+#
+#     annotations = viewstate.xpath(".//annotation")
+#     if len(annotations) > 1:
+#         raise ValueError("More than one annotation found")
+#     annot = annotations[0]
+#     an_color = annot.get("color")
+#     #     display(len(annotation))
+#     an_x = list(map(int, annot.xpath(".//pointlist/point/x/text()")))
+#     an_y = list(map(int, annot.xpath(".//pointlist/point/y/text()")))
+#     return dict(title=an_title, color=an_color, x=an_x, y=an_y, details=an_details)
 
 def get_one_annotation(viewstate):
-    titles_list = viewstate.xpath(".//title/text()")
+    def get_text(el):
+        tx = el.text
+        return "" if tx is None else tx
+    titles_list = viewstate.findall(".//title")
     if len(titles_list) == 0:
         an_title = ""
     elif len(titles_list) == 1:
-        an_title = titles_list[0]
+        an_title = get_text(titles_list[0])
     else:
         raise ValueError("More than one title in viewstate")
-    details_list = viewstate.xpath(".//details/text()")
+    details_list = viewstate.findall(".//details")
     if len(details_list) == 0:
         an_details = ""
     elif len(details_list) == 1:
-        an_details = details_list[0]
+        an_details = get_text(details_list[0])
     else:
         raise ValueError("More than one details in viewstate")
 
-    annotations = viewstate.xpath(".//annotation")
+    annotations = viewstate.findall(".//annotation")
     if len(annotations) > 1:
         raise ValueError("More than one annotation found")
     annot = annotations[0]
     an_color = annot.get("color")
     #     display(len(annotation))
-    an_x = list(map(int, annot.xpath(".//pointlist/point/x/text()")))
-    an_y = list(map(int, annot.xpath(".//pointlist/point/y/text()")))
+    an_x = list(map(int, map(get_text, annot.findall(".//pointlist/point/x"))))
+    an_y = list(map(int, map(get_text, annot.findall(".//pointlist/point/y"))))
     return dict(title=an_title, color=an_color, x=an_x, y=an_y, details=an_details)
 
+
+# def _ndpa_file_to_json(pth):
+#
+#     # problem is loading lxml together with openslide
+#     from lxml import etree
+#
+#     tree = etree.parse(pth)
+#     viewstates = tree.xpath("//ndpviewstate")
+#     all_anotations = list(map(get_one_annotation, viewstates))
+#     fn = pth + ".json"
+#     with open(fn, "w") as outfile:
+#         json.dump(all_anotations, outfile)
 
 def _ndpa_file_to_json(pth):
 
     # problem is loading lxml together with openslide
-    from lxml import etree
+    # from lxml import etree
+
+    # with xml there is no need to use subprocess anymore
+    import xml.etree.ElementTree as etree
 
     tree = etree.parse(pth)
-    viewstates = tree.xpath("//ndpviewstate")
+    viewstates = tree.findall("//ndpviewstate")
     all_anotations = list(map(get_one_annotation, viewstates))
     fn = pth + ".json"
     with open(fn, "w") as outfile:
@@ -188,7 +231,8 @@ def read_annotations_ndpa(pth) -> list:
             logger.error(traceback.format_exc())
             logger.debug(f"Command {' '.join(command)}")
             logger.debug(f"Command '{e.cmd}' returned with code {e.returncode}")
-            logger.debug(f"Output of command: \n{e.output.decode()}")
+            logger.debug(f"Output of command 1: \n{str(e.output)}")
+            logger.debug(f"Output of command 2: \n{e.output.decode()}")
             exit(e.returncode)
             # raise RuntimeError("command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))
 
