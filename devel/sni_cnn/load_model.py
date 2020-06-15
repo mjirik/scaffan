@@ -1,15 +1,15 @@
+import pickle as plk
+import random
+from statistics import mean
+
 import matplotlib
+import matplotlib.patches as patches
+import numpy as np
 from matplotlib import pyplot as plt
 from numpy import load
 from tensorflow.keras.models import load_model
-import random
-import scaffan.scaffan.image as scim
-import matplotlib.patches as patches
-from training_data_generator import load_lobulus
 from training_data_generator import cut_the_image
 from training_data_generator import shrink_image
-import numpy as np
-from statistics import mean
 
 TRAIN_DATA_SAVE_FILE = 'D:\\FAV\\Scaffold\\data\\train_data.npy'
 TRAIN_LABELS_SAVE_FILE = 'D:\\FAV\\Scaffold\\data\\train_labels.npy'
@@ -17,6 +17,10 @@ TEST_DATA_SAVE_FILE = 'D:\\FAV\\Scaffold\\data\\test_data.npy'
 TEST_LABELS_SAVE_FILE = 'D:\\FAV\\Scaffold\\data\\test_labels.npy'
 DISPLAY_SIZE = 80
 CUT_SIZE = 0.2  # Size of training data [mm]
+
+VERSION = '3'
+EXPORT_PATH = "D:\\FAV\\Scaffold\\export\\v" + VERSION + "/"
+MASKS_PATH = 'D:\\FAV\\Scaffold\\data\\masks.plk'
 
 def compute_MSE_of_mean_value(y):
     y = y.reshape(len(y))
@@ -39,7 +43,7 @@ def manual_validation_1():
     y_test = labels[1, :].reshape(data_count, 1)
 
     data_count = y_test.shape[0]
-    loaded_model = load_model("export/")
+    loaded_model = load_model(EXPORT_PATH)
 
     score = loaded_model.evaluate(x_test, y_test, verbose=0)
 
@@ -60,17 +64,23 @@ def manual_validation_1():
         plt.gray()
         plt.show()
 
-def evaluate_annotation(file_path, ann_id, visual=False):
-    loaded_model = load_model("export/")
-    anim = scim.AnnotatedImage(file_path)
-    lobulus = load_lobulus(anim, ann_id)
-    cuts = cut_the_image(lobulus, False)
-    crop_size = int((1 / lobulus.view.region_pixelsize[0]) * CUT_SIZE)
+def evaluate_annotation(index, visual=False):
+    loaded_model = load_model(EXPORT_PATH)
+
+    # anim = scim.AnnotatedImage(file_path)
+    # lobulus = load_lobulus(anim, ann_id)
+
+    mask_imgs = plk.load(open(MASKS_PATH, 'rb'))
+
+    mask_img = mask_imgs[index]
+
+    cuts = cut_the_image(mask_img, True)
+    crop_size = int((1 / mask_img.pixel_size) * CUT_SIZE)
 
     evaluations = []
 
     for i, cut_point in enumerate(cuts):
-        image_crop = lobulus.image[cut_point[0]:cut_point[0] + crop_size, cut_point[1]:cut_point[1] + crop_size]
+        image_crop = mask_img.image[cut_point[0]:cut_point[0] + crop_size, cut_point[1]:cut_point[1] + crop_size]
 
         image_crop = shrink_image(image_crop)
 
@@ -79,7 +89,7 @@ def evaluate_annotation(file_path, ann_id, visual=False):
 
     fig, ax = plt.subplots(1)
 
-    ax.imshow(lobulus.lobulus_mask.astype(float)*lobulus.image)
+    ax.imshow(mask_img.mask.astype(float)*mask_img.image)
 
     for i, point in enumerate(cuts):
         rect = patches.Rectangle((point[0], point[1]), crop_size,
@@ -89,8 +99,13 @@ def evaluate_annotation(file_path, ann_id, visual=False):
         plt.text(point[0]+10, point[1]+75, str(round(evaluations[i], 3)))
 
     mean_evaluation = mean(evaluations)
-    plt.title('Mean SNI - CNN evaluation: ' + str(np.round(mean_evaluation, 3)))
-    plt.show()
+
+    print(mask_img.file_name)
+
+    if visual:
+        plt.title('Mean SNI - CNN evaluation: ' + str(np.round(mean_evaluation, 3)))
+        plt.show()
+    pass
 
 
 
@@ -99,4 +114,4 @@ if __name__ == '__main__':
     matplotlib.use('TkAgg')
 
     manual_validation_1()
-    # evaluate_annotation('D:\\FAV\\Scaffold\\Scaffan-analysis\\PIG-002_J-18-0091_HE.ndpi', 3, True)
+    # evaluate_annotation(22, True)
