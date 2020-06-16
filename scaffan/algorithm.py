@@ -680,10 +680,7 @@ class Scaffan:
         self.evaluation.run()
         # Copy all parameters to table
         self.report.finish_actual_row()
-
-    def manual_select(self):
-        logger.debug("Manual selection")
-        # full_view = self.anim.get_full_view()
+    def get_preview(self):
         full_view = self.anim.get_view(
             location=[0, 0], level=0, size_on_level=self.anim.get_slide_size()[::-1]
         )
@@ -696,6 +693,24 @@ class Scaffan:
             f"Manual selection2, view.loc={view_corner.region_location}, view.size={view_corner.region_size_on_level}, pxsz={view_corner.region_pixelsize}"
         )
         img = view_corner.get_region_image(as_gray=False)
+        return img
+
+    def manual_select(self):
+        logger.debug("Manual selection")
+        # full_view = self.anim.get_full_view()
+        img = self.get_preview()
+        # full_view = self.anim.get_view(
+        #     location=[0, 0], level=0, size_on_level=self.anim.get_slide_size()[::-1]
+        # )
+        # pxsz_mm = float(self.get_parameter("Processing;Preview Pixelsize")) * 1000
+        # view_corner = full_view.to_pixelsize(pixelsize_mm=[pxsz_mm, pxsz_mm])
+        # logger.debug(
+        #     f"Manual selection1, view.loc={full_view.region_location}, view.size={full_view.region_size_on_level}, pxsz={full_view.region_pixelsize}"
+        # )
+        # logger.debug(
+        #     f"Manual selection2, view.loc={view_corner.region_location}, view.size={view_corner.region_size_on_level}, pxsz={view_corner.region_pixelsize}"
+        # )
+        # img = view_corner.get_region_image(as_gray=False)
         plt.ioff()
         fig = plt.figure(figsize=(12, 8))
         fig.canvas.set_window_title(
