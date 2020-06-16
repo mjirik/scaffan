@@ -3,14 +3,11 @@ import numpy as np
 from matplotlib import pyplot as plt
 from numpy import load
 from tensorflow import saved_model
-from tensorflow.keras.layers import BatchNormalization
 from tensorflow.keras.layers import Conv2D
 from tensorflow.keras.layers import Dense
-from tensorflow.keras.layers import Dropout
 from tensorflow.keras.layers import Flatten
 from tensorflow.keras.layers import MaxPool2D
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.optimizers import SGD
 from tensorflow.keras.optimizers import Adam
 
 TRAIN_DATA_SAVE_FILE = 'D:\\FAV\\Scaffold\\data\\train_data.npy'
@@ -18,40 +15,13 @@ TRAIN_LABELS_SAVE_FILE = 'D:\\FAV\\Scaffold\\data\\train_labels.npy'
 TEST_DATA_SAVE_FILE = 'D:\\FAV\\Scaffold\\data\\test_data.npy'
 TEST_LABELS_SAVE_FILE = 'D:\\FAV\\Scaffold\\data\\test_labels.npy'
 
-VERSION = '3'
+VERSION = '_VGG16_2'
 EXPORT_PATH = "D:\\FAV\\Scaffold\\export\\v" + VERSION + "/"
 
 DISPLAY_SIZE = 80
 
 BATCH_SIZE = 64
 EPOCHS = 10
-
-
-def compute_sample_weights(labels, hom):
-    data_count = labels.shape[0]
-    sample_weights = np.zeros((data_count,))
-
-    lbls = labels.reshape((data_count,))
-
-    label_values = list(set(lbls))
-    label_value_counts = np.zeros((len(label_values),))
-    label_value_weights = np.zeros((len(label_values),))
-
-    for i, label_value in enumerate(label_values):
-        for j in range(data_count):
-            if abs(lbls[j] - label_value) < 0.001:
-                label_value_counts[i] = label_value_counts[i] + 1
-
-    for i in range(len(label_values)):
-        label_value_weights[i] = 1 / (label_value_counts[i] / data_count)
-
-    for i in range(data_count):
-        for j, label_value in enumerate(label_values):
-            if abs(lbls[i] - label_value) < 0.001:
-                sample_weights[i] = hom[i] * label_value_weights[j]
-
-    return sample_weights
-
 
 def load_data():
     train_data = load(TRAIN_DATA_SAVE_FILE)
@@ -74,35 +44,34 @@ def load_data():
     test_data = test_data.swapaxes(0, 2)
     test_data = test_data.reshape((test_data_count, DISPLAY_SIZE, DISPLAY_SIZE, 1))
 
-    # sample_weights = compute_sample_weights(train_sni, train_hom)
-
     return train_data, train_sni, train_hom, test_data, test_sni, test_hom
 
 
 def create_model():
     model = Sequential([
-        BatchNormalization(input_shape=(DISPLAY_SIZE, DISPLAY_SIZE, 1)),
-        Conv2D(128, (3, 3), activation='relu', input_shape=(DISPLAY_SIZE, DISPLAY_SIZE, 1)),
-        MaxPool2D((2, 2)),
-        Dropout(0.2),
-        Conv2D(128, (3, 3), activation='relu'),
-        MaxPool2D((2, 2)),
-        Dropout(0.2),
-        Conv2D(128, (3, 3), activation='relu'),
-        MaxPool2D((2, 2)),
-        Dropout(0.2),
-        Conv2D(128, (3, 3), activation='relu'),
-        MaxPool2D((2, 2)),
+        Conv2D(input_shape=(DISPLAY_SIZE, DISPLAY_SIZE, 1), filters=64, kernel_size=(3, 3), padding="same",
+               activation="relu"),
+        Conv2D(filters=64, kernel_size=(3, 3), padding="same", activation="relu"),
+        MaxPool2D(pool_size=(2, 2), strides=(2, 2)),
+        Conv2D(filters=128, kernel_size=(3, 3), padding="same", activation="relu"),
+        Conv2D(filters=128, kernel_size=(3, 3), padding="same", activation="relu"),
+        MaxPool2D(pool_size=(2, 2), strides=(2, 2)),
+        Conv2D(filters=256, kernel_size=(3, 3), padding="same", activation="relu"),
+        Conv2D(filters=256, kernel_size=(3, 3), padding="same", activation="relu"),
+        Conv2D(filters=256, kernel_size=(3, 3), padding="same", activation="relu"),
+        MaxPool2D(pool_size=(2, 2), strides=(2, 2)),
+        Conv2D(filters=512, kernel_size=(3, 3), padding="same", activation="relu"),
+        Conv2D(filters=512, kernel_size=(3, 3), padding="same", activation="relu"),
+        Conv2D(filters=512, kernel_size=(3, 3), padding="same", activation="relu"),
+        MaxPool2D(pool_size=(2, 2), strides=(2, 2)),
+        Conv2D(filters=512, kernel_size=(3, 3), padding="same", activation="relu"),
+        Conv2D(filters=512, kernel_size=(3, 3), padding="same", activation="relu"),
+        Conv2D(filters=512, kernel_size=(3, 3), padding="same", activation="relu"),
+        MaxPool2D(pool_size=(2, 2), strides=(2, 2)),
         Flatten(),
-        Dense(512, activation='relu'),
-        Dropout(0.2),
-        Dense(256, activation='relu'),
-        Dropout(0.2),
-        Dense(128, activation='relu'),
-        Dropout(0.2),
-        Dense(128, activation='relu'),
-        Dropout(0.2),
-        Dense(1, activation=None, use_bias=False)
+        Dense(units=4096, activation="relu"),
+        Dense(units=4096, activation="relu"),
+        Dense(units=1, activation=None, use_bias=False)
     ])
 
     return model
