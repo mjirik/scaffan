@@ -222,6 +222,14 @@ class SkeletonAnalysis:
         datarow["Branch number"] = num
         label, num = scipy.ndimage.label(conv == 1)
         datarow["Dead ends number"] = num
+        if "Area" in datarow:
+            area_unit = datarow["Area unit"]
+            datarow[f"Branch number density [1/{area_unit}^2]"] = datarow["Branch number"]/datarow["Area"]
+            datarow[f"Dead ends number density [1/{area_unit}^2]"] = datarow["Dead ends number"]/datarow["Area"]
+            datarow[f"Skeleton length density [{area_unit}/{area_unit}^2]"] = datarow["Branch length number"]/datarow["Area"]
+        else:
+            # probably area can be estimated by view area
+            logger.debug("Unknown area. Skipping density calculation")
 
         self.report.add_cols_to_actual_row(datarow)
 
