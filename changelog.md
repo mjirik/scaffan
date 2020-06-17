@@ -1,5 +1,7 @@
 # Changelog
 
+* [Added] CNN lobule quality
+
 # 0.24 
 
 * [Added] More debug options

@@ -44,6 +44,7 @@ import scaffan.slide_segmentation
 from scaffan.pyqt_widgets import BatchFileProcessingParameter
 from scaffan.image_intensity_rescale_pyqtgraph import RescaleIntensityPercentilePQG
 from . import sni_prediction
+from . import lobule_quality_estimation_cnn
 
 
 class Scaffan:
@@ -78,6 +79,9 @@ class Scaffan:
         self.evaluation = scaffan.evaluation.Evaluation()
         self.intensity_rescale = RescaleIntensityPercentilePQG()
         self.slide_segmentation = scaffan.slide_segmentation.ScanSegmentation(
+            report=self.report
+        )
+        self.lobule_quality_estimation_cnn = lobule_quality_estimation_cnn.LobuleQualityEstimationCNN(
             report=self.report
         )
         # self.slide_segmentation.report = self.report
@@ -224,6 +228,7 @@ class Scaffan:
                     self.lobulus_processing.parameters,
                     self.skeleton_analysis.parameters,
                     self.glcm_textures.parameters,
+                    self.lobule_quality_estimation_cnn.parameters,
                     {
                         "name": "Whole Scan Margin",
                         "type": "float",
@@ -403,6 +408,7 @@ class Scaffan:
         logger.debug(f"report output dir: {self.report.outputdir}")
         fn_spreadsheet = self.parameters.param("Output", "Common Spreadsheet File")
         self.report.additional_spreadsheet_fn = str(fn_spreadsheet.value())
+        self.lobule_quality_estimation_cnn.init()
 
     def set_annotation_color_selection(
         self, color: str, override_automatic_lobulus_selection=True
@@ -642,6 +648,9 @@ class Scaffan:
         run_texture_analysis = self.parameters.param(
             "Processing", "Texture Analysis"
         ).value()
+        run_lobule_quality_estimation = self.parameters.param(
+            "Processing", "Lobule Quality Estimation CNN"
+        ).value()
         logger.debug("before skeleton analysis")
         if run_skeleton_analysis:
             self.skeleton_analysis.skeleton_analysis(show=show)
@@ -653,6 +662,13 @@ class Scaffan:
                 lobulus_segmentation=self.lobulus_processing.lobulus_mask,
             )
             self.glcm_textures.run()
+        if run_lobule_quality_estimation:
+            self.lobule_quality_estimation_cnn.set_input_data(
+                view=self.lobulus_processing.view,
+                annotation_id=annotation_id,
+                lobulus_segmentation=self.lobulus_processing.lobulus_mask,
+            )
+            self.lobule_quality_estimation_cnn.run()
         logger.trace("after texture analysis")
         t1 = time.time()
         ann_center = self.anim.get_annotation_center_mm(annotation_id)

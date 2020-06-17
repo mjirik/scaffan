@@ -1,8 +1,6 @@
 #! /usr/bin/python
 # -*- coding: utf-8 -*-
 
-# import logging
-# logger = logging.getLogger(__name__)
 from loguru import logger
 import unittest
 import io3d
@@ -147,6 +145,43 @@ def test_get_lobulus_mask():
     ), "segmentation should have more than 100 px"
     assert (
         np.sum(lob_proc.central_vein_mask) > 0
+    ), "segmentation should have more than 0 px"
+    assert np.sum(lob_proc.annotation_mask) < np.sum(
+        lob_proc.lobulus_mask
+    ), "annotation should be smaller than lobulus"
+
+def test_get_lobulus_mask_manual():
+    fn = io3d.datasets.join_path(
+        "medical", "orig", "sample_data", "SCP003", "SCP003.ndpi", get_root=True
+    )
+    anim = scaffan.image.AnnotatedImage(fn)
+    anns = anim.get_annotations_by_color("#FFFF00")
+
+    report = None
+    lob_proc = scaffan.lobulus.Lobulus(report=report)
+    lob_proc.parameters.param("Manual Segmentation").setValue(True)
+    lob_proc.set_annotated_image_and_id(anim, anns[0])
+    lob_proc.run()
+    # there are several useful masks
+    #
+    # lob_proc.annotation_mask
+    # lob_proc.lobulus_mask
+    # lob_proc.central_vein_mask
+    # lob_proc.border_mask
+
+    # import matplotlib.pyplot as plt
+    # plt.imshow(lob_proc.lobulus_mask)
+    # plt.show()
+
+    # this is for testing
+    assert (
+            np.sum(lob_proc.annotation_mask) > 100
+    ), "segmentation should have more than 100 px"
+    assert (
+            np.sum(lob_proc.lobulus_mask) > 100
+    ), "segmentation should have more than 100 px"
+    assert (
+            np.sum(lob_proc.central_vein_mask) > 0
     ), "segmentation should have more than 0 px"
     assert np.sum(lob_proc.annotation_mask) < np.sum(
         lob_proc.lobulus_mask
