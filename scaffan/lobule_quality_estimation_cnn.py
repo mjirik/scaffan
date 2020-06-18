@@ -34,7 +34,8 @@ class LobuleQualityEstimationCNN:
         self,
         report: Report = None,
         pname="Quality Estimation CNN",
-        ptype="group",
+        # ptype="group",
+        ptype="bool",
         pvalue=False,
         ptip="CNN estimator of quality",
     ):

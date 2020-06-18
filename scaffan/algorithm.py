@@ -728,12 +728,14 @@ class Scaffan:
         pxsz_mm = float(self.get_parameter("Processing;Preview Pixelsize")) * 1000
         centers_mm = list(np.asarray(centers_mm) / pxsz_mm)
 
-        view_corner, _ = self.get_preview_view()
+        view_corner = self.get_preview_view()
         return self.prepare_circle_annotations_from_points_px_in_preview(view_corner, centers_mm)
 
     def prepare_circle_annotations_from_points_px_in_preview(self, view_corner, centers_px_view):
-        x_px_view, y_px_view = zip(centers_px_view)
-        pts_glob_px = view_corner.coords_view_px_to_glob_px(x_px_view, y_px_view)
+
+        x_px_view, y_px_view = zip(*list(centers_px_view))
+        logger.debug(x_px_view)
+        pts_glob_px = view_corner.coords_view_px_to_glob_px(np.asarray(x_px_view), np.asarray(y_px_view))
         centers_px = list(zip(*pts_glob_px))
         logger.debug(f"Manual selection5, centers_px_global={centers_px}")
         r_mm = (

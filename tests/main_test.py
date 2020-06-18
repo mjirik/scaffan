@@ -538,6 +538,33 @@ def test_run_lobuluses():
     mainapp.set_parameter("Processing;Scan Segmentation", False)
     run_on_yellow(mainapp, fn)
 
+def test_run_lobulus_with_seeds_mm():
+    """
+    Try to run by seeds mm. Just few iterations.
+    :return:
+    """
+    fn = io3d.datasets.join_path(
+        "medical", "orig", "sample_data", "SCP003", "SCP003.ndpi", get_root=True
+    )
+    mainapp = scaffan.algorithm.Scaffan()
+    mainapp.set_output_dir(".test_run_with_seeds_mm")
+    mainapp.set_parameter("Processing;Scan Segmentation", False)
+    mainapp.set_parameter("Input;Lobulus Selection Method", "Auto") # this is not evaluated
+    mainapp.set_parameter("Processing;Skeleton Analysis", False)
+    mainapp.set_parameter("Processing;Texture Analysis", False)
+    mainapp.set_parameter("Processing;Open output dir", False)
+    mainapp.set_parameter("Processing;Quality Estimation CNN", False)
+    mainapp.set_parameter(
+        "Processing;Lobulus Segmentation;Border Segmentation;Iterations", 10
+    )
+    mainapp.set_parameter(
+        "Processing;Lobulus Segmentation;Central Vein Segmentation;Iterations", 10
+    )
+    mainapp.set_input_file(fn)
+    mainapp.run_lobuluses(seeds_mm=[[6.86, 6.86]])
+    assert (0.01 < mainapp.report.df["Area"][0]), "At least something should be found"
+
+
 
 # @unittest.skip("Skip it is somehow broken")
 @pytest.mark.slow
