@@ -2,11 +2,13 @@
 
 * [Added] CNN lobule quality
 
+
 # 0.24 
 
 * [Added] More debug options
 * [Changed] Increased efectivity during training step by removing prediction
 * [Changed] Reset parameters after training
+* [Added] Seeds [mm] can be added in API
 
 # 0.23
 
