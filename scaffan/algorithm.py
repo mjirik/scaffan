@@ -653,7 +653,7 @@ class Scaffan:
             "Processing", "Texture Analysis"
         ).value()
         run_lobule_quality_estimation = self.parameters.param(
-            "Processing", "Lobule Quality Estimation CNN"
+            "Processing", "Quality Estimation CNN"
         ).value()
         logger.debug("before skeleton analysis")
         if run_skeleton_analysis:
