@@ -518,13 +518,17 @@ class Scaffan:
                 logger.error(f"Unknown Lobulus Selection Method: {automatic_lobulus_selection}")
         return annotation_ids, automatic_lobulus_selection
 
-    def run_lobuluses(self, event=None, annotation_ids:Optional[list]=None):
+    def run_lobuluses(self, event=None, seeds_mm:Optional[list]=None):
         """
         :param event:
-        :param annotation_ids: If annotation ids is not none, and Lobulus Selection Method is set to
+        :param seeds_mm: If not none, and Lobulus Selection Method is set to
         :return:
         """
+        annotation_ids = None
         self.init_run()
+        if seeds_mm:
+            _, annotation_ids = self.prepare_circle_annotations_from_seeds_mm(centers_mm=seeds_mm)
+
         self.report.level = self.parameters.param("Processing", "Report Level").value()
 
         show = self.parameters.param("Processing", "Show").value()
@@ -720,7 +724,7 @@ class Scaffan:
         img = view_corner.get_region_image(as_gray=False)
         return view_corner, img
 
-    def prepare_circle_annotations_from_points_mm(self, centers_mm):
+    def prepare_circle_annotations_from_seeds_mm(self, centers_mm):
         pxsz_mm = float(self.get_parameter("Processing;Preview Pixelsize")) * 1000
         centers_mm = list(np.asarray(centers_mm) / pxsz_mm)
 
