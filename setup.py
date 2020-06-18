@@ -63,7 +63,7 @@ setup(
         "sample2": ["scaffan/scaffan_icon256.png"],
         "segmentation_model": ["segmentation_model.pkl"],
         "segmentation_model_not_working": ["scaffan/segmentation_model.pkl"],
-        "cnn_model": ["posenet_highLR.model"],
+        "cnn_model": ["scaffan/posenet_highLR.model"], # if it works the scaffan way is the right one
         "sni_area": ["SNI_area_regressor.joblib"],
         "segmentation_model_default": ["segmentation_model_default.pkl"],
         "segmentation_model_default_not_working": ["scaffan/segmentation_model_default.pkl"],
