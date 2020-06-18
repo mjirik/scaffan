@@ -16,7 +16,7 @@ from io3d import cachefile
 import json
 import time
 import platform
-from typing import List, Union
+from typing import List, Union, Optional
 
 # import PyQt5.QtWidgets
 # print("start 3")
@@ -493,23 +493,38 @@ class Scaffan:
                 key, wanted_val = wanted
                 self.set_parameter(key, val)
 
-    def run_lobuluses(self, event=None):
-        self.init_run()
-        annotation_ids = None
-        # if color is None:
+    def _prepare_annoataion_ids_for_run_lobuluses(self, annotation_ids:Optional[list]=None):
         pcolor = self.parameters.param("Input", "Annotation Color")
         color = pcolor.value()
+        automatic_lobulus_selection = self.parameters.param(
+            "Input", "Lobulus Selection Method"
+        ).value()
+        logger.debug(f"Lobulus Selection={automatic_lobulus_selection}")
+        if annotation_ids is None:
+
+            if automatic_lobulus_selection == "Color":
+                annotation_ids = self.anim.get_annotations_by_color(
+                    color,
+                    raise_exception_if_not_found=self.raise_exception_if_color_not_found,
+                )
+            # elif automatic_lobulus_selection and not run_slide_segmentation:
+            elif automatic_lobulus_selection == "Manual":
+                # on training we dont want to do the prediction and we set
+                annotation_ids = self.manual_select()
+            elif automatic_lobulus_selection == "None":
+                annotation_ids = []
+            else:
+                logger.error(f"Unknown Lobulus Selection Method: {automatic_lobulus_selection}")
+        return annotation_ids, automatic_lobulus_selection
+
+    def run_lobuluses(self, event=None, annotation_ids:Optional[list]=None):
+        """
+        :param event:
+        :param annotation_ids: If annotation ids is not none, and Lobulus Selection Method is set to
+        :return:
+        """
+        self.init_run()
         self.report.level = self.parameters.param("Processing", "Report Level").value()
-        # print("Color ", color)
-        # fnparam = self.parameters.param("Input", "File Path")
-        # from .image import AnnotatedImage
-        # path = self.parameters.param("Input", "File Path")
-        # anim = AnnotatedImage(path.value())
-        # if color is None:
-        #     color = list(self.anim.colors.keys())[0]
-        # print(self.anim.colors)
-        # if annotation_ids is None:
-        #     logger.error("No color selected")
 
         show = self.parameters.param("Processing", "Show").value()
         self.report.set_show(show)
@@ -517,21 +532,9 @@ class Scaffan:
         run_slide_segmentation = self.parameters.param(
             "Processing", "Scan Segmentation"
         ).value()
-        automatic_lobulus_selection = self.parameters.param(
-            "Input", "Lobulus Selection Method"
-        ).value()
-        logger.debug(f"Lobulus Selection={automatic_lobulus_selection}")
-        if automatic_lobulus_selection == "Color":
-            annotation_ids = self.anim.get_annotations_by_color(
-                color,
-                raise_exception_if_not_found=self.raise_exception_if_color_not_found,
-            )
-        # elif automatic_lobulus_selection and not run_slide_segmentation:
-        if automatic_lobulus_selection == "Manual":
-            # on training we dont want to do the prediction and we set
-            annotation_ids = self.manual_select()
-        if automatic_lobulus_selection == "None":
-            annotation_ids = []
+        annotation_ids, automatic_lobulus_selection = self._prepare_annoataion_ids_for_run_lobuluses(annotation_ids)
+
+        # if automatic_lobulus_selection == "use annotation_ids": ...
 
         if run_slide_segmentation:
             # fn_input = self.parameters.param("Input", "File Path").value()
@@ -716,7 +719,18 @@ class Scaffan:
         img = view_corner.get_region_image(as_gray=False)
         return view_corner, img
 
-    def prepare_circle_annotations_from_points_px_in_preview(self, view_corner, centers_px):
+    def prepare_circle_annotations_from_points_mm(self, centers_mm):
+        pxsz_mm = float(self.get_parameter("Processing;Preview Pixelsize")) * 1000
+        centers_mm = list(np.asarray(centers_mm) / pxsz_mm)
+
+        view_corner, _ = self.get_preview_view()
+        return self.prepare_circle_annotations_from_points_px_in_preview(view_corner, centers_mm)
+
+    def prepare_circle_annotations_from_points_px_in_preview(self, view_corner, centers_px_view):
+        x_px_view, y_px_view = zip(centers_px_view)
+        pts_glob_px = view_corner.coords_view_px_to_glob_px(x_px_view, y_px_view)
+        centers_px = list(zip(*pts_glob_px))
+        logger.debug(f"Manual selection5, centers_px_global={centers_px}")
         r_mm = (
                 float(self.get_parameter("Processing;Scan Segmentation;Annotation Radius"))
                 * 1000
@@ -773,12 +787,11 @@ class Scaffan:
         # x_px = (x_px_view*view_corner.zoom[0] + offset_px[0])
         # y_px = (y_px_view*view_corner.zoom[1] + offset_px[1])
         # pts_glob_px = [x_px, y_px]
+        xy_px_view = zip(x_px_view, y_px_view)
 
-        pts_glob_px = view_corner.coords_view_px_to_glob_px(x_px_view, y_px_view)
-        centers_px = list(zip(*pts_glob_px))
-        logger.debug(f"Manual selection5, centers_px_global={centers_px}")
         # centers_px = list(zip(*pts_glob_px))
-        view_corner, ann_ids = self.prepare_circle_annotations_from_points_px_in_preview(view_corner, centers_px)
+        view_corner, ann_ids = self.prepare_circle_annotations_from_points_px_in_preview(
+            view_corner, centers_px_view=xy_px_view)
         # logger.debug(f"annotations={self.anim.annotations}")
 
         logger.debug("annotation selected")
