@@ -696,25 +696,43 @@ class Scaffan:
         self.evaluation.run()
         # Copy all parameters to table
         self.report.finish_actual_row()
-    def get_preview(self):
+
+    def get_preview_view(self):
         full_view = self.anim.get_view(
             location=[0, 0], level=0, size_on_level=self.anim.get_slide_size()[::-1]
         )
         pxsz_mm = float(self.get_parameter("Processing;Preview Pixelsize")) * 1000
         view_corner = full_view.to_pixelsize(pixelsize_mm=[pxsz_mm, pxsz_mm])
-        logger.debug(
-            f"Manual selection1, view.loc={full_view.region_location}, view.size={full_view.region_size_on_level}, pxsz={full_view.region_pixelsize}"
-        )
+        return view_corner
+
+    def get_preview(self):
+        view_corner = self.get_preview_view()
+        # logger.debug(
+        #     f"Manual selection1, view.loc={full_view.region_location}, view.size={full_view.region_size_on_level}, pxsz={full_view.region_pixelsize}"
+        # )
         logger.debug(
             f"Manual selection2, view.loc={view_corner.region_location}, view.size={view_corner.region_size_on_level}, pxsz={view_corner.region_pixelsize}"
         )
         img = view_corner.get_region_image(as_gray=False)
-        return img
+        return view_corner, img
+
+    def prepare_circle_annotations_from_points_px_in_preview(self, view_corner, centers_px):
+        r_mm = (
+                float(self.get_parameter("Processing;Scan Segmentation;Annotation Radius"))
+                * 1000
+        )
+
+        ann_ids, _ = scaffan.slide_segmentation.add_circle_annotation(
+            view_corner, centers_px, annotations=self.anim.annotations, r_mm=r_mm
+        )
+        view_corner.set_annotations(self.anim.annotations)
+        view_corner.adjust_annotation_to_image_view()
+        return view_corner, ann_ids
 
     def manual_select(self):
         logger.debug("Manual selection")
         # full_view = self.anim.get_full_view()
-        img = self.get_preview()
+        view_corner, img = self.get_preview()
         # full_view = self.anim.get_view(
         #     location=[0, 0], level=0, size_on_level=self.anim.get_slide_size()[::-1]
         # )
@@ -760,16 +778,7 @@ class Scaffan:
         centers_px = list(zip(*pts_glob_px))
         logger.debug(f"Manual selection5, centers_px_global={centers_px}")
         # centers_px = list(zip(*pts_glob_px))
-        r_mm = (
-            float(self.get_parameter("Processing;Scan Segmentation;Annotation Radius"))
-            * 1000
-        )
-
-        ann_ids, _ = scaffan.slide_segmentation.add_circle_annotation(
-            view_corner, centers_px, annotations=self.anim.annotations, r_mm=r_mm
-        )
-        view_corner.set_annotations(self.anim.annotations)
-        view_corner.adjust_annotation_to_image_view()
+        view_corner, ann_ids = self.prepare_circle_annotations_from_points_px_in_preview(view_corner, centers_px)
         # logger.debug(f"annotations={self.anim.annotations}")
 
         logger.debug("annotation selected")
