@@ -11,7 +11,9 @@ import os
 from pathlib import Path
 import time
 from tensorflow.keras.models import load_model
-import cv2
+
+# import cv2 # pokud potřebujeme jen měnit velikost, raději bych cv2 ze závislostí vynechal
+import skimage.transform
 from statistics import mean
 
 #
@@ -188,4 +190,6 @@ class LobuleQualityEstimationCNN:
         """
         Resize image to display size
         """
-        return cv2.resize(img, dsize=(self.DISPLAY_SIZE, self.DISPLAY_SIZE), interpolation=cv2.INTER_CUBIC)
+        return skimage.transform.resize(img, output_shape=(self.DISPLAY_SIZE, self.DISPLAY_SIZE), preserve_range=True)
+        # pokud nepotřebujeme z cv2 nic jiného, zkusil bych jej nahradit, aby se nezvětšovaly závislosti.
+        # return cv2.resize(img, dsize=(self.DISPLAY_SIZE, self.DISPLAY_SIZE), interpolation=cv2.INTER_CUBIC)
