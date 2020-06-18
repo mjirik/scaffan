@@ -35,7 +35,7 @@ class LobuleQualityEstimationCNN:
         report: Report = None,
         pname="Quality Estimation CNN",
         ptype="group",
-        pvalue=None,
+        pvalue=False,
         ptip="CNN estimator of quality",
     ):
         params = [
