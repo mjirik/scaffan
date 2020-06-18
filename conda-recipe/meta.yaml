@@ -55,6 +55,7 @@ requirements:
     - scikit-image
     - scikit-learn
     - read-roi
+    - tensorflow
 
   run:
     - python>=3.6
@@ -98,6 +99,7 @@ requirements:
     - scikit-image
     - scikit-learn
     - czifile
+    - tensorflow
 
 test:
   # Python imports
