@@ -77,8 +77,8 @@ class LobuleQualityEstimationCNN:
         # načtení architektury modelu
         # načtení parametrů modelu
 
-        model_path = path_to_script / "nejlepsi.model"
-        self.model = load_model(model_path)
+        model_path = path_to_script / "cnn model v3"
+        self.model = load_model(str(model_path))
 
     def set_input_data(
             self, view: image.View, annotation_id: int = None, lobulus_segmentation=None
