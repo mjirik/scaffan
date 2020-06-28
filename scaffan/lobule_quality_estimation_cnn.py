@@ -77,7 +77,7 @@ class LobuleQualityEstimationCNN:
         # načtení architektury modelu
         # načtení parametrů modelu
 
-        model_path = path_to_script / "cnn model v3"
+        model_path = path_to_script / "cnn models" / "v7.h5"
         self.model = load_model(str(model_path))
 
     def set_input_data(
