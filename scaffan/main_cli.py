@@ -44,16 +44,21 @@ def run(ctx, log_level, *args, **kwargs):
             log_level = int(log_level)
         except ValueError as e:
             log_level = log_level.upper()
-        logger.remove()
+        # logger se odebírá při debugování v pycharm
+        # if log_level == "DEBUG":
+        #     pass
+        # else:
+        # todo return remove
+        # logger.remove()
         i = logger.add(sys.stderr, level=log_level, colorize=True)
     if ctx.invoked_subcommand is None:
         # click.echo("I am about to invoke GUI")
         ctx.invoke(gui, *args, **kwargs)
     else:
-        pass
-        # click.echo("I am about to invoke %s" % ctx.invoked_subcommand)
+        logger.debug(f"I am about to invoke {ctx.invoked_subcommand}")
         # next command is useless. It is invoked automatically
         # ctx.invoke(ctx.invoked_subcommand, *args, **kwargs)
+        # pass
 
 
 @run.command(context_settings=CONTEXT_SETTINGS, help="Set persistent values")
@@ -149,7 +154,7 @@ def install():
     default=None,
 )
 @click.option(
-    "--color", "-c", type=str, help="Annotation collor in hexa (#0000FF)", default=None,
+    "--color", "-c", type=str, help="Annotation color in hexa (#0000FF)", default=None,
 )
 @click.option(
     "--output-path",
@@ -174,7 +179,16 @@ def install():
     help='Set parameter. First argument is path to parameter separated by ";". Second is the value.'
     "python -m scaffan gui -p Processing,Show True",
 )
-def nogui(input_path, color, output_path, params):
+@click.option(
+    "--seeds_mm",
+    "-smm",
+    multiple=True,
+    default=None,
+    nargs=2,
+    help='Set parameter. First argument is path to parameter separated by ";". Second is the value.'
+         "python -m scaffan gui -p Processing,Show True",
+)
+def nogui(input_path, color, output_path, params, seeds_mm):
     # if log_level is not None:
     #     i = logger.add(level=log_level)
     logger.debug(
@@ -195,8 +209,12 @@ def nogui(input_path, color, output_path, params):
     if color is not None:
         logger.debug(f"color={color}")
         mainapp.set_annotation_color_selection(color)
-
-    mainapp.run_lobuluses()
+    # do float
+    logger.debug(f"seeds_mm={seeds_mm}")
+    if seeds_mm:
+        seeds_mm = [[float(c[0]), float(c[1])] for c in seeds_mm]
+        logger.debug(f"seeds_mm readed {seeds_mm}")
+    mainapp.run_lobuluses(seeds_mm=seeds_mm)
 
 
 # def install():

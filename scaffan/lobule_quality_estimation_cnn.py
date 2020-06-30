@@ -10,7 +10,6 @@ from chainer import serializers
 import os
 from pathlib import Path
 import time
-from tensorflow.keras.models import load_model
 
 # import cv2 # pokud potřebujeme jen měnit velikost, raději bych cv2 ze závislostí vynechal
 import skimage.transform
@@ -74,6 +73,7 @@ class LobuleQualityEstimationCNN:
         pass
 
     def init(self):
+        from tensorflow.keras.models import load_model
         # načtení architektury modelu
         # načtení parametrů modelu
 

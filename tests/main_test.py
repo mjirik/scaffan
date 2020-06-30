@@ -602,3 +602,14 @@ def run_on_yellow(mainapp, fn_yellow):
     ), "Central Vein segmentation should have Dice coefficient above some low level"
     # self.assertLess(0.5, mainapp.evaluation.evaluation_history[1]["Central Vein Dice"],
     #                 "Central Vein should have Dice coefficient above some low level")
+
+def run_with_external_seeds_mm():
+    fn = io3d.datasets.join_path(
+        "medical/orig/scaffan-analysis-czi/Zeiss-scans/05_2019_11_12__-1-2.czi",
+        get_root=True,
+    )
+
+
+    mainapp = scaffan.algorithm.Scaffan()
+    mainapp.set_parameter("Processing;Scan Segmentation", False)
+    run_on_yellow(mainapp, fn)

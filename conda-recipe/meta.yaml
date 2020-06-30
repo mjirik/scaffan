@@ -55,7 +55,8 @@ requirements:
     - scikit-image
     - scikit-learn
     - read-roi
-    - tensorflow
+    # tensorflow 2 is not available in conda with py36, we need py36 because of openslide
+#    - tensorflow >= 2.0
 
   run:
     - python>=3.6
@@ -74,6 +75,10 @@ requirements:
     - {{ pin_compatible('morphsnakes', max_pin='x', min_pin="x.x") }}
 #    - morphsnakes
 #    - pyqt>=5.0
+    # 2.12.1
+    # 2.18.2
+    # 1.13.8
+    # 2.0 - 2.18
     - {{ pin_compatible('pyqt', max_pin='x', min_pin="x.x") }}
     - {{ pin_compatible('exsu', max_pin='x', min_pin="x.x") }}
 #    - pyqt=5.9.2 # tested
@@ -99,7 +104,12 @@ requirements:
     - scikit-image
     - scikit-learn
     - czifile
-    - tensorflow
+# tensorflow 2 is not available in conda with py36, we need py36 because of openslide
+#    - tensorflow >= 2.0
+    # required by TF2 from pip
+    - absl-py
+    - termcolor
+    # ---------------- end of TF2 requr
 
 test:
   # Python imports

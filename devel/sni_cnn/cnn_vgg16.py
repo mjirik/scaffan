@@ -2,13 +2,6 @@ import matplotlib
 import numpy as np
 from matplotlib import pyplot as plt
 from numpy import load
-from tensorflow import saved_model
-from tensorflow.keras.layers import Conv2D
-from tensorflow.keras.layers import Dense
-from tensorflow.keras.layers import Flatten
-from tensorflow.keras.layers import MaxPool2D
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.optimizers import Adam
 
 TRAIN_DATA_SAVE_FILE = 'D:\\FAV\\Scaffold\\data\\train_data.npy'
 TRAIN_LABELS_SAVE_FILE = 'D:\\FAV\\Scaffold\\data\\train_labels.npy'
@@ -48,6 +41,10 @@ def load_data():
 
 
 def create_model():
+    from tensorflow import saved_model
+    from tensorflow.keras.layers import Conv2D, Dense, Flatten, MaxPool2D
+    from tensorflow.keras.models import Sequential
+    from tensorflow.keras.optimizers import Adam
     model = Sequential([
         Conv2D(input_shape=(DISPLAY_SIZE, DISPLAY_SIZE, 1), filters=64, kernel_size=(3, 3), padding="same",
                activation="relu"),
@@ -78,6 +75,11 @@ def create_model():
 
 
 if __name__ == '__main__':
+    from tensorflow import saved_model
+    from tensorflow.keras.layers import Conv2D, Dense, Flatten, MaxPool2D
+    from tensorflow.keras.models import Sequential
+    from tensorflow.keras.optimizers import Adam
+
     train_x, train_y, train_weights, test_x, test_y, test_weights = load_data()
 
     assert not np.any(np.isnan(train_x))

@@ -527,6 +527,7 @@ class Scaffan:
         annotation_ids = None
         self.init_run()
         if seeds_mm:
+            logger.debug(f"seeds_mm={seeds_mm}")
             _, annotation_ids = self.prepare_circle_annotations_from_seeds_mm(centers_mm=seeds_mm)
 
         self.report.level = self.parameters.param("Processing", "Report Level").value()
@@ -796,6 +797,9 @@ class Scaffan:
         # pts_glob_px = [x_px, y_px]
         xy_px_view = zip(x_px_view, y_px_view)
 
+        pxsz_mm = float(self.get_parameter("Processing;Preview Pixelsize")) * 1000
+        seeds_mm = list(np.asarray(xy_px_view) / pxsz_mm)
+        logger.debug(f"seeds_mm={seeds_mm}")
         # centers_px = list(zip(*pts_glob_px))
         view_corner, ann_ids = self.prepare_circle_annotations_from_points_px_in_preview(
             view_corner, centers_px_view=xy_px_view)

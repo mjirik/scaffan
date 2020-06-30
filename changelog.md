@@ -1,7 +1,7 @@
 # Changelog
 
 * [Added] CNN lobule quality
-
+* [Added] Seeds in mm available from CLI
 
 # 0.24 
 

@@ -2,7 +2,6 @@ import matplotlib
 import numpy as np
 from matplotlib import pyplot as plt
 from numpy import load
-from tensorflow import saved_model
 from tensorflow.keras.layers import BatchNormalization
 from tensorflow.keras.layers import Conv2D
 from tensorflow.keras.layers import Dense
@@ -109,6 +108,8 @@ def create_model():
 
 
 if __name__ == '__main__':
+    from tensorflow import saved_model
+
     train_x, train_y, train_weights, test_x, test_y, test_weights = load_data()
 
     assert not np.any(np.isnan(train_x))
