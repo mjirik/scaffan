@@ -61,7 +61,7 @@ def run(ctx, log_level, log_file, *args, **kwargs):
         else:
             sink = sys.stderr
         logger.remove()
-        i = logger.add(sys.sink, level=log_level, colorize=True)
+        i = logger.add(sink, level=log_level, colorize=True)
     if ctx.invoked_subcommand is None:
         # click.echo("I am about to invoke GUI")
         ctx.invoke(gui, *args, **kwargs)
