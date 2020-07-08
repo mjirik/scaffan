@@ -37,8 +37,15 @@ CONTEXT_SETTINGS = dict(help_option_names=["-h", "--help"])
     help="Set logging level",
     default="INFO",
 )
+@click.option(
+    "--log-file",
+    "-lf",
+    # type=,
+    help="Set logging file",
+    default=None,
+)
 @click.pass_context
-def run(ctx, log_level, *args, **kwargs):
+def run(ctx, log_level, log_file, *args, **kwargs):
     if log_level is not None:
         try:
             log_level = int(log_level)
@@ -48,9 +55,13 @@ def run(ctx, log_level, *args, **kwargs):
         # if log_level == "DEBUG":
         #     pass
         # else:
-        # todo return remove
-        # logger.remove()
-        i = logger.add(sys.stderr, level=log_level, colorize=True)
+        if log_file:
+            Path(log_file).parent.mkdir(parents=True, exist_ok=True)
+            sink = log_file
+        else:
+            sink = sys.stderr
+        logger.remove()
+        i = logger.add(sys.sink, level=log_level, colorize=True)
     if ctx.invoked_subcommand is None:
         # click.echo("I am about to invoke GUI")
         ctx.invoke(gui, *args, **kwargs)

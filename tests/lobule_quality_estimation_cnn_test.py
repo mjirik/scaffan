@@ -39,16 +39,16 @@ def test_get_lobulus_mask_manual():
 
     # TODO uncomment this
 
-    # lqe.init()
-    # lqe.set_input_data(
-    #     view=lob_proc.view,
-    #     annotation_id=annotation_id,
-    #     lobulus_segmentation=lob_proc.lobulus_mask,
-    # )
-    # quality = lqe.run()
+    lqe.init()
+    lqe.set_input_data(
+        view=lob_proc.view,
+        annotation_id=annotation_id,
+        lobulus_segmentation=lob_proc.lobulus_mask,
+    )
+    quality = lqe.run()
     #
     # # TODO now the acceptance range is too wide. Set the values closer.
-    # expected_quality = 0.7
-    # expected_quality_range = 0.3
-    # assert quality == pytest.approx(expected_quality, expected_quality_range)
+    expected_quality = 0.7
+    expected_quality_range = 0.3
+    assert quality == pytest.approx(expected_quality, expected_quality_range)
 
