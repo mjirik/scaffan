@@ -6,6 +6,7 @@
 
 * [Added] CNN lobule quality
 * [Added] Seeds in mm available from CLI
+* [Added] Log to file fron CLI
 
 # 0.24 
 
