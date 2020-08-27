@@ -1400,7 +1400,7 @@ class View:
         # logger.debug(f"imcr dtype: {image1.dtype}, shape: {image1.shape}, min max: [{np.min(image1[:,:,:3])}, {np.max(image1[:,:,:3])}], mean: {np.mean(image1[:,:,:3])}, min max alpha: [{np.min(image1[:,:,3])}, {np.max(image1[:,:,3])}], mean: {np.mean(image1[:,:,3])}")
 
         if as_gray:
-            im = skimage.color.rgb2gray(im)
+            im = skimage.color.rgb2gray(skimage.color.rgba2rgb(im))
 
         if self._is_resized_by_pixelsize:
             pxsz_level, pxunit_level = self.anim.get_pixel_size(level=self.region_level)
