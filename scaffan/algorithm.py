@@ -238,7 +238,7 @@ class Scaffan:
                     {
                         "name": "Preview Pixelsize",
                         "type": "float",
-                        "value": 0.00002,  # 0.02 mm
+                        "value": 0.00001,  # 0.02 mm
                         "suffix": "m",
                         "siPrefix": True,
                         "tip": "Pixelsize used for manual lobuli selection. ",
@@ -795,7 +795,7 @@ class Scaffan:
         # x_px = (x_px_view*view_corner.zoom[0] + offset_px[0])
         # y_px = (y_px_view*view_corner.zoom[1] + offset_px[1])
         # pts_glob_px = [x_px, y_px]
-        xy_px_view = zip(x_px_view, y_px_view)
+        xy_px_view = list(zip(x_px_view, y_px_view))
 
         pxsz_mm = float(self.get_parameter("Processing;Preview Pixelsize")) * 1000
         seeds_mm = list(np.asarray(xy_px_view) / pxsz_mm)
