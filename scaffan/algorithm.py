@@ -124,7 +124,9 @@ class Scaffan:
                         + "The annotattion for other image format are expected to be done in ImageJ ROI Manager.\n"
                         "File with annotations for is expected to be in the same dir and same name "
                         "with file extension `.roi.zip`. \n"
-                        "Color of segmentation can be part of the polyon name ('my annotation #00FF00')",
+                        "Color of segmentation should be part of the polyon name ('my annotation #00FF00').\n"
+                        "There has to be one rectangle annotataion covering the whole image. It is used to detect"
+                        "original size of image used for generating ImageJ ROI.",
                     },
                     # {
                     #     "name": "Lobulus Selection Method",
