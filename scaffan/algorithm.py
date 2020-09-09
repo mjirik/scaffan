@@ -105,7 +105,17 @@ class Scaffan:
                 "name": "Input",
                 "type": "group",
                 "children": [
-                    {"name": "File Path", "type": "str"},
+                    {"name": "File Path", "type": "str",
+                         "tip": "Annotations are imported automatically. Black, red and magenta annotations can be used"
+                         + "in training as intra-lobular, extra-lobular and background.\n\n"
+                         + "The annotations from `.ndpi` files are automativally imported.\n "
+                         + "The annotattion for other image format are expected to be done in ImageJ ROI Manager.\n"
+                           "File with annotations for is expected to be in the same dir and same name "
+                           "with file extension `.roi.zip`. \n"
+                           "Color of segmentation should be part of the polyon name ('my annotation #00FF00').\n"
+                           "There has to be one rectangle annotataion covering the whole image. It is used to detect"
+                           "original size of image used for generating ImageJ ROI."
+                     },
                     {"name": "Select", "type": "action"},
                     {"name": "Data Info", "type": "str", "readonly": True},
                     {
@@ -120,11 +130,6 @@ class Scaffan:
                         "tip": "Auto: select lobulus based on Scan Segmentation.\n"
                         "Color: based on annotation color.\n"
                         "Manual: manually pick the lobule. \n\n"
-                        + "The annotations from `.ndpi` files are automatically imported.\n "
-                        + "The annotattion for other image format are expected to be done in ImageJ ROI Manager.\n"
-                        "File with annotations for is expected to be in the same dir and same name "
-                        "with file extension `.roi.zip`. \n"
-                        "Color of segmentation can be part of the polyon name ('my annotation #00FF00')",
                     },
                     # {
                     #     "name": "Lobulus Selection Method",

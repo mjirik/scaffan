@@ -133,6 +133,11 @@ def ndpa_to_json(path):
 
 
 def get_imsize_from_imagej_roi(rois):
+    """
+    Get size from ImageJ annotation. There have to be rectangle over the whole image.
+    :param rois:
+    :return:
+    """
     width = 0
     height = 0
     rect = False
@@ -149,15 +154,18 @@ def get_imsize_from_imagej_roi(rois):
                 height = heighti
 
             rect = True
-        if not rect:
-            raise Exception(
-                "There should be rectangle in ROI file to define image size."
-            )
+    if not rect:
+        raise Exception(
+            "There should be rectangle in ROI file to define image size."
+        )
     return np.array([height, width])
 
 
 def read_annotations_imagej(path, slide_size) -> list:
     """
+    Read annotation from ImageJ. It is stored in `.roi.zip` file. There should be one rectangle annotation over
+    whole image to allow get size of the image used to produce the ROI.
+    All polygon-type annotations should contain color code in name like #FF0000 for red.
     :param path: Path to original image file. The ROI file name is derived from by adding .roi.zip
     :param slide_size:
     :return:

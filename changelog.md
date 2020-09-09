@@ -7,6 +7,7 @@
 * [Added] CNN lobule quality
 * [Added] Seeds in mm available from CLI
 * [Added] Log to file fron CLI
+* [Fixed] ImageJ ROI annotation. Rectangle does not have to be first now.
 
 # 0.24 
 
