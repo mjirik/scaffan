@@ -1,5 +1,8 @@
 #! /usr/bin/python
 # -*- coding: utf-8 -*-
+"""
+Train new parameters for HCTF segmentation
+"""
 
 from loguru import logger
 import unittest
@@ -103,7 +106,7 @@ mainapp.set_report_level(10)
 # ]
 fns = [
     # number of areas: 9, 17, 4,
-    io3d.datasets.join_path("medical", "orig", "Scaffan-analysis", "PIG-002_J-18-0091_HE.ndpi", get_root=True),
+#     io3d.datasets.join_path("medical", "orig", "Scaffan-analysis", "PIG-002_J-18-0091_HE.ndpi", get_root=True),
     # training
     io3d.datasets.join_path("medical", "orig", "Scaffan-analysis", "PIG-003_J-18-0165_HE.ndpi", get_root=True),
     # training
@@ -114,7 +117,13 @@ fns = [
     io3d.datasets.join_path("medical", "orig", "Scaffan-analysis", "PIG-005_J-18-0631_HE_LML per decell.ndpi", get_root=True),
     io3d.datasets.join_path("medical", "orig", "Scaffan-analysis", "PIG-005_J-18-0633_HE_PRML per decell.ndpi", get_root=True),
     io3d.datasets.join_path("medical", "orig", "Scaffan-analysis", "Pig-009_Pilsen_HE_009-LM-P.ndpi", get_root=True),
-    io3d.datasets.join_path("medical", "orig", "Scaffan-analysis", "PIG-004_BBJ-004-3 _HE_parenchyme.ndpi", get_root=True)
+    io3d.datasets.join_path("medical", "orig", "Scaffan-analysis", "PIG-004_BBJ-004-3 _HE_parenchyme.ndpi", get_root=True),
+    io3d.datasets.joinp("medical", "orig", "scaner_zeiss", "Moulisova-JENA", "06_2019_11_12__-1-3.czi"),
+    io3d.datasets.joinp("medical", "orig", "scaner_zeiss", "Moulisova-JENA", "07_2019_11_12__f-1.czi"),
+    io3d.datasets.joinp("medical", "orig", "scaner_zeiss", "Moulisova-JENA", "07_2019_11_13__l-2.czi"),
+    io3d.datasets.joinp("medical", "orig", "scaner_zeiss", "Moulisova-JENA", "08_2019_11_12__-1-4.czi"),
+    io3d.datasets.joinp("medical", "orig", "scaner_zeiss", "Moulisova-JENA", "08_2019_11_13__-4.czi"),
+#     io3d.datasets.joinp("medical", "orig", "scaner_zeiss", "Moulisova-JENA", "")
 ]
 
 mainapp.train_scan_segmentation(fns)

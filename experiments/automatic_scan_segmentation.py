@@ -1,6 +1,11 @@
 #! /usr/bin/python
 # -*- coding: utf-8 -*-
 
+"""
+Segmentation is done with training update to actual data
+"""
+
+
 from loguru import logger
 import unittest
 import os
@@ -88,7 +93,7 @@ def set_same(mainapp, fn):
     mainapp.set_parameter("Processing;Scan Segmentation;HCTFS;Load Default Classifier", True)
     mainapp.set_parameter("Processing;Scan Segmentation;HCTFS;Clean Before Training", False)
     mainapp.set_parameter("Processing;Scan Segmentation;HCTFS;Training Weight", 100)
-    mainapp.set_parameter("Processing;Scan Segmentation;HCFTS;Run Training", True)
+    mainapp.set_parameter("Processing;Scan Segmentation;HCTFS;Run Training", True)
     mainapp.set_parameter("Processing;Scan Segmentation;Lobulus Number", 0)
     # mainapp.set_parameter("Processing;Lobulus Segmentation;Manual Segmentation", True)
 
