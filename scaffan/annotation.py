@@ -154,10 +154,10 @@ def get_imsize_from_imagej_roi(rois):
                 height = heighti
 
             rect = True
-        if not rect:
-            raise Exception(
-                "There should be rectangle in ROI file to define image size."
-            )
+    if not rect:
+        raise Exception(
+            "There should be rectangle in ROI file to define image size."
+        )
     return np.array([height, width])
 
 

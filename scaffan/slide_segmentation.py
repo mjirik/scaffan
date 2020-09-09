@@ -107,9 +107,9 @@ class ScanSegmentation:
                         "type": "bool",
                         "value": False,
                         "tip": "Use annotated image to train classifier.\n"
-                        + "Red area is extra-lobular tissue.\n"
-                        + "Black area is intra-lobular tissue.\n"
-                        + "Magenta area is empty part of the image.\n",
+                        + "Red (#FF0000) area is extra-lobular tissue.\n"
+                        + "Black (#000000) area is intra-lobular tissue.\n"
+                        + "Magenta (#FF00FF) area is empty part of the image.\n",
                     },
                     {
                         "name": "Load Default Classifier",
