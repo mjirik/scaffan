@@ -500,6 +500,9 @@ class Scaffan:
                 self.set_parameter(key, val)
 
     def _prepare_annoataion_ids_for_run_lobuluses(self, annotation_ids:Optional[list]=None):
+        run_slide_segmentation = self.parameters.param(
+            "Processing", "Scan Segmentation"
+        ).value()
         pcolor = self.parameters.param("Input", "Annotation Color")
         color = pcolor.value()
         automatic_lobulus_selection = self.parameters.param(
@@ -519,6 +522,12 @@ class Scaffan:
                 annotation_ids = self.manual_select()
             elif automatic_lobulus_selection == "None":
                 annotation_ids = []
+            elif automatic_lobulus_selection == "Auto":
+                if run_slide_segmentation:
+                    self.slide_segmentation.add_biggest_to_annotations()
+                    annotation_ids = self.slide_segmentation.ann_biggest_ids
+                else:
+                    logger.error("Cannot do automatic lobulus selection without whole slide segmentation")
             else:
                 logger.error(f"Unknown Lobulus Selection Method: {automatic_lobulus_selection}")
         return annotation_ids, automatic_lobulus_selection
@@ -543,7 +552,6 @@ class Scaffan:
         run_slide_segmentation = self.parameters.param(
             "Processing", "Scan Segmentation"
         ).value()
-        annotation_ids, automatic_lobulus_selection = self._prepare_annoataion_ids_for_run_lobuluses(annotation_ids)
 
         # if automatic_lobulus_selection == "use annotation_ids": ...
 
@@ -555,9 +563,11 @@ class Scaffan:
             wsm = self.parameters.param("Processing", "Whole Scan Margin").value()
             self.slide_segmentation.init(self.anim.get_full_view(margin=wsm))
             self.slide_segmentation.run()
-            if automatic_lobulus_selection == "Auto":
-                self.slide_segmentation.add_biggest_to_annotations()
-                annotation_ids = self.slide_segmentation.ann_biggest_ids
+            # this can be used for automatic lobulus localization
+
+        annotation_ids, automatic_lobulus_selection = self._prepare_annoataion_ids_for_run_lobuluses(
+            annotation_ids, run_slide_segmentation
+        )
 
         if annotation_ids is None:
             raise NoLobulusSelectionUsedError
