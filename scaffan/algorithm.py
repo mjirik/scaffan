@@ -566,7 +566,7 @@ class Scaffan:
             # this can be used for automatic lobulus localization
 
         annotation_ids, automatic_lobulus_selection = self._prepare_annoataion_ids_for_run_lobuluses(
-            annotation_ids, run_slide_segmentation
+            annotation_ids
         )
 
         if annotation_ids is None:
