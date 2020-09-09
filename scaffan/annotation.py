@@ -173,7 +173,7 @@ def read_annotations_imagej(path, slide_size) -> list:
     # import io3d
     # import numpy as np
     fn = path + ".roi.zip"
-    logger.debug("Looking for ROI file {fn}")
+    logger.debug(f"Looking for ROI file {fn}")
     anns = []
     if op.exists(fn):
         # def read_annotations_imagej(, slide_size=slide_size):

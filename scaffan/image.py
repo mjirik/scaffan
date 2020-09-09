@@ -956,6 +956,8 @@ class AnnotatedImage:
         )
         im = np.asarray(imcr)
         if as_gray:
+            if im.shape[2] == 4:
+                im = skimage.color.rgba2rgb(im)
             im = skimage.color.rgb2gray(im)
             if as_unit8:
                 im = (im * 255).astype(np.uint8)
@@ -1402,7 +1404,7 @@ class View:
         if as_gray:
             if im.shape[2] == 4:
                 im = skimage.color.rgba2rgb(im)
-            im = skimage.color.rgb2gray()
+            im = skimage.color.rgb2gray(im)
 
         if self._is_resized_by_pixelsize:
             pxsz_level, pxunit_level = self.anim.get_pixel_size(level=self.region_level)

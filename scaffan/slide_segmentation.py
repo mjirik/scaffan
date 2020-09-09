@@ -77,6 +77,7 @@ class ScanSegmentation:
                 "type": "float",
                 # "value": 0.00001,  # 0.01 mm
                 "value": 0.000005,  # 0.005 mm
+                "value": 0.00000355,  # 0.005 mm
                 "suffix": "m",
                 "siPrefix": True,
                 "tip": "Resolution used for segmentation processing. "
