@@ -40,6 +40,7 @@ from exsu.report import Report
 from .image import AnnotatedImage
 from . import texture
 from . import whole_slide_seg_unet
+import scaffan
 
 
 class ScanSegmentation:
@@ -66,6 +67,13 @@ class ScanSegmentation:
         #     glcm_levels=128
         # )
         self._unet = whole_slide_seg_unet.WholeSlideSegmentationUNet(report=report)
+
+        self._glcm = scaffan.texture.GLCMTextureMeasurement(
+            "whole_slide_glcm",
+            texture_label="whole_slide_glcm",
+            add_cols_to_report=False,
+            report=report,
+        )
         params = [
             # {
             #     "name": "Tile Size",
