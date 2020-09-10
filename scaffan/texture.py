@@ -156,13 +156,6 @@ class GLCMTextureMeasurement:
                 "suffix": "px",
             },
             {
-                "name": "Tile Spacing",
-                "type": "int",
-                # "value": 32,
-                "value": tile_spacing,
-                "suffix": "px",
-            },
-            {
                 "name": "Working Resolution",
                 "type": "float",
                 # "value": 0.000001,
@@ -197,7 +190,7 @@ class GLCMTextureMeasurement:
         self.report = report
 
     def set_input_data(
-        self, view: image.View, annotation_id: int = None, lobulus_segmentation=None
+        self, view: image.View, annotation_id:int=None, lobulus_segmentation=None
     ):
         self.anim = view.anim
         self.annotation_id = annotation_id
@@ -323,6 +316,15 @@ class GLCMTextureMeasurement:
         #     "GLCM Homogenity": np.mean(e1[seg]),
         #     "GLCM Correlation": np.mean(e2[seg]),
         # }
+        if self.report:
+            self.report.imsave(
+                f"glcm_texture_features_{fn_id}",
+                # (self.measured_features * 255).astype(np.uint8),
+                self.measured_features,
+                level=60 + self.report_severity_offset,
+                level_npz=55 + self.report_severity_offset,
+                level_skimage=20 + self.report_severity_offset,
+            )
         if self.sni_predictor is not None:
             # texture processing is called twice
             self.sni_predictor.predict_area(row)

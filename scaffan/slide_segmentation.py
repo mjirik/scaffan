@@ -349,8 +349,13 @@ class ScanSegmentation:
         if method == "HCTFS":
             return self._get_features_hctf(view, debug_return=debug_return)
         elif method == "GLCMTFS":
-            # @TODO put here get features
-            pass
+            self._glcm.set_input_data(view=view, annotation_id=None, lobulus_segmentation=None)
+            self._glcm.run(recalculate_view=False)
+            features = self._glcm.measured_features
+            if debug_return:
+                return features, []
+            else:
+                return features
         pass
 
     def _get_features_hctf(self, view: View, debug_return=False) -> np.ndarray:
@@ -515,13 +520,13 @@ class ScanSegmentation:
     def predict_on_view(self, view):
         smethod = str(self.parameters.param("Segmentation Method").value())
         if smethod in ["HCTFS", "GLCMTFS"]:
-            return self.predict_on_view_hctfs(view)
+            return self.predict_on_view_tfs(view)
         elif smethod == "U-Net":
             return self._unet.predict_tile(view)
         else:
             raise ValueError(f"Unknown segmentation method '{smethod}'")
 
-    def predict_on_view_hctfs(self, view):
+    def predict_on_view_tfs(self, view):
         image = self._get_features(view)
         fvs = image.reshape(-1, image.shape[2])
         #         print(f"fvs: {fvs[:10]}")
@@ -953,7 +958,7 @@ class ScanSegmentation:
                 else:
                     logger.error("Default classifier not found")
 
-        if bool(self.parameters.param(method, "Run Training").value()):
+        if bool(self.parameters.param("TFS General", "Run Training").value()):
             self.train_classifier()
             self.save_classifier()
         if bool(self.parameters.param("Run Prediction").value()):
