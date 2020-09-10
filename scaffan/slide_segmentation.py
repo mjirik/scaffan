@@ -337,19 +337,19 @@ class ScanSegmentation:
             #             plt.figure()
             #             plt.imshow(ann_raster)
             #             plt.show()
-            img = self._get_features(view_ann)
+            img = self._get_features(view_ann, annotation_id=id1)
             stride = int(self.parameters.param("TFS General", "Training Stride").value())
             pixels = img[ann_raster][::stride]
             pixels_list.append(pixels)
         pixels_all = np.concatenate(pixels_list, axis=0)
         return pixels_all
 
-    def _get_features(self, view: View, debug_return=False) -> np.ndarray:
+    def _get_features(self, view: View, debug_return=False, annotation_id=None) -> np.ndarray:
         method = str(self.parameters.param("Segmentation Method").value())
         if method == "HCTFS":
             return self._get_features_hctf(view, debug_return=debug_return)
         elif method == "GLCMTFS":
-            self._glcm.set_input_data(view=view, annotation_id=None, lobulus_segmentation=None)
+            self._glcm.set_input_data(view=view, annotation_id=annotation_id, lobulus_segmentation=None)
             self._glcm.run(recalculate_view=False)
             features = self._glcm.measured_features
             if debug_return:
@@ -948,8 +948,8 @@ class ScanSegmentation:
         # self._inner_texture.add_cols_to_report = False
 
         method = str(self.parameters.param("Segmentation Method").value())
-        if method in ("HCTFS", "GLCMS"):
-            if bool(self.parameters.param(method, "Load Default Classifier").value()):
+        if method in ("HCTFS", "GLCMTFS"):
+            if bool(self.parameters.param("TFS General", "Load Default Classifier").value()):
                 if self.clf_default_fn.exists():
                     logger.debug(
                         f"Reading default classifier from {str(self.clf_default_fn)}"

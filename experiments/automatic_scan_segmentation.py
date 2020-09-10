@@ -18,6 +18,7 @@ import datetime
 
 experiment_title = "scan segmentation default and each training"
 experiment_title = "scan segmentation default and each training with weight"
+method = "GLCMTFS"
 
 experiment_datetime = datetime.datetime.now()
 experiment_datetime_fn = experiment_datetime.strftime("%Y%m%d-%H%M%S")
@@ -61,7 +62,8 @@ mainapp.set_persistent_cols({
     "Experiment Datetime": experiment_datetime.isoformat(" ", "seconds"),
 })
 
-mainapp.set_parameter("Processing;Intensity Normalization", True)
+mainapp.set_parameter("Processing;Scan Segmentation;Segmentation Method", method)
+mainapp.set_parameter("Processing;Intensity Normalization", False)
 # mainapp.set_parameter("Processing;Intensity Normalization;Run Intensity Normalization", True)
 # mainapp.set_parameter("Processing;Scan Segmentation;Working Resolution", 0.000005) # default is 0.000001 (10 um)
 mainapp.set_parameter("Processing;Scan Segmentation;Working Resolution", 0.0000025) # default is 0.000001 (10 um)

@@ -15,6 +15,7 @@ from pathlib import Path
 import datetime
 
 experiment_title = "scan segmentation training"
+method = "GLCMTFS"
 
 experiment_datetime = datetime.datetime.now()
 experiment_datetime_fn = experiment_datetime.strftime("%Y%m%d-%H%M%S")
@@ -48,6 +49,8 @@ logger.info(f"running experiment: {experiment_title} started at: {experiment_dat
 # annotations = scan.read_annotations(fn)
 # scan.annotations_to_px(imsl, annotations)
 mainapp = scaffan.algorithm.Scaffan()
+mainapp.set_parameter("Processing;Scan Segmentation;Segmentation Method", method)
+mainapp.slide_segmentation.prepade_clf() # this is usually automatically called in run()
 clf_fn = None  # rewrite the original
 if clf_fn is not None:
     mainapp.slide_segmentation.clf_fn = clf_fn
