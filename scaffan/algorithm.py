@@ -482,14 +482,14 @@ class Scaffan:
             if i == 0:
                 if clean_before_training is not None:
                     self.set_parameter(
-                        "Processing;Scan Segmentation;HCTFS;Clean Before Training",
+                        "Processing;Scan Segmentation;TFS General;Clean Before Training",
                         clean_before_training,
                     )
             else:
                 self.set_parameter(
-                    "Processing;Scan Segmentation;HCTFS;Clean Before Training", False
+                    "Processing;Scan Segmentation;TFS General;Clean Before Training", False
                 )
-            self.set_parameter("Processing;Scan Segmentation;HCTFS;Run Training", True)
+            self.set_parameter("Processing;Scan Segmentation;TFS General;Run Training", True)
             #             mainapp.set_parameter("Processing;Slide Segmentation;Lobulus Number", 0)
             # mainapp.start_gui(qapp=qapp)
             self.run_lobuluses()

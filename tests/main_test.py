@@ -73,7 +73,7 @@ class MainGuiTest(unittest.TestCase):
         )
         mainapp.set_parameter("Processing;Skeleton Analysis", False)
         mainapp.set_parameter("Processing;Texture Analysis", False)
-        mainapp.set_parameter("Processing;Scan Segmentation;HCTFS;Run Training", True)
+        mainapp.set_parameter("Processing;Scan Segmentation;TFS General;Run Training", True)
         mainapp.set_parameter("Processing;Scan Segmentation;Lobulus Number", 3)
 
         # mainapp.set_parameter("Input;Lobulus Selection Method", "Manual")
@@ -368,13 +368,13 @@ class MainGuiTest(unittest.TestCase):
             mainapp.set_parameter("Processing;Texture Analysis", False)
             mainapp.set_parameter("Processing;Open output dir", False)
             mainapp.set_parameter(
-                "Processing;Scan Segmentation;HCTFS;Clean Before Training", False
+                "Processing;Scan Segmentation;TFS General;Clean Before Training", False
             )
             mainapp.set_parameter(
                 "Processing;Scan Segmentation;Segmentation Method", segmentation_method
             )
             mainapp.set_parameter(
-                "Processing;Scan Segmentation;HCTFS;Run Training", False
+                "Processing;Scan Segmentation;TFS General;Run Training", False
             )
             # Set some Unet parameter here. It is used if the U-Net Segmentation method is used.
             # mainapp.set_parameter("Processing;Scan Segmentation;U-Net;Some Parameter", False)
@@ -423,7 +423,7 @@ class MainGuiTest(unittest.TestCase):
         logger.debug(f"classificator prior modification time: {modtime0}")
         if stride:
             logger.debug(f"setting stride {stride}")
-            mainapp.set_parameter("Processing;Scan Segmentation;HCTFS;Training Stride", stride)
+            mainapp.set_parameter("Processing;Scan Segmentation;TFS General;Training Stride", stride)
         mainapp.train_scan_segmentation(fns)
 
         # for i, fn in enumerate(fns):
@@ -438,8 +438,8 @@ class MainGuiTest(unittest.TestCase):
         #     mainapp.set_parameter("Processing;Texture Analysis", False)
         #     if i == 0:
         #     else:
-        #         mainapp.set_parameter("Processing;Scan Segmentation;HCTFS;Clean Before Training", False)
-        #     mainapp.set_parameter("Processing;Scan Segmentation;HCTFS;Run Training", True)
+        #         mainapp.set_parameter("Processing;Scan Segmentation;TFS General;Clean Before Training", False)
+        #     mainapp.set_parameter("Processing;Scan Segmentation;TFS General;Run Training", True)
         #     mainapp.set_parameter("Processing;Scan Segmentation;Lobulus Number", 0)
         #     # mainapp.start_gui(qapp=qapp)
         #     mainapp.run_lobuluses()
@@ -482,11 +482,11 @@ class MainGuiTest(unittest.TestCase):
         #     mainapp.set_parameter("Processing;Texture Analysis", False)
         #     mainapp.set_parameter("Processing;Open output dir", False)
         #     mainapp.set_parameter(
-        #         "Processing;Scan Segmentation;HCTFS;Clean Before Training", False
+        #         "Processing;Scan Segmentation;TFS General;Clean Before Training", False
         #     )
         #     mainapp.set_parameter("Processing;Scan Segmentation;Segmentation Method", "U-Net")
         #     mainapp.set_parameter("Processing;Scan Segmentation;Working Tile Size", 224)
-        #     mainapp.set_parameter("Processing;Scan Segmentation;HCTFS;Run Training", False)
+        #     mainapp.set_parameter("Processing;Scan Segmentation;TFS General;Run Training", False)
         #     # Set some Unet parameter here. It is used if the U-Net Segmentation method is used.
         #     # mainapp.set_parameter("Processing;Scan Segmentation;U-Net;Some Parameter", False)
         #     mainapp.set_parameter("Processing;Scan Segmentation;Lobulus Number", 0)

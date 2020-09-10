@@ -94,14 +94,14 @@ class ScanSegmentation:
             {
                 "name": "Segmentation Method",
                 "type": "list",
-                "values": ["U-Net", "HCTFS"],
+                "values": ["U-Net", "HCTFS", "GLCMTFS"],
                 "value": "U-Net",
             },
             self._unet.parameters,
             {
-                "name": "HCTFS",
+                "name": "TFS General",
                 "type": "group",
-                "tip": "Hand-crafter Texture Features based Segmentation parameters",
+                "tip": "Texture Features based Segmentation parameters",
                 "expanded": False,
                 "children": [
                     {
@@ -221,14 +221,9 @@ class ScanSegmentation:
         # QuadraticDiscriminantAnalysis(),
         # GaussianNB(),
         # self.clf = GaussianNB()
-        self.clf = self._clf_object(**self._clf_params)
-        self.clf_fn: Path = Path(Path(__file__).parent / "segmentation_model.pkl")
-        self.clf_default_fn: Path = Path(
-            Path(__file__).parent / "segmentation_model_default.pkl"
-        )
-        if self.clf_fn.exists():
-            logger.debug(f"Reading classifier from {str(self.clf_fn)}")
-            self.clf = joblib.load(self.clf_fn)
+        self.clf = None
+        self.clf_fn = None
+        self.clf_default_fn = None
         self.predicted_tiles = None
         # self.output_label_fn = "label.png"
         # self.output_raster_fn = "image.png"
@@ -258,6 +253,19 @@ class ScanSegmentation:
         self.tile_size = None
         self.ann_biggest_ids = []
         self.make_tiles()
+        self.prepade_clf()
+
+    def prepade_clf(self):
+        method = str(self.parameters.param("Segmentation Method").value())
+        method_str = method.replace(" ", "_")
+        self.clf = self._clf_object(**self._clf_params)
+        self.clf_fn: Path = Path(Path(__file__).parent / f"segmentation_model_{method_str}.pkl")
+        self.clf_default_fn: Path = Path(
+            Path(__file__).parent / f"segmentation_model_default_{method_str}.pkl"
+        )
+        if self.clf_fn.exists():
+            logger.debug(f"Reading classifier from {str(self.clf_fn)}")
+            self.clf = joblib.load(self.clf_fn)
 
     def train_classifier(self, pixels=None, y=None, sample_weight: float = None):
         logger.debug("start training")
@@ -266,11 +274,11 @@ class ScanSegmentation:
             pixels, y = self.prepare_training_pixels()
         if sample_weight is None:
             sample_weight = float(
-                self.parameters.param("HCTFS", "Training Weight").value()
+                self.parameters.param("TFS General", "Training Weight").value()
             )
         sample_weight = [sample_weight] * len(y)
 
-        if bool(self.parameters.param("HCTFS", "Clean Before Training").value()):
+        if bool(self.parameters.param("TFS General", "Clean Before Training").value()):
             self.clf = self._clf_object(**self._clf_params)
             # self.clf = GaussianNB()
             logger.debug(f"cleaning the classifier {self.clf}")
@@ -322,13 +330,22 @@ class ScanSegmentation:
             #             plt.imshow(ann_raster)
             #             plt.show()
             img = self._get_features(view_ann)
-            stride = int(self.parameters.param("HCTFS", "Training Stride").value())
+            stride = int(self.parameters.param("TFS General", "Training Stride").value())
             pixels = img[ann_raster][::stride]
             pixels_list.append(pixels)
         pixels_all = np.concatenate(pixels_list, axis=0)
         return pixels_all
 
     def _get_features(self, view: View, debug_return=False) -> np.ndarray:
+        method = str(self.parameters.param("Segmentation Method").value())
+        if method == "HCTFS":
+            return self._get_features_hctf(view, debug_return=debug_return)
+        elif method == "GLCMTFS":
+            # @TODO put here get features
+            pass
+        pass
+
+    def _get_features_hctf(self, view: View, debug_return=False) -> np.ndarray:
         """
         Three colors and one gaussian smooth reg channel.
         An alternative features computation can be done by setting callback function
@@ -489,7 +506,7 @@ class ScanSegmentation:
 
     def predict_on_view(self, view):
         smethod = str(self.parameters.param("Segmentation Method").value())
-        if smethod == "HCTFS":
+        if smethod in ["HCTFS", "GLCMTFS"]:
             return self.predict_on_view_hctfs(view)
         elif smethod == "U-Net":
             return self._unet.predict_tile(view)
@@ -908,6 +925,9 @@ class ScanSegmentation:
         # self.anim.annotations.extend(anns)
         self.ann_biggest_ids.extend(biggest_ids)
 
+    def _prepare_clf_fn(self):
+        method = str(self.parameters.param("Segmentation Method").value())
+
     def run(self):
         logger.debug("run...")
         # GLCM
@@ -915,8 +935,8 @@ class ScanSegmentation:
         # self._inner_texture.add_cols_to_report = False
 
         method = str(self.parameters.param("Segmentation Method").value())
-        if method == "HCTFS":
-            if bool(self.parameters.param("HCTFS", "Load Default Classifier").value()):
+        if method in ("HCTFS", "GLCMS"):
+            if bool(self.parameters.param(method, "Load Default Classifier").value()):
                 if self.clf_default_fn.exists():
                     logger.debug(
                         f"Reading default classifier from {str(self.clf_default_fn)}"
@@ -925,7 +945,7 @@ class ScanSegmentation:
                 else:
                     logger.error("Default classifier not found")
 
-        if bool(self.parameters.param("HCTFS", "Run Training").value()):
+        if bool(self.parameters.param(method, "Run Training").value()):
             self.train_classifier()
             self.save_classifier()
         if bool(self.parameters.param("Run Prediction").value()):
