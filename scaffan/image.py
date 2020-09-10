@@ -956,7 +956,7 @@ class AnnotatedImage:
         )
         im = np.asarray(imcr)
         if as_gray:
-            if im.shape[2] == 4:
+            if (len(im.shape) > 2) & (im.shape[2] == 4):
                 im = skimage.color.rgba2rgb(im)
             im = skimage.color.rgb2gray(im)
             if as_unit8:
@@ -1402,7 +1402,8 @@ class View:
         # logger.debug(f"imcr dtype: {image1.dtype}, shape: {image1.shape}, min max: [{np.min(image1[:,:,:3])}, {np.max(image1[:,:,:3])}], mean: {np.mean(image1[:,:,:3])}, min max alpha: [{np.min(image1[:,:,3])}, {np.max(image1[:,:,3])}], mean: {np.mean(image1[:,:,3])}")
 
         if as_gray:
-            if im.shape[2] == 4:
+
+            if (len(im.shape) > 2) & (im.shape[2] == 4):
                 im = skimage.color.rgba2rgb(im)
             im = skimage.color.rgb2gray(im)
 
