@@ -73,6 +73,8 @@ def run_slide_seg(
     seg.report.finish_actual_row()
     seg.report.dump()
     return seg
+    # plt.imshow(seg.full_prefilter_image)
+    # plt.show()
     # plt.imshow(seg.full_output_image)
     # plt.show()
     # plt.imshow(seg.full_raster_image)
@@ -100,3 +102,33 @@ def test_get_biggest_lobuli():
     # dir(seg)
     anim = scaffan.image.AnnotatedImage(fn)
     seg.init(anim.get_full_view(margin=-0.4))
+
+def test_postprocessing():
+    odir = Path(__file__).parent / "slide_seg_SCP003_test_output/"
+    fn = io3d.datasets.join_path(
+        "medical", "orig", "sample_data", "SCP003", "SCP003.ndpi", get_root=True
+    )
+    logger.debug(f"report dir={odir.absolute()}")
+    fn = str(fn)
+
+    report = exsu.Report(
+        outputdir=odir,
+        show=False
+        # additional_spreadsheet_fn=odir/"report.xlsx"
+    )
+    seg = scaffan.slide_segmentation.ScanSegmentation(report=report)
+    # dir(seg)
+    seg.parameters.param("Segmentation Method").setValue("GLCMTFS")
+    seg.parameters.param("Save Training Labels").setValue(True)
+    im = np.random.random([600, 400])
+    sg = (im > 0.3).astype(np.uint8)
+    sg[300:320, 100:105] = 2
+    imf = seg._labeling_filtration(sg)
+    assert imf[0,-1] == 0
+    assert imf[300,110] == 1
+    # plt.imshow(sg)
+    # plt.show()
+    # plt.imshow(imf)
+    # plt.show()
+
+

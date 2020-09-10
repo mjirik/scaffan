@@ -197,13 +197,15 @@ class GLCMTextureMeasurement:
         self.report = report
 
     def set_input_data(
-        self, view: image.View, annotation_id:int=None, lobulus_segmentation=None
+        self, view: image.View, annotation_id:int=None, lobulus_segmentation=None,
+            texture_label_str_id:str=None
     ):
         self.anim = view.anim
         self.annotation_id = annotation_id
         self.parent_view = view
         logger.trace(f"lobulus segmentation {lobulus_segmentation}")
         self.lobulus_segmentation = lobulus_segmentation
+        self.texture_label_str_id = texture_label_str_id
 
     def run(self, recalculate_view=True):
         """
@@ -233,7 +235,8 @@ class GLCMTextureMeasurement:
         texture_image = view.get_region_image(as_gray=True)
 
         fn_ann_id = "" if self.annotation_id is None else f"_{self.annotation_id}"
-        fn_id = "{}{}{}".format(self.filename_label, fn_ann_id, texture_label_fn)
+        tx_ann_id = "" if self.texture_label_str_id is None else f"_{self.texture_label_str_id}"
+        fn_id = "{}{}{}{}".format(self.filename_label, fn_ann_id, texture_label_fn, tx_ann_id)
         if self.report is not None:
             self.report.imsave(
                 f"texture_input_image_{fn_id}.png",

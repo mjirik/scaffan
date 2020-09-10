@@ -70,9 +70,13 @@ class ScanSegmentation:
 
         self._glcm = scaffan.texture.GLCMTextureMeasurement(
             "whole_slide_glcm",
-            texture_label="whole_slide_glcm",
+            texture_label="ws_part",
             add_cols_to_report=False,
             report=report,
+            # tile_size=64,
+            # tile_spacing=32,
+            tile_size=16,
+            tile_spacing=8,
         )
         params = [
             # {
@@ -161,6 +165,25 @@ class ScanSegmentation:
                 + "There is computation cost when it is turned on. "
                 + "It is not used in standard processing. "
                 + "The training labels are: 'unknown', 'background', 'intralobular' and 'interlobular'.",
+            },
+            {
+                "name": "Postprocessing",
+                "type": "bool",
+                "value": True,
+                "tip": "Run postprocessing based on intra-lobular smoothing and maximal distance from extra-lobular tissue",
+                "expanded": False,
+                "children": [
+                    {
+                        "name": "Max. Distance",
+                        "type": "float",
+                        "value": 0.001,  # 1 mm
+                        # "value": 0.000005,  # 0.005 mm
+                        # "value": 0.00000355,  # 0.005 mm
+                        "suffix": "m",
+                        "siPrefix": True,
+                        "tip": "Maximal distance from extra-lobular tissue"
+                    },
+                ]
             },
             {
                 "name": "Lobulus Number",
@@ -349,7 +372,12 @@ class ScanSegmentation:
         if method == "HCTFS":
             return self._get_features_hctf(view, debug_return=debug_return)
         elif method == "GLCMTFS":
-            self._glcm.set_input_data(view=view, annotation_id=annotation_id, lobulus_segmentation=None)
+            texture_label_str_id = f"{view.region_location[0]}_{view.region_location[1]}" if annotation_id is None else None
+            self._glcm.set_input_data(
+                view=view, annotation_id=annotation_id, lobulus_segmentation=None,
+                texture_label_str_id=texture_label_str_id
+
+            )
             self._glcm.run(recalculate_view=False)
             features = self._glcm.measured_features
             if debug_return:
@@ -662,7 +690,8 @@ class ScanSegmentation:
         logger.debug(f"output_image.shape={output_image.shape}")
         full_image = output_image[self._full_image_crop_slice()]
         self.full_prefilter_image = full_image
-        if str(self.parameters.param("Segmentation Method").value()) == "HCTFS":
+        # if str(self.parameters.param("Segmentation Method").value()) in ["HCTFS", "GLCMTFS"]:
+        if bool(self.parameters.param("Postprocessing").value()):
             self.full_output_image = self._labeling_filtration(full_image)
         else:
             self.full_output_image = full_image
@@ -687,11 +716,20 @@ class ScanSegmentation:
         smooth label 0 and label 1, keep label 2
         """
         logger.debug("labeling filtration")
+        # r_m = float(self.parameters.param("Annotation Radius").value())  # * 1000 # mm
+        resolution_m = float(
+            self.parameters.param("Working Resolution").value()
+        )  # * 1000
+        max_dist_m = float(
+            self.parameters.param("Postprocessing", "Max. Distance").value()
+        )  # * 1000
         tmp_img = full_image.copy()
         tmp_img[full_image == 2] = 1
         import skimage.filters
+        mask = scipy.ndimage.distance_transform_edt(full_image != 2, sampling=resolution_m) < max_dist_m
+        tmp_img[~mask] = 0
 
-        tmp_img = skimage.filters.gaussian(tmp_img.astype(np.float), sigma=4)
+        tmp_img = skimage.filters.gaussian(tmp_img.astype(np.float), sigma=4, preserve_range=False)
 
         tmp_img = (tmp_img > 0.5).astype(np.int)
         tmp_img[full_image == 2] = 2
