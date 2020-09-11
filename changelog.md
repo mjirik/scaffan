@@ -1,6 +1,10 @@
 # Changelog
 
 
+# 0.26
+
+* [Added] GLCM used for slide segmentation
+* [Changed] Postprocessing of whole slide segmentaion is now based on max dist from extra-lobular tissue.
 
 # 0.25
 
@@ -8,7 +12,6 @@
 * [Added] Seeds in mm available from CLI
 * [Added] Log to file fron CLI
 * [Fixed] ImageJ ROI annotation. Rectangle does not have to be first now.
-* [Changed] Postprocessing of whole slide segmentaion is now based on max dist from extra-lobular tissue.
 
 # 0.24 
 
