@@ -1,5 +1,5 @@
 # import os, sys; sys.path.append(os.path.dirname(os.path.realpath(__file__)))
-__version__ = "0.25.3"
+__version__ = "0.26.0"
 """
 Used for scaffold analysis
 """
