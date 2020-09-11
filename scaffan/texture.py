@@ -241,7 +241,7 @@ class GLCMTextureMeasurement:
             self.report.imsave(
                 f"texture_input_image_{fn_id}.png",
                 (texture_image * 255).astype(np.uint8),
-                level=60 + self.report_severity_offset,
+                level=45 + self.report_severity_offset,
                 level_npz=40 + self.report_severity_offset,
                 level_skimage=20 + self.report_severity_offset,
             )
@@ -331,9 +331,9 @@ class GLCMTextureMeasurement:
                 f"glcm_texture_features_{fn_id}",
                 # (self.measured_features * 255).astype(np.uint8),
                 self.measured_features,
-                level=60 + self.report_severity_offset,
+                level=45 + self.report_severity_offset,
                 # level_npz=55 + self.report_severity_offset,
-                npz_level=55 + self.report_severity_offset,
+                npz_level=40 + self.report_severity_offset,
                 # level_skimage=0,
                 # level_skimage=45 + self.report_severity_offset,
             )
