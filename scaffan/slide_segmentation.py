@@ -107,7 +107,8 @@ class ScanSegmentation:
                 "name": "Segmentation Method",
                 "type": "list",
                 "values": ["U-Net", "HCTFS", "GLCMTFS"],
-                "value": "U-Net",
+                "value": "GLCMTFS",
+                # "value": "U-Net",
             },
             self._unet.parameters,
             {
