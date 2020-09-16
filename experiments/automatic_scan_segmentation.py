@@ -100,6 +100,7 @@ def set_same(mainapp, fn):
     mainapp.set_parameter("Processing;Scan Segmentation;TFS General;Run Training", False)
     mainapp.set_parameter("Processing;Scan Segmentation;Lobulus Number", 0)
     mainapp.set_parameter("Processing;Scan Segmentation;TFS General;Load Default Classifier", True)
+    mainapp.set_parameter("Processing;Scan Segmentation;Save Training Labels", True)
     # mainapp.set_parameter("Processing;Scan Segmentation;TFS General;Clean Before Training", False)
     # mainapp.set_parameter("Processing;Scan Segmentation;TFS General;Training Weight", 100)
     # mainapp.set_parameter("Processing;Lobulus Segmentation;Manual Segmentation", True)
