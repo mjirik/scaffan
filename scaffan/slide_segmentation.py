@@ -881,7 +881,7 @@ class ScanSegmentation:
 
     def evaluate_labels(self):
 
-        if self.whole_slide_training_labels and self.full_output_image:
+        if self.whole_slide_training_labels is not None and self.full_output_image is not None:
             # labels_true = (self.whole_slide_training_labels - 1).astype(np.int8)
 
             selection = self.whole_slide_training_labels > 0
