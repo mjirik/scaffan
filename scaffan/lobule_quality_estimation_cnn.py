@@ -78,6 +78,10 @@ class LobuleQualityEstimationCNN:
         # načtení parametrů modelu
 
         model_path = path_to_script / "cnn models" / "v7.h5"
+        logger.debug(f"model_path[{type(model_path)}={model_path}")
+        # model_path = str(model_path)
+        # logger.debug(f"model_path[{type(model_path)}:{model_path}")
+        # TODO fix the problem with cuda
         self.model = load_model(str(model_path))
 
     def set_input_data(

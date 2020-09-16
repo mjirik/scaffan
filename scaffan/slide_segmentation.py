@@ -288,9 +288,9 @@ class ScanSegmentation:
         self.tile_size = None
         self.ann_biggest_ids = []
         self.make_tiles()
-        self.prepade_clf()
+        self.init_clf()
 
-    def prepade_clf(self):
+    def init_clf(self):
         method = str(self.parameters.param("Segmentation Method").value())
         method_str = method.replace(" ", "_")
         self.clf = self._clf_object(**self._clf_params)

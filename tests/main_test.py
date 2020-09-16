@@ -347,7 +347,9 @@ class MainGuiTest(unittest.TestCase):
         # if clf_fn is not None:
         #     mainapp.slide_segmentation.clf_fn = Path(clf_fn)
         # clf_fn = Path(mainapp.slide_segmentation.clf_fn)
+        mainapp.slide_segmentation.init_clf()
         clf_fn = mainapp.slide_segmentation.clf_fn
+
         assert clf_fn.exists()
 
         if clf_fn.exists():
