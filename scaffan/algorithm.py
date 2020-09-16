@@ -296,7 +296,7 @@ class Scaffan:
         # import pdb; pdb.set_trace()
         # print("ahoj")
 
-    def set_output_dir(self, path: Union[str, Path] = None):
+    def set_output_dir(self, path: Union[str, Path]=None):
         """
         Set directory for all outputs. The standard
         :param path: if no parameter is given the standard path in ~/data/SA_%Date_%Time is selected
@@ -462,6 +462,7 @@ class Scaffan:
         # clf_fn = Path(mainapp.slide_segmentation.clf_fn)
         clf_fn = Path(self.slide_segmentation.clf_fn)
         logger.debug(f"train clf on path: {clf_fn}, exists: {clf_fn.exists()}")
+        logger.debug(f"default output dir prefix={self._default_output_dir_prefix}")
 
         for i, fn in enumerate(fns):
             self.set_input_file(fn)

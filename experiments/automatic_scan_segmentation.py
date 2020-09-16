@@ -51,7 +51,7 @@ logger.info(f"running experiment: {experiment_title} started at: {experiment_dat
 # imsl = openslide.OpenSlide(fn)
 # annotations = scan.read_annotations(fn)
 # scan.annotations_to_px(imsl, annotations)
-mainapp = scaffan.algorithm.Scaffan(default_output_dir_prefix=experiment_dir)
+mainapp = scaffan.algorithm.Scaffan()
 
 
 #############
@@ -93,11 +93,15 @@ def set_same(mainapp, fn):
     mainapp.set_parameter("Processing;Skeleton Analysis", False)
     mainapp.set_parameter("Processing;Texture Analysis", False)
     mainapp.set_parameter("Processing;Open output dir", False)
-    mainapp.set_parameter("Processing;Scan Segmentation;TFS General;Load Default Classifier", True)
-    mainapp.set_parameter("Processing;Scan Segmentation;TFS General;Clean Before Training", False)
-    mainapp.set_parameter("Processing;Scan Segmentation;TFS General;Training Weight", 100)
-    mainapp.set_parameter("Processing;Scan Segmentation;TFS General;Run Training", True)
+    # mainapp.set_parameter("Processing;Scan Segmentation;TFS General;Load Default Classifier", True)
+    # mainapp.set_parameter("Processing;Scan Segmentation;TFS General;Clean Before Training", False)
+    # mainapp.set_parameter("Processing;Scan Segmentation;TFS General;Training Weight", 100)
+    # mainapp.set_parameter("Processing;Scan Segmentation;TFS General;Run Training", True)
+    mainapp.set_parameter("Processing;Scan Segmentation;TFS General;Run Training", False)
     mainapp.set_parameter("Processing;Scan Segmentation;Lobulus Number", 0)
+    mainapp.set_parameter("Processing;Scan Segmentation;TFS General;Load Default Classifier", True)
+    # mainapp.set_parameter("Processing;Scan Segmentation;TFS General;Clean Before Training", False)
+    # mainapp.set_parameter("Processing;Scan Segmentation;TFS General;Training Weight", 100)
     # mainapp.set_parameter("Processing;Lobulus Segmentation;Manual Segmentation", True)
 
 fns = [
