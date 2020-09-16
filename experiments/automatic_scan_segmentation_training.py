@@ -126,7 +126,8 @@ fns = [
     io3d.datasets.joinp("medical", "orig", "scaner_zeiss", "Moulisova-JENA", "07_2019_11_13__l-2.czi"),
     io3d.datasets.joinp("medical", "orig", "scaner_zeiss", "Moulisova-JENA", "08_2019_11_12__-1-4.czi"),
     io3d.datasets.joinp("medical", "orig", "scaner_zeiss", "Moulisova-JENA", "08_2019_11_13__-4.czi"),
-#     io3d.datasets.joinp("medical", "orig", "scaner_zeiss", "Moulisova-JENA", "")
+    # io3d.datasets.joinp("medical", "orig", "scaner_zeiss", "Moulisova-JENA", "11_2019_11_13__-7.czi"), # test data
+    #     io3d.datasets.joinp("medical", "orig", "scaner_zeiss", "Moulisova-JENA", "")
 ]
 
 mainapp.train_scan_segmentation(fns)
