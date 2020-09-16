@@ -79,6 +79,7 @@ class ScanSegmentation:
             # tile_spacing=32,
             tile_size=16,
             tile_spacing=8,
+            report_severity_offset=-20
         )
         params = [
             # {
