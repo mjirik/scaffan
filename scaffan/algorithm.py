@@ -214,7 +214,7 @@ class Scaffan:
                     #     "name": "Run Scan Segmentation",
                     #     "type": "bool",
                     #     "value": True,
-                    #     "tip": "Run analysis of whole slide before all other processing is perfomed",
+                    #     "tip": "Run analysis of whole scan before all other processing is perfomed",
                     # },
                     # {
                     #     "name": "Skeleton Analysis",
@@ -527,7 +527,7 @@ class Scaffan:
                     self.slide_segmentation.add_biggest_to_annotations()
                     annotation_ids = self.slide_segmentation.ann_biggest_ids
                 else:
-                    logger.error("Cannot do automatic lobulus selection without whole slide segmentation")
+                    logger.error("Cannot do automatic lobulus selection without whole scan segmentation")
             else:
                 logger.error(f"Unknown Lobulus Selection Method: {automatic_lobulus_selection}")
         return annotation_ids, automatic_lobulus_selection

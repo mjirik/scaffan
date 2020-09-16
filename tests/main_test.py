@@ -335,7 +335,7 @@ class MainGuiTest(unittest.TestCase):
 
     def _testing_slide_segmentation_clf(self, fns, segmentation_method, whole_scan_margin=0.0):
         """
-        Run whole slide segmentation on all input files and check whether all three labels are
+        Run whole scan segmentation on all input files and check whether all three labels are
         represented in the output labeling.
 
         :param fns:
@@ -391,7 +391,7 @@ class MainGuiTest(unittest.TestCase):
             logger.debug("asserts")
             assert (
                 specimen_size_mm < whole_area_mm
-            ), "Specimen should be smaller then whole slide"
+            ), "Specimen should be smaller then whole scan"
             assert specimen_size_mm > whole_area_mm * 0.1, "Specimen should big enough"
             assert (
                 mainapp.slide_segmentation.sinusoidal_area_mm > 0.1 * specimen_size_mm
@@ -499,7 +499,7 @@ class MainGuiTest(unittest.TestCase):
         #     )
         #     whole_area_mm = mainapp.slide_segmentation.empty_area_mm + specimen_size_mm
         #     logger.debug("asserts")
-        #     assert specimen_size_mm < whole_area_mm, "Specimen should be smaller then whole slide"
+        #     assert specimen_size_mm < whole_area_mm, "Specimen should be smaller then whole scan"
         #     assert specimen_size_mm > whole_area_mm * 0.1, "Specimen should big enough"
         #     assert (
         #             mainapp.slide_segmentation.sinusoidal_area_mm > 0.1 * specimen_size_mm

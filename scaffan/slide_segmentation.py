@@ -22,6 +22,8 @@ from sklearn.naive_bayes import GaussianNB
 import numpy as np
 from skimage.feature import peak_local_max
 import skimage.filters
+import sklearn.metrics
+# import skimage.metrics
 from skimage.morphology import disk
 import scipy.ndimage
 import matplotlib.pyplot as plt
@@ -50,7 +52,7 @@ class ScanSegmentation:
         pname="Scan Segmentation",
         ptype="bool",
         pvalue=True,
-        ptip="Run analysis of whole slide before all other processing is perfomed.\n"
+        ptip="Run analysis of whole scan before all other processing is perfomed.\n"
         + "If automatic lobulus selection is selected, "
         + "defined number of biggest lobuli are selected for texture analysis.",
     ):
@@ -192,7 +194,7 @@ class ScanSegmentation:
                 "value": 5,
                 # "suffix": "px",
                 "siPrefix": False,
-                "tip": "Number of lobuluses automatically selected after whole slide segmentation",
+                "tip": "Number of lobuluses automatically selected after whole scan segmentation",
             },
             {
                 "name": "Annotation Radius",
@@ -877,6 +879,21 @@ class ScanSegmentation:
             }
         )
 
+    def evaluate_labels(self):
+
+        if self.whole_slide_training_labels and self.full_output_image:
+            labels_true = (self.whole_slide_training_labels - 1).astype(np.int8)
+
+            accuracy = sklearn.metrics.accuracy_score(
+                labels_true.ravel(), self.full_output_image.ravel(), normalize=True
+            )
+            self.report.set_persistent_cols(
+                {
+                    "Whole Scan Training Labels Accuracy": accuracy
+                }
+            )
+
+
     def _find_biggest_lobuli(self):
         """
         :param n_max: Number of points. All points are returned if set to negative values.
@@ -987,13 +1004,14 @@ class ScanSegmentation:
         if bool(self.parameters.param("TFS General", "Run Training").value()):
             self.train_classifier()
             self.save_classifier()
+        if bool(self.parameters.param("Save Training Labels").value()):
+            self.save_training_labels()
         if bool(self.parameters.param("Run Prediction").value()):
             logger.debug("predict...")
             self.predict()
             logger.debug("evaluate...")
             self.evaluate()
-        if bool(self.parameters.param("Save Training Labels").value()):
-            self.save_training_labels()
+            self.evaluate_labels()
 
         res = list(self.anim.get_pixel_size(self.level))
         logger.debug(f"slide segmentation resolution = {res}")
