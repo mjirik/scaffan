@@ -79,7 +79,7 @@ class ScanSegmentation:
             # tile_spacing=32,
             tile_size=16,
             tile_spacing=8,
-            report_severity_offset=-20
+            report_severity_offset=-30
         )
         params = [
             # {
@@ -292,6 +292,7 @@ class ScanSegmentation:
 
     def init_clf(self):
         method = str(self.parameters.param("Segmentation Method").value())
+        logger.debug(f"method={method}")
         method_str = method.replace(" ", "_")
         self.clf = self._clf_object(**self._clf_params)
         self.clf_fn: Path = Path(Path(__file__).parent / f"segmentation_model_{method_str}.pkl")

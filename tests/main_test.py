@@ -347,18 +347,9 @@ class MainGuiTest(unittest.TestCase):
         # if clf_fn is not None:
         #     mainapp.slide_segmentation.clf_fn = Path(clf_fn)
         # clf_fn = Path(mainapp.slide_segmentation.clf_fn)
-        mainapp.slide_segmentation.init_clf()
-        clf_fn = mainapp.slide_segmentation.clf_fn
+        modtime0 = None
 
-        assert clf_fn.exists()
-
-        if clf_fn.exists():
-            modtime0 = datetime.fromtimestamp(clf_fn.stat().st_mtime)
-        else:
-            modtime0 = ""
-        logger.debug(f"classificator prior modification time: {modtime0}")
-
-        for fn in fns:
+        for i, fn in enumerate(fns):
             mainapp.set_input_file(fn)
             mainapp.set_output_dir()
             # There does not have to be set some color
@@ -378,11 +369,24 @@ class MainGuiTest(unittest.TestCase):
             mainapp.set_parameter(
                 "Processing;Scan Segmentation;TFS General;Run Training", False
             )
+
             # Set some Unet parameter here. It is used if the U-Net Segmentation method is used.
             # mainapp.set_parameter("Processing;Scan Segmentation;U-Net;Some Parameter", False)
             mainapp.set_parameter("Processing;Scan Segmentation;Lobulus Number", 0)
             mainapp.set_parameter("Processing;Whole Scan Margin", whole_scan_margin)
             # mainapp.start_gui(qapp=qapp)
+
+            if i == 0:
+                mainapp.slide_segmentation.init_clf()
+                clf_fn = mainapp.slide_segmentation.clf_fn
+                if segmentation_method != "U-Net":
+                    assert clf_fn.exists()
+                if clf_fn.exists():
+                    modtime0 = datetime.fromtimestamp(clf_fn.stat().st_mtime)
+                else:
+                    modtime0 = ""
+                logger.debug(f"classificator prior modification time: {modtime0}")
+
             mainapp.run_lobuluses()
 
             specimen_size_mm = (
@@ -402,15 +406,16 @@ class MainGuiTest(unittest.TestCase):
                 mainapp.slide_segmentation.septum_area_mm > 0.1 * specimen_size_mm
             ), "Septum area should be at least 10% of the specimen area"
 
-        assert Path(
-            mainapp.slide_segmentation.clf_fn
-        ).exists(), "The file with pretrained classifier should exist"
-        clf_fn = Path(mainapp.slide_segmentation.clf_fn)
-        modtime1 = datetime.fromtimestamp(clf_fn.stat().st_mtime)
-        logger.debug(f"classificator prior modification time: {modtime1}")
-        assert (
-            modtime0 == modtime1
-        ), "We are not changing the pretrained classifier file"
+        if segmentation_method != "U-Net":
+            assert Path(
+                mainapp.slide_segmentation.clf_fn
+            ).exists(), "The file with pretrained classifier should exist"
+            clf_fn = Path(mainapp.slide_segmentation.clf_fn)
+            modtime1 = datetime.fromtimestamp(clf_fn.stat().st_mtime)
+            logger.debug(f"classificator prior modification time: {modtime1}")
+            assert (
+                modtime0 == modtime1
+            ), "We are not changing the pretrained classifier file"
 
     def _slide_segmentation_train_clf(self, fns, clf_fn=None, stride=None):
         mainapp = scaffan.algorithm.Scaffan()
