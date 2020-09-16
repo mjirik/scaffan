@@ -882,16 +882,20 @@ class ScanSegmentation:
     def evaluate_labels(self):
 
         if self.whole_slide_training_labels and self.full_output_image:
-            labels_true = (self.whole_slide_training_labels - 1).astype(np.int8)
+            # labels_true = (self.whole_slide_training_labels - 1).astype(np.int8)
 
-            accuracy = sklearn.metrics.accuracy_score(
-                labels_true.ravel(), self.full_output_image.ravel(), normalize=True
-            )
-            self.report.set_persistent_cols(
-                {
-                    "Whole Scan Training Labels Accuracy": accuracy
-                }
-            )
+            selection = self.whole_slide_training_labels > 0
+            if np.sum(selection) > 0:
+                accuracy = sklearn.metrics.accuracy_score(
+                    self.whole_slide_training_labels[selection].ravel(),
+                    self.full_output_image[selection].ravel(),
+                    normalize=True
+                )
+                self.report.set_persistent_cols(
+                    {
+                        "Whole Scan Training Labels Accuracy": accuracy
+                    }
+                )
 
 
     def _find_biggest_lobuli(self):
