@@ -239,8 +239,15 @@ class GLCMTextureMeasurement:
         fn_id = "{}{}{}{}".format(self.filename_label, fn_ann_id, texture_label_fn, tx_ann_id)
         if self.report is not None:
             self.report.imsave(
-                f"texture_input_image_{fn_id}.png",
+                f"texture_input_image_mul255_{fn_id}.png",
                 (texture_image * 255).astype(np.uint8),
+                level=45 + self.report_severity_offset,
+                level_npz=40 + self.report_severity_offset,
+                level_skimage=20 + self.report_severity_offset,
+            )
+            self.report.imsave(
+                f"texture_input_image_mul1_{fn_id}.png",
+                texture_image,
                 level=45 + self.report_severity_offset,
                 level_npz=40 + self.report_severity_offset,
                 level_skimage=20 + self.report_severity_offset,

@@ -587,20 +587,7 @@ class ScanSegmentation:
         for view, tile_params in self.tiles:
             # view = self.tiles[ix][iy]
             sl_tl, sl_gl, loc = tile_params
-            seg_black = view.get_annotation_raster_by_color(
-                "#000000", raise_exception_if_not_found=False
-            )
-            seg_magenta = view.get_annotation_raster_by_color(
-                "#FF00FF", raise_exception_if_not_found=False
-            )
-            seg_red = view.get_annotation_raster_by_color(
-                "#FF0000", raise_exception_if_not_found=False
-            )
-            # find overlays
-            overlays = (1 * seg_black + 1 * seg_magenta + 1 * seg_red) > 1
-            segmentation = 2 * seg_black + 1 * seg_magenta + 3 * seg_red
-            # remove overlays
-            segmentation[overlays] = 0
+            segmentation = view.get_training_labels()
             output_image[
                 sl_gl
             ] = segmentation  # .get_region_image(as_gray=as_gray)[sl_x_tl, sl_y_tl, :3]
@@ -609,7 +596,7 @@ class ScanSegmentation:
         self.report.imsave(
             "whole_slide_training_labels.png",
             self.whole_slide_training_labels,
-            level_skimage=20,
+            level_skimage=40,
             level_npz=30,
         )
 
@@ -864,7 +851,7 @@ class ScanSegmentation:
         img = self.get_raster_image(as_gray=False)
         #         plt.imshow(img)
         self.report.imsave(
-            "slice_raster.png", img.astype(np.uint8), level_skimage=20, level_npz=30
+            "slice_raster.png", img.astype(np.uint8), level_skimage=40, level_npz=30
         )
         fig = plt.figure()
         plt.imshow(img)
