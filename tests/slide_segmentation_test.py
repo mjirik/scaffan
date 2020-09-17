@@ -68,6 +68,8 @@ def run_slide_seg(
     assert type(seg.whole_slide_training_labels) == np.ndarray
     assert seg.full_raster_image.shape[:2] == seg.full_output_image.shape[:2]
     assert seg.whole_slide_training_labels.shape[:2] == seg.full_output_image.shape[:2]
+    if seg.accuracy:
+        assert seg.accuracy > 0.2
     if add_biggest:
         seg.add_biggest_to_annotations()
     seg.report.finish_actual_row()
@@ -78,6 +80,7 @@ def run_slide_seg(
     # plt.imshow(seg.full_output_image)
     # plt.show()
     # plt.imshow(seg.full_raster_image)
+    # plt.contour(seg.whole_slide_training_labels)
     # plt.show()
     # plt.imshow(seg.whole_slide_training_labels)
     # plt.show()

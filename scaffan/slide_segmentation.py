@@ -272,6 +272,7 @@ class ScanSegmentation:
         self.septum_area_mm = None
         self.sinusoidal_area_mm = None
         self.alternative_get_features = None
+        self.accuracy = None
 
     # def init(self, anim: scim.AnnotatedImage):
     def init(self, view: scim.View):
@@ -604,6 +605,16 @@ class ScanSegmentation:
             level_npz=30,
         )
 
+    def _imsave_full_raster_and_training_labels(self):
+        if (self.full_raster_image is not None) and (self.whole_slide_training_labels is not None):
+            fig = plt.figure()
+            plt.imshow(self.full_raster_image)
+            plt.contour(self.whole_slide_training_labels,
+                        # cmap="Purples"
+                        )
+            self.report.savefig("whole_slide_raster_and_training_labels.png", level=45)
+            plt.close(fig)
+
     def predict_tiles(self):
         if self.tiles is None:
             self.make_tiles()
@@ -858,8 +869,16 @@ class ScanSegmentation:
             "slice_raster.png", img.astype(np.uint8), level_skimage=40, level_npz=30
         )
         fig = plt.figure()
-        plt.imshow(img)
-        self.view.plot_annotations(None)
+        # plt.imshow(img)
+        # view_tmp = self.view
+        # the view is wrong if it is based on whole scan image
+        view_tmp = self.view.to_pixelsize(self.used_pixelsize_mm)
+        plt.imshow(view_tmp.get_raster_image(as_gray=False))
+
+        # logger.debug(f"slice_raster size on pixelsize {self.view.region_pixelsize}, {self.view.annotations}")
+        logger.debug(self.view.region_size_on_level)
+        logger.debug(f"view.region_level={self.view.region_level}")
+        view_tmp.plot_annotations(None)
         # self.view.region_imshow_annotation(i=None)
         # self.view.imshow()
         self.report.savefig("slice_raster_with_annotation.png", level=45)
@@ -889,7 +908,7 @@ class ScanSegmentation:
             selection = self.whole_slide_training_labels > 0
             if np.sum(selection) > 0:
                 accuracy = sklearn.metrics.accuracy_score(
-                    self.whole_slide_training_labels[selection].ravel(),
+                    self.whole_slide_training_labels[selection].ravel() - 1,
                     self.full_output_image[selection].ravel(),
                     normalize=True
                 )
@@ -898,6 +917,14 @@ class ScanSegmentation:
                         "Whole Scan Training Labels Accuracy": accuracy
                     }
                 )
+                self.accuracy = accuracy
+                fig = plt.figure()
+                plt.imshow(self.full_output_image, cmap="Purples")
+                plt.contour(self.whole_slide_training_labels, cmap="Reds")
+                self.report.savefig("segmentation_and_training_labels.png", level=45)
+                plt.close(fig)
+                return accuracy
+        return None
 
 
     def _find_biggest_lobuli(self):
@@ -927,7 +954,7 @@ class ScanSegmentation:
         # image_max = scipy.ndimage.maximum_filter(dist, size=min_distance, mode="constant")
         # Comparison between image_max and im to find the coordinates of local maxima
         coordinates = peak_local_max(dist, min_distance=min_distance)
-        point_dist = dist[list(zip(*coordinates))]
+        point_dist = dist[tuple(list(zip(*coordinates)))]
         # display(point_dist)
         # max_point_inds = point_dist.argsort()[-n_max:][::-1]
         sorted_point_inds = point_dist.argsort()[::-1]
@@ -962,12 +989,12 @@ class ScanSegmentation:
             "ro",
         )
         plt.axis("off")
+        self.report.savefig(
+            "sinusoidal_tissue_local_centers.png", level=55
+        )
         self.report.savefig_and_show(
             "sinusoidal_tissue_local_centers.pdf", fig, level=55
         )
-        # self.report.savefig_and_show(
-        #     "sinusoidal_tissue_local_centers.png", fig, level=55
-        # )
 
         return max_points
 
@@ -1018,6 +1045,7 @@ class ScanSegmentation:
             logger.debug("evaluate...")
             self.evaluate()
             self.evaluate_labels()
+            self._imsave_full_raster_and_training_labels()
 
         res = list(self.anim.get_pixel_size(self.level))
         logger.debug(f"slide segmentation resolution = {res}")

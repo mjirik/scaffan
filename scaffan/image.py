@@ -601,6 +601,7 @@ class AnnotatedImage:
             view = view_level0.to_level(level)
         else:
             view = view_level0
+        # resize annotations
         return view
 
     def get_view(

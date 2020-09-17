@@ -273,11 +273,14 @@ def plot_annotations(
         x = np.asarray(annotation[x_key]) * factor[0]
         y = np.asarray(annotation[y_key]) * factor[1]
         # plt.hold(True)
-        plt.plot(x, y, c=annotation["color"])
-        if show_id:
-            plt.text(
-                np.min(x), np.min(y), str(i), c=annotation["color"], fontsize="x-small"
-            )
+        if len(x) == 0 or len(y) == 0:
+            logger.debug(f"Annotation id={i} has zero length")
+        else:
+            plt.plot(x, y, c=annotation["color"])
+            if show_id:
+                plt.text(
+                    np.min(x), np.min(y), str(i), c=annotation["color"], fontsize="x-small"
+                )
 
 
 def adjust_xy_to_image_view(imsl, x_px, y_px, center, level, size):
