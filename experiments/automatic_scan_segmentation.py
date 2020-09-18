@@ -106,23 +106,23 @@ def set_same(mainapp, fn):
     # mainapp.set_parameter("Processing;Lobulus Segmentation;Manual Segmentation", True)
 
 fns = [
-    # "medical/orig/Scaffan-analysis/PIG-001_J-17-0571_LM central_HE.ndpi",
-    # "medical/orig/Scaffan-analysis/PIG-001_J-17-0569_LM_HE.ndpi",
-    # # "medical/orig/Scaffan-analysis/PIG-001_J-17-0567_edge RM_HE.ndpi",  # no annotation
-    # "medical/orig/Scaffan-analysis/PIG-002_J-18-0091_HE.ndpi",
-    # "medical/orig/Scaffan-analysis/PIG-002_J-18-0092_HE.ndpi",
-    # "medical/orig/Scaffan-analysis/PIG-002_J-18-0094_HE_rescan.ndpi", # bad focus
-    # "medical/orig/Scaffan-analysis/PIG-003_J-18-0165_HE.ndpi",
-    # "medical/orig/Scaffan-analysis/PIG-003_J-18-0166_HE.ndpi",
-    # "medical/orig/Scaffan-analysis/PIG-003_J-18-0167_HE.ndpi",
-    # "medical/orig/Scaffan-analysis/PIG-003_J-18-0168_HE.ndpi",
-    # "medical/orig/Scaffan-analysis/PIG-003_J-18-0169_HE.ndpi",
-    # "medical/orig/Scaffan-analysis/PIG-003_J-18-0170_HE.ndpi",
-    # "medical/orig/Scaffan-analysis/PIG-004_BBJ-004-4_HE_parenchyme.ndpi",
-    # "medical/orig/Scaffan-analysis/PIG-004_BBJ-004-3 _HE_parenchyme.ndpi",
-    # "medical/orig/Scaffan-analysis/PIG-004_BBJ-004-2 _HE_parenchyme.ndpi",
-    # "medical/orig/Scaffan-analysis/PIG-005_J-18-0630_HE_LLL per decell.ndpi",
-    # "medical/orig/Scaffan-analysis/PIG-005_J-18-0631_HE_LML per decell.ndpi",
+    "medical/orig/Scaffan-analysis/PIG-001_J-17-0571_LM central_HE.ndpi",
+    "medical/orig/Scaffan-analysis/PIG-001_J-17-0569_LM_HE.ndpi",
+    # "medical/orig/Scaffan-analysis/PIG-001_J-17-0567_edge RM_HE.ndpi",  # no annotation
+    "medical/orig/Scaffan-analysis/PIG-002_J-18-0091_HE.ndpi",
+    "medical/orig/Scaffan-analysis/PIG-002_J-18-0092_HE.ndpi",
+    "medical/orig/Scaffan-analysis/PIG-002_J-18-0094_HE_rescan.ndpi", # bad focus
+    "medical/orig/Scaffan-analysis/PIG-003_J-18-0165_HE.ndpi",
+    "medical/orig/Scaffan-analysis/PIG-003_J-18-0166_HE.ndpi",
+    "medical/orig/Scaffan-analysis/PIG-003_J-18-0167_HE.ndpi",
+    "medical/orig/Scaffan-analysis/PIG-003_J-18-0168_HE.ndpi",
+    "medical/orig/Scaffan-analysis/PIG-003_J-18-0169_HE.ndpi",
+    "medical/orig/Scaffan-analysis/PIG-003_J-18-0170_HE.ndpi",
+    "medical/orig/Scaffan-analysis/PIG-004_BBJ-004-4_HE_parenchyme.ndpi",
+    "medical/orig/Scaffan-analysis/PIG-004_BBJ-004-3 _HE_parenchyme.ndpi",
+    "medical/orig/Scaffan-analysis/PIG-004_BBJ-004-2 _HE_parenchyme.ndpi",
+    "medical/orig/Scaffan-analysis/PIG-005_J-18-0630_HE_LLL per decell.ndpi",
+    "medical/orig/Scaffan-analysis/PIG-005_J-18-0631_HE_LML per decell.ndpi",
     "medical/orig/Scaffan-analysis/PIG-005_J-18-0633_HE_PRML per decell.ndpi",
     "medical/orig/Scaffan-analysis/PIG-008_P008 LL-C_HE_parenchyme centr..ndpi",
     "medical/orig/Scaffan-analysis/PIG-008_P008 LL-P_HE_parenchyme perif..ndpi",
@@ -144,10 +144,10 @@ fns = [
     'medical/orig/Scaffan-analysis-whole-scan-addition/Pig-011_Pilsen_HE_RM-P (1).ndpi',
     'medical/orig/Scaffan-analysis-whole-scan-addition/PIG-012_Pilsen_HE_LMC (1).ndpi',
     "medical/orig/scaner_zeiss/Moulisova-JENA/11_2019_11_13__-7.czi", # test data
-    # "medical/orig/scaner_zeiss/Moulisova-JENA/01_2019_11_12__RecognizedCode.czi",
-    # "medical/orig/scaner_zeiss/Moulisova-JENA/01_2019_11_13__RecognizedCode.czi",
-    # "medical/orig/scaner_zeiss/Moulisova-JENA/02_2019_11_12__RecognizedCode-1_pt1.czi",
-    # "medical/orig/scaner_zeiss/Moulisova-JENA/02_2019_11_13__l.czi",
+    # "medical/orig/scaner_zeiss/Moulisova-JENA/01_2019_11_12__RecognizedCode.czi", # no annotation
+    # "medical/orig/scaner_zeiss/Moulisova-JENA/01_2019_11_13__RecognizedCode.czi", # no annotation
+    # "medical/orig/scaner_zeiss/Moulisova-JENA/02_2019_11_12__RecognizedCode-1_pt1.czi", # no annotation
+    # "medical/orig/scaner_zeiss/Moulisova-JENA/02_2019_11_13__l.czi", # no annotation
     "medical/orig/scaner_zeiss/Moulisova-JENA/06_2019_11_12__-1-3.czi",
     "medical/orig/scaner_zeiss/Moulisova-JENA/07_2019_11_12__f-1.czi",
     "medical/orig/scaner_zeiss/Moulisova-JENA/07_2019_11_13__l-2.czi",
