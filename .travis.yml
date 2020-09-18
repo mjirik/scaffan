@@ -11,7 +11,6 @@ python:
 
 os: linux
 # Ubuntu 14.04 Trusty support
-sudo: required
 dist: trusty
 # install new cmake
 #addons:
