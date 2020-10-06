@@ -335,7 +335,7 @@ class MainGuiTest(unittest.TestCase):
 
     def _testing_slide_segmentation_clf(self, fns, segmentation_method, whole_scan_margin=0.0):
         """
-        Run whole slide segmentation on all input files and check whether all three labels are
+        Run whole scan segmentation on all input files and check whether all three labels are
         represented in the output labeling.
 
         :param fns:
@@ -347,16 +347,9 @@ class MainGuiTest(unittest.TestCase):
         # if clf_fn is not None:
         #     mainapp.slide_segmentation.clf_fn = Path(clf_fn)
         # clf_fn = Path(mainapp.slide_segmentation.clf_fn)
-        clf_fn = mainapp.slide_segmentation.clf_fn
-        assert clf_fn.exists()
+        modtime0 = None
 
-        if clf_fn.exists():
-            modtime0 = datetime.fromtimestamp(clf_fn.stat().st_mtime)
-        else:
-            modtime0 = ""
-        logger.debug(f"classificator prior modification time: {modtime0}")
-
-        for fn in fns:
+        for i, fn in enumerate(fns):
             mainapp.set_input_file(fn)
             mainapp.set_output_dir()
             # There does not have to be set some color
@@ -376,11 +369,24 @@ class MainGuiTest(unittest.TestCase):
             mainapp.set_parameter(
                 "Processing;Scan Segmentation;TFS General;Run Training", False
             )
+
             # Set some Unet parameter here. It is used if the U-Net Segmentation method is used.
             # mainapp.set_parameter("Processing;Scan Segmentation;U-Net;Some Parameter", False)
             mainapp.set_parameter("Processing;Scan Segmentation;Lobulus Number", 0)
             mainapp.set_parameter("Processing;Whole Scan Margin", whole_scan_margin)
             # mainapp.start_gui(qapp=qapp)
+
+            if i == 0:
+                mainapp.slide_segmentation.init_clf()
+                clf_fn = mainapp.slide_segmentation.clf_fn
+                if segmentation_method != "U-Net":
+                    assert clf_fn.exists()
+                if clf_fn.exists():
+                    modtime0 = datetime.fromtimestamp(clf_fn.stat().st_mtime)
+                else:
+                    modtime0 = ""
+                logger.debug(f"classificator prior modification time: {modtime0}")
+
             mainapp.run_lobuluses()
 
             specimen_size_mm = (
@@ -391,7 +397,7 @@ class MainGuiTest(unittest.TestCase):
             logger.debug("asserts")
             assert (
                 specimen_size_mm < whole_area_mm
-            ), "Specimen should be smaller then whole slide"
+            ), "Specimen should be smaller then whole scan"
             assert specimen_size_mm > whole_area_mm * 0.1, "Specimen should big enough"
             assert (
                 mainapp.slide_segmentation.sinusoidal_area_mm > 0.1 * specimen_size_mm
@@ -400,15 +406,16 @@ class MainGuiTest(unittest.TestCase):
                 mainapp.slide_segmentation.septum_area_mm > 0.1 * specimen_size_mm
             ), "Septum area should be at least 10% of the specimen area"
 
-        assert Path(
-            mainapp.slide_segmentation.clf_fn
-        ).exists(), "The file with pretrained classifier should exist"
-        clf_fn = Path(mainapp.slide_segmentation.clf_fn)
-        modtime1 = datetime.fromtimestamp(clf_fn.stat().st_mtime)
-        logger.debug(f"classificator prior modification time: {modtime1}")
-        assert (
-            modtime0 == modtime1
-        ), "We are not changing the pretrained classifier file"
+        if segmentation_method != "U-Net":
+            assert Path(
+                mainapp.slide_segmentation.clf_fn
+            ).exists(), "The file with pretrained classifier should exist"
+            clf_fn = Path(mainapp.slide_segmentation.clf_fn)
+            modtime1 = datetime.fromtimestamp(clf_fn.stat().st_mtime)
+            logger.debug(f"classificator prior modification time: {modtime1}")
+            assert (
+                modtime0 == modtime1
+            ), "We are not changing the pretrained classifier file"
 
     def _slide_segmentation_train_clf(self, fns, clf_fn=None, stride=None):
         mainapp = scaffan.algorithm.Scaffan()
@@ -499,7 +506,7 @@ class MainGuiTest(unittest.TestCase):
         #     )
         #     whole_area_mm = mainapp.slide_segmentation.empty_area_mm + specimen_size_mm
         #     logger.debug("asserts")
-        #     assert specimen_size_mm < whole_area_mm, "Specimen should be smaller then whole slide"
+        #     assert specimen_size_mm < whole_area_mm, "Specimen should be smaller then whole scan"
         #     assert specimen_size_mm > whole_area_mm * 0.1, "Specimen should big enough"
         #     assert (
         #             mainapp.slide_segmentation.sinusoidal_area_mm > 0.1 * specimen_size_mm

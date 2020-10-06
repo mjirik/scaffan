@@ -1,5 +1,6 @@
 # Changelog
 
+* [Added] Output prefix dir can be set to easier processing of multiple files.
 
 # 0.26
 

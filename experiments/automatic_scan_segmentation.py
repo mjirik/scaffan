@@ -66,7 +66,8 @@ mainapp.set_parameter("Processing;Scan Segmentation;Segmentation Method", method
 mainapp.set_parameter("Processing;Intensity Normalization", False)
 # mainapp.set_parameter("Processing;Intensity Normalization;Run Intensity Normalization", True)
 # mainapp.set_parameter("Processing;Scan Segmentation;Working Resolution", 0.000005) # default is 0.000001 (10 um)
-mainapp.set_parameter("Processing;Scan Segmentation;Working Resolution", 0.0000025) # default is 0.000001 (10 um)
+# mainapp.set_parameter("Processing;Scan Segmentation;Working Resolution", 0.0000025) # default is 0.000001 (10 um)
+mainapp.set_parameter("Processing;Scan Segmentation;Save Training Labels", True)
 # mainapp.set_parameter("Processing;Lobulus Segmentation;Central Vein Segmentation;Threshold", 0.18)
 mainapp.set_parameter("Processing;Lobulus Segmentation;Central Vein Segmentation;Threshold", 0.20)
 # mainapp.parameters.param("Processing", "Lobulus Segmentation", "Central Vein Segmentation", "Threshold").setValue(0.20)
@@ -76,7 +77,7 @@ mainapp.set_parameter("Processing;Lobulus Segmentation;Manual Segmentation", Fal
 
 mainapp.set_parameter("Processing;Skeleton Analysis", False)
 mainapp.set_parameter("Processing;Texture Analysis", False)
-mainapp.set_report_level(35)
+mainapp.set_report_level(40)
 # mainapp.set_parameter("Processing;Lobulus Segmentation;Manual Segmentation", True)
 
 def set_same(mainapp, fn):
@@ -92,11 +93,16 @@ def set_same(mainapp, fn):
     mainapp.set_parameter("Processing;Skeleton Analysis", False)
     mainapp.set_parameter("Processing;Texture Analysis", False)
     mainapp.set_parameter("Processing;Open output dir", False)
-    mainapp.set_parameter("Processing;Scan Segmentation;TFS General;Load Default Classifier", True)
+    # mainapp.set_parameter("Processing;Scan Segmentation;TFS General;Load Default Classifier", True)
     mainapp.set_parameter("Processing;Scan Segmentation;TFS General;Clean Before Training", False)
     mainapp.set_parameter("Processing;Scan Segmentation;TFS General;Training Weight", 100)
     mainapp.set_parameter("Processing;Scan Segmentation;TFS General;Run Training", True)
+    # mainapp.set_parameter("Processing;Scan Segmentation;TFS General;Run Training", False)
     mainapp.set_parameter("Processing;Scan Segmentation;Lobulus Number", 0)
+    mainapp.set_parameter("Processing;Scan Segmentation;TFS General;Load Default Classifier", True)
+    mainapp.set_parameter("Processing;Scan Segmentation;Save Training Labels", True)
+    # mainapp.set_parameter("Processing;Scan Segmentation;TFS General;Clean Before Training", False)
+    # mainapp.set_parameter("Processing;Scan Segmentation;TFS General;Training Weight", 100)
     # mainapp.set_parameter("Processing;Lobulus Segmentation;Manual Segmentation", True)
 
 fns = [
@@ -137,6 +143,22 @@ fns = [
     'medical/orig/Scaffan-analysis-whole-scan-addition/PIG-012_Pilsen_HE_LLP (1).ndpi',
     'medical/orig/Scaffan-analysis-whole-scan-addition/Pig-011_Pilsen_HE_RM-P (1).ndpi',
     'medical/orig/Scaffan-analysis-whole-scan-addition/PIG-012_Pilsen_HE_LMC (1).ndpi',
+    "medical/orig/scaner_zeiss/Moulisova-JENA/11_2019_11_13__-7.czi", # test data
+    # "medical/orig/scaner_zeiss/Moulisova-JENA/01_2019_11_12__RecognizedCode.czi", # no annotation
+    # "medical/orig/scaner_zeiss/Moulisova-JENA/01_2019_11_13__RecognizedCode.czi", # no annotation
+    # "medical/orig/scaner_zeiss/Moulisova-JENA/02_2019_11_12__RecognizedCode-1_pt1.czi", # no annotation
+    # "medical/orig/scaner_zeiss/Moulisova-JENA/02_2019_11_13__l.czi", # no annotation
+    "medical/orig/scaner_zeiss/Moulisova-JENA/06_2019_11_12__-1-3.czi",
+    "medical/orig/scaner_zeiss/Moulisova-JENA/07_2019_11_12__f-1.czi",
+    "medical/orig/scaner_zeiss/Moulisova-JENA/07_2019_11_13__l-2.czi",
+    "medical/orig/scaner_zeiss/Moulisova-JENA/08_2019_11_12__-1-4.czi",
+    "medical/orig/scaner_zeiss/Moulisova-JENA/08_2019_11_13__-4.czi",
+    # "medical/orig/scaner_zeiss/Moulisova-JENA/",
+    # "medical/orig/scaner_zeiss/Moulisova-JENA/",
+    # "medical/orig/scaner_zeiss/Moulisova-JENA/",
+    # "medical/orig/scaner_zeiss/Moulisova-JENA/",
+    # "medical/orig/scaner_zeiss/Moulisova-JENA/",
+    # "medical/orig/scaner_zeiss/Moulisova-JENA/",
 ]
 
 for fn in fns:

@@ -239,8 +239,15 @@ class GLCMTextureMeasurement:
         fn_id = "{}{}{}{}".format(self.filename_label, fn_ann_id, texture_label_fn, tx_ann_id)
         if self.report is not None:
             self.report.imsave(
-                f"texture_input_image_{fn_id}.png",
+                f"texture_input_image_mul255_{fn_id}.png",
                 (texture_image * 255).astype(np.uint8),
+                level=45 + self.report_severity_offset,
+                level_npz=40 + self.report_severity_offset,
+                level_skimage=20 + self.report_severity_offset,
+            )
+            self.report.imsave(
+                f"texture_input_image_mul1_{fn_id}.png",
+                texture_image,
                 level=45 + self.report_severity_offset,
                 level_npz=40 + self.report_severity_offset,
                 level_skimage=20 + self.report_severity_offset,
@@ -280,8 +287,9 @@ class GLCMTextureMeasurement:
         plt.title("GLCM correlation")
         image.imshow_with_colorbar(energy[:, :, 2])
         mx = np.max(energy, axis=(0, 1))
-        # mn = np.min(energy, axis=(0, 1))
+        mn = np.min(energy, axis=(0, 1))
         logger.debug(f"GLCM max energy, homogeneity, correlation: {mx}")
+        logger.debug(f"GLCM min energy, homogeneity, correlation: {mn}")
         # plt.colorbar()
         if self.report is not None:
             self.report.savefig_and_show(
@@ -292,10 +300,16 @@ class GLCMTextureMeasurement:
         # if close_figs:
         #     plt.close(fig)
         # plt.savefig("glcm_features_{}.png".format(title))
-
+        logger.debug(f"glcm_features_{fn_id} saved")
         fig = plt.figure()
-        plt.imshow(energy)
+        # 0..1 normalization because energy (3rd channel) can be negative
+        w = np.ones([1, 1, 3])
+        w.ravel()[2] = 0.5
+        t = np.zeros([1, 1, 3])
+        t.ravel()[2] = 0.5
+        plt.imshow(energy * w + t)
         if self.report is not None:
+
             self.report.savefig_and_show(
                 "glcm_features_color_{}.png".format(fn_id),
                 fig,
@@ -342,8 +356,10 @@ class GLCMTextureMeasurement:
             self.sni_predictor.predict_area(row)
         if self.report is not None and self.add_cols_to_report:
             self.report.add_cols_to_actual_row(row)
+
         logger.debug(
-            f"GLCM textures for id {self.annotation_id if self.annotation_id is not None else '-'} finished"
+            f"GLCM textures for id={self.annotation_id if self.annotation_id is not None else '-'} "
+            f"(tx_label={tx_ann_id}) finished"
         )
 
         # plt.show()

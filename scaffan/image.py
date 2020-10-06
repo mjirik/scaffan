@@ -601,6 +601,7 @@ class AnnotatedImage:
             view = view_level0.to_level(level)
         else:
             view = view_level0
+        # resize annotations
         return view
 
     def get_view(
@@ -1545,6 +1546,43 @@ class View:
             margin=margin,
             margin_in_pixels=margin_in_pixels,
         )
+
+    def get_training_labels(self, fill_gaps=False, return_debug_images=False):
+        view = self
+        seg_black = view.get_annotation_raster_by_color(
+            "#000000", raise_exception_if_not_found=False
+        )
+        seg_magenta = view.get_annotation_raster_by_color(
+            "#FF00FF", raise_exception_if_not_found=False
+        )
+        seg_red = view.get_annotation_raster_by_color(
+            "#FF0000", raise_exception_if_not_found=False
+        )
+        # find overlays
+        overlays = (1 * seg_black + 1 * seg_magenta + 1 * seg_red) > 1
+        segmentation = 2 * seg_black + 1 * seg_magenta + 3 * seg_red
+        # remove overlays
+        segmentation[overlays] = 0
+        if not fill_gaps:
+            if return_debug_images:
+                return segmentation, []
+            return segmentation
+        else:
+            from scipy.ndimage import morphology
+            dst, inds = morphology.distance_transform_edt(segmentation==0, return_indices=True)
+            # plt.imshow(dst)
+
+            # fill the gaps
+            filled = segmentation[[*inds]]
+            # plt.imshow(filled, vim=1)
+            # plt.colorbar()
+            if return_debug_images:
+                return filled, [dst]
+            else:
+                return filled
+
+
+
 
 
 class ColorError(Exception):

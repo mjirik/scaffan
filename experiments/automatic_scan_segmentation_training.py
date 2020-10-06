@@ -48,9 +48,9 @@ logger.info(f"running experiment: {experiment_title} started at: {experiment_dat
 # imsl = openslide.OpenSlide(fn)
 # annotations = scan.read_annotations(fn)
 # scan.annotations_to_px(imsl, annotations)
-mainapp = scaffan.algorithm.Scaffan()
+mainapp = scaffan.algorithm.Scaffan(default_output_dir_prefix=experiment_dir)
 mainapp.set_parameter("Processing;Scan Segmentation;Segmentation Method", method)
-mainapp.slide_segmentation.prepade_clf() # this is usually automatically called in run()
+mainapp.slide_segmentation.init_clf() # this is usually automatically called in run()
 clf_fn = None  # rewrite the original
 if clf_fn is not None:
     mainapp.slide_segmentation.clf_fn = clf_fn
@@ -82,7 +82,7 @@ mainapp.set_parameter("Processing;Intensity Normalization", False)
 
 # mainapp.set_parameter("Processing;Skeleton Analysis", False)
 # mainapp.set_parameter("Processing;Texture Analysis", False)
-mainapp.set_parameter("Processing;Scan Segmentation;Save Training Labels", True) # default is 0.000001 (10 um)
+mainapp.set_parameter("Processing;Scan Segmentation;Save Training Labels", True)
 mainapp.set_report_level(10)
 # mainapp.set_parameter("Processing;Lobulus Segmentation;Manual Segmentation", True)
 
@@ -109,9 +109,9 @@ mainapp.set_report_level(10)
 # ]
 fns = [
     # number of areas: 9, 17, 4,
-#     io3d.datasets.join_path("medical", "orig", "Scaffan-analysis", "PIG-002_J-18-0091_HE.ndpi", get_root=True),
+#     io3d.datasets.join_path("medical", "orig", "Scaffan-analysis", "PIG-002_J-18-0091_HE.ndpi", get_root=True), # ugly data
     # training
-    io3d.datasets.join_path("medical", "orig", "Scaffan-analysis", "PIG-003_J-18-0165_HE.ndpi", get_root=True),
+    # io3d.datasets.join_path("medical", "orig", "Scaffan-analysis", "PIG-003_J-18-0165_HE.ndpi", get_root=True), # test data
     # training
     io3d.datasets.join_path("medical", "orig", "Scaffan-analysis", "PIG-003_J-18-0168_HE.ndpi", get_root=True),
     # training
@@ -126,7 +126,8 @@ fns = [
     io3d.datasets.joinp("medical", "orig", "scaner_zeiss", "Moulisova-JENA", "07_2019_11_13__l-2.czi"),
     io3d.datasets.joinp("medical", "orig", "scaner_zeiss", "Moulisova-JENA", "08_2019_11_12__-1-4.czi"),
     io3d.datasets.joinp("medical", "orig", "scaner_zeiss", "Moulisova-JENA", "08_2019_11_13__-4.czi"),
-#     io3d.datasets.joinp("medical", "orig", "scaner_zeiss", "Moulisova-JENA", "")
+    # io3d.datasets.joinp("medical", "orig", "scaner_zeiss", "Moulisova-JENA", "11_2019_11_13__-7.czi"), # test data
+    #     io3d.datasets.joinp("medical", "orig", "scaner_zeiss", "Moulisova-JENA", "")
 ]
 
 mainapp.train_scan_segmentation(fns)
