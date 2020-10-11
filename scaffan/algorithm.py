@@ -563,6 +563,7 @@ class Scaffan:
 
         # if automatic_lobulus_selection == "use annotation_ids": ...
 
+        t0 = time.time()
         if run_slide_segmentation:
             # fn_input = self.parameters.param("Input", "File Path").value()
 
@@ -576,6 +577,8 @@ class Scaffan:
         annotation_ids, automatic_lobulus_selection = self._prepare_annoataion_ids_for_run_lobuluses(
             annotation_ids
         )
+        t1 = time.time()
+        self.report.set_persistent_cols({"Lobules Selection Time [s]": t1 - t0})
 
         if annotation_ids is None:
             raise NoLobulusSelectionUsedError
@@ -632,24 +635,27 @@ class Scaffan:
 
         # print("ann ids", annotation_ids)
 
-    def _add_general_information_to_actual_row(self):
+    def _add_general_information_to_actual_row(self, update_dict:dict=None):
         inpath = Path(self.parameters.param("Input", "File Path").value())
         fn = inpath.parts[-1]
         fn_out = self.parameters.param("Output", "Directory Path").value()
+        data_to_add = {
+            "File Name": str(fn),
+            "File Path": str(inpath),
+            "Annotation Color": self.parameters.param(
+                "Input", "Annotation Color"
+            ).value(),
+            "Datetime": datetime.datetime.now().isoformat(" ", "seconds"),
+            "platform.system": platform.uname().system,
+            "platform.node": platform.uname().node,
+            "platform.processor": platform.uname().processor,
+            "Scaffan Version": scaffan.__version__,
+            "Output Directory Path": str(fn_out),
+        }
+        if update_dict:
+            data_to_add.update(update_dict)
         self.report.add_cols_to_actual_row(
-            {
-                "File Name": str(fn),
-                "File Path": str(inpath),
-                "Annotation Color": self.parameters.param(
-                    "Input", "Annotation Color"
-                ).value(),
-                "Datetime": datetime.datetime.now().isoformat(" ", "seconds"),
-                "platform.system": platform.uname().system,
-                "platform.node": platform.uname().node,
-                "platform.processor": platform.uname().processor,
-                "Scaffan Version": scaffan.__version__,
-                "Output Directory Path": str(fn_out),
-            }
+            data_to_add
         )
         self.report.add_cols_to_actual_row(self.parameters_to_dict())
 
