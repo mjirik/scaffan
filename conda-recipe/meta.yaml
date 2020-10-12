@@ -1,10 +1,10 @@
 package:
   name: scaffan
-  version: "0.26.2"
+  version: "0.27.0"
 
 source:
 # this is used for build from git hub
-  git_rev: 0.26.2
+  git_rev: 0.27.0
   git_url: https://github.com/mjirik/scaffan.git
 
 # this is used for pypi
