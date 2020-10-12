@@ -13,6 +13,7 @@ language: minimal
 os: linux
 # Ubuntu 14.04 Trusty support
 #dist: trusty
+# language: generic works together with no dist specified
 dist: xenial
 # install new cmake
 #addons:
