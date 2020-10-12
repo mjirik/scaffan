@@ -75,6 +75,7 @@ install:
 # command to run tests
 #script: nosetests -v --with-coverage -s --cover-package=scaffan
 script:
+  - xvfb-run make test
   - python -m pytest --cov=scaffan/ -v -s --durations=5
 after_success:
     - coveralls
