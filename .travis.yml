@@ -1,5 +1,6 @@
-language: python
+language: generic
 #python:
+#  "3.6"
 #    - "2.6"
 #  - 2.7
   # - "3.2"
