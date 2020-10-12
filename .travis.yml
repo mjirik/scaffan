@@ -1,4 +1,4 @@
-language: generic
+language: minimal
 #python:
 #  "3.6"
 #    - "2.6"
@@ -13,6 +13,7 @@ language: generic
 os: linux
 # Ubuntu 14.04 Trusty support
 #dist: trusty
+dist: xenial
 # install new cmake
 #addons:
 #  apt:
