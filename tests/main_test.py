@@ -324,6 +324,7 @@ class MainGuiTest(unittest.TestCase):
         ]
         self._testing_slide_segmentation_clf(fns, segmentation_method="HCTFS")
 
+    @unittest.skipIf(os.environ.get("TRAVIS", default=False), "Skip on Travis-CI")
     def test_testing_slide_segmentation_clf_unet(self):
         fns = [
             io3d.datasets.join_path(
