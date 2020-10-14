@@ -35,6 +35,7 @@ from matplotlib.path import Path as mplPath
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from PIL import Image
 from PIL.TiffTags import TAGS
+import traceback
 
 annotationID = Union[int, str]
 annotationIDs = List[annotationID]
@@ -44,20 +45,20 @@ annotationIDs = List[annotationID]
 
 
 def import_openslide():
-
-    pth = op.expanduser(r"~\Downloads\openslide-win64-20171122\bin")
-    dll_list = glob.glob(op.join(pth, "*.dll"))
-    if len(dll_list) < 5:
-        print("Trying to download openslide dll files in {}".format(pth))
-        libfixer.libfix()
-    # pth = op.expanduser(r"~\projects\scaffan\devel\knihovny")
-    # pth = op.expanduser(r"~\Miniconda3\envs\lisa36\Library\bin")
-    sys.path.insert(0, pth)
-    orig_PATH = os.environ["PATH"]
-    orig_split = orig_PATH.split(";")
-    if pth not in orig_split:
-        print("add path {}".format(pth))
-    os.environ["PATH"] = pth + ";" + os.environ["PATH"]
+    if os.name == 'nt':
+        pth = op.expanduser(r"~\Downloads\openslide-win64-20171122\bin")
+        dll_list = glob.glob(op.join(pth, "*.dll"))
+        if len(dll_list) < 5:
+            print("Trying to download openslide dll files in {}".format(pth))
+            libfixer.libfix()
+        # pth = op.expanduser(r"~\projects\scaffan\devel\knihovny")
+        # pth = op.expanduser(r"~\Miniconda3\envs\lisa36\Library\bin")
+        sys.path.insert(0, pth)
+        orig_PATH = os.environ["PATH"]
+        orig_split = orig_PATH.split(";")
+        if pth not in orig_split:
+            logger.debug("add path {}".format(pth))
+        os.environ["PATH"] = pth + ";" + os.environ["PATH"]
 
 
 import_openslide()
@@ -357,23 +358,24 @@ class ImageSlide:
             xr = meta_dict["XResolution"]
             logger.debug(f"xr={xr}")
             xres = (xr[0][1] / xr[0][0]) * unit_multiplicator
-            self.parameters.param("Input", "Pixel Size X").setValue(xres)
+            # self.parameters.param("Input", "Pixel Size X").setValue(xres)
             yr = meta_dict["YResolution"]
             logger.debug(f"yr={xr}")
             yres = (yr[0][1] / yr[0][0]) * unit_multiplicator
         except Exception as e:
+            logger.debug(traceback.format_exc())
             logger.warning("Resolution reading failed")
             xres = 1.0
             yres = 1.0
 
         self.dimensions = [meta_dict["ImageLength"][0], meta_dict["ImageWidth"][0]]
         meta_dict["tiff.ResolutionUnit"] = "m"
-        meta_dict["tiff.XResolution"] = xres
-        meta_dict["tiff.YResolution"] = yres
+        meta_dict["tiff.XResolution"] = 1.0 / xres
+        meta_dict["tiff.YResolution"] = 1.0 / yres
         meta_dict["hamamatsu.XOffsetFromSlideCentre"] = 0
         meta_dict["hamamatsu.YOffsetFromSlideCentre"] = 0
-        meta_dict["openslide.level[0].height"] = self.dimensions[0]
-        meta_dict["openslide.level[0].width"] = self.dimensions[1]
+        meta_dict["openslide.level[0].height"] = self.dimensions[1]
+        meta_dict["openslide.level[0].width"] = self.dimensions[0]
         self.properties = meta_dict
 
     #     if self.openslide is not None:
