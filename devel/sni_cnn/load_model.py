@@ -18,8 +18,8 @@ TEST_LABELS_SAVE_FILE = 'D:\\FAV\\Scaffold\\data\\test_labels.npy'
 DISPLAY_SIZE = 80
 CUT_SIZE = 0.2  # Size of training data [mm]
 
-VERSION = '3'
-EXPORT_PATH = "D:\\FAV\\Scaffold\\export\\v" + VERSION + "/"
+VERSION = '1'
+EXPORT_PATH = "D:\\FAV\\Scaffold\\export\\v" + VERSION + ".h5"
 MASKS_PATH = 'D:\\FAV\\Scaffold\\data\\masks.plk'
 
 def compute_MSE_of_mean_value(y):
@@ -51,10 +51,12 @@ def manual_validation_1():
     print('MSE for CNN: ' + str(score[1]))
 
     while True:
-        print('Close window to see the next one or stop the program.')
         test_index = random.randrange(data_count)
-        testing_image = x_test[test_index, :, :, 0]
 
+        if y_test[test_index] > 0.95:
+            continue
+        print('Close window to see the next one or stop the program.')
+        testing_image = x_test[test_index, :, :, 0]
         prediction = loaded_model.predict(testing_image.reshape(1, DISPLAY_SIZE, DISPLAY_SIZE, 1), verbose=0)
 
         print('Guess:' + str(prediction))
@@ -65,7 +67,7 @@ def manual_validation_1():
         plt.show()
 
 def evaluate_annotation(index, visual=False):
-    loaded_model = load_model(EXPORT_PATH)
+    loaded_model = load_model()
 
     # anim = scim.AnnotatedImage(file_path)
     # lobulus = load_lobulus(anim, ann_id)
@@ -74,7 +76,7 @@ def evaluate_annotation(index, visual=False):
 
     mask_img = mask_imgs[index]
 
-    cuts = cut_the_image(mask_img, True)
+    cuts = cut_the_image(mask_img, False)
     crop_size = int((1 / mask_img.pixel_size) * CUT_SIZE)
 
     evaluations = []
@@ -101,6 +103,7 @@ def evaluate_annotation(index, visual=False):
     mean_evaluation = mean(evaluations)
 
     print(mask_img.file_name)
+    print(mask_img.ann_id)
 
     if visual:
         plt.title('Mean SNI - CNN evaluation: ' + str(np.round(mean_evaluation, 3)))
@@ -114,4 +117,4 @@ if __name__ == '__main__':
     matplotlib.use('TkAgg')
 
     manual_validation_1()
-    # evaluate_annotation(22, True)
+    # evaluate_annotation(12, True)

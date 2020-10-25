@@ -12,8 +12,8 @@ import numpy as np
 import pandas as pd
 from scipy.ndimage import gaussian_filter
 
-import scaffan.scaffan.image as scim
-from scaffan.scaffan import lobulus
+import scaffan.image as scim
+from scaffan import lobulus
 import json
 import pickle as plk
 from image_with_mask import ImageWithMask

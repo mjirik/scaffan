@@ -17,8 +17,8 @@ TRAIN_LABELS_SAVE_FILE = 'D:\\FAV\\Scaffold\\data\\train_labels.npy'
 TEST_DATA_SAVE_FILE = 'D:\\FAV\\Scaffold\\data\\test_data.npy'
 TEST_LABELS_SAVE_FILE = 'D:\\FAV\\Scaffold\\data\\test_labels.npy'
 
-VERSION = '3'
-EXPORT_PATH = "D:\\FAV\\Scaffold\\export\\v" + VERSION + "/"
+VERSION = '1'
+EXPORT_PATH = "D:\\FAV\\Scaffold\\export\\v" + VERSION + ".h5"
 
 DISPLAY_SIZE = 80
 
@@ -128,7 +128,7 @@ if __name__ == '__main__':
                         sample_weight=train_weights,
                         validation_data=(test_x, test_y, test_weights))
 
-    saved_model.save(model, EXPORT_PATH)
+    model.save(EXPORT_PATH)
 
     matplotlib.use('TkAgg')
     plt.figure()
