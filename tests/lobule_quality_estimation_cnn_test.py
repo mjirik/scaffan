@@ -11,6 +11,8 @@ import scaffan.lobulus
 # import scaffan.algorithm
 import scaffan.lobule_quality_estimation_cnn
 import pytest
+import re
+
 
 def test_get_lobulus_mask_manual():
     fn = io3d.datasets.join_path(
@@ -28,27 +30,18 @@ def test_get_lobulus_mask_manual():
     lob_proc.set_annotated_image_and_id(anim, annotation_id=annotation_id)
     lob_proc.run()
 
-    # there are several useful masks
-    #
-    # lob_proc.annotation_mask
-    # lob_proc.lobulus_mask
-    # lob_proc.central_vein_mask
-    # lob_proc.border_mask
-
     lqe = scaffan.lobule_quality_estimation_cnn.LobuleQualityEstimationCNN()
 
-    # TODO uncomment this
+    lqe.init()
+    lqe.set_input_data(
+        view=lob_proc.view,
+        annotation_id=annotation_id,
+        lobulus_segmentation=lob_proc.lobulus_mask,
+    )
+    quality = lqe.run()
 
-    # lqe.init()
-    # lqe.set_input_data(
-    #     view=lob_proc.view,
-    #     annotation_id=annotation_id,
-    #     lobulus_segmentation=lob_proc.lobulus_mask,
-    # )
-    # quality = lqe.run()
-    # #
-    # # # TODO now the acceptance range is too wide. Set the values closer.
-    # expected_quality = 0.7
-    # expected_quality_range = 0.3
-    # assert quality == pytest.approx(expected_quality, expected_quality_range)
+    reg_search = re.search("SNI=(\d*\.?\d*) ", lob_proc.anim.annotations[annotation_id]['details'])
 
+    expected_quality = float(reg_search.group(1))
+    expected_quality_range = 0.1
+    assert quality == pytest.approx(expected_quality, expected_quality_range)

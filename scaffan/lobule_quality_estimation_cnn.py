@@ -77,7 +77,7 @@ class LobuleQualityEstimationCNN:
         # načtení architektury modelu
         # načtení parametrů modelu
 
-        model_path = path_to_script / "cnn models" / "v7.h5"
+        model_path = path_to_script / "cnn models" / "v1.h5"
         logger.debug(f"model_path[{type(model_path)}={model_path}")
         # model_path = str(model_path)
         # logger.debug(f"model_path[{type(model_path)}:{model_path}")
