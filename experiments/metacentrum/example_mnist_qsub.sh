@@ -7,7 +7,7 @@
 # # PBS -l select=1:ncpus=1:mem=1gb:scratch_local=4gb
 
 # add to qsub with:
-# qsub scaffan_experiment_1.sh
+# qsub example_mnist_qsub.sh.sh
 
 # nastaveni domovskeho adresare, v promenne $LOGNAME je ulozeno vase prihlasovaci jmeno
 DATADIR="/storage/plzen1/home/$LOGNAME/projects/gmbseg/devel/metacentrum/"
