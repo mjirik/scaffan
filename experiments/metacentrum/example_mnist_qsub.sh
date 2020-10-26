@@ -19,6 +19,7 @@ DATADIR="/storage/plzen1/home/$LOGNAME/projects/gmbseg/devel/metacentrum/"
 
 echo "job: $PBS_JOBID running on: `uname -n`" >result # just an example computation
 
+# You can probably comment this part
 SOURCE="${BASH_SOURCE[0]}"
 while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
   DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
@@ -37,22 +38,33 @@ cd $SCRATCHDIR || exit 1
 # cp $DATADIR/gaussian_test.com $SCRATCHDIR
 
 # spusteni aplikace - samotny vypocet
+
+# path to your conda
 export PATH=/storage/plzen1/home/$LOGNAME/miniconda3/bin:$PATH
+# activate conda environment gbmseg, you can skip this part if you are not usign conda environments
 source activate gbmseg
-#echo /storage/plzen1/home/$LOGNAME/projects/scaffan/experiments/metacentrum/SA_experiments.xlsx
-# this is because of python click
+
+# 
+# this is because of python click package (if you don't know what it is you don't need it)
 #export LC_ALL=C.UTF-8
 #export LANG=C.UTF-8
 
-# python -m scaffan set --common-spreadsheet-file /storage/plzen1/home/$LOGNAME/projects/scaffan/experiments/metacentrum/SA_experiments.xlsx
-#python -m scaffan set --common-spreadsheet-file /storage/plzen4-ntis/projects/queetech/medical/processed/scaffan2019/metacentrum/SA_experiments.xlsx
-#python -m io3d.datasets -sdp  /storage/plzen4-ntis/projects/queetech/
+
+# RUN YOUR PYTHON SCRIPT
+# output prints are stored in results.out
 python /storage/plzen1/home/$LOGNAME/projects/gbmseg/devel/metacentrum/example_mnist.py > results.out
+
+# examples how to run python scripts
+# python -m scaffan set --common-spreadsheet-file /storage/plzen1/home/$LOGNAME/projects/scaffan/experiments/metacentrum/SA_experiments.xlsx
+# python -m scaffan set --common-spreadsheet-file /storage/plzen4-ntis/projects/queetech/medical/processed/scaffan2019/metacentrum/SA_experiments.xlsx
+# python -m io3d.datasets -sdp  /storage/plzen4-ntis/projects/queetech/
+
 
 echo "$DIR"
 ls
 # kopirovani vystupnich dat z vypocetnicho uzlu do domovskeho adresare,
 # pokud by pri kopirovani doslo k chybe, nebude adresar SCRATCH vymazan pro moznost rucniho vyzvednuti dat
-cp results.out $DATADIR && cp -r SA_* $DATADIR || export CLEAN_SCRATCH=false
+cp results.out $DATADIR || export CLEAN_SCRATCH=false
+#cp results.out $DATADIR && cp -r SA_* $DATADIR || export CLEAN_SCRATCH=false
 #cp results.out $DATADIR && cp scaffan.log $DATADIR && cp -r test_run_lobuluses_output_dir* $DATADIR || export CLEAN_SCRATCH=false
 #cp results.out $DATADIR || export CLEAN_SCRATCH=false
