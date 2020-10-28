@@ -14,7 +14,7 @@ os: linux
 # Ubuntu 14.04 Trusty support
 #dist: trusty
 # language: generic works together with no dist specified
-dist: xenial
+#dist: xenial
 # install new cmake
 #addons:
 #  apt:
@@ -77,5 +77,6 @@ install:
 script:
   - xvfb-run make test
   - python -m pytest --cov=scaffan/ -v -s --durations=5
+
 after_success:
     - coveralls
