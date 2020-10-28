@@ -79,8 +79,8 @@ class LobuleQualityEstimationCNN:
         # načtení parametrů modelu
 
         cnn_model_version = str(self.parameters.param("Version").value())
-        model_path = path_to_script / "cnn models" / f"{cnn_model_version}.h5"
-        logger.debug(f"model_path[{type(model_path)}={model_path}")
+        model_path = path_to_script / f"{cnn_model_version}.h5"
+        logger.debug(f"model_path[{type(model_path)}]={model_path}")
         # model_path = str(model_path)
         # logger.debug(f"model_path[{type(model_path)}:{model_path}")
         # TODO fix the problem with cuda
