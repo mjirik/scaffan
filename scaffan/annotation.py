@@ -17,7 +17,7 @@ import re
 import math
 from read_roi import read_roi_zip
 
-__version__ = "0.27.3"
+__version__ = "0.27.4"
 
 # def get_one_annotation(viewstate):
 #     titles_list = viewstate.xpath(".//title/text()")
