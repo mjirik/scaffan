@@ -1,6 +1,6 @@
 # Changelog
 
-# 0.27.1
+# 0.27.3
 
 * [Added] Output prefix dir can be set to easier processing of multiple files.
 * [Fixed] TIFF import 
