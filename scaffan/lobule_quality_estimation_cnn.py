@@ -32,29 +32,30 @@ class LobuleQualityEstimationCNN:
     def __init__(
         self,
         report: Report = None,
-        pname="Quality Estimation CNN",
+        pname="SNI Prediction CNN",
         # ptype="group",
         ptype="bool",
-        pvalue=False,
+        pvalue=True,
+        # pvalue=False,
         ptip="CNN estimator of quality",
     ):
         params = [
             {
-                "name": "Example Integer Param",
-                "type": "int",
-                "value": 224,
-                "suffix": "px",
+                "name": "Version",
+                "type": "str",
+                "value": "v1",
+                # "suffix": "px",
                 "siPrefix": False,
-                "tip": "Value defines size of something",
+                "tip": "Version of used CNN model",
             },
-            {
-                "name": "Example Float Param",
-                "type": "float",
-                "value": 0.00006,
-                "suffix": "m",
-                "siPrefix": True,
-                "tip": "Value defines size of something",
-            },
+            # {
+            #     "name": "Example Float Param",
+            #     "type": "float",
+            #     "value": 0.00006,
+            #     "suffix": "m",
+            #     "siPrefix": True,
+            #     "tip": "Value defines size of something",
+            # },
         ]
         self.parameters = Parameter.create(
             name=pname,
@@ -77,7 +78,8 @@ class LobuleQualityEstimationCNN:
         # načtení architektury modelu
         # načtení parametrů modelu
 
-        model_path = path_to_script / "cnn models" / "v1.h5"
+        cnn_model_version = str(self.parameters.param("Version").value())
+        model_path = path_to_script / "cnn models" / f"{cnn_model_version}.h5"
         logger.debug(f"model_path[{type(model_path)}={model_path}")
         # model_path = str(model_path)
         # logger.debug(f"model_path[{type(model_path)}:{model_path}")

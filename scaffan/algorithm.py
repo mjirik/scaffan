@@ -420,7 +420,7 @@ class Scaffan:
         logger.debug(f"report output dir: {self.report.outputdir}")
         fn_spreadsheet = self.parameters.param("Output", "Common Spreadsheet File")
         self.report.additional_spreadsheet_fn = str(fn_spreadsheet.value())
-        if self.get_parameter("Processing;Quality Estimation CNN") ==  True:
+        if self.get_parameter("Processing;SNI Prediction CNN") ==  True:
             self.lobule_quality_estimation_cnn.init()
 
     def set_annotation_color_selection(
