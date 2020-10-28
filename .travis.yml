@@ -60,7 +60,7 @@ install:
 #    - conda install --yes --file requirements_conda.txt
     - conda create -n travis --yes --file requirements_conda.txt python=3.6 openslide-python
     - source activate travis
-    - conda install --yes pip nose coveralls pytest pytest-cov
+    - conda install --yes pip nose coveralls pytest pytest-cov tensorflow
     - conda list -e
     - pip install imagecodecs
     - python -m io3d.datasets -v -gdp
