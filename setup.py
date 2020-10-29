@@ -59,7 +59,7 @@ setup(
     # have to be included in MANIFEST.in as well.
     package_data={
         "sample1": ["scaffan_icon256.png"],
-        "": ["*.png", "*.ico", "*.joblib", "*.pkl", "*.model"],
+        "": ["*.png", "*.ico", "*.joblib", "*.pkl", "*.model", "*.h5"],
         # "sample2": ["scaffan/scaffan_icon256.png"],
         "segmentation_model_HCTFS": ["segmentation_model_HCTFS.pkl"],
         "segmentation_model_GLCMTFS": ["segmentation_model_GLCMTFS.pkl"],
