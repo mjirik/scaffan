@@ -98,7 +98,7 @@ def test_cli_seeds_mm():
          "-p", "Processing;Skeleton Analysis", "False",
          "-p", "Processing;Texture Analysis", "False",
          "-p", "Processing;Open output dir", "False",
-         "-p", "Processing;Quality Estimation CNN", "False",
+         "-p", "Processing;SNI Prediction CNN", "False",
          ],
     )
 

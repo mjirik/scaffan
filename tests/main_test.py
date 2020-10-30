@@ -561,7 +561,7 @@ def test_run_lobulus_with_seeds_mm():
     mainapp.set_parameter("Processing;Skeleton Analysis", False)
     mainapp.set_parameter("Processing;Texture Analysis", False)
     mainapp.set_parameter("Processing;Open output dir", False)
-    mainapp.set_parameter("Processing;Quality Estimation CNN", False)
+    mainapp.set_parameter("Processing;SNI Prediction CNN", False)
     mainapp.set_parameter(
         "Processing;Lobulus Segmentation;Border Segmentation;Iterations", 10
     )
