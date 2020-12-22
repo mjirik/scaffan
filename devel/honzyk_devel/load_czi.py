@@ -3,9 +3,16 @@ import matplotlib.pyplot as plt
 import sed3
 import numpy as np
 from skimage.color import rgb2hsv
+from pathlib import Path
+from loguru import logger
 
-NDPI_EXAMPLE = "D:\\FAV\\Scaffold\\Scaffan-analysis\\PIG-002_J-18-0091_HE.ndpi"
-CZI_EXAMPLE = "D:\\ML-Data\\Anicka - reticular fibers\\J9_9\\J9_9_a.czi"
+NDPI_EXAMPLE = Path("D:\\FAV\\Scaffold\\Scaffan-analysis\\PIG-002_J-18-0091_HE.ndpi")
+CZI_EXAMPLE = Path("D:\\ML-Data\\Anicka - reticular fibers\\J9_9\\J9_9_a.czi")
+# CZI_EXAMPLE = r"G:\Můj disk\data\biomedical\orig\Anicka - reticular fibers\J9_15\J9_15_a.czi"
+
+NDPI_EXAMPLE.exists()
+NDPI_EXAMPLE.parent / "jiny_soubor.ndpi"
+
 
 custom_grad = [
     [1.0, 0.0, 0.0],
@@ -14,7 +21,7 @@ custom_grad = [
 ]
 
 
-def get_crop(img, center=None, size=(100, 100)):
+def get_crop_by_center(img, center=None, size=(100, 100)):
     if center is None:
         center = img.shape[0] // 2, img.shape[1] // 2
 
@@ -23,6 +30,7 @@ def get_crop(img, center=None, size=(100, 100)):
 
 
 def anotate_texture(img):
+
     ed = sed3.sed3(img)
     ed.show()
 
@@ -54,6 +62,13 @@ def get_centroid_colors_rgb(img, seeds):
 
     for level in levels:
         centroids.append(np.sum(img[seeds == level], axis=0) / np.sum(seeds == level))
+
+    import sklearn.naive_bayes
+    cl = sklearn.naive_bayes.GaussianNB(priors=[1/3., 1/3., 1/3.])
+    # X 4 sloupce, tolik řádek, kolik pixelů
+    # Y label 0, 1,2
+    # cl.fit(X, Y)
+    # cl.predict(X_test)
 
     return centroids
 
@@ -106,11 +121,23 @@ def get_image_filter(img, seeds):
     return filter
 
 
-def load_example_img():
+def load_example_img(stride=10):
     # get full img as numpy array
     anim = scim.AnnotatedImage(CZI_EXAMPLE)
     img = anim.get_full_view().get_region_image()
-    img = get_crop(img, (8700, 12000), (1400, 1400))
+    logger.debug(f"img shape={img.shape}")
+    ed = sed3.sed3(img[::stride, ::stride, :])
+    ed.show()
+    nzx, nzy, nzz = np.nonzero(ed.seeds)
+    logger.debug(f"crop x {(np.min(nzx) * stride, np.max(nzx) * stride)}")
+    logger.debug(f"crop y {(np.min(nzy) * stride, np.max(nzy) * stride)}")
+
+    img = img[
+        np.min(nzx) * stride:np.max(nzx) * stride,
+        np.min(nzy) * stride:np.max(nzy) * stride,
+        :
+    ]
+    # img = get_crop_by_center(img, (8700, 12000), (1400, 1400))
     return img
 
 
@@ -156,5 +183,5 @@ def filter_image():
 
 
 if __name__ == '__main__':
-    # create_annotation()
+    create_annotation()
     filter_image()
