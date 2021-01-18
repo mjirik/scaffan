@@ -6,12 +6,13 @@ import numpy as np
 import sed3
 
 import scaffan.image as scim
+from skimage.color import rgb2hsv
 
 
 def zoom_img(img, stride=10):
     """Use sed3 tool to manually zoom to wanted image region.
 
-    parameter-stride: for image view (Displaying image in full resolution is both resource and time consuming.)
+    :parameter stride: for image view (Displaying image in full resolution is both resource and time consuming.)
     """
     # show sed3 tool for region selection
     ed = sed3.sed3(img[::stride, ::stride, :])
@@ -58,10 +59,23 @@ def load_image(f_path=None):
     return img
 
 
+def hue_to_continuous_2d(img):
+    """Takes hsv image and returns ´hhsv´ format, where hue is replaced by 2 values - sin(hue) and cos(hue)"""
+    hue = np.expand_dims(img[:, :, 0], -1)
+    hue_x = np.cos(hue * 2 * np.pi)
+    hue_y = np.sin(hue * 2 * np.pi)
+    img = np.concatenate((hue_x, hue_y, img[:, :, 1:]), axis=-1)
+    return img
+
+
 def run():
     """Run the annotation process."""
     img = load_image()
     seeds = annotate(img)
+
+    img = rgb2hsv(img)
+    img = hue_to_continuous_2d(img)
+
     np.save('seeds.npy', seeds)
     np.save('image.npy', img)
 
