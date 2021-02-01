@@ -27,3 +27,17 @@ class Filter:
         :parameter img: input image
         """
         raise NotImplementedError
+
+    @abc.abstractmethod
+    def load_model(self, file_name):
+        """Load model parameters from file.
+        :parameter file_name: file name
+        """
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def save_model(self, file_name):
+        """Save model parameters from file.
+        :parameter file_name: file name
+        """
+        raise NotImplementedError

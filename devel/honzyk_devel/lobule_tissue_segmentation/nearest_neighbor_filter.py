@@ -7,6 +7,7 @@ class NearestNeighborFilter(Filter):
 
     def create_model(self):
         self.centroinds = []
+        return None
 
     def train_model(self, img, seeds):
         # get all types of annotation
@@ -38,3 +39,9 @@ class NearestNeighborFilter(Filter):
         filter_mask = np.argmin(np.array(centroid_distances), axis=0)
 
         return filter_mask
+
+    def load_model(self, file_name='nearest_neighbor_filter.npy'):
+        self.centroids = np.load(file_name)
+
+    def save_model(self, file_name='nearest_neighbor_filter.npy'):
+        np.save(file_name, self.centroids)
