@@ -136,6 +136,7 @@ class GLCMTextureMeasurement:
         Make texture description.
         It is used twice in scaffan.
 
+        :type add_cols_to_report: indicate the severity of texture analysis
         :param filename_label:
         :param pname:
         :param ptype:
@@ -192,6 +193,7 @@ class GLCMTextureMeasurement:
         self.annotation_id = None
         self.lobulus_segmentation = None
         self.report_severity_offset = report_severity_offset
+        self.log_level = "DEBUG" if add_cols_to_report else "TRACE"
 
     def set_report(self, report: Report):
         self.report = report
@@ -288,8 +290,8 @@ class GLCMTextureMeasurement:
         image.imshow_with_colorbar(energy[:, :, 2])
         mx = np.max(energy, axis=(0, 1))
         mn = np.min(energy, axis=(0, 1))
-        logger.debug(f"GLCM max energy, homogeneity, correlation: {mx}")
-        logger.debug(f"GLCM min energy, homogeneity, correlation: {mn}")
+        logger.log(self.log_level, f"GLCM max energy, homogeneity, correlation: {mx}")
+        logger.log(self.log_level, f"GLCM min energy, homogeneity, correlation: {mn}")
         # plt.colorbar()
         if self.report is not None:
             self.report.savefig_and_show(
@@ -357,7 +359,8 @@ class GLCMTextureMeasurement:
         if self.report is not None and self.add_cols_to_report:
             self.report.add_cols_to_actual_row(row)
 
-        logger.debug(
+        logger.log(
+            self.log_level,
             f"GLCM textures for id={self.annotation_id if self.annotation_id is not None else '-'} "
             f"(tx_label={tx_ann_id}) finished"
         )

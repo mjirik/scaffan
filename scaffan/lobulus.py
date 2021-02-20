@@ -426,7 +426,9 @@ class Lobulus:
 
     def run(self, show=True):
 
+        logger.debug("Looking for the border")
         self.find_border(show)
+        logger.debug("Looking for the central vein")
         self.find_central_vein(show)
         # inner_lobulus_margin_mm = 0.02
 
@@ -445,6 +447,7 @@ class Lobulus:
         plt.contour(self.annotation_mask + self.central_vein_mask + self.border_mask)
         self.view.add_ticks()
 
+        logger.debug("Preparing lobule mask data to report")
         datarow = {}
         datarow["Annotation ID"] = self.annotation_id
         numeric_id = self.anim.get_annotation_id(self.annotation_id)
