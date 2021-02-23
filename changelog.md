@@ -2,7 +2,7 @@
 
 # 0.28
 
-* [Added] Configuration in ini files
+* [Added] Configuration in cfg files
 * [Changed] Logging levels finetuned
 
 # 0.28.2

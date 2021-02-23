@@ -634,12 +634,12 @@ class Scaffan:
         if open_dir:
             os_interaction.open_path(self.report.outputdir)
 
-        self.save_parameters_as_ini_file(str(Path(self.report.outputdir) / "parameters.ini"))
+        self.save_parameters_as_cfg_file(str(Path(self.report.outputdir) / "parameters.ini"))
         logger.debug("finished")
 
         # print("ann ids", annotation_ids)
 
-    def _get_parameters_as_ini(self):
+    def _get_parameters_as_cfg(self):
         dct = self.parameters_to_dict()
         config = configparser.ConfigParser()
         config.optionxform = str # preserve case size
@@ -649,8 +649,8 @@ class Scaffan:
         config["scaffan"] = dct
         return config
 
-    def get_parameters_as_ini_string(self):
-        config = self._get_parameters_as_ini()
+    def get_parameters_as_cfg_string(self):
+        config = self._get_parameters_as_cfg()
         s = ""
         with io.StringIO() as ss:
             config.write(ss)
@@ -658,24 +658,24 @@ class Scaffan:
             s = ss.read()
         return s
 
-    def save_parameters_as_ini_file(self, filename):
-        config = self._get_parameters_as_ini()
+    def save_parameters_as_cfg_file(self, filename):
+        config = self._get_parameters_as_cfg()
         with open(filename, "w") as cf:
             config.write(cf)
 
-    def load_parameters_from_ini_string(self, s):
+    def load_parameters_from_cfg_string(self, s):
         config = configparser.ConfigParser()
         config.optionxform = str # preserve case size
         config.read_string(s)
-        self._set_parameters_from_ini(config)
+        self._set_parameters_from_cfg(config)
 
-    def load_parameters_from_ini_file(self, filename):
+    def load_parameters_from_cfg_file(self, filename):
         config = configparser.ConfigParser()
         config.optionxform = str # preserve case size
         config.read_file(open(filename))
-        self._set_parameters_from_ini(config)
+        self._set_parameters_from_cfg(config)
 
-    def _set_parameters_from_ini(self, config):
+    def _set_parameters_from_cfg(self, config):
         dct = dict(config["scaffan"])
         for key in dct:
             logger.debug(f"{key}, {type(dct[key])}, {dct[key]}")

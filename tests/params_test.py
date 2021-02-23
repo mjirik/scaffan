@@ -31,7 +31,7 @@ def test_get_and_set_params():
     param_key = "Output;Directory Path"
     mainapp = scaffan.algorithm.Scaffan()
     param_val = mainapp.get_parameter(param_key)
-    ini_str = mainapp.get_parameters_as_ini_string()
+    ini_str = mainapp.get_parameters_as_cfg_string()
     assert ini_str.find(param_key) > 0
 
     # set some parameters
@@ -40,24 +40,24 @@ def test_get_and_set_params():
 [scaffan]
 Output;Directory Path = /dir/with/nothing
 """
-    mainapp.load_parameters_from_ini_string(ini_str)
+    mainapp.load_parameters_from_cfg_string(ini_str)
     param_val2 = mainapp.get_parameter(param_key)
     assert param_val != param_val2
     assert param_val2 == "/dir/with/nothing"
 
     # write again the same parameters
-    mainapp.load_parameters_from_ini_string(ini_str)
+    mainapp.load_parameters_from_cfg_string(ini_str)
     param_val2 = mainapp.get_parameter(param_key)
     assert param_val == param_val2
 
 def test_parameters_from_ini_file():
     param_key = "Output;Directory Path"
     mainapp = scaffan.algorithm.Scaffan()
-    fn0 = "test_params0.ini"
-    fn1 = "test_params1.ini"
+    fn0 = "test_params0.cfg"
+    fn1 = "test_params1.cfg"
 
     param_val0 = mainapp.get_parameter(param_key)
-    mainapp.save_parameters_as_ini_file(fn0)
+    mainapp.save_parameters_as_cfg_file(fn0)
 
     # set some parameters
     ini_str = """[scaffan]
@@ -66,9 +66,9 @@ Output;Directory Path = /dir/with/nothing
     with open(fn1, 'w') as f:
         f.write(ini_str)
 
-    mainapp.load_parameters_from_ini_file(fn1)
+    mainapp.load_parameters_from_cfg_file(fn1)
     assert mainapp.get_parameter(param_key) == "/dir/with/nothing"
 
-    mainapp.load_parameters_from_ini_file(fn0)
+    mainapp.load_parameters_from_cfg_file(fn0)
     assert mainapp.get_parameter(param_key) == param_val0
 
