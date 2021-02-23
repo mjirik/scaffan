@@ -21,10 +21,10 @@ def params_and_values(
         # print(pth)
         ch = p.child(name)
         # print(f"name: {name}, type {type(ch)}")
-        if type(ch) is pyqtgraph.parametertree.parameterTypes.SimpleParameter:
+        if (type(ch) is pyqtgraph.parametertree.parameterTypes.SimpleParameter) or (ch.value() is not None):
             dct[pth_local] = ch.value()
             # print(pth)
-        else:
+        if len(ch.children()) > 0:
             params_and_values(ch, pth_local)
 
     return dct

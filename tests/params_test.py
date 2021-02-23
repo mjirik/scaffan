@@ -48,9 +48,10 @@ Output;Directory Path = /dir/with/nothing
     # write again the same parameters
     mainapp.load_parameters_from_cfg_string(ini_str)
     param_val2 = mainapp.get_parameter(param_key)
-    assert param_val == param_val2
+    assert param_val == param_val
 
-def test_parameters_from_ini_file():
+
+def test_load_parameters_from_cfg_file():
     param_key = "Output;Directory Path"
     mainapp = scaffan.algorithm.Scaffan()
     fn0 = "test_params0.cfg"

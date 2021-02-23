@@ -634,13 +634,14 @@ class Scaffan:
         if open_dir:
             os_interaction.open_path(self.report.outputdir)
 
-        self.save_parameters_as_cfg_file(str(Path(self.report.outputdir) / "parameters.ini"))
+        self.save_parameters_as_cfg_file(str(Path(self.report.outputdir) / "parameters.cfg"))
         logger.debug("finished")
 
         # print("ann ids", annotation_ids)
 
     def _get_parameters_as_cfg(self):
         dct = self.parameters_to_dict()
+        logger.debug(dct)
         config = configparser.ConfigParser()
         config.optionxform = str # preserve case size
 
@@ -660,6 +661,7 @@ class Scaffan:
 
     def save_parameters_as_cfg_file(self, filename):
         config = self._get_parameters_as_cfg()
+        logger.debug(f"Saving config into '{filename}'")
         with open(filename, "w") as cf:
             config.write(cf)
 
