@@ -641,7 +641,6 @@ class Scaffan:
 
     def _get_parameters_as_cfg(self):
         dct = self.parameters_to_dict()
-        logger.debug(dct)
         config = configparser.ConfigParser()
         config.optionxform = str # preserve case size
 
