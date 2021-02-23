@@ -1,11 +1,14 @@
 # Changelog
 
-# 0.28
+Latest version: 0.28.2
+
+# Not released
 
 * [Added] Configuration in cfg files
 * [Changed] Logging levels finetuned
 
-# 0.28.2
+
+# 0.28
 
 * [Added] Output prefix dir can be set to easier processing of multiple files.
 * [Fixed] TIFF import 
