@@ -93,6 +93,15 @@ def set(common_spreadsheet_file=None):
 
 @run.command(context_settings=CONTEXT_SETTINGS)
 @click.option(
+    "--ini-file",
+    "-pi",
+    default=None,
+    nargs=1,
+    help='Path to ini file with parameters. In the file, the section have to be [scaffan]. '
+         'The key of the parameter is path to parameter separated by ";". The value is value of parameter.'
+         "python -m scaffan gui -pi parameter.ini",
+)
+@click.option(
     "--params",
     "-p",
     multiple=True,
@@ -109,13 +118,15 @@ def set(common_spreadsheet_file=None):
 #     default=None,
 # )
 @click.option("--print-params", "-pp", is_flag=True, help="Print parameters")
-def gui(params, print_params):
+def gui(ini_file, params, print_params):
     mainapp = algorithm.Scaffan()
     if print_params:
         import pprint
 
         pprint.pprint(mainapp.parameters_to_dict())
         exit()
+    if ini_file:
+        mainapp.load_parameters_from_ini_string(ini_file)
     for param in params:
         mainapp.set_parameter(param[0], value=ast.literal_eval(param[1]))
         # mainapp.parameters.param(*param[0].split(";")).setValue(ast.literal_eval(param[1]))
@@ -182,13 +193,22 @@ def install():
 #     default=None,
 # )
 @click.option(
+    "--ini-file",
+    "-pi",
+    default=None,
+    nargs=1,
+    help='Path to ini file with parameters. In the file, the section have to be [scaffan]. '
+         'The key of the parameter is path to parameter separated by ";". The value is value of parameter.'
+         "python -m scaffan gui -pi parameter.ini",
+)
+@click.option(
     "--params",
     "-p",
     multiple=True,
     default="",
     nargs=2,
     help='Set parameter. First argument is path to parameter separated by ";". Second is the value.'
-    "python -m scaffan gui -p Processing,Show True",
+         "python -m scaffan gui -p Processing,Show True",
 )
 @click.option(
     "--seeds_mm",
@@ -199,7 +219,7 @@ def install():
     help='Set parameter. First argument is path to parameter separated by ";". Second is the value.'
          "python -m scaffan gui -p Processing,Show True",
 )
-def nogui(input_path, color, output_path, params, seeds_mm):
+def nogui(input_path, color, output_path, ini_file, params, seeds_mm):
     # if log_level is not None:
     #     i = logger.add(level=log_level)
     logger.debug(
@@ -207,6 +227,8 @@ def nogui(input_path, color, output_path, params, seeds_mm):
     )
     mainapp = algorithm.Scaffan()
     logger.debug(f"Scaffan created")
+    if ini_file:
+        mainapp.load_parameters_from_ini_string(ini_file)
     app_tools.set_parameters_by_path(mainapp.parameters, params)
     # for param in params:
     #     logger.debug(f"param={param}")

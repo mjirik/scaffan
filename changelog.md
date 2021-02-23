@@ -1,5 +1,10 @@
 # Changelog
 
+# 0.28
+
+* [Added] Configuration in ini files
+* [Changed] Logging levels finetuned
+
 # 0.28.2
 
 * [Added] Output prefix dir can be set to easier processing of multiple files.

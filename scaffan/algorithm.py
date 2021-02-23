@@ -17,6 +17,8 @@ import json
 import time
 import platform
 from typing import List, Union, Optional
+import configparser
+import io
 
 # import PyQt5.QtWidgets
 # print("start 3")
@@ -614,7 +616,7 @@ class Scaffan:
                     raise e
         saved_params = self.parameters.saveState()
         io3d.misc.obj_to_file(
-            saved_params, str(Path(self.report.outputdir) / "parameters.yaml")
+            self.parameters_to_dict(), str(Path(self.report.outputdir) / "parameters.yaml")
         )
         try:
             with open(
@@ -631,9 +633,54 @@ class Scaffan:
         open_dir = self.parameters.param("Processing", "Open output dir").value()
         if open_dir:
             os_interaction.open_path(self.report.outputdir)
+
+        self.save_parameters_as_ini_file(str(Path(self.report.outputdir) / "parameters.ini"))
         logger.debug("finished")
 
         # print("ann ids", annotation_ids)
+
+    def _get_parameters_as_ini(self):
+        dct = self.parameters_to_dict()
+        config = configparser.ConfigParser()
+        config.optionxform = str # preserve case size
+
+        # convert values to string
+        dct = dict(zip(dct.keys(), map(str, dct.values())))
+        config["scaffan"] = dct
+        return config
+
+    def get_parameters_as_ini_string(self):
+        config = self._get_parameters_as_ini()
+        s = ""
+        with io.StringIO() as ss:
+            config.write(ss)
+            ss.seek(0)  # rewind
+            s = ss.read()
+        return s
+
+    def save_parameters_as_ini_file(self, filename):
+        config = self._get_parameters_as_ini()
+        with open(filename, "w") as cf:
+            config.write(cf)
+
+    def load_parameters_from_ini_string(self, s):
+        config = configparser.ConfigParser()
+        config.optionxform = str # preserve case size
+        config.read_string(s)
+        self._set_parameters_from_ini(config)
+
+    def load_parameters_from_ini_file(self, filename):
+        config = configparser.ConfigParser()
+        config.optionxform = str # preserve case size
+        config.read_file(open(filename))
+        self._set_parameters_from_ini(config)
+
+    def _set_parameters_from_ini(self, config):
+        dct = dict(config["scaffan"])
+        for key in dct:
+            logger.debug(f"{key}, {type(dct[key])}, {dct[key]}")
+            self.set_parameter(key, dct[key])
+
 
     def _add_general_information_to_actual_row(self, update_dict:dict=None):
         inpath = Path(self.parameters.param("Input", "File Path").value())
