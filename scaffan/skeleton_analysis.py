@@ -92,7 +92,7 @@ class SkeletonAnalysis:
             f"shape of lobulus.central_vein_mask {self.lobulus.central_vein_mask.shape} {np.max(self.lobulus.central_vein_mask)}"
         )
         logger.debug(
-            f"unique of shape of lobulus.central_vein_mask {np.unique(self.lobulus.central_vein_mask)}"
+            f"unique of lobulus.central_vein_mask {np.unique(self.lobulus.central_vein_mask)}"
         )
         # import pdb; pdb.set_trace()
         # TODO Split the function here
