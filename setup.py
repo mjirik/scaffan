@@ -72,7 +72,7 @@ setup(
         # "cnn_model_not_working": ["scaffan/posenet_highLR.model"],
         # "sni_area_not_working": ["scaffan/SNI_area_regressor.joblib"],
         "sni_per-pixel": ["SNI_per-pixel_regressor.joblib"],
-        "cnn_model_sni": ["v1.h5"]
+        # "cnn_model_sni": ["v1.h5"] # now we are downloading model from github
         # "sni_per-pixel_not_working": ["scaffan/SNI_per-pixel_regressor.joblib"],
     },
     # Although 'package_data' is the preferred approach, in some case you may

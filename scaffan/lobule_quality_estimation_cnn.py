@@ -73,18 +73,36 @@ class LobuleQualityEstimationCNN:
         self.model = None
         pass
 
-    def init(self):
+    def init(self, force_download_model=False):
         from tensorflow.keras.models import load_model
         # načtení architektury modelu
         # načtení parametrů modelu
 
         cnn_model_version = str(self.parameters.param("Version").value())
-        model_path = path_to_script / f"{cnn_model_version}.h5"
+        model_path = self._get_devel_model_path()
+        if not model_path.exists() or force_download_model:
+            model_path = self.download_model(cnn_model_version)
         logger.debug(f"model_path[{type(model_path)}]={model_path}")
         # model_path = str(model_path)
         # logger.debug(f"model_path[{type(model_path)}:{model_path}")
         # TODO fix the problem with cuda
         self.model = load_model(str(model_path))
+
+    def _get_devel_model_path(self):
+        cnn_model_version = str(self.parameters.param("Version").value())
+        model_path = path_to_script / f"{cnn_model_version}.h5"
+        return model_path
+
+    def download_model(self, cnn_model_version):
+        import requests
+        model_path = Path(f'~/.scaffan/{cnn_model_version}.h5').expanduser()
+        url = f'https://github.com/mjirik/scaffan/raw/master/scaffan/{cnn_model_version}.h5'
+        if not model_path.exists():
+            model_path.parent.mkdir(parents=True, exist_ok=True)
+            logger.debug(f"Downloading from '{url}' to {str(model_path)}")
+            r = requests.get(url, allow_redirects=True)
+            open(model_path, 'wb').write(r.content)
+        return model_path
 
     def set_input_data(
             self, view: image.View, annotation_id: int = None, lobulus_segmentation=None

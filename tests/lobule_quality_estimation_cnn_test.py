@@ -32,7 +32,7 @@ def test_get_lobulus_mask_manual():
 
     lqe = scaffan.lobule_quality_estimation_cnn.LobuleQualityEstimationCNN()
 
-    lqe.init()
+    lqe.init(force_download_model=True) # this will test the model download
     lqe.set_input_data(
         view=lob_proc.view,
         annotation_id=annotation_id,
