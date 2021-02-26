@@ -86,13 +86,9 @@ class SkeletonAnalysis:
 
         inner = self.lobulus.central_vein_mask
         logger.debug(
-            f"dtype of lobulus.central_vein_mask {self.lobulus.central_vein_mask.dtype}"
-        )
-        logger.debug(
-            f"shape of lobulus.central_vein_mask {self.lobulus.central_vein_mask.shape} {np.max(self.lobulus.central_vein_mask)}"
-        )
-        logger.debug(
-            f"unique of lobulus.central_vein_mask {np.unique(self.lobulus.central_vein_mask)}"
+            f"lobulus.central_vein_mask: dtype={self.lobulus.central_vein_mask.dtype}, " +
+            f"shape={self.lobulus.central_vein_mask.shape}, "
+            f"unique={np.unique(self.lobulus.central_vein_mask)}"
         )
         # import pdb; pdb.set_trace()
         # TODO Split the function here
@@ -100,6 +96,7 @@ class SkeletonAnalysis:
             self.parameters.param("Inner Lobulus Margin").value() * 1000
         )
 
+        logger.debug("Distance transform...")
         # eroded image for threshold analysis
         dstmask = scipy.ndimage.morphology.distance_transform_edt(
             self.lobulus.lobulus_mask, self.lobulus.view.region_pixelsize[::-1]
@@ -116,6 +113,7 @@ class SkeletonAnalysis:
             order=0,
             anti_aliasing=False,
         )
+        logger.debug(f"Resizing masks to {resize_params['output_shape']}")
         detail_mask = skimage.transform.resize(
             self.lobulus.lobulus_mask, **resize_params
         ).astype(np.int8)
@@ -152,6 +150,7 @@ class SkeletonAnalysis:
             f"detail_inner_lobulus_mask {detail_central_vein_mask.shape} {detail_central_vein_mask.dtype} "
             f"{np.min(detail_central_vein_mask)} {np.max(detail_central_vein_mask)}"
         )
+        logger.debug("Thresholding and skeletonization...")
         threshold = skimage.filters.threshold_otsu(
             detail_image[detail_inner_lobulus_mask == 1]
         )
@@ -162,7 +161,9 @@ class SkeletonAnalysis:
         # if show:
         #     plt.show()
         skeleton = skeletonize(imthr)
-        datarow["Skeleton length"] = np.sum(skeleton) * detail_view.region_pixelsize[0]
+        sumskel = np.sum(skeleton)
+        logger.debug(f"Skeletonization finished. threshold={threshold}, sumskel={sumskel}")
+        datarow["Skeleton length"] = sumskel * detail_view.region_pixelsize[0]
         datarow["Output pixel size 0"] = detail_view.region_pixelsize[0]
         datarow["Output pixel size 1"] = detail_view.region_pixelsize[1]
         datarow["Output image size 0"] = (
@@ -200,6 +201,7 @@ class SkeletonAnalysis:
             # skimage.io.imsave(op.join(self.report.outputdir, "raw_skeleton_{}.png".format(self.annotation_id)), 50 * skeleton)
             # skimage.io.imsave(op.join(self.report.outputdir, "raw_thr_{}.png".format(self.annotation_id)), 50 * imthr)
 
+        logger.debug("Branching points detection...")
         conv = scipy.signal.convolve2d(skeleton, np.ones([3, 3]), mode="same")
         conv = conv * skeleton
         fig = plt.figure(figsize=(12, 10))
@@ -232,6 +234,7 @@ class SkeletonAnalysis:
             logger.debug("Unknown area. Skipping density calculation")
 
         self.report.add_cols_to_actual_row(datarow)
+        logger.debug("Skeleton analysis finished.")
 
     def imsave(self, base_fn, arr, k=50):
         base_fn = base_fn.format(self.lobulus.annotation_id)
