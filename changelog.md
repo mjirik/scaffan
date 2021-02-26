@@ -4,6 +4,9 @@ Latest version: 0.29.2
 
 # Not released
 
+# 0.29
+
+* [Changed] Models stored on github only for smaller anaconda package
 * [Added] Configuration in cfg files
 * [Changed] Logging levels finetuned
 
