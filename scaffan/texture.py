@@ -302,7 +302,7 @@ class GLCMTextureMeasurement:
         # if close_figs:
         #     plt.close(fig)
         # plt.savefig("glcm_features_{}.png".format(title))
-        logger.debug(f"glcm_features_{fn_id} saved")
+        logger.log(self.log_level, f"glcm_features_{fn_id} saved")
         fig = plt.figure()
         # 0..1 normalization because energy (3rd channel) can be negative
         w = np.ones([1, 1, 3])
@@ -326,7 +326,7 @@ class GLCMTextureMeasurement:
         self.measured_features = energy
 
         if self.lobulus_segmentation is None:
-            logger.debug(f"No lobulus segmentation given")
+            logger.debug(self.log_level, f"No lobulus segmentation given")
             seg = (slice(None), slice(None))
         if self.texture_label is None:
             texture_label_stats = ""
@@ -360,9 +360,10 @@ class GLCMTextureMeasurement:
             self.report.add_cols_to_actual_row(row)
 
         logger.log(
-            self.log_level,
+            # self.log_level,
+            "DEBUG",
             f"GLCM textures for id={self.annotation_id if self.annotation_id is not None else '-'} "
-            f"(tx_label={tx_ann_id}) finished"
+            f"(tx_label={tx_ann_id}) finished. {'No segmentation.' if not (self.lobulus_segmentation) else ''}"
         )
 
         # plt.show()

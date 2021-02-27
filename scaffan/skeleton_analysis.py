@@ -113,23 +113,28 @@ class SkeletonAnalysis:
             order=0,
             anti_aliasing=False,
         )
-        logger.debug(f"Resizing masks to {resize_params['output_shape']}")
+        logger.debug(f"Resizing mask from {self.lobulus_mask.shape} to {resize_params['output_shape']}")
         detail_mask = skimage.transform.resize(
             self.lobulus.lobulus_mask, **resize_params
         ).astype(np.int8)
+        logger.debug(f"Resizing mask from {inner_lobulus_mask.shape} to {resize_params['output_shape']}")
         detail_inner_lobulus_mask = skimage.transform.resize(
             inner_lobulus_mask, **resize_params
         )
+        logger.debug(f"Resizing mask from {inner.shape} to {resize_params['output_shape']}")
         detail_central_vein_mask = skimage.transform.resize(
             inner == 1, **resize_params
         ).astype(np.int8)
 
+        logger.debug(f"Preparing to show")
         detail_view = self.view
         detail_image = detail_view.get_region_image(as_gray=True)
+        logger.debug("preparing figure")
         fig = plt.figure()
         plt.imshow(detail_image)
         plt.contour(detail_mask + detail_inner_lobulus_mask)
         detail_view.add_ticks()
+        logger.debug("fig to report...")
         if self.report is not None:
             self.report.savefig_and_show(
                 "skeleton_analysis_detail_image_and_mask_{}.png".format(
