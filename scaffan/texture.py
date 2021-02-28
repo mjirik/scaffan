@@ -362,8 +362,8 @@ class GLCMTextureMeasurement:
         logger.log(
             # self.log_level,
             "DEBUG",
-            f"GLCM textures for id={self.annotation_id if self.annotation_id is not None else '-'} "
-            f"(tx_label={tx_ann_id}) finished. {'No segmentation.' if not (self.lobulus_segmentation) else ''}"
+            f"GLCM textures id={self.annotation_id if self.annotation_id is not None else '-'} "
+            f"(tx_label={tx_ann_id}) done. {'No seg.' if self.lobulus_segmentation is not None else ''}"
         )
 
         # plt.show()
