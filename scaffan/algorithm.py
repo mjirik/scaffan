@@ -411,7 +411,7 @@ class Scaffan:
         return dilipg.params_and_values(self.parameters)
 
     def init_run(self):
-        logger.debug("Init Run")
+        logger.debug(f"ScaffAn ({scaffan.__version__}) Init Run")
         fnparam = self.parameters.param("Input", "File Path")
         path = fnparam.value()
         # run_resc_int = self.parameters.param("Processing", "Intensity Normalization", "Run Intensity Normalization").value()
