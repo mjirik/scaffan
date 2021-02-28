@@ -96,7 +96,7 @@ class SkeletonAnalysis:
             self.parameters.param("Inner Lobulus Margin").value() * 1000
         )
 
-        logger.debug(f"Distance transform. type(mask)={type(self.lobulus.lobulus_mask)}, "
+        logger.debug(f"Distance transform. type(mask)={str(type(self.lobulus.lobulus_mask))}, "
                      f"mask.shape={self.lobulus.lobulus_mask.shape}, "
                      f"mask.unique={np.unique(self.lobulus.lobulus_mask, return_counts=True)}"
                      )

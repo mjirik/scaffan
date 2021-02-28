@@ -82,7 +82,7 @@ class LobuleQualityEstimationCNN:
         model_path = self._get_devel_model_path()
         if not model_path.exists() or force_download_model:
             model_path = self.download_model(cnn_model_version)
-        logger.debug(f"model_path[{type(model_path)}]={model_path}")
+        logger.debug(f"model_path[{str(type(model_path))}]={model_path}")
         # model_path = str(model_path)
         # logger.debug(f"model_path[{type(model_path)}:{model_path}")
         # TODO fix the problem with cuda
