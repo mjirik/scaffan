@@ -96,13 +96,16 @@ class SkeletonAnalysis:
             self.parameters.param("Inner Lobulus Margin").value() * 1000
         )
 
-        logger.debug("Distance transform...")
+        logger.debug(f"Distance transform. type(mask)={type(self.lobulus.lobulus_mask)}, "
+                     f"mask.shape={self.lobulus.lobulus_mask.shape}, "
+                     f"mask.unique={np.unique(self.lobulus_mask)}"
+                     )
         # eroded image for threshold analysis
         dstmask = scipy.ndimage.morphology.distance_transform_edt(
             self.lobulus.lobulus_mask, self.lobulus.view.region_pixelsize[::-1]
         )
         inner_lobulus_mask = dstmask > inner_lobulus_margin_mm
-        # print("inner_lobulus_mask" , np.sum(inner_lobulus_mask==0), np.sum(inner_lobulus_mask==1))
+        logger.debug(f"inner_lobulus_mask: unique/counts={np.unique(inner_lobulus_mask, return_counts=True)}")
 
         # detail_level = 2
         new_size = self.view.get_size_on_pixelsize_mm()
