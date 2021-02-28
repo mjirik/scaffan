@@ -104,3 +104,8 @@ venv.bak/
 .mypy_cache/
 
 .idea/
+
+#tests/*.png
+#tests/*.eps
+tests/*
+!test/*.py
