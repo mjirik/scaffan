@@ -116,7 +116,7 @@ class SkeletonAnalysis:
             order=0,
             anti_aliasing=False,
         )
-        logger.debug(f"Resizing mask from {self.lobulus_mask.shape} to {resize_params['output_shape']}")
+        logger.debug(f"Resizing mask from {self.lobulus.lobulus_mask.shape} to {resize_params['output_shape']}")
         detail_mask = skimage.transform.resize(
             self.lobulus.lobulus_mask, **resize_params
         ).astype(np.int8)
