@@ -326,7 +326,7 @@ class GLCMTextureMeasurement:
         self.measured_features = energy
 
         if self.lobulus_segmentation is None:
-            logger.debug(self.log_level, f"No lobulus segmentation given")
+            logger.log(self.log_level, f"No lobulus segmentation given")
             seg = (slice(None), slice(None))
         if self.texture_label is None:
             texture_label_stats = ""
