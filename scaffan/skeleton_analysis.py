@@ -87,7 +87,7 @@ class SkeletonAnalysis:
         inner = self.lobulus.central_vein_mask
         logger.debug(
             f"lobulus.central_vein_mask: dtype={self.lobulus.central_vein_mask.dtype}, " +
-            f"shape={self.lobulus.central_vein_mask.shape}, "
+            f"shape={self.lobulus.central_vein_mask.shape}, " +
             f"unique={np.unique(self.lobulus.central_vein_mask)}"
         )
         # import pdb; pdb.set_trace()
@@ -98,7 +98,7 @@ class SkeletonAnalysis:
 
         logger.debug(f"Distance transform. type(mask)={type(self.lobulus.lobulus_mask)}, "
                      f"mask.shape={self.lobulus.lobulus_mask.shape}, "
-                     f"mask.unique={np.unique(self.lobulus_mask)}"
+                     f"mask.unique={np.unique(self.lobulus.lobulus_mask, return_counts=True)}"
                      )
         # eroded image for threshold analysis
         dstmask = scipy.ndimage.morphology.distance_transform_edt(
