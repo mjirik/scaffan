@@ -1,4 +1,5 @@
 import unittest
+import os
 
 import numpy as np
 from matplotlib import pyplot as plt
@@ -11,6 +12,7 @@ from .visualization import show_visual
 
 models = [NearestNeighborFilter(), SvmFilter(), NaiveBayesFilter()]
 
+@unittest.skipIf(os.environ.get("TRAVIS", default=False), "Skip on Travis-CI")
 class TestFilter(unittest.TestCase):
     """"""
 
