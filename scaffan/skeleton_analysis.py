@@ -131,7 +131,9 @@ class SkeletonAnalysis:
 
         logger.debug(f"Preparing to show")
         detail_view = self.view
-        detail_image = detail_view.get_region_image(as_gray=True)
+        logger.debug(f'view={detail_view}')
+        # TODO change log_level to trace
+        detail_image = detail_view.get_region_image(as_gray=True, log_level="DEBUG")
         logger.debug("preparing figure")
         fig = plt.figure()
         plt.imshow(detail_image)

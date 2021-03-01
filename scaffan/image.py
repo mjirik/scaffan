@@ -1067,8 +1067,9 @@ class View:
         self.get_raster_image = self.get_region_image
         self.get_annotation_region_raster = self.get_annotation_raster
 
+
     def set_region(
-        self,
+            self,
         center=None,
         level: int = None,
         size_on_level=None,
@@ -1189,6 +1190,8 @@ class View:
         # scan.adjust_annotation_to_image_view(
         #     self.anim.openslide, self.annotations, center, level, size_on_level
         # )
+    def __str__(self):
+        return f"View: location={self.location}, level={self.region_level}, size_on_level={self.region_size_on_level}"
 
     def set_annotations(self, annotations):
         import copy
@@ -1382,7 +1385,7 @@ class View:
     ):
         self.anim.openslide.level_downsamples
 
-    def get_region_image(self, as_gray=False):
+    def get_region_image(self, as_gray=False, log_level="TRACE"):
         """
         Get raster image from the view. It can have defined pixelsize, and also the level
         :param as_gray:
@@ -1403,7 +1406,9 @@ class View:
             location, level=self.region_level, size=self.region_size_on_level
         )
         im = np.asarray(imcr)
-        # logger.debug(f"imcr dtype: {image1.dtype}, shape: {image1.shape}, min max: [{np.min(image1[:,:,:3])}, {np.max(image1[:,:,:3])}], mean: {np.mean(image1[:,:,:3])}, min max alpha: [{np.min(image1[:,:,3])}, {np.max(image1[:,:,3])}], mean: {np.mean(image1[:,:,3])}")
+
+        logger.log(log_level, f"imcr dtype: {im.dtype}, shape: {im.shape}, min max: [{np.min(im[:,:,:3])}, {np.max(im[:,:,:3])}]")
+        # logger.debug(f"imcr dtype: {im.dtype}, shape: {im.shape}, min max: [{np.min(im[:,:,:3])}, {np.max(im[:,:,:3])}], mean: {np.mean(im[:,:,:3])}, min max alpha: [{np.min(im[:,:,3])}, {np.max(im[:,:,3])}], mean: {np.mean(im[:,:,3])}")
 
         if as_gray:
             if (len(im.shape) > 2):
@@ -1412,11 +1417,13 @@ class View:
                 im = skimage.color.rgb2gray(im)
 
         if self._is_resized_by_pixelsize:
+            logger.log(log_level, "Resized by pixelsize")
             pxsz_level, pxunit_level = self.anim.get_pixel_size(level=self.region_level)
             # swap coordinates because openslice output image have swapped image coordinates
             im_resized = imma.image.resize_to_mm(
                 im, pxsz_level[::-1], self.region_pixelsize[::-1], anti_aliasing=True
             )
+            logger.log(log_level, f"pxsz_level={pxsz_level}")
             req_sz = self._requested_size_on_level_when_defined_by_pixelsize
             if req_sz is not None:
                 req_sz = np.asarray(req_sz)

@@ -316,7 +316,7 @@ class MainGuiTest(unittest.TestCase):
         ]
         self._testing_slide_segmentation_clf(fns, "HCTFS")
 
-    def test_testing_slide_segmentation_clf(self):
+    def test_testing_slide_segmentation_clf_one_data(self):
         fns = [
             io3d.datasets.join_path(
                 "medical", "orig", "sample_data", "SCP003", "SCP003.ndpi", get_root=True
