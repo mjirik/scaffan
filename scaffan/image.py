@@ -1191,7 +1191,7 @@ class View:
         #     self.anim.openslide, self.annotations, center, level, size_on_level
         # )
     def __str__(self):
-        return f"View: location={self.location}, level={self.region_level}, size_on_level={self.region_size_on_level}"
+        return f"View: location={self.region_location}, level={self.region_level}, size_on_level={self.region_size_on_level}"
 
     def set_annotations(self, annotations):
         import copy
