@@ -1416,6 +1416,7 @@ class View:
                     im = skimage.color.rgba2rgb(im)
                 im = skimage.color.rgb2gray(im)
 
+        logger.log(log_level, "resize if resized by pixelsize")
         if self._is_resized_by_pixelsize:
             logger.log(log_level, "Resized by pixelsize")
             pxsz_level, pxunit_level = self.anim.get_pixel_size(level=self.region_level)
@@ -1440,9 +1441,11 @@ class View:
                     im_resized = imma.image.resize_to_shape(im, req_sz[::-1])
             im = im_resized
 
+        logger.log(log_level, "Do intensity rescale if necessary")
         if self.anim.run_intensity_rescale:
             im = self.anim.intensity_rescaler.rescale_intensity(im)
 
+        logger.log(log_level, "Do intensity rescale if necessary")
         return im
 
     def imshow(self, as_gray=False):

@@ -243,6 +243,15 @@ class SkeletonAnalysis:
             # probably area can be estimated by view area
             logger.debug("Unknown area. Skipping density calculation")
 
+        if "Lobulus Equivalent Surface" in datarow:
+            area_unit = datarow["Area unit"]
+            datarow[f"Equivalent branch number density [1/{area_unit}^2]"] = datarow["Branch number"]/datarow["Lobulus Equivalent Surface"]
+            datarow[f"Equivalent dead ends number density [1/{area_unit}^2]"] = datarow["Dead ends number"]/datarow["Lobulus Equivalent Surface"]
+            datarow[f"Equivalent skeleton length density [{area_unit}/{area_unit}^2]"] = datarow["Branch length number"]/datarow["Lobulus Equivalent Surface"]
+        else:
+            # probably area can be estimated by view area
+            logger.debug("Unknown 'Lobulus Equivalent Surface'. Skipping density calculation")
+
         self.report.add_cols_to_actual_row(datarow)
         logger.debug("Skeleton analysis finished.")
 
