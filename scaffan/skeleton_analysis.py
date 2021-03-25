@@ -200,8 +200,9 @@ class SkeletonAnalysis:
             self.imsave(
                 "lobulus_thr_skeleton_{}.png",
                 (skeleton.astype(np.uint8) + imthr + detail_mask).astype(np.uint8),
+                severity=55
             )
-            self.imsave("skeleton_{}.png", skeleton)
+            self.imsave("skeleton_{}.png", skeleton, 55)
             self.imsave("thr_{}.png", imthr)
             # plt.imsave(op.join(self.report.outputdir, "skeleton_thr_lobulus_{}.png".format(self.annotation_id)), skeleton.astype(np.uint8) + imthr + detail_mask)
             # plt.imsave(op.join(self.report.outputdir, "skeleton_{}.png".format(self.annotation_id)), skeleton)
@@ -255,6 +256,6 @@ class SkeletonAnalysis:
         self.report.add_cols_to_actual_row(datarow)
         logger.debug("Skeleton analysis finished.")
 
-    def imsave(self, base_fn, arr, k=50):
+    def imsave(self, base_fn, arr, severity=50):
         base_fn = base_fn.format(self.lobulus.annotation_id)
-        self.report.imsave(base_fn, arr, k)
+        self.report.imsave(base_fn, arr, severity)
