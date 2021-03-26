@@ -111,4 +111,4 @@ tests/*
 !test/*.py
 
 # temp
-temp/
+tmp/
