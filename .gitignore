@@ -109,3 +109,6 @@ venv.bak/
 #tests/*.eps
 tests/*
 !test/*.py
+
+# temp
+temp/
