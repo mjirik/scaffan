@@ -270,6 +270,7 @@ class ScanSegmentation:
         self.ann_biggest_ids = []
         self.empty_area_mm = None
         self.septum_area_mm = None
+        self.sample_area_mm = None
         self.sinusoidal_area_mm = None
         self.alternative_get_features = None
         self.accuracy = None
@@ -884,7 +885,8 @@ class ScanSegmentation:
         self.report.savefig("slice_raster_with_annotation.png", level=45)
         plt.close(fig)
         # fig.ax
-        self.intralobular_ratio = countd[1] / (countd[1] + countd[2])
+        self.sample_area_mm = (countd[1] + countd[2])
+        self.intralobular_ratio = countd[1] / self.sample_area_mm if self.sample_area_mm > 0 else None
         logger.debug(f"real_pixel_size={self.used_pixelsize_mm}")
         self.empty_area_mm = np.prod(self.used_pixelsize_mm) * countd[0]
         self.sinusoidal_area_mm = np.prod(self.used_pixelsize_mm) * countd[1]
@@ -894,6 +896,7 @@ class ScanSegmentation:
             {
                 "Scan Segmentation Empty Area [mm^2]": self.empty_area_mm,
                 "Scan Segmentation Septum Area [mm^2]": self.septum_area_mm,
+                "Scan Segmentation Sample Area [mm^2]": self.sample_area_mm,
                 "Scan Segmentation Sinusoidal Area [mm^2]": self.sinusoidal_area_mm,
                 "Scan Segmentation Used Pixelsize [mm]": self.used_pixelsize_mm[0],
                 "Scan Segmentation Classifier": str(self.clf),
