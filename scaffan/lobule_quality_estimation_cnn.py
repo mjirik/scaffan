@@ -13,7 +13,7 @@ import time
 
 # import cv2 # pokud potřebujeme jen měnit velikost, raději bych cv2 ze závislostí vynechal
 import skimage.transform
-from statistics import mean
+# from statistics import mean
 
 #
 # The automatic test is in
@@ -132,7 +132,8 @@ class LobuleQualityEstimationCNN:
             evaluations.append(sni_prediction)
 
         # výsledek uložený do proměnné sni_prediction
-        sni_prediction = mean(evaluations)
+
+        sni_prediction = np.mean(evaluations) if len(evaluations) > 0 else np.NaN
 
         if self.report:
             label = "SNI prediction CNN"
