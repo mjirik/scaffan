@@ -22,4 +22,6 @@ pyqt=5.*
 # requirements of TF2 installed later by pip
 absl-py
 termcolor
+# libiconv because OSError: libiconv.so.2: cannot open shared object file: No suc..
+libiconv
 # ------ end of TF2 requirements

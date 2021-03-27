@@ -70,7 +70,7 @@ install:
     - ls ~/data
     - ls ~/data/medical
     - ls ~/data/medical/orig
-
+    - libiconv
 
 # command to run tests
 #script: nosetests -v --with-coverage -s --cover-package=scaffan
