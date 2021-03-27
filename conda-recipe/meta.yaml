@@ -92,8 +92,9 @@ requirements:
     - pywin32 # [win]
     # - numpy
     # - pyqt 4.11.*
-#    - xlwings
-    - xlrd
+#    - xlwings #
+    - xlrd # used for .xls only
+    - openpyxl
     - {{ pin_compatible('loguru', max_pin='x') }}
 #    - loguru
     - openslide-python # [not win]
