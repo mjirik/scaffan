@@ -6,6 +6,8 @@ Latest version: 0.29.15
 
 # 0.29
 
+* [Changed] Improved image ticks
+* [Fixed] Problem with crashes on large lobules
 * [Changed] Models stored on github only for smaller anaconda package
 * [Added] Configuration in cfg files
 * [Changed] Logging levels finetuned
