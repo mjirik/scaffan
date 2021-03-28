@@ -268,7 +268,7 @@ class GLCMTextureMeasurement:
                 level_npz=40 + self.report_severity_offset,
                 level_skimage=20 + self.report_severity_offset,
             )
-        logger.message(self.log_level, "Tile processing...")
+        logger.log(self.log_level, "Tile processing...")
         energy = tiles_processing(
             1 - texture_image,
             fcn=lambda img: texture_glcm_features(img, levels),
