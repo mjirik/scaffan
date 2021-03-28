@@ -477,7 +477,11 @@ class Lobulus:
         datarow["Area"] = area_px * np.prod(self.view.region_pixelsize)
         # rprops = skimage.measure.regionprops(self.lobulus_mask)
         # logger.debug(f"len rprops: {len(rprops)}")
-        perimeter_px = skimage.measure.perimeter(self.lobulus_mask, neighbourhood=8)
+
+        perimeter_px = skimage.measure.perimeter(
+            scipy.ndimage.morphology.binary_fill_holes(self.lobulus_mask),
+            neighbourhood=8
+        )
         datarow["Lobulus Perimeter"] = perimeter_px * self.view.region_pixelsize[0]
         datarow["Lobulus Boundary Compactness"] = (
             4 * np.pi * area_px / perimeter_px ** 2
