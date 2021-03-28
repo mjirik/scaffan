@@ -45,10 +45,12 @@ __version__ = "0.29.15"
 #     an_y = list(map(int, annot.xpath(".//pointlist/point/y/text()")))
 #     return dict(title=an_title, color=an_color, x=an_x, y=an_y, details=an_details)
 
+
 def get_one_annotation(viewstate):
     def get_text(el):
         tx = el.text
         return "" if tx is None else tx
+
     titles_list = viewstate.findall(".//title")
     if len(titles_list) == 0:
         an_title = ""
@@ -86,6 +88,7 @@ def get_one_annotation(viewstate):
 #     fn = pth + ".json"
 #     with open(fn, "w") as outfile:
 #         json.dump(all_anotations, outfile)
+
 
 def _ndpa_file_to_json(pth):
 
@@ -155,9 +158,7 @@ def get_imsize_from_imagej_roi(rois):
 
             rect = True
     if not rect:
-        raise Exception(
-            "There should be rectangle in ROI file to define image size."
-        )
+        raise Exception("There should be rectangle in ROI file to define image size.")
     return np.array([height, width])
 
 
@@ -279,7 +280,11 @@ def plot_annotations(
             plt.plot(x, y, c=annotation["color"])
             if show_id:
                 plt.text(
-                    np.min(x), np.min(y), str(i), c=annotation["color"], fontsize="x-small"
+                    np.min(x),
+                    np.min(y),
+                    str(i),
+                    c=annotation["color"],
+                    fontsize="x-small",
                 )
 
 

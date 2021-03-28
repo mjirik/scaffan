@@ -45,7 +45,7 @@ annotationIDs = List[annotationID]
 
 
 def import_openslide():
-    if os.name == 'nt':
+    if os.name == "nt":
         pth = op.expanduser(r"~\Downloads\openslide-win64-20171122\bin")
         dll_list = glob.glob(op.join(pth, "*.dll"))
         if len(dll_list) < 5:
@@ -959,7 +959,7 @@ class AnnotatedImage:
         )
         im = np.asarray(imcr)
         if as_gray:
-            if (len(im.shape) > 2):
+            if len(im.shape) > 2:
                 if im.shape[2] == 4:
                     im = skimage.color.rgba2rgb(im)
                 im = skimage.color.rgb2gray(im)
@@ -1067,9 +1067,8 @@ class View:
         self.get_raster_image = self.get_region_image
         self.get_annotation_region_raster = self.get_annotation_raster
 
-
     def set_region(
-            self,
+        self,
         center=None,
         level: int = None,
         size_on_level=None,
@@ -1190,6 +1189,7 @@ class View:
         # scan.adjust_annotation_to_image_view(
         #     self.anim.openslide, self.annotations, center, level, size_on_level
         # )
+
     def __str__(self):
         return f"View: location={self.region_location}, level={self.region_level}, size_on_level={self.region_size_on_level}"
 
@@ -1366,7 +1366,6 @@ class View:
         labels = ["{:.1e}".format(i * region_pixelsize[1]) for i in locs]
         plt.yticks(locs[1:-1], labels[1:-1])
 
-
     def plot_annotations(self, i=None):
         if i is None:
             anns = self.annotations
@@ -1408,11 +1407,14 @@ class View:
         )
         im = np.asarray(imcr)
 
-        logger.log(log_level, f"imcr dtype: {im.dtype}, shape: {im.shape}, min max: [{np.min(im[:,:,:3])}, {np.max(im[:,:,:3])}]")
+        logger.log(
+            log_level,
+            f"imcr dtype: {im.dtype}, shape: {im.shape}, min max: [{np.min(im[:,:,:3])}, {np.max(im[:,:,:3])}]",
+        )
         # logger.debug(f"imcr dtype: {im.dtype}, shape: {im.shape}, min max: [{np.min(im[:,:,:3])}, {np.max(im[:,:,:3])}], mean: {np.mean(im[:,:,:3])}, min max alpha: [{np.min(im[:,:,3])}, {np.max(im[:,:,3])}], mean: {np.mean(im[:,:,3])}")
 
         if as_gray:
-            if (len(im.shape) > 2):
+            if len(im.shape) > 2:
                 if im.shape[2] == 4:
                     logger.log(log_level, "RGBA to RGB...")
                     # im = skimage.color.rgba2rgb(im)
@@ -1585,7 +1587,10 @@ class View:
             return segmentation
         else:
             from scipy.ndimage import morphology
-            dst, inds = morphology.distance_transform_edt(segmentation==0, return_indices=True)
+
+            dst, inds = morphology.distance_transform_edt(
+                segmentation == 0, return_indices=True
+            )
             # plt.imshow(dst)
 
             # fill the gaps
@@ -1596,9 +1601,6 @@ class View:
                 return filled, [dst]
             else:
                 return filled
-
-
-
 
 
 class ColorError(Exception):

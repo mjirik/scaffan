@@ -17,8 +17,6 @@ path_to_script = Path(os.path.dirname(os.path.abspath(__file__)))
 # path_to_scaffan = Path(os.path.join(path_to_script, ".."))
 
 
-
-
 class WholeSlideGLCM:
     def __init__(
         self,

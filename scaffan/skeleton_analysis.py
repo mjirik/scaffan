@@ -86,9 +86,9 @@ class SkeletonAnalysis:
 
         inner = self.lobulus.central_vein_mask
         logger.debug(
-            f"lobulus.central_vein_mask: dtype={self.lobulus.central_vein_mask.dtype}, " +
-            f"shape={self.lobulus.central_vein_mask.shape}, " +
-            f"unique={np.unique(self.lobulus.central_vein_mask)}"
+            f"lobulus.central_vein_mask: dtype={self.lobulus.central_vein_mask.dtype}, "
+            + f"shape={self.lobulus.central_vein_mask.shape}, "
+            + f"unique={np.unique(self.lobulus.central_vein_mask)}"
         )
         # import pdb; pdb.set_trace()
         # TODO Split the function here
@@ -96,16 +96,19 @@ class SkeletonAnalysis:
             self.parameters.param("Inner Lobulus Margin").value() * 1000
         )
 
-        logger.debug(f"Distance transform. type(mask)={str(type(self.lobulus.lobulus_mask))}, "
-                     f"mask.shape={self.lobulus.lobulus_mask.shape}, "
-                     f"mask.unique={np.unique(self.lobulus.lobulus_mask, return_counts=True)}"
-                     )
+        logger.debug(
+            f"Distance transform. type(mask)={str(type(self.lobulus.lobulus_mask))}, "
+            f"mask.shape={self.lobulus.lobulus_mask.shape}, "
+            f"mask.unique={np.unique(self.lobulus.lobulus_mask, return_counts=True)}"
+        )
         # eroded image for threshold analysis
         dstmask = scipy.ndimage.morphology.distance_transform_edt(
             self.lobulus.lobulus_mask, self.lobulus.view.region_pixelsize[::-1]
         )
         inner_lobulus_mask = dstmask > inner_lobulus_margin_mm
-        logger.debug(f"inner_lobulus_mask: unique/counts={np.unique(inner_lobulus_mask, return_counts=True)}")
+        logger.debug(
+            f"inner_lobulus_mask: unique/counts={np.unique(inner_lobulus_mask, return_counts=True)}"
+        )
 
         # detail_level = 2
         new_size = self.view.get_size_on_pixelsize_mm()
@@ -116,22 +119,28 @@ class SkeletonAnalysis:
             order=0,
             anti_aliasing=False,
         )
-        logger.debug(f"Resizing mask from {self.lobulus.lobulus_mask.shape} to {resize_params['output_shape']}")
+        logger.debug(
+            f"Resizing mask from {self.lobulus.lobulus_mask.shape} to {resize_params['output_shape']}"
+        )
         detail_mask = skimage.transform.resize(
             self.lobulus.lobulus_mask, **resize_params
         ).astype(np.int8)
-        logger.debug(f"Resizing mask from {inner_lobulus_mask.shape} to {resize_params['output_shape']}")
+        logger.debug(
+            f"Resizing mask from {inner_lobulus_mask.shape} to {resize_params['output_shape']}"
+        )
         detail_inner_lobulus_mask = skimage.transform.resize(
             inner_lobulus_mask, **resize_params
         )
-        logger.debug(f"Resizing mask from {inner.shape} to {resize_params['output_shape']}")
+        logger.debug(
+            f"Resizing mask from {inner.shape} to {resize_params['output_shape']}"
+        )
         detail_central_vein_mask = skimage.transform.resize(
             inner == 1, **resize_params
         ).astype(np.int8)
 
         logger.debug(f"Preparing to show")
         detail_view = self.view
-        logger.debug(f'view={detail_view}')
+        logger.debug(f"view={detail_view}")
         # TODO change log_level to trace
         detail_image = detail_view.get_region_image(as_gray=True, log_level="DEBUG")
         logger.debug("preparing figure")
@@ -172,7 +181,9 @@ class SkeletonAnalysis:
         #     plt.show()
         skeleton = skeletonize(imthr)
         sumskel = np.sum(skeleton)
-        logger.debug(f"Skeletonization finished. threshold={threshold}, sumskel={sumskel}")
+        logger.debug(
+            f"Skeletonization finished. threshold={threshold}, sumskel={sumskel}"
+        )
         datarow["Skeleton length"] = sumskel * detail_view.region_pixelsize[0]
         datarow["Output pixel size 0"] = detail_view.region_pixelsize[0]
         datarow["Output pixel size 1"] = detail_view.region_pixelsize[1]
@@ -200,7 +211,7 @@ class SkeletonAnalysis:
             self.imsave(
                 "lobulus_thr_skeleton_{}.png",
                 (skeleton.astype(np.uint8) + imthr + detail_mask).astype(np.uint8),
-                severity=55
+                severity=55,
             )
             self.imsave("skeleton_{}.png", skeleton, 55)
             self.imsave("thr_{}.png", imthr)
@@ -237,21 +248,37 @@ class SkeletonAnalysis:
         datarow["Dead ends number"] = num
         if "Area" in datarow:
             area_unit = datarow["Area unit"]
-            datarow[f"Branch number density [1/{area_unit}^2]"] = datarow["Branch number"]/datarow["Area"]
-            datarow[f"Dead ends number density [1/{area_unit}^2]"] = datarow["Dead ends number"]/datarow["Area"]
-            datarow[f"Skeleton length density [{area_unit}/{area_unit}^2]"] = datarow["Branch length number"]/datarow["Area"]
+            datarow[f"Branch number density [1/{area_unit}^2]"] = (
+                datarow["Branch number"] / datarow["Area"]
+            )
+            datarow[f"Dead ends number density [1/{area_unit}^2]"] = (
+                datarow["Dead ends number"] / datarow["Area"]
+            )
+            datarow[f"Skeleton length density [{area_unit}/{area_unit}^2]"] = (
+                datarow["Branch length number"] / datarow["Area"]
+            )
         else:
             # probably area can be estimated by view area
             logger.debug("Unknown area. Skipping density calculation")
 
         if "Lobulus Equivalent Surface" in datarow:
             area_unit = datarow["Area unit"]
-            datarow[f"Equivalent branch number density [1/{area_unit}^2]"] = datarow["Branch number"]/datarow["Lobulus Equivalent Surface"]
-            datarow[f"Equivalent dead ends number density [1/{area_unit}^2]"] = datarow["Dead ends number"]/datarow["Lobulus Equivalent Surface"]
-            datarow[f"Equivalent skeleton length density [{area_unit}/{area_unit}^2]"] = datarow["Branch length number"]/datarow["Lobulus Equivalent Surface"]
+            datarow[f"Equivalent branch number density [1/{area_unit}^2]"] = (
+                datarow["Branch number"] / datarow["Lobulus Equivalent Surface"]
+            )
+            datarow[f"Equivalent dead ends number density [1/{area_unit}^2]"] = (
+                datarow["Dead ends number"] / datarow["Lobulus Equivalent Surface"]
+            )
+            datarow[
+                f"Equivalent skeleton length density [{area_unit}/{area_unit}^2]"
+            ] = (
+                datarow["Branch length number"] / datarow["Lobulus Equivalent Surface"]
+            )
         else:
             # probably area can be estimated by view area
-            logger.debug("Unknown 'Lobulus Equivalent Surface'. Skipping density calculation")
+            logger.debug(
+                "Unknown 'Lobulus Equivalent Surface'. Skipping density calculation"
+            )
 
         self.report.add_cols_to_actual_row(datarow)
         logger.debug("Skeleton analysis finished.")

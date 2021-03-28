@@ -63,8 +63,11 @@ class Scaffan:
             repodir=Path(__file__).parent.resolve(),
             check_version_of=["numpy", "scipy", "skimage"],
         )
-        self._default_output_dir_prefix = default_output_dir_prefix if \
-            default_output_dir_prefix else self._prepare_default_output_dir_prefix()
+        self._default_output_dir_prefix = (
+            default_output_dir_prefix
+            if default_output_dir_prefix
+            else self._prepare_default_output_dir_prefix()
+        )
         # self.report.level = 50
 
         self.raise_exception_if_color_not_found = True
@@ -111,17 +114,19 @@ class Scaffan:
                 "name": "Input",
                 "type": "group",
                 "children": [
-                    {"name": "File Path", "type": "str",
-                         "tip": "Annotations are imported automatically. Black, red and magenta annotations can be used"
-                         + "in training as intra-lobular, extra-lobular and background.\n\n"
-                         + "The annotations from `.ndpi` files are automativally imported.\n "
-                         + "The annotattion for other image format are expected to be done in ImageJ ROI Manager.\n"
-                           "File with annotations for is expected to be in the same dir and same name "
-                           "with file extension `.roi.zip`. \n"
-                           "Color of segmentation should be part of the polyon name ('my annotation #00FF00').\n"
-                           "There has to be one rectangle annotataion covering the whole image. It is used to detect"
-                           "original size of image used for generating ImageJ ROI."
-                     },
+                    {
+                        "name": "File Path",
+                        "type": "str",
+                        "tip": "Annotations are imported automatically. Black, red and magenta annotations can be used"
+                        + "in training as intra-lobular, extra-lobular and background.\n\n"
+                        + "The annotations from `.ndpi` files are automativally imported.\n "
+                        + "The annotattion for other image format are expected to be done in ImageJ ROI Manager.\n"
+                        "File with annotations for is expected to be in the same dir and same name "
+                        "with file extension `.roi.zip`. \n"
+                        "Color of segmentation should be part of the polyon name ('my annotation #00FF00').\n"
+                        "There has to be one rectangle annotataion covering the whole image. It is used to detect"
+                        "original size of image used for generating ImageJ ROI.",
+                    },
                     {"name": "Select", "type": "action"},
                     {"name": "Data Info", "type": "str", "readonly": True},
                     {
@@ -135,7 +140,7 @@ class Scaffan:
                         # },
                         "tip": "Auto: select lobulus based on Scan Segmentation.\n"
                         "Color: based on annotation color.\n"
-                        "Manual: manually pick the lobule. \n\n"
+                        "Manual: manually pick the lobule. \n\n",
                     },
                     # {
                     #     "name": "Lobulus Selection Method",
@@ -298,7 +303,7 @@ class Scaffan:
         # import pdb; pdb.set_trace()
         # print("ahoj")
 
-    def set_output_dir(self, path: Union[str, Path]=None):
+    def set_output_dir(self, path: Union[str, Path] = None):
         """
         Set directory for all outputs. The standard
         :param path: if no parameter is given the standard path in ~/data/SA_%Date_%Time is selected
@@ -422,7 +427,7 @@ class Scaffan:
         logger.debug(f"report output dir: {self.report.outputdir}")
         fn_spreadsheet = self.parameters.param("Output", "Common Spreadsheet File")
         self.report.additional_spreadsheet_fn = str(fn_spreadsheet.value())
-        if self.get_parameter("Processing;SNI Prediction CNN") ==  True:
+        if self.get_parameter("Processing;SNI Prediction CNN") == True:
             self.lobule_quality_estimation_cnn.init()
 
     def set_annotation_color_selection(
@@ -478,7 +483,7 @@ class Scaffan:
                 ("Processing;Skeleton Analysis", False),
                 ("Processing;Texture Analysis", False),
                 ("Processing;Lobulus Segmentation", False),
-                ("Processing;Scan Segmentation;Run Prediction", False)
+                ("Processing;Scan Segmentation;Run Prediction", False),
             ]
             prev_values = []
             for key, val in paramlist:
@@ -497,9 +502,12 @@ class Scaffan:
                     )
             else:
                 self.set_parameter(
-                    "Processing;Scan Segmentation;TFS General;Clean Before Training", False
+                    "Processing;Scan Segmentation;TFS General;Clean Before Training",
+                    False,
                 )
-            self.set_parameter("Processing;Scan Segmentation;TFS General;Run Training", True)
+            self.set_parameter(
+                "Processing;Scan Segmentation;TFS General;Run Training", True
+            )
             #             mainapp.set_parameter("Processing;Slide Segmentation;Lobulus Number", 0)
             # mainapp.start_gui(qapp=qapp)
             self.run_lobuluses()
@@ -509,7 +517,9 @@ class Scaffan:
                 key, wanted_val = wanted
                 self.set_parameter(key, val)
 
-    def _prepare_annoataion_ids_for_run_lobuluses(self, annotation_ids:Optional[list]=None):
+    def _prepare_annoataion_ids_for_run_lobuluses(
+        self, annotation_ids: Optional[list] = None
+    ):
         run_slide_segmentation = self.parameters.param(
             "Processing", "Scan Segmentation"
         ).value()
@@ -537,12 +547,16 @@ class Scaffan:
                     self.slide_segmentation.add_biggest_to_annotations()
                     annotation_ids = self.slide_segmentation.ann_biggest_ids
                 else:
-                    logger.error("Cannot do automatic lobulus selection without whole scan segmentation")
+                    logger.error(
+                        "Cannot do automatic lobulus selection without whole scan segmentation"
+                    )
             else:
-                logger.error(f"Unknown Lobulus Selection Method: {automatic_lobulus_selection}")
+                logger.error(
+                    f"Unknown Lobulus Selection Method: {automatic_lobulus_selection}"
+                )
         return annotation_ids, automatic_lobulus_selection
 
-    def run_lobuluses(self, event=None, seeds_mm:Optional[list]=None):
+    def run_lobuluses(self, event=None, seeds_mm: Optional[list] = None):
         """
         :param event:
         :param seeds_mm: If not none, and Lobulus Selection Method is set to
@@ -552,7 +566,9 @@ class Scaffan:
         self.init_run()
         if seeds_mm:
             logger.debug(f"seeds_mm={seeds_mm}")
-            _, annotation_ids = self.prepare_circle_annotations_from_seeds_mm(centers_mm=seeds_mm)
+            _, annotation_ids = self.prepare_circle_annotations_from_seeds_mm(
+                centers_mm=seeds_mm
+            )
 
         self.report.level = self.parameters.param("Processing", "Report Level").value()
 
@@ -576,9 +592,10 @@ class Scaffan:
             self.slide_segmentation.run()
             # this can be used for automatic lobulus localization
 
-        annotation_ids, automatic_lobulus_selection = self._prepare_annoataion_ids_for_run_lobuluses(
-            annotation_ids
-        )
+        (
+            annotation_ids,
+            automatic_lobulus_selection,
+        ) = self._prepare_annoataion_ids_for_run_lobuluses(annotation_ids)
         t1 = time.time()
         self.report.set_persistent_cols({"Lobules Selection Time [s]": t1 - t0})
 
@@ -616,7 +633,8 @@ class Scaffan:
                     raise e
         saved_params = self.parameters.saveState()
         io3d.misc.obj_to_file(
-            self.parameters_to_dict(), str(Path(self.report.outputdir) / "parameters.yaml")
+            self.parameters_to_dict(),
+            str(Path(self.report.outputdir) / "parameters.yaml"),
         )
         try:
             with open(
@@ -634,7 +652,9 @@ class Scaffan:
         if open_dir:
             os_interaction.open_path(self.report.outputdir)
 
-        self.save_parameters_as_cfg_file(str(Path(self.report.outputdir) / "parameters.cfg"))
+        self.save_parameters_as_cfg_file(
+            str(Path(self.report.outputdir) / "parameters.cfg")
+        )
         logger.debug("finished")
 
         # print("ann ids", annotation_ids)
@@ -642,7 +662,7 @@ class Scaffan:
     def _get_parameters_as_cfg(self):
         dct = self.parameters_to_dict()
         config = configparser.ConfigParser()
-        config.optionxform = str # preserve case size
+        config.optionxform = str  # preserve case size
 
         # convert values to string
         dct = dict(zip(dct.keys(), map(str, dct.values())))
@@ -666,13 +686,13 @@ class Scaffan:
 
     def load_parameters_from_cfg_string(self, s):
         config = configparser.ConfigParser()
-        config.optionxform = str # preserve case size
+        config.optionxform = str  # preserve case size
         config.read_string(s)
         self._set_parameters_from_cfg(config)
 
     def load_parameters_from_cfg_file(self, filename):
         config = configparser.ConfigParser()
-        config.optionxform = str # preserve case size
+        config.optionxform = str  # preserve case size
         config.read_file(open(filename))
         self._set_parameters_from_cfg(config)
 
@@ -682,8 +702,7 @@ class Scaffan:
             logger.debug(f"{key}, {type(dct[key])}, {dct[key]}")
             self.set_parameter(key, dct[key])
 
-
-    def _add_general_information_to_actual_row(self, update_dict:dict=None):
+    def _add_general_information_to_actual_row(self, update_dict: dict = None):
         inpath = Path(self.parameters.param("Input", "File Path").value())
         fn = inpath.parts[-1]
         fn_out = self.parameters.param("Output", "Directory Path").value()
@@ -702,9 +721,7 @@ class Scaffan:
         }
         if update_dict:
             data_to_add.update(update_dict)
-        self.report.add_cols_to_actual_row(
-            data_to_add
-        )
+        self.report.add_cols_to_actual_row(data_to_add)
         self.report.add_cols_to_actual_row(self.parameters_to_dict())
 
     def _run_lobulus(self, annotation_id):
@@ -816,18 +833,24 @@ class Scaffan:
         centers_mm = list(np.asarray(centers_mm) / pxsz_mm)
 
         view_corner = self.get_preview_view()
-        return self.prepare_circle_annotations_from_points_px_in_preview(view_corner, centers_mm)
+        return self.prepare_circle_annotations_from_points_px_in_preview(
+            view_corner, centers_mm
+        )
 
-    def prepare_circle_annotations_from_points_px_in_preview(self, view_corner, centers_px_view):
+    def prepare_circle_annotations_from_points_px_in_preview(
+        self, view_corner, centers_px_view
+    ):
 
         x_px_view, y_px_view = zip(*list(centers_px_view))
         logger.debug(x_px_view)
-        pts_glob_px = view_corner.coords_view_px_to_glob_px(np.asarray(x_px_view), np.asarray(y_px_view))
+        pts_glob_px = view_corner.coords_view_px_to_glob_px(
+            np.asarray(x_px_view), np.asarray(y_px_view)
+        )
         centers_px = list(zip(*pts_glob_px))
         logger.debug(f"Manual selection5, centers_px_global={centers_px}")
         r_mm = (
-                float(self.get_parameter("Processing;Scan Segmentation;Annotation Radius"))
-                * 1000
+            float(self.get_parameter("Processing;Scan Segmentation;Annotation Radius"))
+            * 1000
         )
 
         ann_ids, _ = scaffan.slide_segmentation.add_circle_annotation(
@@ -887,8 +910,12 @@ class Scaffan:
         seeds_mm = list(np.asarray(xy_px_view) / pxsz_mm)
         logger.debug(f"seeds_mm={seeds_mm}")
         # centers_px = list(zip(*pts_glob_px))
-        view_corner, ann_ids = self.prepare_circle_annotations_from_points_px_in_preview(
-            view_corner, centers_px_view=xy_px_view)
+        (
+            view_corner,
+            ann_ids,
+        ) = self.prepare_circle_annotations_from_points_px_in_preview(
+            view_corner, centers_px_view=xy_px_view
+        )
         # logger.debug(f"annotations={self.anim.annotations}")
 
         logger.debug("annotation selected")

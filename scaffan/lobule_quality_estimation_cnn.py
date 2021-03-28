@@ -13,6 +13,7 @@ import time
 
 # import cv2 # pokud potřebujeme jen měnit velikost, raději bych cv2 ze závislostí vynechal
 import skimage.transform
+
 # from statistics import mean
 
 #
@@ -20,8 +21,6 @@ import skimage.transform
 # main_test.py: test_testing_slide_segmentation_clf_unet()
 path_to_script = Path(os.path.dirname(os.path.abspath(__file__)))
 # path_to_scaffan = Path(os.path.join(path_to_script, ".."))
-
-
 
 
 class LobuleQualityEstimationCNN:
@@ -75,6 +74,7 @@ class LobuleQualityEstimationCNN:
 
     def init(self, force_download_model=False):
         from tensorflow.keras.models import load_model
+
         # načtení architektury modelu
         # načtení parametrů modelu
 
@@ -95,17 +95,18 @@ class LobuleQualityEstimationCNN:
 
     def download_model(self, cnn_model_version):
         import requests
-        model_path = Path(f'~/.scaffan/{cnn_model_version}.h5').expanduser()
-        url = f'https://github.com/mjirik/scaffan/raw/master/scaffan/{cnn_model_version}.h5'
+
+        model_path = Path(f"~/.scaffan/{cnn_model_version}.h5").expanduser()
+        url = f"https://github.com/mjirik/scaffan/raw/master/scaffan/{cnn_model_version}.h5"
         if not model_path.exists():
             model_path.parent.mkdir(parents=True, exist_ok=True)
             logger.debug(f"Downloading from '{url}' to {str(model_path)}")
             r = requests.get(url, allow_redirects=True)
-            open(model_path, 'wb').write(r.content)
+            open(model_path, "wb").write(r.content)
         return model_path
 
     def set_input_data(
-            self, view: image.View, annotation_id: int = None, lobulus_segmentation=None
+        self, view: image.View, annotation_id: int = None, lobulus_segmentation=None
     ):
         self.anim = view.anim
         self.annotation_id = annotation_id
@@ -117,16 +118,24 @@ class LobuleQualityEstimationCNN:
         # Tady by bylo tělo algoritmu
 
         # Phase 1: Cut out rectangle samples from original image
-        snip_corners = self.cut_the_image(self.lobulus_segmentation, self.parent_view.region_pixelsize[0], False)
+        snip_corners = self.cut_the_image(
+            self.lobulus_segmentation, self.parent_view.region_pixelsize[0], False
+        )
         crop_size = int((1 / self.parent_view.region_pixelsize[0]) * self.CUT_SIZE)
         evaluations = []
 
         # Phase 2: Predict SNI value for every sample
         for i, cut_point in enumerate(snip_corners):
             img = self.parent_view.get_region_image(True)
-            image_snip = img[cut_point[0]:cut_point[0] + crop_size, cut_point[1]:cut_point[1] + crop_size]
+            image_snip = img[
+                cut_point[0] : cut_point[0] + crop_size,
+                cut_point[1] : cut_point[1] + crop_size,
+            ]
             image_snip = self.shrink_image(image_snip)
-            prediction = self.model.predict(image_snip.reshape(1, self.DISPLAY_SIZE, self.DISPLAY_SIZE, 1), verbose=0)
+            prediction = self.model.predict(
+                image_snip.reshape(1, self.DISPLAY_SIZE, self.DISPLAY_SIZE, 1),
+                verbose=0,
+            )
             # Predictions are normalized to an interval <0,1> but SNI belongs to <0,2>
             sni_prediction = 2 * np.float(prediction)
             evaluations.append(sni_prediction)
@@ -216,6 +225,10 @@ class LobuleQualityEstimationCNN:
         """
         Resize image to display size
         """
-        return skimage.transform.resize(img, output_shape=(self.DISPLAY_SIZE, self.DISPLAY_SIZE), preserve_range=True)
+        return skimage.transform.resize(
+            img,
+            output_shape=(self.DISPLAY_SIZE, self.DISPLAY_SIZE),
+            preserve_range=True,
+        )
         # pokud nepotřebujeme z cv2 nic jiného, zkusil bych jej nahradit, aby se nezvětšovaly závislosti.
         # return cv2.resize(img, dsize=(self.DISPLAY_SIZE, self.DISPLAY_SIZE), interpolation=cv2.INTER_CUBIC)

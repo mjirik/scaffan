@@ -23,6 +23,7 @@ import numpy as np
 from skimage.feature import peak_local_max
 import skimage.filters
 import sklearn.metrics
+
 # import skimage.metrics
 from skimage.morphology import disk
 import scipy.ndimage
@@ -79,7 +80,7 @@ class ScanSegmentation:
             # tile_spacing=32,
             tile_size=16,
             tile_spacing=8,
-            report_severity_offset=-30
+            report_severity_offset=-30,
         )
         params = [
             # {
@@ -185,9 +186,9 @@ class ScanSegmentation:
                         # "value": 0.00000355,  # 0.005 mm
                         "suffix": "m",
                         "siPrefix": True,
-                        "tip": "Maximal distance from extra-lobular tissue"
+                        "tip": "Maximal distance from extra-lobular tissue",
                     },
-                ]
+                ],
             },
             {
                 "name": "Lobulus Number",
@@ -212,8 +213,8 @@ class ScanSegmentation:
                 "value": True,
                 # "suffix": "px",
                 "siPrefix": False,
-                "tip": "Per-pixel prediction (segmentation) is the key step in slide segmentation.\n" +
-                "It can be skipped during the training phase or for debug reasons."
+                "tip": "Per-pixel prediction (segmentation) is the key step in slide segmentation.\n"
+                + "It can be skipped during the training phase or for debug reasons.",
             },
             # self._inner_texture.parameters,
         ]
@@ -297,7 +298,9 @@ class ScanSegmentation:
         logger.debug(f"method={method}")
         method_str = method.replace(" ", "_")
         self.clf = self._clf_object(**self._clf_params)
-        self.clf_fn: Path = Path(Path(__file__).parent / f"segmentation_model_{method_str}.pkl")
+        self.clf_fn: Path = Path(
+            Path(__file__).parent / f"segmentation_model_{method_str}.pkl"
+        )
         self.clf_default_fn: Path = Path(
             Path(__file__).parent / f"segmentation_model_default_{method_str}.pkl"
         )
@@ -368,22 +371,31 @@ class ScanSegmentation:
             #             plt.imshow(ann_raster)
             #             plt.show()
             img = self._get_features(view_ann, annotation_id=id1)
-            stride = int(self.parameters.param("TFS General", "Training Stride").value())
+            stride = int(
+                self.parameters.param("TFS General", "Training Stride").value()
+            )
             pixels = img[ann_raster][::stride]
             pixels_list.append(pixels)
         pixels_all = np.concatenate(pixels_list, axis=0)
         return pixels_all
 
-    def _get_features(self, view: View, debug_return=False, annotation_id=None) -> np.ndarray:
+    def _get_features(
+        self, view: View, debug_return=False, annotation_id=None
+    ) -> np.ndarray:
         method = str(self.parameters.param("Segmentation Method").value())
         if method == "HCTFS":
             return self._get_features_hctf(view, debug_return=debug_return)
         elif method == "GLCMTFS":
-            texture_label_str_id = f"{view.region_location[0]}_{view.region_location[1]}" if annotation_id is None else None
+            texture_label_str_id = (
+                f"{view.region_location[0]}_{view.region_location[1]}"
+                if annotation_id is None
+                else None
+            )
             self._glcm.set_input_data(
-                view=view, annotation_id=annotation_id, lobulus_segmentation=None,
-                texture_label_str_id=texture_label_str_id
-
+                view=view,
+                annotation_id=annotation_id,
+                lobulus_segmentation=None,
+                texture_label_str_id=texture_label_str_id,
             )
             self._glcm.run(recalculate_view=False)
             features = self._glcm.measured_features
@@ -607,12 +619,15 @@ class ScanSegmentation:
         )
 
     def _imsave_full_raster_and_training_labels(self):
-        if (self.full_raster_image is not None) and (self.whole_slide_training_labels is not None):
+        if (self.full_raster_image is not None) and (
+            self.whole_slide_training_labels is not None
+        ):
             fig = plt.figure()
             plt.imshow(self.full_raster_image)
-            plt.contour(self.whole_slide_training_labels,
-                        # cmap="Purples"
-                        )
+            plt.contour(
+                self.whole_slide_training_labels,
+                # cmap="Purples"
+            )
             self.report.savefig("whole_slide_raster_and_training_labels.png", level=45)
             plt.close(fig)
 
@@ -730,10 +745,16 @@ class ScanSegmentation:
         tmp_img = full_image.copy()
         tmp_img[full_image == 2] = 1
         import skimage.filters
-        mask = scipy.ndimage.distance_transform_edt(full_image != 2, sampling=resolution_m) < max_dist_m
+
+        mask = (
+            scipy.ndimage.distance_transform_edt(full_image != 2, sampling=resolution_m)
+            < max_dist_m
+        )
         tmp_img[~mask] = 0
 
-        tmp_img = skimage.filters.gaussian(tmp_img.astype(np.float), sigma=4, preserve_range=False)
+        tmp_img = skimage.filters.gaussian(
+            tmp_img.astype(np.float), sigma=4, preserve_range=False
+        )
 
         tmp_img = (tmp_img > 0.5).astype(np.int)
         tmp_img[full_image == 2] = 2
@@ -885,8 +906,10 @@ class ScanSegmentation:
         self.report.savefig("slice_raster_with_annotation.png", level=45)
         plt.close(fig)
         # fig.ax
-        self.sample_area_mm = (countd[1] + countd[2])
-        self.intralobular_ratio = countd[1] / self.sample_area_mm if self.sample_area_mm > 0 else None
+        self.sample_area_mm = countd[1] + countd[2]
+        self.intralobular_ratio = (
+            countd[1] / self.sample_area_mm if self.sample_area_mm > 0 else None
+        )
         logger.debug(f"real_pixel_size={self.used_pixelsize_mm}")
         self.empty_area_mm = np.prod(self.used_pixelsize_mm) * countd[0]
         self.sinusoidal_area_mm = np.prod(self.used_pixelsize_mm) * countd[1]
@@ -905,7 +928,10 @@ class ScanSegmentation:
 
     def evaluate_labels(self):
 
-        if self.whole_slide_training_labels is not None and self.full_output_image is not None:
+        if (
+            self.whole_slide_training_labels is not None
+            and self.full_output_image is not None
+        ):
             # labels_true = (self.whole_slide_training_labels - 1).astype(np.int8)
 
             selection = self.whole_slide_training_labels > 0
@@ -913,12 +939,10 @@ class ScanSegmentation:
                 accuracy = sklearn.metrics.accuracy_score(
                     self.whole_slide_training_labels[selection].ravel() - 1,
                     self.full_output_image[selection].ravel(),
-                    normalize=True
+                    normalize=True,
                 )
                 self.report.set_persistent_cols(
-                    {
-                        "Whole Scan Training Labels Accuracy": accuracy
-                    }
+                    {"Whole Scan Training Labels Accuracy": accuracy}
                 )
                 self.accuracy = accuracy
                 fig = plt.figure()
@@ -928,7 +952,6 @@ class ScanSegmentation:
                 plt.close(fig)
                 return accuracy
         return None
-
 
     def _find_biggest_lobuli(self):
         """
@@ -992,9 +1015,7 @@ class ScanSegmentation:
             "ro",
         )
         plt.axis("off")
-        self.report.savefig(
-            "sinusoidal_tissue_local_centers.png", level=55
-        )
+        self.report.savefig("sinusoidal_tissue_local_centers.png", level=55)
         self.report.savefig_and_show(
             "sinusoidal_tissue_local_centers.pdf", fig, level=55
         )
@@ -1028,7 +1049,9 @@ class ScanSegmentation:
 
         method = str(self.parameters.param("Segmentation Method").value())
         if method in ("HCTFS", "GLCMTFS"):
-            if bool(self.parameters.param("TFS General", "Load Default Classifier").value()):
+            if bool(
+                self.parameters.param("TFS General", "Load Default Classifier").value()
+            ):
                 if self.clf_default_fn.exists():
                     logger.debug(
                         f"Reading default classifier from {str(self.clf_default_fn)}"

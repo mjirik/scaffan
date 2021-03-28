@@ -30,7 +30,13 @@ def tile_centers(image_shape, tile_spacing):
 
 
 def tiles_processing(
-    image, fcn, tile_spacing, fcn_output_n=None, dtype=np.int8, tile_size=None, log_level="TRACE"
+    image,
+    fcn,
+    tile_spacing,
+    fcn_output_n=None,
+    dtype=np.int8,
+    tile_size=None,
+    log_level="TRACE",
 ):
     """
     Process image tile by tile. Last tile in every row and avery column may be smaller if modulo of shape of image and
@@ -200,8 +206,11 @@ class GLCMTextureMeasurement:
         self.report = report
 
     def set_input_data(
-        self, view: image.View, annotation_id:int=None, lobulus_segmentation=None,
-            texture_label_str_id:str=None
+        self,
+        view: image.View,
+        annotation_id: int = None,
+        lobulus_segmentation=None,
+        texture_label_str_id: str = None,
     ):
         self.anim = view.anim
         self.annotation_id = annotation_id
@@ -238,8 +247,12 @@ class GLCMTextureMeasurement:
         texture_image = view.get_region_image(as_gray=True)
 
         fn_ann_id = "" if self.annotation_id is None else f"_{self.annotation_id}"
-        tx_ann_id = "" if self.texture_label_str_id is None else f"_{self.texture_label_str_id}"
-        fn_id = "{}{}{}{}".format(self.filename_label, fn_ann_id, texture_label_fn, tx_ann_id)
+        tx_ann_id = (
+            "" if self.texture_label_str_id is None else f"_{self.texture_label_str_id}"
+        )
+        fn_id = "{}{}{}{}".format(
+            self.filename_label, fn_ann_id, texture_label_fn, tx_ann_id
+        )
         if self.report is not None:
             self.report.imsave(
                 f"texture_input_image_mul255_{fn_id}.png",
@@ -269,7 +282,9 @@ class GLCMTextureMeasurement:
         plt.subplot(221)
         # grayscale image is there because of travis memory error
         logger.log(self.log_level, "get_region_image...")
-        logger.trace(f"view.size={view.get_size_on_pixelsize_mm()}, energy.shape={energy.shape}")
+        logger.trace(
+            f"view.size={view.get_size_on_pixelsize_mm()}, energy.shape={energy.shape}"
+        )
         img_for_preview = view.get_region_image(as_gray=True, log_level=self.log_level)
         plt.imshow(img_for_preview, cmap="gray")
         # if self.annotation_id is not None:
@@ -367,7 +382,7 @@ class GLCMTextureMeasurement:
             # self.log_level,
             "DEBUG",
             f"GLCM textures id={self.annotation_id if self.annotation_id is not None else '-'} "
-            f"(tx_label={tx_ann_id}) done. {'No seg.' if self.lobulus_segmentation is None else ''}"
+            f"(tx_label={tx_ann_id}) done. {'No seg.' if self.lobulus_segmentation is None else ''}",
         )
 
         # plt.show()

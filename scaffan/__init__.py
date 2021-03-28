@@ -1,8 +1,9 @@
 # import os, sys; sys.path.append(os.path.dirname(os.path.realpath(__file__)))
 import subprocess
+
 try:
 
-    __version__ = subprocess.check_output("git describe".split(' '), cwd="..").strip()
+    __version__ = subprocess.check_output("git describe".split(" "), cwd="..").strip()
 except (subprocess.CalledProcessError, FileNotFoundError) as e:
     __version__ = "0.29.15"
 """

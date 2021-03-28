@@ -97,9 +97,9 @@ def set(common_spreadsheet_file=None):
     "-cf",
     default=None,
     nargs=1,
-    help='Path to cfg file with parameters. In the file, the section have to be [scaffan]. '
-         'The key of the parameter is path to parameter separated by ";". The value is value of parameter.'
-         "python -m scaffan gui -cf parameter.cfg",
+    help="Path to cfg file with parameters. In the file, the section have to be [scaffan]. "
+    'The key of the parameter is path to parameter separated by ";". The value is value of parameter.'
+    "python -m scaffan gui -cf parameter.cfg",
 )
 @click.option(
     "--params",
@@ -197,9 +197,9 @@ def install():
     "-cf",
     default=None,
     nargs=1,
-    help='Path to config file with parameters. In the file, the section have to be [scaffan]. '
-         'The key of the parameter is path to parameter separated by ";". The value is value of parameter.'
-         "python -m scaffan gui -pi parameter.cfg",
+    help="Path to config file with parameters. In the file, the section have to be [scaffan]. "
+    'The key of the parameter is path to parameter separated by ";". The value is value of parameter.'
+    "python -m scaffan gui -pi parameter.cfg",
 )
 @click.option(
     "--params",
@@ -208,7 +208,7 @@ def install():
     default="",
     nargs=2,
     help='Set parameter. First argument is path to parameter separated by ";". Second is the value.'
-         "python -m scaffan gui -p Processing,Show True",
+    "python -m scaffan gui -p Processing,Show True",
 )
 @click.option(
     "--seeds_mm",
@@ -217,7 +217,7 @@ def install():
     default=None,
     nargs=2,
     help='Set parameter. First argument is path to parameter separated by ";". Second is the value.'
-         "python -m scaffan gui -p Processing,Show True",
+    "python -m scaffan gui -p Processing,Show True",
 )
 def nogui(input_path, color, output_path, config_file, params, seeds_mm):
     # if log_level is not None:
