@@ -30,7 +30,7 @@ def tile_centers(image_shape, tile_spacing):
 
 
 def tiles_processing(
-    image, fcn, tile_spacing, fcn_output_n=None, dtype=np.int8, tile_size=None
+    image, fcn, tile_spacing, fcn_output_n=None, dtype=np.int8, tile_size=None, log_level="TRACE"
 ):
     """
     Process image tile by tile. Last tile in every row and avery column may be smaller if modulo of shape of image and
@@ -57,6 +57,7 @@ def tiles_processing(
 
     output = np.zeros(shape, dtype=dtype)
     for x0 in range(0, image.shape[0], tile_spacing[0]):
+        logger.log(log_level, f"tileprocessing x0={x0}")
         for x1 in range(0, image.shape[1], tile_spacing[1]):
             sl_in = (
                 slice(
@@ -254,6 +255,7 @@ class GLCMTextureMeasurement:
                 level_npz=40 + self.report_severity_offset,
                 level_skimage=20 + self.report_severity_offset,
             )
+        logger.message(self.log_level, "Tile processing...")
         energy = tiles_processing(
             1 - texture_image,
             fcn=lambda img: texture_glcm_features(img, levels),
@@ -266,14 +268,16 @@ class GLCMTextureMeasurement:
         fig = plt.figure(figsize=(10, 12))
         plt.subplot(221)
         # grayscale image is there because of travis memory error
-        img = view.get_region_image(as_gray=True)
-        plt.imshow(img)
+        logger.log(self.log_level, "get_region_image...")
+        logger.trace(f"view.size={view.get_size_on_pixelsize_mm()}, energy.shape={energy.shape}")
+        img_for_preview = view.get_region_image(as_gray=True, log_level=self.log_level)
+        plt.imshow(img_for_preview, cmap="gray")
         # if self.annotation_id is not None:
         view.plot_annotations(self.annotation_id)
         if self.lobulus_segmentation is not None:
             seg = (
                 imma.image.resize_to_shape(
-                    self.lobulus_segmentation, shape=img.shape[:2], order=0
+                    self.lobulus_segmentation, shape=img_for_preview.shape[:2], order=0
                 )
                 == 1
             )

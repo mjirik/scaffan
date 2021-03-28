@@ -737,24 +737,30 @@ class Scaffan:
         run_lobule_quality_estimation = self.parameters.param(
             "Processing", "SNI Prediction CNN"
         ).value()
-        logger.debug("before skeleton analysis")
         if run_skeleton_analysis:
+            logger.debug("Skeleton analysis...")
             self.skeleton_analysis.skeleton_analysis(show=show)
         if run_texture_analysis:
+            logger.debug("Texture analysis...")
             # self.glcm_textures.report = self.report
             self.glcm_textures.set_input_data(
                 view=self.lobulus_processing.view,
                 annotation_id=annotation_id,
                 lobulus_segmentation=self.lobulus_processing.lobulus_mask,
             )
+            logger.debug("...run...")
             self.glcm_textures.run()
+            logger.debug("Texture analysis finished")
         if run_lobule_quality_estimation:
+            logger.debug("Lobule quality estimation CNN...")
             self.lobule_quality_estimation_cnn.set_input_data(
                 view=self.lobulus_processing.view,
                 annotation_id=annotation_id,
                 lobulus_segmentation=self.lobulus_processing.lobulus_mask,
             )
+            logger.debug("...run...")
             self.lobule_quality_estimation_cnn.run()
+            logger.debug("Lobule quality estimation CNN finished.")
         logger.trace("after texture analysis")
         t1 = time.time()
         ann_center = self.anim.get_annotation_center_mm(annotation_id)
@@ -776,9 +782,12 @@ class Scaffan:
             }
         )
         # evaluation
+        logger.debug("Evaluation...")
+        t1 = time.time()
         self.evaluation.set_input_data(
             self.anim, annotation_id, self.lobulus_processing
         )
+        logger.debug("...run...")
         self.evaluation.run()
         # Copy all parameters to table
         self.report.finish_actual_row()
