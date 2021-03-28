@@ -1357,14 +1357,15 @@ class View:
         self.add_ticks()
 
     def add_ticks(self):
+        region_pixelsize = self.region_pixelsize
         locs, labels = plt.xticks()
-        in_mm = locs * self.region_pixelsize[0]
-        labels = ["{:.1e}".format(i) for i in in_mm]
-        plt.xticks(locs, labels, rotation="vertical")
+        labels = ["{:.1e}".format(i * region_pixelsize[0]) for i in locs]
+        plt.xticks(locs[1:-1], labels[1:-1], rotation="vertical")
 
         locs, labels = plt.yticks()
-        labels = ["{:.1e}".format(i * self.region_pixelsize[1]) for i in locs]
-        plt.yticks(locs, labels)
+        labels = ["{:.1e}".format(i * region_pixelsize[1]) for i in locs]
+        plt.yticks(locs[1:-1], labels[1:-1])
+
 
     def plot_annotations(self, i=None):
         if i is None:
@@ -1413,7 +1414,10 @@ class View:
         if as_gray:
             if (len(im.shape) > 2):
                 if im.shape[2] == 4:
-                    im = skimage.color.rgba2rgb(im)
+                    logger.log(log_level, "RGBA to RGB...")
+                    # im = skimage.color.rgba2rgb(im)
+                    im = im[:, :, :3]
+                logger.log(log_level, "RGB to gray ...")
                 im = skimage.color.rgb2gray(im)
 
         logger.log(log_level, "resize if resized by pixelsize")
