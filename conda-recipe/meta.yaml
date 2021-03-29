@@ -112,6 +112,7 @@ requirements:
     # required by TF2 from pip
     - absl-py
     - termcolor
+    - libiconv # not sure if it is necessary to install it from conda
     # ---------------- end of TF2 requr
 
 test:
