@@ -29,6 +29,7 @@ from scaffan import annotation as scan
 from scaffan import libfixer
 from scaffan import image_intensity_rescale
 import imma
+import imma.image
 from pathlib import Path
 
 from matplotlib.path import Path as mplPath
