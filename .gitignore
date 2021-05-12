@@ -112,3 +112,7 @@ tests/*
 
 # temp
 tmp/
+
+*.sln
+*.pyproj
+*.suo
