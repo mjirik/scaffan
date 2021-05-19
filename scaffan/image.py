@@ -414,7 +414,7 @@ class AnnotatedImage:
         self.level_pixelsize: list = None
         self.level_pixelsize_derived_from_resolution_on_level_0: bool = False
         self._set_level_pixelsize()
-
+        self.annotations = None
         if not skip_read_annotations:
             self.read_annotations()
         self.intensity_rescaler = image_intensity_rescale.RescaleIntensityPercentile()
@@ -553,6 +553,7 @@ class AnnotatedImage:
             self.annotations = scan.read_annotations_ndpa(self.path)
             self.annotations = scan.annotations_to_px(self.openslide, self.annotations)
         if self.image_type == ".czi":
+            self.annotations = []
             # TODO nastavení self.annotations na základě anim
             #  self.path # cesta k CZI souboru
             #  metadata
