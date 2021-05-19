@@ -170,3 +170,13 @@ def test_read_czi_with_scaffold_data():
 
     assert pixelsize2[0] > pixelsize1[0]
     assert pixelsize2[1] > pixelsize1[1]
+
+
+def test_read_annotations_czi():
+    fn = io3d.datasets.join_path(
+        "medical/orig/scaffan-analysis-czi/Zeiss-scans/01_2019_11_12__RecognizedCode.czi",
+        get_root=True,
+    )
+    logger.debug("filename {}".format(fn))
+    anim = scim.AnnotatedImage(fn)
+    assert len(anim.annotations) > 0

@@ -552,6 +552,13 @@ class AnnotatedImage:
         if self.image_type == ".ndpi":
             self.annotations = scan.read_annotations_ndpa(self.path)
             self.annotations = scan.annotations_to_px(self.openslide, self.annotations)
+        if self.image_type == ".czi":
+            # TODO nastavení self.annotations na základě anim
+            #  self.path # cesta k CZI souboru
+            #  metadata
+            #  self.annotations = insert_zeiss_annotation_bezier(anim=self, ...)
+            #  test function tests / image_czi_test.py
+            pass
         else:  # if self.image_type == ".tiff":
             slide_size = self.get_slide_size()
             # pxsz, unit = self.get_pixel_size(0)
