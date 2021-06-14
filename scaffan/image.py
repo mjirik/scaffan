@@ -261,6 +261,11 @@ class ImageSlide:
             self.imagedata = img
         return self.imagedata
 
+    def get_metadata_czi(anim, picture_path_annotation):
+        with CziFile(picture_path_annotation) as czi:
+            metadata = czi.metadata()
+        return metadata
+
     def _read_region_other_than_ndpi(self, location, level, size):
         """
         Works also for small nzi files
@@ -631,6 +636,7 @@ class AnnotatedImage:
             #  metadata
             imagedata_czi = ImageSlide._get_imagedata_czi(self) # kdyztak pridat vlastni metodu 
             metadata_czi = imagedata_czi.metadata
+            #metadata_czi = ImageSlide.get_metadata_czi(anim=self, path=self.path) # nacitani metadat pomoci vlastni metody
             listOfBeziers, listOfCircles, listOfRectangles, listOfEllipses = load_zeiss_elements(anim=self, metadata=metadata_czi)
             #  self.annotations = insert_zeiss_annotation_bezier(anim=self, ...)
             self.annotations = insert_zeiss_annotation_bezier(anim=self, listOfBeziers=listOfBeziers, margin = 2.0)
