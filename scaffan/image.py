@@ -543,6 +543,78 @@ class AnnotatedImage:
     def get_region_center_by_location(self, location, level, size):
         return get_region_center_by_location(self.openslide, location, level, size)
 
+    def load_zeiss_elements(anim, metadata, pixelSizeMM):
+        root = minidom.parseString(metadata)
+        elements = root.getElementsByTagName("Elements")
+
+        listOfBeziers = []
+        listOfCircles = []
+        listOfRectangles = []
+        listOfEllipses = []
+
+        for j in range(len(elements)):
+            for child in elements[j].childNodes:
+                if (child.nodeName == "Bezier"):
+                    listOfPoints_temp = []
+                    points = child.getElementsByTagName("Points")[0].firstChild.nodeValue
+                    temp_points = points.split()
+                    for i in range(len(temp_points)):
+                        point_X = float(temp_points[i].split(",")[0]) * pixelSizeMM[0][0]
+                        point_Y = float(temp_points[i].split(",")[1]) * pixelSizeMM[0][1]
+    
+                        pointsXY_float = (point_X, point_Y)
+                        listOfPoints_temp.append(pointsXY_float)
+                        if(i == 0):
+                            lastPointsXY = pointsXY_float # aby byla krivka spojena
+                    listOfPoints_temp.append(lastPointsXY)
+                    listOfBeziers.append(listOfPoints_temp)
+    
+                elif (child.nodeName == "Circle"):
+                    center_X = float(child.getElementsByTagName("CenterX")[0].firstChild.data) * pixelSizeMM[0][0] # v mm od leveho okraje
+                    center_Y = float(child.getElementsByTagName("CenterY")[0].firstChild.data) * pixelSizeMM[0][1] # v mm od horniho okraje obrazku
+                    radius = float(child.getElementsByTagName("Radius")[0].firstChild.data) * pixelSizeMM[0][0]
+                    listOfCircles.append((center_X, center_Y, radius))
+    
+                elif (child.nodeName == "Rectangle"):
+                    X_left_top = float(child.getElementsByTagName("Left")[0].firstChild.data) * pixelSizeMM[0][0]
+                    Y_left_top = float(child.getElementsByTagName("Top")[0].firstChild.data) * pixelSizeMM[0][1]
+                    width_rec = float(child.getElementsByTagName("Width")[0].firstChild.data) * pixelSizeMM[0][0]
+                    height_rec = float(child.getElementsByTagName("Height")[0].firstChild.data) * pixelSizeMM[0][1]
+                    listOfRectangles.append((X_left_top, Y_left_top, width_rec, height_rec))
+    
+                elif (child.nodeName == "Ellipse"):
+                    center_X = float(child.getElementsByTagName("CenterX")[0].firstChild.data) * pixelSizeMM[0][0]
+                    center_Y = float(child.getElementsByTagName("CenterY")[0].firstChild.data) * pixelSizeMM[0][1]
+                    radiusX = float(child.getElementsByTagName("RadiusX")[0].firstChild.data) * pixelSizeMM[0][0]
+                    radiusY = float(child.getElementsByTagName("RadiusY")[0].firstChild.data) * pixelSizeMM[0][1]
+                    listOfEllipses.append((center_X, center_Y, radiusX, radiusY))
+
+        return listOfBeziers, listOfCircles, listOfRectangles, listOfEllipses
+
+    def insert_zeiss_annotation_bezier(anim, listOfBeziers, *args, **kwargs):
+         pixelSizeMM = anim.get_pixel_size()
+         if (len(listOfBeziers) != 0):
+            anim.annotations = []
+            for bezier in listOfBeziers:
+                x_mm = []
+                y_mm = []
+                for tuple_XY in bezier:
+                    x_mm.append(tuple_XY[0])
+                    y_mm.append(tuple_XY[1])
+    
+                x_px = np.asarray(x_mm) / pixelSizeMM[0][0]
+                y_px = np.asarray(y_mm) / pixelSizeMM[0][1]
+    
+                anim.annotations.append({"x_mm": x_mm, "y_mm": y_mm, "color": "#ff0000", "x_px": x_px, "y_px": y_px})
+
+                #views = anim.get_views([0], pixelsize_mm = [0.01, 0.01])
+            views = anim.get_views(*args, **kwargs) # vybiram, jakou chci zobrazit anotaci
+            view = views[0]
+            img = view.get_region_image(as_gray = False)
+            plt.imshow(img)
+            view.plot_annotations()
+            plt.show()
+
     def read_annotations(self):
         """
         Read all annotations of the file and save extracted information.
@@ -557,7 +629,11 @@ class AnnotatedImage:
             # TODO nastavení self.annotations na základě anim
             #  self.path # cesta k CZI souboru
             #  metadata
+            imagedata_czi = ImageSlide._get_imagedata_czi(self) # kdyztak pridat vlastni metodu 
+            metadata_czi = imagedata_czi.metadata
+            listOfBeziers, listOfCircles, listOfRectangles, listOfEllipses = load_zeiss_elements(anim=self, metadata=metadata_czi)
             #  self.annotations = insert_zeiss_annotation_bezier(anim=self, ...)
+            self.annotations = insert_zeiss_annotation_bezier(anim=self, listOfBeziers=listOfBeziers, margin = 2.0)
             #  test function tests / image_czi_test.py
             pass
         else:  # if self.image_type == ".tiff":
