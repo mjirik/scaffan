@@ -549,6 +549,7 @@ class AnnotatedImage:
         return get_region_center_by_location(self.openslide, location, level, size)
 
     def load_zeiss_elements(anim, metadata, pixelSizeMM):
+        from xml.dom import minidom
         root = minidom.parseString(metadata)
         elements = root.getElementsByTagName("Elements")
 
