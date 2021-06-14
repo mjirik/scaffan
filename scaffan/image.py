@@ -633,10 +633,12 @@ class AnnotatedImage:
             self.annotations = []
             # TODO nastavení self.annotations na základě anim
             #  self.path # cesta k CZI souboru
+
             #  metadata
-            imagedata_czi = ImageSlide._get_imagedata_czi(self) # kdyztak pridat vlastni metodu 
-            metadata_czi = imagedata_czi.metadata
-            #metadata_czi = ImageSlide.get_metadata_czi(anim=self, path=self.path) # nacitani metadat pomoci vlastni metody
+            #imagedata_czi = ImageSlide._get_imagedata_czi(self) # kdyztak pridat vlastni metodu 
+            #metadata_czi = imagedata_czi.metadata
+
+            metadata_czi = ImageSlide.get_metadata_czi(anim=self, path=self.path) # nacitani metadat pomoci vlastni metody (asi bude fungovat spise) 
             listOfBeziers, listOfCircles, listOfRectangles, listOfEllipses = load_zeiss_elements(anim=self, metadata=metadata_czi)
             #  self.annotations = insert_zeiss_annotation_bezier(anim=self, ...)
             self.annotations = insert_zeiss_annotation_bezier(anim=self, listOfBeziers=listOfBeziers, margin = 2.0)
