@@ -180,3 +180,11 @@ def test_read_annotations_czi():
     logger.debug("filename {}".format(fn))
     anim = scim.AnnotatedImage(fn)
     assert len(anim.annotations) > 0
+
+    # views = anim.get_views([0], pixelsize_mm = [0.01, 0.01])
+    # # views = anim.get_views(*args, **kwargs) # vybiram, jakou chci zobrazit anotaci
+    # view = views[0]
+    # img = view.get_region_image(as_gray = False)
+    # plt.imshow(img)
+    # view.plot_annotations()
+    # plt.show()

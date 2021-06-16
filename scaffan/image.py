@@ -261,7 +261,8 @@ class ImageSlide:
             self.imagedata = img
         return self.imagedata
 
-    def get_metadata_czi(anim, picture_path_annotation):
+    def _get_metadata_czi(self, picture_path_annotation):
+        from czifile import CziFile
         with CziFile(picture_path_annotation) as czi:
             metadata = czi.metadata()
         return metadata
@@ -548,8 +549,9 @@ class AnnotatedImage:
     def get_region_center_by_location(self, location, level, size):
         return get_region_center_by_location(self.openslide, location, level, size)
 
-    def load_zeiss_elements(anim, metadata, pixelSizeMM):
+    def load_zeiss_elements(self, metadata):
         from xml.dom import minidom
+        pixelSizeMM = self.get_pixel_size()
         root = minidom.parseString(metadata)
         elements = root.getElementsByTagName("Elements")
 
@@ -597,7 +599,7 @@ class AnnotatedImage:
 
         return listOfBeziers, listOfCircles, listOfRectangles, listOfEllipses
 
-    def insert_zeiss_annotation_bezier(anim, listOfBeziers, *args, **kwargs):
+    def insert_zeiss_annotation_bezier(self, anim, listOfBeziers):
          pixelSizeMM = anim.get_pixel_size()
          if (len(listOfBeziers) != 0):
             anim.annotations = []
@@ -611,15 +613,15 @@ class AnnotatedImage:
                 x_px = np.asarray(x_mm) / pixelSizeMM[0][0]
                 y_px = np.asarray(y_mm) / pixelSizeMM[0][1]
     
-                anim.annotations.append({"x_mm": x_mm, "y_mm": y_mm, "color": "#ff0000", "x_px": x_px, "y_px": y_px})
+                anim.annotations.append({"x_mm": x_mm, "y_mm": y_mm, "color": "#ff0000", "x_px": x_px, "y_px": y_px, "title":""})
 
                 #views = anim.get_views([0], pixelsize_mm = [0.01, 0.01])
-            views = anim.get_views(*args, **kwargs) # vybiram, jakou chci zobrazit anotaci
-            view = views[0]
-            img = view.get_region_image(as_gray = False)
-            plt.imshow(img)
-            view.plot_annotations()
-            plt.show()
+            # views = anim.get_views(*args, **kwargs) # vybiram, jakou chci zobrazit anotaci
+            # view = views[0]
+            # img = view.get_region_image(as_gray = False)
+            # plt.imshow(img)
+            # view.plot_annotations()
+            # plt.show()
 
     def read_annotations(self):
         """
@@ -639,12 +641,11 @@ class AnnotatedImage:
             #imagedata_czi = ImageSlide._get_imagedata_czi(self) # kdyztak pridat vlastni metodu 
             #metadata_czi = imagedata_czi.metadata
 
-            metadata_czi = ImageSlide.get_metadata_czi(anim=self, path=self.path) # nacitani metadat pomoci vlastni metody (asi bude fungovat spise) 
-            listOfBeziers, listOfCircles, listOfRectangles, listOfEllipses = load_zeiss_elements(anim=self, metadata=metadata_czi)
+            metadata_czi = self.openslide._get_metadata_czi(self.path) # nacitani metadat pomoci vlastni metody (asi bude fungovat spise)
+            listOfBeziers, listOfCircles, listOfRectangles, listOfEllipses = self.load_zeiss_elements(metadata=metadata_czi)
             #  self.annotations = insert_zeiss_annotation_bezier(anim=self, ...)
-            self.annotations = insert_zeiss_annotation_bezier(anim=self, listOfBeziers=listOfBeziers, margin = 2.0)
+            self.insert_zeiss_annotation_bezier(anim=self, listOfBeziers=listOfBeziers)
             #  test function tests / image_czi_test.py
-            pass
         else:  # if self.image_type == ".tiff":
             slide_size = self.get_slide_size()
             # pxsz, unit = self.get_pixel_size(0)
