@@ -891,11 +891,15 @@ class ScanSegmentation:
             "slice_raster.png", img.astype(np.uint8), level_skimage=40, level_npz=30
         )
         fig = plt.figure()
+        logger.debug("Figure created")
         # plt.imshow(img)
         # view_tmp = self.view
         # the view is wrong if it is based on whole scan image
         view_tmp = self.view.to_pixelsize(self.used_pixelsize_mm)
-        plt.imshow(view_tmp.get_raster_image(as_gray=False))
+        logger.debug("resized")
+        raster = view_tmp.get_raster_image(as_gray=False)
+        logger.debug("show raster")
+        plt.imshow(raster)
 
         # logger.debug(f"slice_raster size on pixelsize {self.view.region_pixelsize}, {self.view.annotations}")
         logger.debug(self.view.region_size_on_level)

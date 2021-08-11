@@ -4,6 +4,11 @@ Latest version: 0.29.18
 
 # Not released
 
+# 0.30
+
+* [Changed] Skeleton analysis - removed areas with hight density of skeleton
+* [Added] Low resolution image of skeleton (intended for web)
+
 # 0.29
 
 * [Changed] Calculating only outer perimeter of lobulus
