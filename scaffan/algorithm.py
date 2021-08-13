@@ -554,7 +554,18 @@ class Scaffan:
                 logger.error(
                     f"Unknown Lobulus Selection Method: {automatic_lobulus_selection}"
                 )
+
+        self._save_preview_with_annotaions_to_report()
         return annotation_ids, automatic_lobulus_selection
+
+    def _save_preview_with_annotaions_to_report(self):
+        # prepare preview with annotations
+        view_corner, img = self.get_preview()
+        self.get_preview()
+        fig = plt.figure(figsize=(12, 8))
+        plt.imshow(img)
+        view_corner.plot_annotations(fontsize="small")
+        self.report.savefig("preview_with_annotations.png", level=60)
 
     def run_lobuluses(self, event=None, seeds_mm: Optional[list] = None):
         """
@@ -817,7 +828,7 @@ class Scaffan:
         view_corner = full_view.to_pixelsize(pixelsize_mm=[pxsz_mm, pxsz_mm])
         return view_corner
 
-    def get_preview(self):
+    def get_preview(self) -> (scaffan.image.View, np.ndarray):
         view_corner = self.get_preview_view()
         # logger.debug(
         #     f"Manual selection1, view.loc={full_view.region_location}, view.size={full_view.region_size_on_level}, pxsz={full_view.region_pixelsize}"

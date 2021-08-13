@@ -8,6 +8,7 @@ Latest version: 0.30.0
 
 * [Changed] Skeleton analysis - removed areas with hight density of skeleton
 * [Added] Low resolution image of skeleton (intended for web)
+* [Added] Generate preview with numbers of annotations
 
 # 0.29
 

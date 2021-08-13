@@ -1065,13 +1065,13 @@ class AnnotatedImage:
             im = self.intensity_rescaler.rescale_intensity(im)
         return im
 
-    def plot_annotations(self, annotation_id=None):
+    def plot_annotations(self, annotation_id=None, fontsize="x-small"):
         if annotation_id is None:
             anns = self.annotations
         else:
             annotation_id = self.get_annotation_id(annotation_id)
             anns = [self.annotations[annotation_id]]
-        scan.plot_annotations(anns, in_region=True)
+        scan.plot_annotations(anns, in_region=True, fontsize=fontsize)
 
     def get_annotation_region_raster(self, i):
         i = self.get_annotation_id(i)
@@ -1461,13 +1461,13 @@ class View:
         labels = ["{:.1e}".format(i * region_pixelsize[1]) for i in locs]
         plt.yticks(locs[1:-1], labels[1:-1])
 
-    def plot_annotations(self, i=None):
+    def plot_annotations(self, i=None, fontsize="x-small"):
         if i is None:
             anns = self.annotations
         else:
             i = self.anim.get_annotation_id(i)
             anns = [self.annotations[i]]
-        scan.plot_annotations(anns, in_region=True, factor=self.zoom)
+        scan.plot_annotations(anns, in_region=True, factor=self.zoom, fontsize=fontsize)
 
     def get_region_location_by_center(self, center, level, size):
         return get_region_location_by_center(self.anim.openslide, center, level, size)
