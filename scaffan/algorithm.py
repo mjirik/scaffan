@@ -87,7 +87,7 @@ class Scaffan:
         self.whole_scan_margin = whole_scan_margin
         self.skeleton_analysis = scaffan.skeleton_analysis.SkeletonAnalysis()
         self.evaluation = scaffan.evaluation.Evaluation()
-        self.evaluation_reset_history_after_each_lobule = False
+        self.evaluation_reset_history_after_each_lobule = True
         self.intensity_rescale = RescaleIntensityPercentilePQG()
         self.slide_segmentation = scaffan.slide_segmentation.ScanSegmentation(
             report=self.report
