@@ -19,6 +19,7 @@ import platform
 from typing import List, Union, Optional
 import configparser
 import io
+import sys
 
 # import PyQt5.QtWidgets
 # print("start 3")
@@ -86,6 +87,7 @@ class Scaffan:
         self.whole_scan_margin = whole_scan_margin
         self.skeleton_analysis = scaffan.skeleton_analysis.SkeletonAnalysis()
         self.evaluation = scaffan.evaluation.Evaluation()
+        self.evaluation_reset_history_after_each_lobule = False
         self.intensity_rescale = RescaleIntensityPercentilePQG()
         self.slide_segmentation = scaffan.slide_segmentation.ScanSegmentation(
             report=self.report
@@ -736,6 +738,8 @@ class Scaffan:
         self.report.add_cols_to_actual_row(self.parameters_to_dict())
 
     def _run_lobulus(self, annotation_id):
+        if self.evaluation_reset_history_after_each_lobule:
+            self.evaluation.evaluation_history = []
         show = self.parameters.param("Processing", "Show").value()
         t0 = time.time()
         inpath = Path(self.parameters.param("Input", "File Path").value())
@@ -1011,3 +1015,24 @@ class Scaffan:
 
 class NoLobulusSelectionUsedError(Exception):
     pass
+
+
+def get_size(obj, seen=None):
+    """Recursively finds size of objects"""
+    size = sys.getsizeof(obj)
+    if seen is None:
+        seen = set()
+    obj_id = id(obj)
+    if obj_id in seen:
+        return 0
+    # Important mark as seen *before* entering recursion to gracefully handle
+    # self-referential objects
+    seen.add(obj_id)
+    if isinstance(obj, dict):
+        size += sum([get_size(v, seen) for v in obj.values()])
+        size += sum([get_size(k, seen) for k in obj.keys()])
+    elif hasattr(obj, '__dict__'):
+        size += get_size(obj.__dict__, seen)
+    elif hasattr(obj, '__iter__') and not isinstance(obj, (str, bytes, bytearray)):
+        size += sum([get_size(i, seen) for i in obj])
+    return size

@@ -4,6 +4,8 @@ Latest version: 0.30.1
 
 # Not released
 
+* [Added] Ability to reset evaluation history after each lobule to save memory
+
 # 0.30
 
 * [Changed] Skeleton analysis - removed areas with hight density of skeleton
