@@ -47,7 +47,8 @@ requirements:
     - morphsnakes
     - pyqt  # =5.9.2 # tested
     - pyqtgraph
-    - click
+    - {{ pin_compatible('click', max_pin='x') }}
+#    - click <= 7
     - pywin32 # [win]
     - loguru
     - exsu

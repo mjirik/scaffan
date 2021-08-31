@@ -105,7 +105,7 @@ def set(common_spreadsheet_file=None):
     "--params",
     "-p",
     multiple=True,
-    default="",
+    default=[],
     nargs=2,
     help='Set parameter. First argument is path to parameter separated by ";". Second is the value.'
     "python -m scaffan gui -p Processing,Show True",
@@ -205,7 +205,7 @@ def install():
     "--params",
     "-p",
     multiple=True,
-    default="",
+    default=[],
     nargs=2,
     help='Set parameter. First argument is path to parameter separated by ";". Second is the value.'
     "python -m scaffan gui -p Processing,Show True",
@@ -214,10 +214,10 @@ def install():
     "--seeds_mm",
     "-smm",
     multiple=True,
-    default=None,
+    default=[],
     nargs=2,
-    help='Set parameter. First argument is path to parameter separated by ";". Second is the value.'
-    "python -m scaffan gui -p Processing,Show True",
+    help='Seeds in milimeters. Can be used miltiple times.'
+    "python -m scaffan gui -smm 1.0 1.0 -smm 2.0 2.0",
 )
 def nogui(input_path, color, output_path, config_file, params, seeds_mm):
     # if log_level is not None:
@@ -233,6 +233,7 @@ def nogui(input_path, color, output_path, config_file, params, seeds_mm):
     # for param in params:
     #     logger.debug(f"param={param}")
     #     mainapp.parameters.param(*param[0].split(";")).setValue(ast.literal_eval(param[1]))
+    # input_path = None if len(input_path) == 0
 
     logger.debug("before input file")
     if input_path is not None:
@@ -244,7 +245,7 @@ def nogui(input_path, color, output_path, config_file, params, seeds_mm):
         mainapp.set_annotation_color_selection(color)
     # do float
     logger.debug(f"seeds_mm={seeds_mm}")
-    if seeds_mm:
+    if len(seeds_mm) > 0:
         seeds_mm = [[float(c[0]), float(c[1])] for c in seeds_mm]
         logger.debug(f"seeds_mm readed {seeds_mm}")
     mainapp.run_lobuluses(seeds_mm=seeds_mm)
