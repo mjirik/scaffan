@@ -22,7 +22,7 @@ You may want to use it with [Hamamatsu NDP Viewer](https://www.hamamatsu.com/eu/
 Run in terminal:
 ```commandline
 
-conda create -n scaffan -c mjirik -c bioconda -c conda-forge pip scaffan pywin32
+conda create -n scaffan -c mjirik -c bioconda -c conda-forge pip scaffan pywin32 python=3.6
 activate scaffan
 pip install openslide-python imagecodecs
 python -m scaffan install
