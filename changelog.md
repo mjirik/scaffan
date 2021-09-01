@@ -4,6 +4,7 @@ Latest version: 0.30.3
 
 # Not released
 
+* [Added] Read CZI images cropped by Zen Blue
 * [Added] Ability to reset evaluation history after each lobule to save memory
 
 # 0.30

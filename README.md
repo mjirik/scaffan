@@ -24,7 +24,7 @@ Run in terminal:
 
 conda create -n scaffan -c mjirik -c bioconda -c conda-forge pip scaffan pywin32 python=3.6
 activate scaffan
-pip install openslide-python imagecodecs
+pip install openslide-python imagecodecs tensorflow
 python -m scaffan install
 python -m scaffan
 ```

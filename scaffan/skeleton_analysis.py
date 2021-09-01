@@ -21,6 +21,7 @@ import scaffan.lobulus
 from exsu.report import Report
 from pyqtgraph.parametertree import Parameter
 import imma.image
+import copy
 
 
 class SkeletonAnalysis:
@@ -82,7 +83,10 @@ class SkeletonAnalysis:
         logger.debug("Lobulus setup done")
 
     def skeleton_analysis(self, show=False):
-        datarow = {}
+        if self.report is None:
+            datarow = {}
+        else:
+            datarow = copy.copy(self.report.actual_row)
 
         inner = self.lobulus.central_vein_mask
         logger.debug(

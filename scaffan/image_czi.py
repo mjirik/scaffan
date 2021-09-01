@@ -32,7 +32,7 @@ def get_py_slices(
 
     slice_sub_not_resized: low resolution indices
 
-    isconj is bool. It is true if the tile is in requested area
+    isconj is bool. It is true if the tile is (at least partially) in requested area
     real_size is unpredictable because if output downcale is 2 the division can be odd.
 
 
@@ -48,8 +48,11 @@ def get_py_slices(
 
     # real_start_subb = start_subb - (start_requ + shape_requ)
     # real_end_subb   = start_subb + (shape_subb - start_requ)
+    subb_start_before_requ_stop = (r_st + r_sh - s_st) > 0
+    requ_start_before_subb_stop = (s_st + s_sh - r_st) > 0
+    isconj = (subb_start_before_requ_stop.all()) and requ_start_before_subb_stop.all()
 
-    isconj = (r_st + r_sh - s_st > 0).all() and (s_st + s_sh - r_st > 0).all()
+    # TODO the size of the endpoint should be probably +1
     if isconj:
 
         st_in_s = np.max(np.vstack([r_st - s_st, [0, 0]]), axis=0).astype(int)
@@ -87,7 +90,9 @@ def get_py_slices(
     return isconj, sl_s, sl_r, size_r, sl_sn, size_rn, sl_rn
 
 
-def read_region_with_level(czi, location, size, level=0, report=None):
+def read_region_with_level(czi, location, size, level=0, report=None,
+                           # use_resize_from_level0=False
+                           ):
     """
     Read region from czi file. White color is filled where no pixels are given if the
     datatype is uint8 or float.
@@ -113,6 +118,8 @@ def read_region_with_level(czi, location, size, level=0, report=None):
     output = np.full(
         list(requested_size) + [czi.shape[-1]], fill_value=value, dtype=czi.dtype
     )
+    number_of_valid_blocks = 0
+    number_of_overlapping_blocks = 0
     # subbs = []
     for subb in czi.subblocks():
         t00 = time.time()
@@ -126,6 +133,8 @@ def read_region_with_level(czi, location, size, level=0, report=None):
         t_slices += float(t01 - t00)
 
         if isconj:
+            logger.trace("Whole czi block is inside requested region")
+            number_of_overlapping_blocks += 1
 
             # subbs.append(subb)
 
@@ -139,9 +148,10 @@ def read_region_with_level(czi, location, size, level=0, report=None):
             # this generates the data with maximal possible resolution. Slow.
             # if subb.shape == subb.stored_shape:
             # this is fast
+            subb_shape = subb.shape[-3:-1]
+            stored_shape = tuple(np.asarray(subb.stored_shape) * 2 ** level)[-3:-1]
             if (
-                subb.shape[-3:-1]
-                == tuple(np.asarray(subb.stored_shape) * 2 ** level)[-3:-1]
+                subb_shape == stored_shape
             ):  # subb.stored_shape:
                 sd = subb.data(resize=False)
                 img = sd[..., sl_sn[0], sl_sn[1], :]
@@ -152,19 +162,27 @@ def read_region_with_level(czi, location, size, level=0, report=None):
                 # logger.debug(axlist)
                 img = np.squeeze(img, axis=axlist)
                 output[sl_rn] = img
+                number_of_valid_blocks += 1
 
-                # try:
-                #     if np.asarray(sz_r != 0).all():
-                #         osh = (sz_r[0], sz_r[1], sd.shape[-1])
-                #         t00 = time.time()
-                #         img_smaller = skimage.transform.resize(
-                #             img,
-                #             output_shape=osh,
-                #             preserve_range=True
-                #         ).astype(img.dtype)
-                #         output[sl_r] = img_smaller
-                #         t01 = time.time()
-                #         t_res += float(t01 - t00)
+            # elif use_resize_from_level0:
+            #     sd = subb.data(resize=False)
+            #     img = sd[..., sl_sn[0], sl_sn[1], :]
+            #     # try:
+            #     if True:
+            #         if np.asarray(sz_r != 0).all():
+            #             osh = (sz_r[0], sz_r[1], sd.shape[-1])
+            #             # t00 = time.time()
+            #             axlist = tuple(range(img.ndim - 3))
+            #             # logger.debug(axlist)
+            #             img = np.squeeze(img, axis=axlist)
+            #             img_smaller = skimage.transform.resize(
+            #                 img,
+            #                 output_shape=osh,
+            #                 preserve_range=True
+            #             ).astype(img.dtype)
+            #             output[sl_r] = img_smaller
+                        # t01 = time.time()
+                        # t_res += float(t01 - t00)
                 #         logger.trace(f"osh={osh}, im.sh={img.shape}") #[{sl_s[0].start}:{sl_s[0].stop}, {sl_s[1].start}:{sl_s[1].stop}], [{sl_r[0].start}:{sl_r[0].stop}, {sl_r[1].start}:{sl_r[1].stop}]")
                 #     logger.trace(f"{subb.start}, {subb.shape}, {subb.stored_shape}") #[{sl_s[0].start}:{sl_s[0].stop}, {sl_s[1].start}:{sl_s[1].stop}], [{sl_r[0].start}:{sl_r[0].stop}, {sl_r[1].start}:{sl_r[1].stop}]")
                 # except OverflowError as e:
@@ -183,9 +201,23 @@ def read_region_with_level(czi, location, size, level=0, report=None):
                 #     f"{subb.start}, {subb.shape}, {subb.stored_shape}, [{sl_s[0].start}:{sl_s[0].stop}, {sl_s[1].start}:{sl_s[1].stop}], [{sl_r[0].start}:{sl_r[0].stop}, {sl_r[1].start}:{sl_r[1].stop}]")
     #             break
     #         else:
-    #             print(f"{subb.start}, {subb.shape}")
+    #             logger.debug(f" not equal size of subb {subb.start}, {subb.shape}")
     t1 = time.time()
     logger.trace(
         f"time to get region={t1-t0}, cumulative resize time={t_res}, cumulative get slices time={t_slices}"
     )
+    if number_of_valid_blocks == 0 and number_of_overlapping_blocks > 0:
+        logger.debug(f"number of used blocks for raster recontruction = {number_of_valid_blocks}")
+        logger.debug(f"number of overlapping blocks for recontruction = {number_of_overlapping_blocks}")
+        logger.debug(f"Failed loading raster on level={level}. Reconstructing raster image by resizing from level=0")
+        size0 = np.asarray(size)*downscale_factor
+
+        output0 = read_region_with_level(czi, location, size0, level=0, report=report)
+        output = skimage.transform.resize(
+                    output0,
+                    output_shape=output.shape,
+                    preserve_range=True
+                ).astype(output.dtype)
+    # TODO here is potential to extract the data more memory efficient by resizing each block
+
     return output

@@ -332,6 +332,22 @@ class ImageSlide:
         root = ET.fromstring(metadata)
         xres = float(root.findall('.//Distance[@Id="X"]/Value')[0].text)
         yres = float(root.findall('.//Distance[@Id="Y"]/Value')[0].text)
+        # xx = float(root.findall('.//Translate[@Id="X"]/Value')[0].text)
+        # yy = float(root.findall('.//Translate[@Id="Y"]/Value')[0].text)
+
+
+        # take care about cropped images created by Zen Blue
+        translate = root.findall('.//Translate')
+        if len(translate) > 0:
+            coord0 = translate[0].attrib['X']
+            coord1 = translate[0].attrib['Y']
+            start = list(self._czi_start)
+            # start[0]
+            # TODO use translate
+            # start[0] += -float(coord0)
+            # start[1] += -float(coord1)
+            # self._czi_start = tuple(start)
+        # yy = root.findall('.//Translate')[0].attrib['Y']
         meta_dict = {}
         logger.debug(f"nzi pixelsize  {xres}x{yres} [m]")
         meta_dict["tiff.ResolutionUnit"] = "m"
@@ -629,23 +645,22 @@ class AnnotatedImage:
         :return:
         """
         logger.debug(f"Reading the annotation {self.path}")
+        self.annotations = []
         if self.image_type == ".ndpi":
             self.annotations = scan.read_annotations_ndpa(self.path)
             self.annotations = scan.annotations_to_px(self.openslide, self.annotations)
-        if self.image_type == ".czi":
+        elif self.image_type == ".czi":
             self.annotations = []
             # TODO nastavení self.annotations na základě anim
             #  self.path # cesta k CZI souboru
-
-            #  metadata
-            #imagedata_czi = ImageSlide._get_imagedata_czi(self) # kdyztak pridat vlastni metodu 
-            #metadata_czi = imagedata_czi.metadata
 
             metadata_czi = self.openslide._get_metadata_czi(self.path) # nacitani metadat pomoci vlastni metody (asi bude fungovat spise)
             listOfBeziers, listOfCircles, listOfRectangles, listOfEllipses = self.load_zeiss_elements(metadata=metadata_czi)
             #  self.annotations = insert_zeiss_annotation_bezier(anim=self, ...)
             self.insert_zeiss_annotation_bezier(anim=self, listOfBeziers=listOfBeziers)
             #  test function tests / image_czi_test.py
+
+        # here can be also reading of imagej annotations in all the cases something like if len(self.annotations) == 0:
         else:  # if self.image_type == ".tiff":
             slide_size = self.get_slide_size()
             # pxsz, unit = self.get_pixel_size(0)
