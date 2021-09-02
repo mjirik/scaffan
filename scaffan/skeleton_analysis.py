@@ -276,7 +276,7 @@ class SkeletonAnalysis:
                 datarow["Dead ends number"] / datarow["Area"]
             )
             datarow[f"Skeleton length density [{area_unit}/{area_unit}^2]"] = (
-                datarow["Branch length number"] / datarow["Area"]
+                datarow["Skeleton length"] / datarow["Area"]
             )
         else:
             # probably area can be estimated by view area
@@ -293,7 +293,7 @@ class SkeletonAnalysis:
             datarow[
                 f"Equivalent skeleton length density [{area_unit}/{area_unit}^2]"
             ] = (
-                datarow["Branch length number"] / datarow["Lobulus Equivalent Surface"]
+                datarow["Skeleton length"] / datarow["Lobulus Equivalent Surface"]
             )
         else:
             # probably area can be estimated by view area

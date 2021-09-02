@@ -4,6 +4,7 @@ Latest version: 0.30.3
 
 # Not released
 
+* [Added] Calculation of relative metrics (e.g. Skeleton length density and  Equivalent skeleto length density)
 * [Fixed] Problem in testing caused by Path used in sys.path
 * [Added] Read CZI images cropped by Zen Blue
 * [Added] Ability to reset evaluation history after each lobule to save memory
