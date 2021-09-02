@@ -337,13 +337,13 @@ class ImageSlide:
 
 
         # take care about cropped images created by Zen Blue
-        translate = root.findall('.//Translate')
-        if len(translate) > 0:
-            coord0 = translate[0].attrib['X']
-            coord1 = translate[0].attrib['Y']
-            start = list(self._czi_start)
+        # TODO use translate
+        # translate = root.findall('.//Translate')
+        # if len(translate) > 0:
+        #     coord0 = translate[0].attrib['X']
+        #     coord1 = translate[0].attrib['Y']
+        #     start = list(self._czi_start)
             # start[0]
-            # TODO use translate
             # start[0] += -float(coord0)
             # start[1] += -float(coord1)
             # self._czi_start = tuple(start)
@@ -1517,9 +1517,13 @@ class View:
         )
         im = np.asarray(imcr)
 
+        if len(im.shape) > 2:
+            im4stat = im[:,:,:3]
+        else:
+            im4stat = im[:,:]
         logger.log(
             log_level,
-            f"imcr dtype: {im.dtype}, shape: {im.shape}, min max: [{np.min(im[:,:,:3])}, {np.max(im[:,:,:3])}]",
+            f"imcr dtype: {im.dtype}, shape: {im.shape}, min max: [{np.min(im4stat)}, {np.max(im4stat)}]",
         )
         # logger.debug(f"imcr dtype: {im.dtype}, shape: {im.shape}, min max: [{np.min(im[:,:,:3])}, {np.max(im[:,:,:3])}], mean: {np.mean(im[:,:,:3])}, min max alpha: [{np.min(im[:,:,3])}, {np.max(im[:,:,3])}], mean: {np.mean(im[:,:,3])}")
 
