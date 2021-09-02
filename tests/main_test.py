@@ -208,7 +208,7 @@ class MainGuiTest(unittest.TestCase):
         mainapp.set_parameter("Processing;Scan Segmentation", False)
         mainapp.set_parameter("Processing;Skeleton Analysis", True)
         mainapp.set_parameter("Processing;Texture Analysis", True)
-        mainapp.evaluation_reset_history_after_each_lobule = False
+        mainapp.keep_evaluation_history_for_each_lobule = True
 
         mainapp.run_lobuluses()
         self.assert_dice_in_first_evaluated_data(mainapp, error_threshold, i=0)

@@ -87,7 +87,7 @@ class Scaffan:
         self.whole_scan_margin = whole_scan_margin
         self.skeleton_analysis = scaffan.skeleton_analysis.SkeletonAnalysis()
         self.evaluation = scaffan.evaluation.Evaluation()
-        self.evaluation_reset_history_after_each_lobule = True
+        self.keep_evaluation_history_for_each_lobule = True
         self.intensity_rescale = RescaleIntensityPercentilePQG()
         self.slide_segmentation = scaffan.slide_segmentation.ScanSegmentation(
             report=self.report
@@ -563,11 +563,12 @@ class Scaffan:
     def _save_preview_with_annotaions_to_report(self):
         # prepare preview with annotations
         view_corner, img = self.get_preview()
-        self.get_preview()
+        # self.get_preview()
         fig = plt.figure(figsize=(12, 8))
         plt.imshow(img)
         view_corner.plot_annotations(fontsize="small")
         self.report.savefig("preview_with_annotations.png", level=60)
+        plt.close(fig)
 
     def run_lobuluses(self, event=None, seeds_mm: Optional[list] = None):
         """
@@ -738,7 +739,7 @@ class Scaffan:
         self.report.add_cols_to_actual_row(self.parameters_to_dict())
 
     def _run_lobulus(self, annotation_id):
-        if self.evaluation_reset_history_after_each_lobule:
+        if not self.keep_evaluation_history_for_each_lobule:
             self.evaluation.evaluation_history = []
         show = self.parameters.param("Processing", "Show").value()
         t0 = time.time()
@@ -838,7 +839,7 @@ class Scaffan:
         #     f"Manual selection1, view.loc={full_view.region_location}, view.size={full_view.region_size_on_level}, pxsz={full_view.region_pixelsize}"
         # )
         logger.debug(
-            f"Manual selection2, view.loc={view_corner.region_location}, view.size={view_corner.region_size_on_level}, pxsz={view_corner.region_pixelsize}"
+            f"Manual selection, view.loc={view_corner.region_location}, view.size={view_corner.region_size_on_level}, pxsz={view_corner.region_pixelsize}"
         )
         img = view_corner.get_region_image(as_gray=False)
         return view_corner, img
@@ -876,7 +877,7 @@ class Scaffan:
         return view_corner, ann_ids
 
     def manual_select(self):
-        logger.debug("Manual selection")
+        logger.debug("Manual selection of lobules.")
         # full_view = self.anim.get_full_view()
         view_corner, img = self.get_preview()
         # full_view = self.anim.get_view(
@@ -897,7 +898,7 @@ class Scaffan:
             "Select lobules. Left/Middle/Right Mouse Button: add/quit/remove"
         )
         logger.debug(
-            f"Manual selection2 backend={matplotlib.get_backend()}, ion={matplotlib.is_interactive()}, img.shape={img.shape}, img.max={np.max(img)}"
+            f"Manual selection backend={matplotlib.get_backend()}, ion={matplotlib.is_interactive()}, img.shape={img.shape}, img.max={np.max(img)}"
         )
         plt.imshow(img)
         # plt.ginput(1)
@@ -907,7 +908,7 @@ class Scaffan:
         # logger.debug("Manual selection4")
         points_px = np.asarray(plt.ginput(-1))
         plt.close(fig)
-        logger.debug(f"Manual selection5, centers_px={points_px}")
+        logger.debug(f"Manual selection, centers_px={points_px}")
 
         # points_px = np.asarray(centers_px)
         from scaffan.image import get_offset_px, get_pixelsize
