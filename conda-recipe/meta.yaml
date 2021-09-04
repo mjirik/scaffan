@@ -107,7 +107,7 @@ requirements:
     - scikit-learn
     - czifile
 # tensorflow 2 is not available in conda with py36, we need py36 because of openslide
-    - tensorflow >= 2.0 # [not win]
+    - tensorflow>=2.0 # [not win]
 # h5py 3.0.0 has problems with tensorflow.
     - h5py<3.0.0
     # required by TF2 from pip
