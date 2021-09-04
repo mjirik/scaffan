@@ -443,9 +443,12 @@ class Lobulus:
         # plt.contour(circle + inner + outer)
         fig = plt.figure(figsize=(12, 10))
         plt.imshow(self.image, cmap="gray")
-        plt.colorbar()
-        plt.contour(self.annotation_mask + self.central_vein_mask + self.border_mask)
-        self.view.add_ticks()
+        # plt.colorbar()
+        # plt.contour(self.annotation_mask + self.central_vein_mask + self.border_mask)
+        plt.contour(self.annotation_mask, colors=["blue"])
+        plt.contour(self.border_mask, colors=["red"])
+        plt.contour(self.central_vein_mask, colors=["orange"])
+        self.view.add_ticks(format='{:.2f}')
 
         logger.debug("Preparing lobule mask data to report")
         datarow = {}

@@ -1466,15 +1466,22 @@ class View:
         self.plot_annotations(i)
         self.add_ticks()
 
-    def add_ticks(self):
+    def add_ticks(self, print_units:bool=True, format:str="{:.1e}"):
+        self.region_pixelunit
         region_pixelsize = self.region_pixelsize
         locs, labels = plt.xticks()
-        labels = ["{:.1e}".format(i * region_pixelsize[0]) for i in locs]
+        labels = [format.format(i * region_pixelsize[0]) for i in locs]
         plt.xticks(locs[1:-1], labels[1:-1], rotation="vertical")
 
         locs, labels = plt.yticks()
-        labels = ["{:.1e}".format(i * region_pixelsize[1]) for i in locs]
+        labels = [format.format(i * region_pixelsize[1]) for i in locs]
         plt.yticks(locs[1:-1], labels[1:-1])
+        ax = plt.gca()
+        # ax.text()
+
+        if print_units:
+            plt.ylabel(str(self.region_pixelunit))
+            # plt.text(-0.1, -0.1, str(self.region_pixelunit) + "asdf")
 
     def plot_annotations(self, i=None, fontsize="x-small"):
         if i is None:

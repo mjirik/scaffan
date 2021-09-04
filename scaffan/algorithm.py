@@ -564,9 +564,19 @@ class Scaffan:
         # prepare preview with annotations
         view_corner, img = self.get_preview()
         # self.get_preview()
-        fig = plt.figure(figsize=(12, 8))
+        # fig = plt.figure(figsize=(12, 8))
+        fig = plt.figure()
+        # plt.axis('off')
         plt.imshow(img)
         view_corner.plot_annotations(fontsize="small")
+
+        plt.gca().set_axis_off()
+        plt.subplots_adjust(top=1, bottom=0, right=1, left=0,
+                            hspace=0, wspace=0)
+        plt.margins(0, 0)
+        plt.gca().xaxis.set_major_locator(plt.NullLocator())
+        plt.gca().yaxis.set_major_locator(plt.NullLocator())
+
         self.report.savefig("preview_with_annotations.png", level=60)
         plt.close(fig)
 
