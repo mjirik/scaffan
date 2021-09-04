@@ -1,6 +1,6 @@
 # Changelog
 
-Latest version: 0.31.0
+Latest version: 0.31.1
 
 # Not released
 
