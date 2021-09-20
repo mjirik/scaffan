@@ -37,6 +37,7 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 from PIL import Image
 from PIL.TiffTags import TAGS
 import traceback
+import re
 
 annotationID = Union[int, str]
 annotationIDs = List[annotationID]
@@ -880,6 +881,15 @@ class AnnotatedImage:
     def select_annotations_by_title(self, title):
         return self.get_annotation_ids(title)
         # return self.get_views(annotation_ids, level=level, **kwargs), annotation_ids
+
+    def select_annotations_by_title_contains(self, title_contains:str) -> annotationIDs:
+        # double for
+        # return [id for title in self.id_by_titles.keys() if len(re.findall(title_regex, title) > 0 in title for id in self.id_by_titles[title]]
+        return [id for title in self.id_by_titles.keys() if title_contains in title for id in self.id_by_titles[title]]
+
+    def select_annotations_by_title_regex(self, title_regex:str) -> annotationIDs:
+        return [id for title in self.id_by_titles.keys() if len(re.findall(title_regex, title)) > 0 for id in self.id_by_titles[title]]
+
 
     def get_views(
         self,
