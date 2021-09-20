@@ -57,3 +57,25 @@ def test_get_lobulus_mask_manual():
     expected_quality = float(reg_search.group(1))
     expected_quality_range = 0.1
     assert quality == pytest.approx(expected_quality, expected_quality_range)
+
+
+def test_tensorflow_load():
+    """
+    It was failing because of inserting the Path into sys.path.insert
+    """
+    from pathlib import Path
+    from tensorflow.keras.models import load_model
+
+    # načtení architektury modelu
+    # načtení parametrů modelu
+
+    # cnn_model_version = str(self.parameters.param("Version").value())
+    # model_path = self._get_devel_model_path()
+    model_path = Path(__file__).parent.parent / "scaffan" / "v1.h5"
+    model_path = Path("./../scaffan/v1.h5").absolute()
+    logger.debug(model_path)
+    logger.debug(model_path.exists())
+    model_path_str = str(model_path)
+    logger.debug(model_path_str)
+
+    load_model(model_path_str)
