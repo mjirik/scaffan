@@ -572,6 +572,8 @@ class AnnotatedImage:
         elements = root.getElementsByTagName("Elements")
 
         listOfBeziers = []
+        listOfBeziersNames = []
+        listOfBeziersColors= []
         listOfCircles = []
         listOfRectangles = []
         listOfEllipses = []
@@ -592,7 +594,9 @@ class AnnotatedImage:
                             lastPointsXY = pointsXY_float # aby byla krivka spojena
                     listOfPoints_temp.append(lastPointsXY)
                     listOfBeziers.append(listOfPoints_temp)
-    
+                    color = child.getElementsByTagName("Name")[0].firstChild.nodeValue
+                    listOfBeziersNames.append(color)
+
                 elif (child.nodeName == "Circle"):
                     center_X = float(child.getElementsByTagName("CenterX")[0].firstChild.data) * pixelSizeMM[0][0] # v mm od leveho okraje
                     center_Y = float(child.getElementsByTagName("CenterY")[0].firstChild.data) * pixelSizeMM[0][1] # v mm od horniho okraje obrazku
@@ -613,13 +617,13 @@ class AnnotatedImage:
                     radiusY = float(child.getElementsByTagName("RadiusY")[0].firstChild.data) * pixelSizeMM[0][1]
                     listOfEllipses.append((center_X, center_Y, radiusX, radiusY))
 
-        return listOfBeziers, listOfCircles, listOfRectangles, listOfEllipses
+        return listOfBeziers, listOfCircles, listOfRectangles, listOfEllipses, listOfBeziersNames
 
-    def insert_zeiss_annotation_bezier(self, anim, listOfBeziers):
+    def insert_zeiss_annotation_bezier(self, anim, listOfBeziers, listOfBeziersNames):
          pixelSizeMM = anim.get_pixel_size()
          if (len(listOfBeziers) != 0):
             anim.annotations = []
-            for bezier in listOfBeziers:
+            for bezier, name in zip(listOfBeziers, listOfBeziersNames):
                 x_mm = []
                 y_mm = []
                 for tuple_XY in bezier:
@@ -628,8 +632,7 @@ class AnnotatedImage:
     
                 x_px = np.asarray(x_mm) / pixelSizeMM[0][0]
                 y_px = np.asarray(y_mm) / pixelSizeMM[0][1]
-    
-                anim.annotations.append({"x_mm": x_mm, "y_mm": y_mm, "color": "#ff0000", "x_px": x_px, "y_px": y_px, "title":""})
+                anim.annotations.append({"x_mm": x_mm, "y_mm": y_mm, "color": "#00ff00", "x_px": x_px, "y_px": y_px, "title": name})
 
                 #views = anim.get_views([0], pixelsize_mm = [0.01, 0.01])
             # views = anim.get_views(*args, **kwargs) # vybiram, jakou chci zobrazit anotaci
@@ -655,9 +658,9 @@ class AnnotatedImage:
             #  self.path # cesta k CZI souboru
 
             metadata_czi = self.openslide._get_metadata_czi(self.path) # nacitani metadat pomoci vlastni metody (asi bude fungovat spise)
-            listOfBeziers, listOfCircles, listOfRectangles, listOfEllipses = self.load_zeiss_elements(metadata=metadata_czi)
+            listOfBeziers, listOfCircles, listOfRectangles, listOfEllipses, listOfBeziersNames = self.load_zeiss_elements(metadata=metadata_czi)
             #  self.annotations = insert_zeiss_annotation_bezier(anim=self, ...)
-            self.insert_zeiss_annotation_bezier(anim=self, listOfBeziers=listOfBeziers)
+            self.insert_zeiss_annotation_bezier(anim=self, listOfBeziers=listOfBeziers, listOfBeziersNames=listOfBeziersNames)
             #  test function tests / image_czi_test.py
 
         # here can be also reading of imagej annotations in all the cases something like if len(self.annotations) == 0:
