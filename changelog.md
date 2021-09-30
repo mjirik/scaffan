@@ -4,6 +4,11 @@ Latest version: 0.31.2
 
 # Not released
 
+* [Added] Ability to remove some colors from the image by Color Filter
+
+# 0.31
+
+
 * [Added] Calculation of relative metrics (e.g. Skeleton length density and  Equivalent skeleto length density)
 * [Fixed] Problem in testing caused by Path used in sys.path
 * [Added] Read CZI images cropped by Zen Blue

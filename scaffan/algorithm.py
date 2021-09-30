@@ -48,6 +48,7 @@ from scaffan.pyqt_widgets import BatchFileProcessingParameter
 from scaffan.image_intensity_rescale_pyqtgraph import RescaleIntensityPercentilePQG
 from . import sni_prediction
 from . import lobule_quality_estimation_cnn
+from . import wsi_color_filter
 
 
 class Scaffan:
@@ -89,6 +90,7 @@ class Scaffan:
         self.evaluation = scaffan.evaluation.Evaluation()
         self.keep_evaluation_history_for_each_lobule = True
         self.intensity_rescale = RescaleIntensityPercentilePQG()
+        self.color_filter = wsi_color_filter.WsiColorFilterPQG()
         self.slide_segmentation = scaffan.slide_segmentation.ScanSegmentation(
             report=self.report
         )
@@ -241,6 +243,7 @@ class Scaffan:
                     #     "value": True,
                     #     # "tip": "Show images",
                     # },
+                    self.color_filter.parameters,
                     self.intensity_rescale.parameters,
                     self.slide_segmentation.parameters,
                     self.lobulus_processing.parameters,
@@ -423,6 +426,8 @@ class Scaffan:
         path = fnparam.value()
         # run_resc_int = self.parameters.param("Processing", "Intensity Normalization", "Run Intensity Normalization").value()
         self.anim = image.AnnotatedImage(path)
+        self.anim.raster_image_preprocessing_function_handler.append(self.color_filter.wsi_color_filter.img_processing)
+        self.color_filter.set_anim_params(self.anim)
         self.intensity_rescale.set_anim_params(self.anim)
         fnparam = self.parameters.param("Output", "Directory Path")
         self.report.init_with_output_dir(fnparam.value())
