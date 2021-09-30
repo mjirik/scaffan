@@ -442,6 +442,13 @@ class AnnotatedImage:
             self.read_annotations()
         self.intensity_rescaler = image_intensity_rescale.RescaleIntensityPercentile()
         self.run_intensity_rescale = False
+        self.raster_image_preprocessing_function_handler = [] # you can add
+
+    def _run_raster_image_preprocessing_function_handler(self, img):
+
+        for fcn in self.raster_image_preprocessing_function_handler:
+            img = fcn(img)
+        return img
 
     def update_pixelsize(self, pixelsize_on_level_0):
         """
@@ -556,6 +563,7 @@ class AnnotatedImage:
             as_gray,
             do_fix_location=do_fix_location,
         )
+        img = self._run_raster_image_preprocessing_function_handler(img)
         if self.run_intensity_rescale:
             img = self.intensity_rescaler.rescale_intensity(img)
         return img
@@ -1089,6 +1097,7 @@ class AnnotatedImage:
             if as_unit8:
                 im = (im * 255).astype(np.uint8)
 
+        im = self._run_raster_image_preprocessing_function_handler(im)
         if self.run_intensity_rescale:
             im = self.intensity_rescaler.rescale_intensity(im)
         return im
@@ -1546,6 +1555,10 @@ class View:
             f"imcr dtype: {im.dtype}, shape: {im.shape}, min max: [{np.min(im4stat)}, {np.max(im4stat)}]",
         )
         # logger.debug(f"imcr dtype: {im.dtype}, shape: {im.shape}, min max: [{np.min(im[:,:,:3])}, {np.max(im[:,:,:3])}], mean: {np.mean(im[:,:,:3])}, min max alpha: [{np.min(im[:,:,3])}, {np.max(im[:,:,3])}], mean: {np.mean(im[:,:,3])}")
+        logger.log(log_level, "Do intensity rescale if necessary")
+        im = self.anim._run_raster_image_preprocessing_function_handler(im)
+        if self.anim.run_intensity_rescale:
+            im = self.anim.intensity_rescaler.rescale_intensity(im)
 
         if as_gray:
             if len(im.shape) > 2:
@@ -1581,11 +1594,7 @@ class View:
                     im_resized = imma.image.resize_to_shape(im, req_sz[::-1])
             im = im_resized
 
-        logger.log(log_level, "Do intensity rescale if necessary")
-        if self.anim.run_intensity_rescale:
-            im = self.anim.intensity_rescaler.rescale_intensity(im)
 
-        logger.log(log_level, "Do intensity rescale if necessary")
         return im
 
     def imshow(self, as_gray=False):
