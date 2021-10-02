@@ -605,9 +605,13 @@ class AnnotatedImage:
                     listOfBeziers.append(listOfPoints_temp)
                     name = child.getElementsByTagName("Name")[0].firstChild.nodeValue
                     listOfBeziersNames.append(name)
-                    color = child.getElementsByTagName("Stroke")[0].firstChild.nodeValue
-                    # remove alpha:   #FFFF0000 -> #FF0000
-                    color = "#" + child.getElementsByTagName("Stroke")[0].firstChild.nodeValue[-6:]
+                    stroke = child.getElementsByTagName("Stroke")
+                    if len(stroke) > 0:
+
+                        # remove alpha:   #FFFF0000 -> #FF0000
+                        color = "#" + stroke[0].firstChild.nodeValue[-6:]
+                    else:
+                        color = "#FF0000"
                     listOfBeziersColors.append(color)
 
                 elif (child.nodeName == "Circle"):
