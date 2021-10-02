@@ -160,7 +160,6 @@ class WsiColorFilter():
             #
             if return_proba:
                 proba[hexa] = chsv_proba2_img
-            logger.debug(hexa)
             img = change_color_using_probability(img, chsv_proba2_img, hexa)
 
         if return_proba:
