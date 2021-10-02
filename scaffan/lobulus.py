@@ -425,6 +425,9 @@ class Lobulus:
         self.central_vein_mask = cvmask
 
     def run(self, show=True):
+        if self.report:
+            image_rgba = self.view.get_region_image(as_gray=False)
+            self.report.imsave(f"lobulus_rgb_{self.annotation_id}.jpg", image_rgba, level=90)
 
         logger.debug("Looking for the border")
         self.find_border(show)
