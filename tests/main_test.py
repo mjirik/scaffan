@@ -622,3 +622,24 @@ def run_with_external_seeds_mm():
     mainapp = scaffan.algorithm.Scaffan()
     mainapp.set_parameter("Processing;Scan Segmentation", False)
     run_on_yellow(mainapp, fn)
+
+def test_run_with_color_filter():
+    fn = io3d.datasets.join_path(
+        "medical/orig/scaffan-analysis-czi/J7_5/J7_5_b_test.czi",
+        get_root=True,
+    )
+
+
+    mainapp = scaffan.algorithm.Scaffan()
+    mainapp.set_input_file(fn)
+    mainapp.set_output_dir("test_run_lobuluses_output_dir_color_filter")
+    mainapp.set_parameter("Input;Lobulus Selection Method", "Manual")
+    # mainapp.set_annotation_color_selection("#FFFF00")
+    mainapp.set_parameter("Processing;Scan Segmentation", False)
+    mainapp.set_parameter("Processing;Lobulus Segmentation;Manual Segmentation", True)
+    mainapp.set_parameter("Processing;Texture Analysis", False)
+    mainapp.set_parameter("Processing;SNI Prediction CNN", False)
+    mainapp.set_parameter("Processing;Report Level", 10)
+    mainapp.run_lobuluses(seeds_mm=[[0.60, 0.90]])
+    # mainapp.run_lobuluses()
+    # run_on_yellow(mainapp, fn)

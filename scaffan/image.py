@@ -650,7 +650,10 @@ class AnnotatedImage:
                 x_px = np.asarray(x_mm) / pixelSizeMM[0][0]
                 y_px = np.asarray(y_mm) / pixelSizeMM[0][1]
 
-                anim.annotations.append({"x_mm": x_mm, "y_mm": y_mm, "color": color, "x_px": x_px, "y_px": y_px, "title": name})
+                anim.annotations.append({
+                    "x_mm": x_mm, "y_mm": y_mm, "color": color, "x_px": x_px, "y_px": y_px, "title": name,
+                    "details": ''
+                })
 
                 #views = anim.get_views([0], pixelsize_mm = [0.01, 0.01])
             # views = anim.get_views(*args, **kwargs) # vybiram, jakou chci zobrazit anotaci
