@@ -3,6 +3,7 @@
 Latest version: 0.31.2
 
 # Not released
+* [Added] Slide segmentation model filename prefix for easier testing
 * [Changed] "Scan Segmentation" renamed to "Whole Scan Segmentation"
 * [Added] Ability to remove some colors from the image by Color Filter
 * [Fixed] Empty manual lobule segmentation for central vein if no central is present

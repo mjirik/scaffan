@@ -275,6 +275,7 @@ class ScanSegmentation:
         self.sinusoidal_area_mm = None
         self.alternative_get_features = None
         self.accuracy = None
+        self._segmentation_model_filename_prefix = "segmentation_model_"
 
     # def init(self, anim: scim.AnnotatedImage):
     def init(self, view: scim.View):
@@ -299,10 +300,10 @@ class ScanSegmentation:
         method_str = method.replace(" ", "_")
         self.clf = self._clf_object(**self._clf_params)
         self.clf_fn: Path = Path(
-            Path(__file__).parent / f"segmentation_model_{method_str}.pkl"
+            Path(__file__).parent / f"{self._segmentation_model_filename_prefix}{method_str}.pkl"
         )
         self.clf_default_fn: Path = Path(
-            Path(__file__).parent / f"segmentation_model_default_{method_str}.pkl"
+            Path(__file__).parent / f"{self._segmentation_model_filename_prefix}default_{method_str}.pkl"
         )
         if self.clf_fn.exists():
             logger.debug(f"Reading classifier from {str(self.clf_fn)}")

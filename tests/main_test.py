@@ -433,6 +433,7 @@ class MainGuiTest(unittest.TestCase):
         if stride:
             logger.debug(f"setting stride {stride}")
             mainapp.set_parameter("Processing;Whole Scan Segmentation;TFS General;Training Stride", stride)
+        mainapp.slide_segmentation._segmentation_model_filename_prefix="segmentation_model_test_"
         mainapp.train_scan_segmentation(fns)
 
         # for i, fn in enumerate(fns):
