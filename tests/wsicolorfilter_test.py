@@ -24,7 +24,7 @@ def test_change_color_whole_scaffan():
     # mainapp.color_filter.set_anim_params(mainapp.anim)
     view, img = mainapp.get_preview()
     plt.imshow(img)
-    plt.show()
+    # plt.show()
 
     # mainapp.set_parameter("Processing;Skeleton Analysis", False)
     # mainapp.set_parameter("Processing;Texture Analysis", False)
