@@ -14,7 +14,7 @@ import sys
 from pathlib import Path
 import datetime
 
-experiment_title = "scan segmentation training"
+experiment_title = "Whole Scan Segmentation training"
 method = "GLCMTFS"
 
 experiment_datetime = datetime.datetime.now()
@@ -49,7 +49,7 @@ logger.info(f"running experiment: {experiment_title} started at: {experiment_dat
 # annotations = scan.read_annotations(fn)
 # scan.annotations_to_px(imsl, annotations)
 mainapp = scaffan.algorithm.Scaffan(default_output_dir_prefix=experiment_dir)
-mainapp.set_parameter("Processing;Scan Segmentation;Segmentation Method", method)
+mainapp.set_parameter("Processing;Whole Scan Segmentation;Segmentation Method", method)
 mainapp.slide_segmentation.init_clf() # this is usually automatically called in run()
 clf_fn = None  # rewrite the original
 if clf_fn is not None:
@@ -71,8 +71,8 @@ mainapp.set_persistent_cols({
 
 mainapp.set_parameter("Processing;Intensity Normalization", False)
 # mainapp.set_parameter("Processing;Intensity Normalization", True)
-# mainapp.set_parameter("Processing;Scan Segmentation;Working Resolution", 0.000005) # default is 0.000001 (10 um)
-# mainapp.set_parameter("Processing;Scan Segmentation;Working Resolution", 0.0000025) # default is 0.000001 (10 um)
+# mainapp.set_parameter("Processing;Whole Scan Segmentation;Working Resolution", 0.000005) # default is 0.000001 (10 um)
+# mainapp.set_parameter("Processing;Whole Scan Segmentation;Working Resolution", 0.0000025) # default is 0.000001 (10 um)
 # mainapp.set_parameter("Processing;Lobulus Segmentation;Central Vein Segmentation;Threshold", 0.18)
 # mainapp.set_parameter("Processing;Lobulus Segmentation;Central Vein Segmentation;Threshold", 0.20)
 # mainapp.parameters.param("Processing", "Lobulus Segmentation", "Central Vein Segmentation", "Threshold").setValue(0.20)
@@ -82,7 +82,7 @@ mainapp.set_parameter("Processing;Intensity Normalization", False)
 
 # mainapp.set_parameter("Processing;Skeleton Analysis", False)
 # mainapp.set_parameter("Processing;Texture Analysis", False)
-mainapp.set_parameter("Processing;Scan Segmentation;Save Training Labels", True)
+mainapp.set_parameter("Processing;Whole Scan Segmentation;Save Training Labels", True)
 mainapp.set_report_level(10)
 # mainapp.set_parameter("Processing;Lobulus Segmentation;Manual Segmentation", True)
 

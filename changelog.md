@@ -3,7 +3,7 @@
 Latest version: 0.31.2
 
 # Not released
-
+* [Changed] "Scan Segmentation" renamed to "Whole Scan Segmentation"
 * [Added] Ability to remove some colors from the image by Color Filter
 * [Fixed] Empty manual lobule segmentation for central vein if no central is present
 

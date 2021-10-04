@@ -50,7 +50,7 @@ class ScanSegmentation:
     def __init__(
         self,
         report: Report = None,
-        pname="Scan Segmentation",
+        pname="Whole Scan Segmentation",
         ptype="bool",
         pvalue=True,
         ptip="Run analysis of whole scan before all other processing is perfomed.\n"
@@ -196,7 +196,7 @@ class ScanSegmentation:
                 "value": 5,
                 # "suffix": "px",
                 "siPrefix": False,
-                "tip": "Number of lobuluses automatically selected after whole scan segmentation",
+                "tip": "Number of lobuluses automatically selected after whole Whole Scan Segmentation",
             },
             {
                 "name": "Annotation Radius",
@@ -866,7 +866,7 @@ class ScanSegmentation:
     def evaluate(self):
         logger.debug("evaluate")
         labels, count = np.unique(self.full_output_image, return_counts=True)
-        logger.debug(f"whole scan segmentation: labels={labels}, count={count}")
+        logger.debug(f"whole Whole Scan Segmentation: labels={labels}, count={count}")
         countd = {0: 0, 1: 0, 2: 0}
         countd.update(dict(zip(labels, count)))
         #         plt.figure(figsize=(10, 10))
@@ -921,12 +921,12 @@ class ScanSegmentation:
         logger.debug(f"empty_area_mm={self.empty_area_mm}")
         self.report.set_persistent_cols(
             {
-                "Scan Segmentation Empty Area [mm^2]": self.empty_area_mm,
-                "Scan Segmentation Septum Area [mm^2]": self.septum_area_mm,
-                "Scan Segmentation Sample Area [mm^2]": self.sample_area_mm,
-                "Scan Segmentation Sinusoidal Area [mm^2]": self.sinusoidal_area_mm,
-                "Scan Segmentation Used Pixelsize [mm]": self.used_pixelsize_mm[0],
-                "Scan Segmentation Classifier": str(self.clf),
+                "Whole Scan Segmentation Empty Area [mm^2]": self.empty_area_mm,
+                "Whole Scan Segmentation Septum Area [mm^2]": self.septum_area_mm,
+                "Whole Scan Segmentation Sample Area [mm^2]": self.sample_area_mm,
+                "Whole Scan Segmentation Sinusoidal Area [mm^2]": self.sinusoidal_area_mm,
+                "Whole Scan Segmentation Used Pixelsize [mm]": self.used_pixelsize_mm[0],
+                "Whole Scan Segmentation Classifier": str(self.clf),
             }
         )
 

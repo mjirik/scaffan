@@ -142,7 +142,7 @@ class Scaffan:
                         # "Manual": "Manual",
                         # "Auto": "Auto",
                         # },
-                        "tip": "Auto: select lobulus based on Scan Segmentation.\n"
+                        "tip": "Auto: select lobulus based on Whole Scan Segmentation.\n"
                         "Color: based on annotation color.\n"
                         "Manual: manually pick the lobule. \n\n",
                     },
@@ -150,7 +150,7 @@ class Scaffan:
                     #     "name": "Lobulus Selection Method",
                     #     "type": "bool",
                     #     "value": True,
-                    #     "tip": "Skip selection based on annotation color and select lobulus based on Scan Segmentation. ",
+                    #     "tip": "Skip selection based on annotation color and select lobulus based on Whole Scan Segmentation. ",
                     # },
                     {
                         "name": "Annotation Color",
@@ -226,7 +226,7 @@ class Scaffan:
                         "tip": "Open system window with output dir when processing is finished",
                     },
                     # {
-                    #     "name": "Run Scan Segmentation",
+                    #     "name": "Run Whole Scan Segmentation",
                     #     "type": "bool",
                     #     "value": True,
                     #     "tip": "Run analysis of whole scan before all other processing is perfomed",
@@ -465,7 +465,7 @@ class Scaffan:
         self, fns: List[Union[str, Path]], clean_before_training=True
     ):
         """
-        Train scan segmentation based on list of files with annotation.
+        Train Whole Scan Segmentation based on list of files with annotation.
         Output dir set before processing is ignored.
         :param fns: list of filenames
         :return:
@@ -490,7 +490,7 @@ class Scaffan:
                 ("Processing;Skeleton Analysis", False),
                 ("Processing;Texture Analysis", False),
                 ("Processing;Lobulus Segmentation", False),
-                ("Processing;Scan Segmentation;Run Prediction", False),
+                ("Processing;Whole Scan Segmentation;Run Prediction", False),
             ]
             prev_values = []
             for key, val in paramlist:
@@ -500,20 +500,20 @@ class Scaffan:
             # self.set_parameter("Processing;Skeleton Analysis", False)
             # self.set_parameter("Processing;Texture Analysis", False)
             # self.set_parameter("Processing;Lobulus Segmentation", False)
-            # self.set_parameter("Processing;Scan Segmentation;Run Prediction", False)
+            # self.set_parameter("Processing;Whole Scan Segmentation;Run Prediction", False)
             if i == 0:
                 if clean_before_training is not None:
                     self.set_parameter(
-                        "Processing;Scan Segmentation;TFS General;Clean Before Training",
+                        "Processing;Whole Scan Segmentation;TFS General;Clean Before Training",
                         clean_before_training,
                     )
             else:
                 self.set_parameter(
-                    "Processing;Scan Segmentation;TFS General;Clean Before Training",
+                    "Processing;Whole Scan Segmentation;TFS General;Clean Before Training",
                     False,
                 )
             self.set_parameter(
-                "Processing;Scan Segmentation;TFS General;Run Training", True
+                "Processing;Whole Scan Segmentation;TFS General;Run Training", True
             )
             #             mainapp.set_parameter("Processing;Slide Segmentation;Lobulus Number", 0)
             # mainapp.start_gui(qapp=qapp)
@@ -528,7 +528,7 @@ class Scaffan:
         self, annotation_ids: Optional[list] = None
     ):
         run_slide_segmentation = self.parameters.param(
-            "Processing", "Scan Segmentation"
+            "Processing", "Whole Scan Segmentation"
         ).value()
         pcolor = self.parameters.param("Input", "Annotation Color")
         color = pcolor.value()
@@ -555,7 +555,7 @@ class Scaffan:
                     annotation_ids = self.slide_segmentation.ann_biggest_ids
                 else:
                     logger.error(
-                        "Cannot do automatic lobulus selection without whole scan segmentation"
+                        "Cannot do automatic lobulus selection without whole Whole Scan Segmentation"
                     )
             else:
                 logger.error(
@@ -605,7 +605,7 @@ class Scaffan:
         self.report.set_show(show)
         self.report.set_save(True)
         run_slide_segmentation = self.parameters.param(
-            "Processing", "Scan Segmentation"
+            "Processing", "Whole Scan Segmentation"
         ).value()
 
         # if automatic_lobulus_selection == "use annotation_ids": ...
@@ -880,7 +880,7 @@ class Scaffan:
         centers_px = list(zip(*pts_glob_px))
         logger.debug(f"Manual selection5, centers_px_global={centers_px}")
         r_mm = (
-            float(self.get_parameter("Processing;Scan Segmentation;Annotation Radius"))
+            float(self.get_parameter("Processing;Whole Scan Segmentation;Annotation Radius"))
             * 1000
         )
 
