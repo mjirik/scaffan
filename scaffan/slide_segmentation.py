@@ -925,7 +925,9 @@ class ScanSegmentation:
                 "Whole Scan Segmentation Septum Area [mm^2]": self.septum_area_mm,
                 "Whole Scan Segmentation Sample Area [mm^2]": self.sample_area_mm,
                 "Whole Scan Segmentation Sinusoidal Area [mm^2]": self.sinusoidal_area_mm,
-                "Whole Scan Segmentation Used Pixelsize [mm]": self.used_pixelsize_mm[0],
+                "Whole Scan Segmentation Used Pixelsize [mm]": self.used_pixelsize_mm[
+                    0
+                ],
                 "Whole Scan Segmentation Classifier": str(self.clf),
             }
         )

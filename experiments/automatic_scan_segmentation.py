@@ -22,12 +22,22 @@ method = "GLCMTFS"
 
 experiment_datetime = datetime.datetime.now()
 experiment_datetime_fn = experiment_datetime.strftime("%Y%m%d-%H%M%S")
-experiment_dir = Path(io3d.datasets.join_path(f"medical/processed/SA_{experiment_datetime_fn}_slide_segmentation", get_root=True))
+experiment_dir = Path(
+    io3d.datasets.join_path(
+        f"medical/processed/SA_{experiment_datetime_fn}_slide_segmentation",
+        get_root=True,
+    )
+)
 
 experiment_dir.mkdir()
 # logger.add(sys.stderr, format="{time} {level} {message}", filter="my_module", level="DEBUG")
 # logger.add(sys.stderr, format="{time} {level} {message}", level="DEBUG")
-logger.add(experiment_dir/"scaffan.log", format="{time} {level} {message}",  level="DEBUG", backtrace=True)
+logger.add(
+    experiment_dir / "scaffan.log",
+    format="{time} {level} {message}",
+    level="DEBUG",
+    backtrace=True,
+)
 logger.debug("logging init")
 logger.debug(f"experiment dir {experiment_dir}")
 
@@ -38,6 +48,7 @@ path_to_scaffan = os.path.join(path_to_script, "..")
 sys.path.insert(0, path_to_scaffan)
 import scaffan
 import scaffan.algorithm
+
 # fn = io3d.datasets.join_path(
 #     "medical", "orig", "sample_data", "SCP003", "SCP003.ndpi", get_root=True
 # )
@@ -45,7 +56,7 @@ import scaffan.algorithm
 #     "medical/orig/Scaffan-analysis/PIG-004_BBJ-004-4_HE_parenchyme.ndpi", get_root=True
 # )
 # logger.debug(f"fn exists {Path(fn).exists()}, fn: {fn}")
-    # .isoformat(' ', 'seconds')
+# .isoformat(' ', 'seconds')
 # datetime.datetime.now().
 logger.info(f"running experiment: {experiment_title} started at: {experiment_datetime}")
 # imsl = openslide.OpenSlide(fn)
@@ -57,10 +68,12 @@ mainapp = scaffan.algorithm.Scaffan()
 #############
 # mainapp.set_output_dir(experiment_dir/"PIG-001")
 
-mainapp.set_persistent_cols({
-    "Experiment Title": experiment_title,
-    "Experiment Datetime": experiment_datetime.isoformat(" ", "seconds"),
-})
+mainapp.set_persistent_cols(
+    {
+        "Experiment Title": experiment_title,
+        "Experiment Datetime": experiment_datetime.isoformat(" ", "seconds"),
+    }
+)
 
 mainapp.set_parameter("Processing;Whole Scan Segmentation;Segmentation Method", method)
 mainapp.set_parameter("Processing;Intensity Normalization", False)
@@ -69,7 +82,9 @@ mainapp.set_parameter("Processing;Intensity Normalization", False)
 # mainapp.set_parameter("Processing;Whole Scan Segmentation;Working Resolution", 0.0000025) # default is 0.000001 (10 um)
 mainapp.set_parameter("Processing;Whole Scan Segmentation;Save Training Labels", True)
 # mainapp.set_parameter("Processing;Lobulus Segmentation;Central Vein Segmentation;Threshold", 0.18)
-mainapp.set_parameter("Processing;Lobulus Segmentation;Central Vein Segmentation;Threshold", 0.20)
+mainapp.set_parameter(
+    "Processing;Lobulus Segmentation;Central Vein Segmentation;Threshold", 0.20
+)
 # mainapp.parameters.param("Processing", "Lobulus Segmentation", "Central Vein Segmentation", "Threshold").setValue(0.20)
 # mainapp.set_parameter("Processing;Skeleton Analysis", True)
 # mainapp.set_parameter("Processing;Texture Analysis", True)
@@ -79,6 +94,7 @@ mainapp.set_parameter("Processing;Skeleton Analysis", False)
 mainapp.set_parameter("Processing;Texture Analysis", False)
 mainapp.set_report_level(40)
 # mainapp.set_parameter("Processing;Lobulus Segmentation;Manual Segmentation", True)
+
 
 def set_same(mainapp, fn):
     logger.debug(f"fn exists {Path(fn).exists()}, fn: {fn}")
@@ -94,16 +110,27 @@ def set_same(mainapp, fn):
     mainapp.set_parameter("Processing;Texture Analysis", False)
     mainapp.set_parameter("Processing;Open output dir", False)
     # mainapp.set_parameter("Processing;Whole Scan Segmentation;TFS General;Load Default Classifier", True)
-    mainapp.set_parameter("Processing;Whole Scan Segmentation;TFS General;Clean Before Training", False)
-    mainapp.set_parameter("Processing;Whole Scan Segmentation;TFS General;Training Weight", 100)
-    mainapp.set_parameter("Processing;Whole Scan Segmentation;TFS General;Run Training", True)
+    mainapp.set_parameter(
+        "Processing;Whole Scan Segmentation;TFS General;Clean Before Training", False
+    )
+    mainapp.set_parameter(
+        "Processing;Whole Scan Segmentation;TFS General;Training Weight", 100
+    )
+    mainapp.set_parameter(
+        "Processing;Whole Scan Segmentation;TFS General;Run Training", True
+    )
     # mainapp.set_parameter("Processing;Whole Scan Segmentation;TFS General;Run Training", False)
     mainapp.set_parameter("Processing;Whole Scan Segmentation;Lobulus Number", 0)
-    mainapp.set_parameter("Processing;Whole Scan Segmentation;TFS General;Load Default Classifier", True)
-    mainapp.set_parameter("Processing;Whole Scan Segmentation;Save Training Labels", True)
+    mainapp.set_parameter(
+        "Processing;Whole Scan Segmentation;TFS General;Load Default Classifier", True
+    )
+    mainapp.set_parameter(
+        "Processing;Whole Scan Segmentation;Save Training Labels", True
+    )
     # mainapp.set_parameter("Processing;Whole Scan Segmentation;TFS General;Clean Before Training", False)
     # mainapp.set_parameter("Processing;Whole Scan Segmentation;TFS General;Training Weight", 100)
     # mainapp.set_parameter("Processing;Lobulus Segmentation;Manual Segmentation", True)
+
 
 fns = [
     "medical/orig/Scaffan-analysis/PIG-001_J-17-0571_LM central_HE.ndpi",
@@ -111,7 +138,7 @@ fns = [
     # "medical/orig/Scaffan-analysis/PIG-001_J-17-0567_edge RM_HE.ndpi",  # no annotation
     "medical/orig/Scaffan-analysis/PIG-002_J-18-0091_HE.ndpi",
     "medical/orig/Scaffan-analysis/PIG-002_J-18-0092_HE.ndpi",
-    "medical/orig/Scaffan-analysis/PIG-002_J-18-0094_HE_rescan.ndpi", # bad focus
+    "medical/orig/Scaffan-analysis/PIG-002_J-18-0094_HE_rescan.ndpi",  # bad focus
     "medical/orig/Scaffan-analysis/PIG-003_J-18-0165_HE.ndpi",
     "medical/orig/Scaffan-analysis/PIG-003_J-18-0166_HE.ndpi",
     "medical/orig/Scaffan-analysis/PIG-003_J-18-0167_HE.ndpi",
@@ -129,21 +156,21 @@ fns = [
     #
     # "medical/orig/Scaffan-analysis-hů/PIG-001_J-17-0571_LM central_HE.ndpi", # Test diacritics
     #
-    'medical/orig/Scaffan-analysis-whole-scan-addition/Pig-014_Pilsen_HE_LM-P.ndpi',
-    'medical/orig/Scaffan-analysis-whole-scan-addition/Pig-013_Pilsen_HE_013-LL-P.ndpi',
-    'medical/orig/Scaffan-analysis-whole-scan-addition/Pilsen_Pig-015_HE_RLP_7.ndpi',
-    'medical/orig/Scaffan-analysis-whole-scan-addition/Pilsen_Pig-015_HE_RMP_4.ndpi',
-    'medical/orig/Scaffan-analysis-whole-scan-addition/Pig-014_Pilsen_HE_RL-C.ndpi',
-    'medical/orig/Scaffan-analysis-whole-scan-addition/Pig-010_Pilsen_HE_RM-P (1).ndpi',
-    'medical/orig/Scaffan-analysis-whole-scan-addition/Pig-013_Pilsen_HE_013-LL-C (1).ndpi',
-    'medical/orig/Scaffan-analysis-whole-scan-addition/Pig-009_Pilsen_HE_009-LM-P.ndpi',
-    'medical/orig/Scaffan-analysis-whole-scan-addition/Pig-010_Pilsen_HE_LL-P (1).ndpi',
-    'medical/orig/Scaffan-analysis-whole-scan-addition/Pig-011_Pilsen_HE_LL-P (1).ndpi',
-    'medical/orig/Scaffan-analysis-whole-scan-addition/Pig-009_Pilsen_HE_009-RL-C (1).ndpi',
-    'medical/orig/Scaffan-analysis-whole-scan-addition/PIG-012_Pilsen_HE_LLP (1).ndpi',
-    'medical/orig/Scaffan-analysis-whole-scan-addition/Pig-011_Pilsen_HE_RM-P (1).ndpi',
-    'medical/orig/Scaffan-analysis-whole-scan-addition/PIG-012_Pilsen_HE_LMC (1).ndpi',
-    "medical/orig/scaner_zeiss/Moulisova-JENA/11_2019_11_13__-7.czi", # test data
+    "medical/orig/Scaffan-analysis-whole-scan-addition/Pig-014_Pilsen_HE_LM-P.ndpi",
+    "medical/orig/Scaffan-analysis-whole-scan-addition/Pig-013_Pilsen_HE_013-LL-P.ndpi",
+    "medical/orig/Scaffan-analysis-whole-scan-addition/Pilsen_Pig-015_HE_RLP_7.ndpi",
+    "medical/orig/Scaffan-analysis-whole-scan-addition/Pilsen_Pig-015_HE_RMP_4.ndpi",
+    "medical/orig/Scaffan-analysis-whole-scan-addition/Pig-014_Pilsen_HE_RL-C.ndpi",
+    "medical/orig/Scaffan-analysis-whole-scan-addition/Pig-010_Pilsen_HE_RM-P (1).ndpi",
+    "medical/orig/Scaffan-analysis-whole-scan-addition/Pig-013_Pilsen_HE_013-LL-C (1).ndpi",
+    "medical/orig/Scaffan-analysis-whole-scan-addition/Pig-009_Pilsen_HE_009-LM-P.ndpi",
+    "medical/orig/Scaffan-analysis-whole-scan-addition/Pig-010_Pilsen_HE_LL-P (1).ndpi",
+    "medical/orig/Scaffan-analysis-whole-scan-addition/Pig-011_Pilsen_HE_LL-P (1).ndpi",
+    "medical/orig/Scaffan-analysis-whole-scan-addition/Pig-009_Pilsen_HE_009-RL-C (1).ndpi",
+    "medical/orig/Scaffan-analysis-whole-scan-addition/PIG-012_Pilsen_HE_LLP (1).ndpi",
+    "medical/orig/Scaffan-analysis-whole-scan-addition/Pig-011_Pilsen_HE_RM-P (1).ndpi",
+    "medical/orig/Scaffan-analysis-whole-scan-addition/PIG-012_Pilsen_HE_LMC (1).ndpi",
+    "medical/orig/scaner_zeiss/Moulisova-JENA/11_2019_11_13__-7.czi",  # test data
     # "medical/orig/scaner_zeiss/Moulisova-JENA/01_2019_11_12__RecognizedCode.czi", # no annotation
     # "medical/orig/scaner_zeiss/Moulisova-JENA/01_2019_11_13__RecognizedCode.czi", # no annotation
     # "medical/orig/scaner_zeiss/Moulisova-JENA/02_2019_11_12__RecognizedCode-1_pt1.czi", # no annotation

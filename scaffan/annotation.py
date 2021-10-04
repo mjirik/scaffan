@@ -261,7 +261,13 @@ def read_annotations_ndpa(pth) -> list:
 
 
 def plot_annotations(
-    annotations, x_key="x", y_key="y", in_region=False, factor=[1, 1], show_id=True, fontsize="x-small"
+    annotations,
+    x_key="x",
+    y_key="y",
+    in_region=False,
+    factor=[1, 1],
+    show_id=True,
+    fontsize="x-small",
 ):
     if type(annotations) is dict:
         annotations = [annotations]

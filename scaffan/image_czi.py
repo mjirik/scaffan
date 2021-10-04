@@ -90,9 +90,14 @@ def get_py_slices(
     return isconj, sl_s, sl_r, size_r, sl_sn, size_rn, sl_rn
 
 
-def read_region_with_level(czi, location, size, level=0, report=None,
-                           # use_resize_from_level0=False
-                           ):
+def read_region_with_level(
+    czi,
+    location,
+    size,
+    level=0,
+    report=None,
+    # use_resize_from_level0=False
+):
     """
     Read region from czi file. White color is filled where no pixels are given if the
     datatype is uint8 or float.
@@ -150,9 +155,7 @@ def read_region_with_level(czi, location, size, level=0, report=None,
             # this is fast
             subb_shape = subb.shape[-3:-1]
             stored_shape = tuple(np.asarray(subb.stored_shape) * 2 ** level)[-3:-1]
-            if (
-                subb_shape == stored_shape
-            ):  # subb.stored_shape:
+            if subb_shape == stored_shape:  # subb.stored_shape:
                 sd = subb.data(resize=False)
                 img = sd[..., sl_sn[0], sl_sn[1], :]
                 # sd = subb.data()
@@ -181,24 +184,24 @@ def read_region_with_level(czi, location, size, level=0, report=None,
             #                 preserve_range=True
             #             ).astype(img.dtype)
             #             output[sl_r] = img_smaller
-                        # t01 = time.time()
-                        # t_res += float(t01 - t00)
-                #         logger.trace(f"osh={osh}, im.sh={img.shape}") #[{sl_s[0].start}:{sl_s[0].stop}, {sl_s[1].start}:{sl_s[1].stop}], [{sl_r[0].start}:{sl_r[0].stop}, {sl_r[1].start}:{sl_r[1].stop}]")
-                #     logger.trace(f"{subb.start}, {subb.shape}, {subb.stored_shape}") #[{sl_s[0].start}:{sl_s[0].stop}, {sl_s[1].start}:{sl_s[1].stop}], [{sl_r[0].start}:{sl_r[0].stop}, {sl_r[1].start}:{sl_r[1].stop}]")
-                # except OverflowError as e:
-                #     import traceback
-                #     from PyQt5.QtCore import pyqtRemoveInputHook
-                #     pyqtRemoveInputHook()
-                #     logger.debug(traceback.format_exc())
-                #     import pdb
-                #     pdb.set_trace()
-                # threr are almost same outputs. The difference is in size of the images
-                # there can be 1 pixel error due to integer division
-                # img_smaller_alternative = skimage.transform.downscale_local_mean(
-                #     img,
-                #     factors=(downscale_factor, downscale_factor, 1))
-                # print(
-                #     f"{subb.start}, {subb.shape}, {subb.stored_shape}, [{sl_s[0].start}:{sl_s[0].stop}, {sl_s[1].start}:{sl_s[1].stop}], [{sl_r[0].start}:{sl_r[0].stop}, {sl_r[1].start}:{sl_r[1].stop}]")
+            # t01 = time.time()
+            # t_res += float(t01 - t00)
+            #         logger.trace(f"osh={osh}, im.sh={img.shape}") #[{sl_s[0].start}:{sl_s[0].stop}, {sl_s[1].start}:{sl_s[1].stop}], [{sl_r[0].start}:{sl_r[0].stop}, {sl_r[1].start}:{sl_r[1].stop}]")
+            #     logger.trace(f"{subb.start}, {subb.shape}, {subb.stored_shape}") #[{sl_s[0].start}:{sl_s[0].stop}, {sl_s[1].start}:{sl_s[1].stop}], [{sl_r[0].start}:{sl_r[0].stop}, {sl_r[1].start}:{sl_r[1].stop}]")
+            # except OverflowError as e:
+            #     import traceback
+            #     from PyQt5.QtCore import pyqtRemoveInputHook
+            #     pyqtRemoveInputHook()
+            #     logger.debug(traceback.format_exc())
+            #     import pdb
+            #     pdb.set_trace()
+            # threr are almost same outputs. The difference is in size of the images
+            # there can be 1 pixel error due to integer division
+            # img_smaller_alternative = skimage.transform.downscale_local_mean(
+            #     img,
+            #     factors=(downscale_factor, downscale_factor, 1))
+            # print(
+            #     f"{subb.start}, {subb.shape}, {subb.stored_shape}, [{sl_s[0].start}:{sl_s[0].stop}, {sl_s[1].start}:{sl_s[1].stop}], [{sl_r[0].start}:{sl_r[0].stop}, {sl_r[1].start}:{sl_r[1].stop}]")
     #             break
     #         else:
     #             logger.debug(f" not equal size of subb {subb.start}, {subb.shape}")
@@ -207,17 +210,21 @@ def read_region_with_level(czi, location, size, level=0, report=None,
         f"time to get region={t1-t0}, cumulative resize time={t_res}, cumulative get slices time={t_slices}"
     )
     if number_of_valid_blocks == 0 and number_of_overlapping_blocks > 0:
-        logger.debug(f"number of used blocks for raster recontruction = {number_of_valid_blocks}")
-        logger.debug(f"number of overlapping blocks for recontruction = {number_of_overlapping_blocks}")
-        logger.debug(f"Failed loading raster on level={level}. Reconstructing raster image by resizing from level=0")
-        size0 = np.asarray(size)*downscale_factor
+        logger.debug(
+            f"number of used blocks for raster recontruction = {number_of_valid_blocks}"
+        )
+        logger.debug(
+            f"number of overlapping blocks for recontruction = {number_of_overlapping_blocks}"
+        )
+        logger.debug(
+            f"Failed loading raster on level={level}. Reconstructing raster image by resizing from level=0"
+        )
+        size0 = np.asarray(size) * downscale_factor
 
         output0 = read_region_with_level(czi, location, size0, level=0, report=report)
         output = skimage.transform.resize(
-                    output0,
-                    output_shape=output.shape,
-                    preserve_range=True
-                ).astype(output.dtype)
+            output0, output_shape=output.shape, preserve_range=True
+        ).astype(output.dtype)
     # TODO here is potential to extract the data more memory efficient by resizing each block
 
     return output

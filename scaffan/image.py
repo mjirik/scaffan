@@ -264,6 +264,7 @@ class ImageSlide:
 
     def _get_metadata_czi(self, picture_path_annotation):
         from czifile import CziFile
+
         with CziFile(picture_path_annotation) as czi:
             metadata = czi.metadata()
         return metadata
@@ -336,7 +337,6 @@ class ImageSlide:
         # xx = float(root.findall('.//Translate[@Id="X"]/Value')[0].text)
         # yy = float(root.findall('.//Translate[@Id="Y"]/Value')[0].text)
 
-
         # take care about cropped images created by Zen Blue
         # TODO use translate
         # translate = root.findall('.//Translate')
@@ -344,10 +344,10 @@ class ImageSlide:
         #     coord0 = translate[0].attrib['X']
         #     coord1 = translate[0].attrib['Y']
         #     start = list(self._czi_start)
-            # start[0]
-            # start[0] += -float(coord0)
-            # start[1] += -float(coord1)
-            # self._czi_start = tuple(start)
+        # start[0]
+        # start[0] += -float(coord0)
+        # start[1] += -float(coord1)
+        # self._czi_start = tuple(start)
         # yy = root.findall('.//Translate')[0].attrib['Y']
         meta_dict = {}
         logger.debug(f"nzi pixelsize  {xres}x{yres} [m]")
@@ -442,7 +442,7 @@ class AnnotatedImage:
             self.read_annotations()
         self.intensity_rescaler = image_intensity_rescale.RescaleIntensityPercentile()
         self.run_intensity_rescale = False
-        self.raster_image_preprocessing_function_handler = [] # you can add
+        self.raster_image_preprocessing_function_handler = []  # you can add
 
     def _run_raster_image_preprocessing_function_handler(self, img):
 
@@ -576,31 +576,38 @@ class AnnotatedImage:
 
     def load_zeiss_elements(self, metadata):
         from xml.dom import minidom
+
         pixelSizeMM = self.get_pixel_size()
         root = minidom.parseString(metadata)
         elements = root.getElementsByTagName("Elements")
 
         listOfBeziers = []
         listOfBeziersNames = []
-        listOfBeziersColors= []
+        listOfBeziersColors = []
         listOfCircles = []
         listOfRectangles = []
         listOfEllipses = []
 
         for j in range(len(elements)):
             for child in elements[j].childNodes:
-                if (child.nodeName == "Bezier"):
+                if child.nodeName == "Bezier":
                     listOfPoints_temp = []
-                    points = child.getElementsByTagName("Points")[0].firstChild.nodeValue
+                    points = child.getElementsByTagName("Points")[
+                        0
+                    ].firstChild.nodeValue
                     temp_points = points.split()
                     for i in range(len(temp_points)):
-                        point_X = float(temp_points[i].split(",")[0]) * pixelSizeMM[0][0]
-                        point_Y = float(temp_points[i].split(",")[1]) * pixelSizeMM[0][1]
-    
+                        point_X = (
+                            float(temp_points[i].split(",")[0]) * pixelSizeMM[0][0]
+                        )
+                        point_Y = (
+                            float(temp_points[i].split(",")[1]) * pixelSizeMM[0][1]
+                        )
+
                         pointsXY_float = (point_X, point_Y)
                         listOfPoints_temp.append(pointsXY_float)
-                        if(i == 0):
-                            lastPointsXY = pointsXY_float # aby byla krivka spojena
+                        if i == 0:
+                            lastPointsXY = pointsXY_float  # aby byla krivka spojena
                     listOfPoints_temp.append(lastPointsXY)
                     listOfBeziers.append(listOfPoints_temp)
                     name = child.getElementsByTagName("Name")[0].firstChild.nodeValue
@@ -614,48 +621,101 @@ class AnnotatedImage:
                         color = "#FF0000"
                     listOfBeziersColors.append(color)
 
-                elif (child.nodeName == "Circle"):
-                    center_X = float(child.getElementsByTagName("CenterX")[0].firstChild.data) * pixelSizeMM[0][0] # v mm od leveho okraje
-                    center_Y = float(child.getElementsByTagName("CenterY")[0].firstChild.data) * pixelSizeMM[0][1] # v mm od horniho okraje obrazku
-                    radius = float(child.getElementsByTagName("Radius")[0].firstChild.data) * pixelSizeMM[0][0]
+                elif child.nodeName == "Circle":
+                    center_X = (
+                        float(child.getElementsByTagName("CenterX")[0].firstChild.data)
+                        * pixelSizeMM[0][0]
+                    )  # v mm od leveho okraje
+                    center_Y = (
+                        float(child.getElementsByTagName("CenterY")[0].firstChild.data)
+                        * pixelSizeMM[0][1]
+                    )  # v mm od horniho okraje obrazku
+                    radius = (
+                        float(child.getElementsByTagName("Radius")[0].firstChild.data)
+                        * pixelSizeMM[0][0]
+                    )
                     listOfCircles.append((center_X, center_Y, radius))
-    
-                elif (child.nodeName == "Rectangle"):
-                    X_left_top = float(child.getElementsByTagName("Left")[0].firstChild.data) * pixelSizeMM[0][0]
-                    Y_left_top = float(child.getElementsByTagName("Top")[0].firstChild.data) * pixelSizeMM[0][1]
-                    width_rec = float(child.getElementsByTagName("Width")[0].firstChild.data) * pixelSizeMM[0][0]
-                    height_rec = float(child.getElementsByTagName("Height")[0].firstChild.data) * pixelSizeMM[0][1]
-                    listOfRectangles.append((X_left_top, Y_left_top, width_rec, height_rec))
-    
-                elif (child.nodeName == "Ellipse"):
-                    center_X = float(child.getElementsByTagName("CenterX")[0].firstChild.data) * pixelSizeMM[0][0]
-                    center_Y = float(child.getElementsByTagName("CenterY")[0].firstChild.data) * pixelSizeMM[0][1]
-                    radiusX = float(child.getElementsByTagName("RadiusX")[0].firstChild.data) * pixelSizeMM[0][0]
-                    radiusY = float(child.getElementsByTagName("RadiusY")[0].firstChild.data) * pixelSizeMM[0][1]
+
+                elif child.nodeName == "Rectangle":
+                    X_left_top = (
+                        float(child.getElementsByTagName("Left")[0].firstChild.data)
+                        * pixelSizeMM[0][0]
+                    )
+                    Y_left_top = (
+                        float(child.getElementsByTagName("Top")[0].firstChild.data)
+                        * pixelSizeMM[0][1]
+                    )
+                    width_rec = (
+                        float(child.getElementsByTagName("Width")[0].firstChild.data)
+                        * pixelSizeMM[0][0]
+                    )
+                    height_rec = (
+                        float(child.getElementsByTagName("Height")[0].firstChild.data)
+                        * pixelSizeMM[0][1]
+                    )
+                    listOfRectangles.append(
+                        (X_left_top, Y_left_top, width_rec, height_rec)
+                    )
+
+                elif child.nodeName == "Ellipse":
+                    center_X = (
+                        float(child.getElementsByTagName("CenterX")[0].firstChild.data)
+                        * pixelSizeMM[0][0]
+                    )
+                    center_Y = (
+                        float(child.getElementsByTagName("CenterY")[0].firstChild.data)
+                        * pixelSizeMM[0][1]
+                    )
+                    radiusX = (
+                        float(child.getElementsByTagName("RadiusX")[0].firstChild.data)
+                        * pixelSizeMM[0][0]
+                    )
+                    radiusY = (
+                        float(child.getElementsByTagName("RadiusY")[0].firstChild.data)
+                        * pixelSizeMM[0][1]
+                    )
                     listOfEllipses.append((center_X, center_Y, radiusX, radiusY))
 
-        return listOfBeziers, listOfCircles, listOfRectangles, listOfEllipses, listOfBeziersNames, listOfBeziersColors
+        return (
+            listOfBeziers,
+            listOfCircles,
+            listOfRectangles,
+            listOfEllipses,
+            listOfBeziersNames,
+            listOfBeziersColors,
+        )
 
-    def insert_zeiss_annotation_bezier(self, anim, listOfBeziers, listOfBeziersNames, listOfBeziersColors):
-         pixelSizeMM = anim.get_pixel_size()
-         if (len(listOfBeziers) != 0):
+    def insert_zeiss_annotation_bezier(
+        self, anim, listOfBeziers, listOfBeziersNames, listOfBeziersColors
+    ):
+        pixelSizeMM = anim.get_pixel_size()
+        if len(listOfBeziers) != 0:
             anim.annotations = []
-            for bezier, name, color in zip(listOfBeziers, listOfBeziersNames, listOfBeziersColors):
+            for bezier, name, color in zip(
+                listOfBeziers, listOfBeziersNames, listOfBeziersColors
+            ):
                 x_mm = []
                 y_mm = []
                 for tuple_XY in bezier:
                     x_mm.append(tuple_XY[0])
                     y_mm.append(tuple_XY[1])
-    
+
                 x_px = np.asarray(x_mm) / pixelSizeMM[0][0]
                 y_px = np.asarray(y_mm) / pixelSizeMM[0][1]
 
-                anim.annotations.append({
-                    "x_mm": x_mm, "y_mm": y_mm, "color": color, "x_px": x_px, "y_px": y_px, "title": name,
-                    "details": ''
-                })
+                anim.annotations.append(
+                    {
+                        "x_mm": x_mm,
+                        "y_mm": y_mm,
+                        "color": color,
+                        "x_px": x_px,
+                        "y_px": y_px,
+                        "title": name,
+                        "details": "",
+                    }
+                )
 
-                #views = anim.get_views([0], pixelsize_mm = [0.01, 0.01])
+                # views = anim.get_views([0], pixelsize_mm = [0.01, 0.01])
             # views = anim.get_views(*args, **kwargs) # vybiram, jakou chci zobrazit anotaci
             # view = views[0]
             # img = view.get_region_image(as_gray = False)
@@ -678,10 +738,24 @@ class AnnotatedImage:
             # TODO nastavení self.annotations na základě anim
             #  self.path # cesta k CZI souboru
 
-            metadata_czi = self.openslide._get_metadata_czi(self.path) # nacitani metadat pomoci vlastni metody (asi bude fungovat spise)
-            listOfBeziers, listOfCircles, listOfRectangles, listOfEllipses, listOfBeziersNames, listOfBeziersColors = self.load_zeiss_elements(metadata=metadata_czi)
+            metadata_czi = self.openslide._get_metadata_czi(
+                self.path
+            )  # nacitani metadat pomoci vlastni metody (asi bude fungovat spise)
+            (
+                listOfBeziers,
+                listOfCircles,
+                listOfRectangles,
+                listOfEllipses,
+                listOfBeziersNames,
+                listOfBeziersColors,
+            ) = self.load_zeiss_elements(metadata=metadata_czi)
             #  self.annotations = insert_zeiss_annotation_bezier(anim=self, ...)
-            self.insert_zeiss_annotation_bezier(anim=self, listOfBeziers=listOfBeziers, listOfBeziersNames=listOfBeziersNames, listOfBeziersColors=listOfBeziersColors)
+            self.insert_zeiss_annotation_bezier(
+                anim=self,
+                listOfBeziers=listOfBeziers,
+                listOfBeziersNames=listOfBeziersNames,
+                listOfBeziersColors=listOfBeziersColors,
+            )
             #  test function tests / image_czi_test.py
 
         # here can be also reading of imagej annotations in all the cases something like if len(self.annotations) == 0:
@@ -902,14 +976,25 @@ class AnnotatedImage:
         return self.get_annotation_ids(title)
         # return self.get_views(annotation_ids, level=level, **kwargs), annotation_ids
 
-    def select_annotations_by_title_contains(self, title_contains:str) -> annotationIDs:
+    def select_annotations_by_title_contains(
+        self, title_contains: str
+    ) -> annotationIDs:
         # double for
         # return [id for title in self.id_by_titles.keys() if len(re.findall(title_regex, title) > 0 in title for id in self.id_by_titles[title]]
-        return [id for title in self.id_by_titles.keys() if title_contains in title for id in self.id_by_titles[title]]
+        return [
+            id
+            for title in self.id_by_titles.keys()
+            if title_contains in title
+            for id in self.id_by_titles[title]
+        ]
 
-    def select_annotations_by_title_regex(self, title_regex:str) -> annotationIDs:
-        return [id for title in self.id_by_titles.keys() if len(re.findall(title_regex, title)) > 0 for id in self.id_by_titles[title]]
-
+    def select_annotations_by_title_regex(self, title_regex: str) -> annotationIDs:
+        return [
+            id
+            for title in self.id_by_titles.keys()
+            if len(re.findall(title_regex, title)) > 0
+            for id in self.id_by_titles[title]
+        ]
 
     def get_views(
         self,
@@ -1500,7 +1585,7 @@ class View:
         self.plot_annotations(i)
         self.add_ticks()
 
-    def add_ticks(self, print_units:bool=True, format:str="{:.1e}"):
+    def add_ticks(self, print_units: bool = True, format: str = "{:.1e}"):
         self.region_pixelunit
         region_pixelsize = self.region_pixelsize
         locs, labels = plt.xticks()
@@ -1559,9 +1644,9 @@ class View:
         im = np.asarray(imcr)
 
         if len(im.shape) > 2:
-            im4stat = im[:,:,:3]
+            im4stat = im[:, :, :3]
         else:
-            im4stat = im[:,:]
+            im4stat = im[:, :]
         logger.log(
             log_level,
             f"imcr dtype: {im.dtype}, shape: {im.shape}, min max: [{np.min(im4stat)}, {np.max(im4stat)}]",
@@ -1605,7 +1690,6 @@ class View:
                     # not sure about [::-1]. Not checked too much.
                     im_resized = imma.image.resize_to_shape(im, req_sz[::-1])
             im = im_resized
-
 
         return im
 

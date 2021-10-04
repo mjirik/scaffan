@@ -426,7 +426,9 @@ class Scaffan:
         path = fnparam.value()
         # run_resc_int = self.parameters.param("Processing", "Intensity Normalization", "Run Intensity Normalization").value()
         self.anim = image.AnnotatedImage(path)
-        self.anim.raster_image_preprocessing_function_handler.append(self.color_filter.wsi_color_filter.img_processing)
+        self.anim.raster_image_preprocessing_function_handler.append(
+            self.color_filter.wsi_color_filter.img_processing
+        )
         self.color_filter.set_anim_params(self.anim)
         self.intensity_rescale.set_anim_params(self.anim)
         fnparam = self.parameters.param("Output", "Directory Path")
@@ -576,8 +578,7 @@ class Scaffan:
         view_corner.plot_annotations(fontsize="small")
 
         plt.gca().set_axis_off()
-        plt.subplots_adjust(top=1, bottom=0, right=1, left=0,
-                            hspace=0, wspace=0)
+        plt.subplots_adjust(top=1, bottom=0, right=1, left=0, hspace=0, wspace=0)
         plt.margins(0, 0)
         plt.gca().xaxis.set_major_locator(plt.NullLocator())
         plt.gca().yaxis.set_major_locator(plt.NullLocator())
@@ -880,7 +881,11 @@ class Scaffan:
         centers_px = list(zip(*pts_glob_px))
         logger.debug(f"Manual selection5, centers_px_global={centers_px}")
         r_mm = (
-            float(self.get_parameter("Processing;Whole Scan Segmentation;Annotation Radius"))
+            float(
+                self.get_parameter(
+                    "Processing;Whole Scan Segmentation;Annotation Radius"
+                )
+            )
             * 1000
         )
 
@@ -1047,8 +1052,8 @@ def get_size(obj, seen=None):
     if isinstance(obj, dict):
         size += sum([get_size(v, seen) for v in obj.values()])
         size += sum([get_size(k, seen) for k in obj.keys()])
-    elif hasattr(obj, '__dict__'):
+    elif hasattr(obj, "__dict__"):
         size += get_size(obj.__dict__, seen)
-    elif hasattr(obj, '__iter__') and not isinstance(obj, (str, bytes, bytearray)):
+    elif hasattr(obj, "__iter__") and not isinstance(obj, (str, bytes, bytearray)):
         size += sum([get_size(i, seen) for i in obj])
     return size

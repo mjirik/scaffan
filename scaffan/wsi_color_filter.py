@@ -20,8 +20,8 @@ class WsiColorFilterPQG:
         pname="Color Filter",
         ptype="group",
         pvalue=True,
-        ptip="A preprocessing of input image. Turns color specified by annotation into color sepcified in annotation title." +
-            "The annotation title must contain 'convert color to #ffffff' to turn color to white.",
+        ptip="A preprocessing of input image. Turns color specified by annotation into color sepcified in annotation title."
+        + "The annotation title must contain 'convert color to #ffffff' to turn color to white.",
         pexpanded=False,
     ):
         # self.rescale_intensity_percentile = image_intensity_rescale.RescaleIntensityPercentile()
@@ -61,18 +61,19 @@ class WsiColorFilterPQG:
         # run_resc_int = self.parameters.param("Processing", "Intensity Normalization").value()
         # run_resc_int = self.parameters.value()
         self.wsi_color_filter.init_color_filter_by_anim(anim)
-        self.wsi_color_filter.slope = self.parameters.param("Sigmoidal Slope").value(),
+        self.wsi_color_filter.slope = (
+            self.parameters.param("Sigmoidal Slope").value(),
+        )
 
 
-
-class WsiColorFilter():
+class WsiColorFilter:
     def __init__(self):
         self.models = {}
         self.color_ids = {}
         self.slope = 1
         pass
 
-    def init_color_filter_by_anim(self, anim:image.AnnotatedImage):
+    def init_color_filter_by_anim(self, anim: image.AnnotatedImage):
         logger.trace(anim.id_by_titles)
         regex = " *convert *color *to *(#[a-fA-F0-9]{6})"
         ids = anim.select_annotations_by_title_regex(regex)
@@ -82,10 +83,9 @@ class WsiColorFilter():
             re.findall(regex, anim.annotations[id]["title"])[0] for id in ids
         ]
 
-        self.color_ids = {value: number for number, value in enumerate(np.unique(
-            color_hexacodes
-        ))
-                          }
+        self.color_ids = {
+            value: number for number, value in enumerate(np.unique(color_hexacodes))
+        }
 
         chsv_data = []
 
@@ -98,6 +98,7 @@ class WsiColorFilter():
             color_hexacode = re.findall(regex, anim.annotations[id]["title"])[0]
 
             from skimage.color import rgb2hsv
+
             # view = anim.get_view(
             #     location_mm=[10, 11],
             #     size_on_level=size_on_level,
@@ -109,7 +110,9 @@ class WsiColorFilter():
             datai = img_chsv[mask > 0]
             # codes = np.zeros([1,datai.shape[1]])
             # codes[:] = color_ids[color_hexacode]
-            codes = np.array([self.color_ids[color_hexacode]] * datai.shape[0]).reshape([-1, 1])
+            codes = np.array([self.color_ids[color_hexacode]] * datai.shape[0]).reshape(
+                [-1, 1]
+            )
             datai = np.concatenate((datai, codes), axis=1)
 
             chsv_data.append(datai)
@@ -127,7 +130,7 @@ class WsiColorFilter():
             self.models[hexa] = model
         pass
 
-    def img_processing(self, img:np.ndarray, return_proba=False) -> np.ndarray:
+    def img_processing(self, img: np.ndarray, return_proba=False) -> np.ndarray:
         if len(self.models) > 0:
             img_copy = img.copy()
 
@@ -136,7 +139,9 @@ class WsiColorFilter():
             img_chsv = rgb_image_to_chsv(img_copy)
             sh = img_chsv.shape
             # flatten the image (roll the x and y axes to the end, squeeze, roll back)
-            chsv_data2 = np.moveaxis(np.moveaxis(img_chsv, 2, 0).reshape([sh[2], -1]), 0, 1)
+            chsv_data2 = np.moveaxis(
+                np.moveaxis(img_chsv, 2, 0).reshape([sh[2], -1]), 0, 1
+            )
             # chsv_proba = model.predict_proba(chsv_data2)
             chsv_proba2 = self.models[hexa].score_samples(chsv_data2)
             #
@@ -185,9 +190,10 @@ def hue_to_continuous_2d(img):
 
 def change_color_using_probability(img_rgb, img_proba, target_color):
     import matplotlib.colors
+
     # target_color = '#B4FBB8'
     color_rgb = np.asarray(matplotlib.colors.to_rgb(target_color))
-    color_hsv = rgb2hsv(color_rgb.reshape([1,1,3]))
+    color_hsv = rgb2hsv(color_rgb.reshape([1, 1, 3]))
     img_hsv = rgb2hsv(img_rgb)
     diff = color_hsv - img_hsv
 

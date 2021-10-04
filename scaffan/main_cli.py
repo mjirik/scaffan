@@ -216,7 +216,7 @@ def install():
     multiple=True,
     default=[],
     nargs=2,
-    help='Seeds in milimeters. Can be used miltiple times.'
+    help="Seeds in milimeters. Can be used miltiple times."
     "python -m scaffan gui -smm 1.0 1.0 -smm 2.0 2.0",
 )
 def nogui(input_path, color, output_path, config_file, params, seeds_mm):

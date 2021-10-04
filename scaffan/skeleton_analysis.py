@@ -190,8 +190,8 @@ class SkeletonAnalysis:
         )
         raw_skeleton = imthr.copy()
         if self.report is not None:
-            self.imsave("lobulus_raw_skeleton_{}.png", raw_skeleton,severity=40)
-        gs = skimage.filters.gaussian((skeleton>0).astype(np.uint8), sigma=10)
+            self.imsave("lobulus_raw_skeleton_{}.png", raw_skeleton, severity=40)
+        gs = skimage.filters.gaussian((skeleton > 0).astype(np.uint8), sigma=10)
         skeleton[gs > 0.001] = 0
         sumskel = np.sum(skeleton)
         logger.debug(
@@ -232,8 +232,10 @@ class SkeletonAnalysis:
 
             logger.debug("Preparing low resoluion skeleton...")
             skeleton_lowres = scipy.ndimage.zoom(
-                skimage.morphology.binary_dilation((skeleton>0).astype(np.uint8), skimage.morphology.disk(2)).astype(np.uint8),
-                0.5
+                skimage.morphology.binary_dilation(
+                    (skeleton > 0).astype(np.uint8), skimage.morphology.disk(2)
+                ).astype(np.uint8),
+                0.5,
             )
             self.imsave("skeleton_lowres_{}.png", skeleton_lowres, 60)
             # plt.imsave(op.join(self.report.outputdir, "skeleton_thr_lobulus_{}.png".format(self.annotation_id)), skeleton.astype(np.uint8) + imthr + detail_mask)
@@ -292,9 +294,7 @@ class SkeletonAnalysis:
             )
             datarow[
                 f"Equivalent skeleton length density [{area_unit}/{area_unit}^2]"
-            ] = (
-                datarow["Skeleton length"] / datarow["Lobulus Equivalent Surface"]
-            )
+            ] = (datarow["Skeleton length"] / datarow["Lobulus Equivalent Surface"])
         else:
             # probably area can be estimated by view area
             logger.debug(

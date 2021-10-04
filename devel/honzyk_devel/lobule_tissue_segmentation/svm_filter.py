@@ -34,10 +34,10 @@ class SvmFilter(Filter):
 
         return filter_mask
 
-    def load_model(self, file_name='svm_filter.npy'):
-        with open(file_name, 'rb') as file:
+    def load_model(self, file_name="svm_filter.npy"):
+        with open(file_name, "rb") as file:
             self.model = plk.load(file)
 
-    def save_model(self, file_name='svm_filter.npy'):
-        with open(file_name, 'wb') as file:
+    def save_model(self, file_name="svm_filter.npy"):
+        with open(file_name, "wb") as file:
             plk.dump(self.model, file)
