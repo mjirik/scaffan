@@ -117,7 +117,8 @@ class WsiColorFilter:
 
             chsv_data.append(datai)
 
-        chsv_data = np.concatenate(chsv_data, axis=0)
+        if len(chsv_data) > 0:
+            chsv_data = np.concatenate(chsv_data, axis=0)
 
         # Do the training
         # models = {}

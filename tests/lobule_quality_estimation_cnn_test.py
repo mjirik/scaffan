@@ -71,8 +71,9 @@ def test_tensorflow_load():
 
     # cnn_model_version = str(self.parameters.param("Version").value())
     # model_path = self._get_devel_model_path()
-    model_path = Path(__file__).parent.parent / "scaffan" / "v1.h5"
-    model_path = Path("./../scaffan/v1.h5").absolute()
+    # scaffan.__file__
+    model_path = Path(scaffan.__file__).parent.parent / "scaffan" / "v1.h5"
+    # model_path = Path("./../scaffan/v1.h5").absolute()
     logger.debug(model_path)
     logger.debug(model_path.exists())
     model_path_str = str(model_path)

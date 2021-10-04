@@ -191,6 +191,6 @@ def test_read_annotations_czi():
     img = view.get_region_image(as_gray=False)
     assert np.max(img) > 50
     assert np.min(img) < 150
-    plt.imshow(img)
-    view.plot_annotations()
-    plt.show()
+    # plt.imshow(img)
+    # view.plot_annotations()
+    # plt.show()

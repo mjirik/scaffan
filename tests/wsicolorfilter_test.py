@@ -69,8 +69,11 @@ def test_change_color_of_wsi():
     # plt.hist(chsv_proba2.flatten(), bins=np.linspace(0, 1, 20))
     # plt.show()
 
-    if True:
-    # if False:
+    # if True:
+    assert np.max(list(probas.values())[0]) > 0.6
+    assert np.min(list(probas.values())[0]) < 0.4
+
+    if False:
         plti = 420
         plt.subplot(plti + 1)
         plt.imshow(img)
@@ -107,12 +110,8 @@ def test_change_color_of_wsi():
         # plt.subplot(plti+ 8)
         # plt.imshow(chsv_proba2_img_exp)
         # plt.colorbar()
-    # plt.contour(mask)
-
-
-
+        # plt.contour(mask)
         plt.show()
-
 
 
 def test_change_color():
