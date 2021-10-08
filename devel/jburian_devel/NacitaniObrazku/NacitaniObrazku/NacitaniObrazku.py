@@ -5,13 +5,14 @@ import sys
 #path_to_script =  Path("~/miniconda3/envs/scaffan/").expanduser()
 #sys.path.insert(0,str(path_to_script))
 import scaffan
-import io3d # just to get data
+import io3d  #just to get data
 import scaffan.image as scim
 import matplotlib.pyplot as plt
 import xml.etree.ElementTree as ET
 from xml.dom import minidom
 from czifile import CziFile
 import numpy as np
+import skimage.io
 
 # Get the data
 io3d.datasets.download("SCP003", dry_run=True)
@@ -143,7 +144,34 @@ def insert_zeiss_annotation_rectangle(anim, listOfRectangles, pixelSizeMM):
         plt.imshow(img)
         view.plot_annotations()
         plt.show()
-  
+
+def get_bezier_annotations(anim, listOfBeziers, pixelSizeMM):
+    if (len(listOfBeziers) != 0):
+        anim.annotations = []
+        for bezier in listOfBeziers:
+            x_mm = []
+            y_mm = []
+            for tuple_XY in bezier:
+                x_mm.append(tuple_XY[0])
+                y_mm.append(tuple_XY[1])
+
+            x_px = np.asarray(x_mm) / pixelSizeMM[0][0]
+            y_px = np.asarray(y_mm) / pixelSizeMM[0][1]
+
+            anim.annotations.append({"x_mm": x_mm, "y_mm": y_mm, "color": "#ff0000", "x_px": x_px, "y_px": y_px})
+
+        return anim.annotations
+
+def annotations_to_img(anim, annotations):
+    for i in range(len(annotations)):
+        views = anim.get_views([i], pixelsize_mm = [0.001, 0.001])
+        #views = anim.get_views([i])
+        view = views[0]
+        img = view.get_region_image(as_gray = False)
+        img_name = "annotation" + str(i) + ".jpg"
+        skimage.io.imsave(img_name, img)
+
+
 # Nacteni elementu ze souboru XML -> elementy ulozene do prislusnych listu
 #picture_path = Path(r"G:\.shortcut-targets-by-id\18TvIZlK5UywpgyOLb6xGOA07h2ZZesN7\Scaffold_implants\I13_S1_1\I13_S1_1.czi")
 picture_path_annotation = Path(r"H:\zeiss_test_shapes.czi")
@@ -163,6 +191,9 @@ listOfBeziers, listOfCircles, listOfRectangles, listOfEllipses = load_zeiss_elem
 insert_zeiss_annotation_bezier(anim, listOfBeziers, pixelSizeMM, [1], margin = 2.0)
 insert_zeiss_annotation_rectangle(anim, listOfRectangles, pixelSizeMM)
 
+# Ziskani a ulozeni anotaci jako .jpg
+bezier_annotations = get_bezier_annotations(anim, listOfBeziers, pixelSizeMM)
+annotations_to_img(anim, bezier_annotations)
 
 # Get grayscale image by center
 pixelsize_mm = [0.005, 0.005]
