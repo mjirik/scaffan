@@ -19,70 +19,58 @@ import pickle as plk
 from image_with_mask import ImageWithMask
 
 FILE_NAME = "PIG-002_J-18-0091_HE.ndpi"
-FILE_PATH = "D:\\FAV\\Scaffold\\Scaffan-analysis\\"
+FILE_PATH = 'D:\\FAV\\Scaffold\\Scaffan-analysis\\'
 
 EXCEL_NAME = "parameter_table_SNI_HOM.xlsx"
-EXCEL_PATH = "D:\\FAV\\Scaffold\\homogeneity\\"
+EXCEL_PATH = 'D:\\FAV\\Scaffold\\homogeneity\\'
+
 
 
 DISPLAY_SIZE = 80
 
-TRAIN_DATA_SAVE_FILE = "D:\\FAV\\Scaffold\\data\\train_data.npy"
-TRAIN_LABELS_SAVE_FILE = "D:\\FAV\\Scaffold\\data\\train_labels.npy"
-TEST_DATA_SAVE_FILE = "D:\\FAV\\Scaffold\\data\\test_data.npy"
-TEST_LABELS_SAVE_FILE = "D:\\FAV\\Scaffold\\data\\test_labels.npy"
-LOBULUS_DATA_SAVE_FILE = "D:\\FAV\\Scaffold\\data\\lobulus_data.npy"
-LOBULUS_LABELS_SAVE_FILE = "D:\\FAV\\Scaffold\\data\\lobulus_labels.npy"
+TRAIN_DATA_SAVE_FILE = 'D:\\FAV\\Scaffold\\data\\train_data.npy'
+TRAIN_LABELS_SAVE_FILE = 'D:\\FAV\\Scaffold\\data\\train_labels.npy'
+TEST_DATA_SAVE_FILE = 'D:\\FAV\\Scaffold\\data\\test_data.npy'
+TEST_LABELS_SAVE_FILE = 'D:\\FAV\\Scaffold\\data\\test_labels.npy'
+LOBULUS_DATA_SAVE_FILE = 'D:\\FAV\\Scaffold\\data\\lobulus_data.npy'
+LOBULUS_LABELS_SAVE_FILE = 'D:\\FAV\\Scaffold\\data\\lobulus_labels.npy'
 
-MASK_MAP_PATH = "D:\\FAV\\Scaffold\\data\\mask_map.json"
-MASKS_PATH = "D:\\FAV\\Scaffold\\data\\masks.plk"
-IMAGES_PATH = "D:\\FAV\\Scaffold\\data\\images.plk"
+MASK_MAP_PATH = 'D:\\FAV\\Scaffold\\data\\mask_map.json'
+MASKS_PATH = 'D:\\FAV\\Scaffold\\data\\masks.plk'
+IMAGES_PATH = 'D:\\FAV\\Scaffold\\data\\images.plk'
 
 CUT_SIZE = 0.2  # Size of training data [mm]
 STEPS_PER_CUT = 4
 
 
 def get_annotation_ids_for_file(source_file_name, excel_df):
-    anotation_ids = excel_df.loc[
-        (excel_df["File Name"] == source_file_name), ["Annotation ID"]
-    ].values[:, 0]
+    anotation_ids = excel_df.loc[(excel_df['File Name'] == source_file_name), ['Annotation ID']].values[:, 0]
 
     return anotation_ids
 
 
 def get_homogenity(source_fname, excel_df, ann_id):
-    homo = excel_df.loc[
-        (excel_df["File Name"] == source_fname) & (excel_df["Annotation ID"] == ann_id),
-        ["HOM"],
-    ]
+    homo = excel_df.loc[(excel_df['File Name'] == source_fname) & (excel_df['Annotation ID'] == ann_id), ['HOM']]
     return homo.values[0][0]
 
-
 def get_sni(source_fname, excel_df, ann_id):
-    sni = excel_df.loc[
-        (excel_df["File Name"] == source_fname) & (excel_df["Annotation ID"] == ann_id),
-        ["SNI"],
-    ]
+    sni = excel_df.loc[(excel_df['File Name'] == source_fname) & (excel_df['Annotation ID'] == ann_id), ['SNI']]
     return sni.values[0][0]
 
 
 def my_plot(img, ann_id, hom, details):
-    img = cv2.resize(
-        img, dsize=(DISPLAY_SIZE, DISPLAY_SIZE), interpolation=cv2.INTER_CUBIC
-    )
+    img = cv2.resize(img, dsize=(DISPLAY_SIZE, DISPLAY_SIZE), interpolation=cv2.INTER_CUBIC)
     plt.figure()
-    plt.title("ID: " + str(ann_id) + ", HOM: " + str(hom) + ", " + details)
-    plt.imshow(img, cmap="gray")
+    plt.title('ID: ' + str(ann_id) + ', HOM: ' + str(hom) + ', ' + details)
+    plt.imshow(img, cmap='gray')
 
 
 def get_all_filenames(excel_df):
-    return enumerate(set(excel_df["File Name"].tolist()))
+    return enumerate(set(excel_df['File Name'].tolist()))
 
 
 def shrink_image(img):
-    return cv2.resize(
-        img, dsize=(DISPLAY_SIZE, DISPLAY_SIZE), interpolation=cv2.INTER_CUBIC
-    )
+    return cv2.resize(img, dsize=(DISPLAY_SIZE, DISPLAY_SIZE), interpolation=cv2.INTER_CUBIC)
 
 
 def cut_the_image(mask_img, overlap=True):
@@ -178,8 +166,8 @@ def remove_images_with_0_hom(data, labels):
         else:
             i = i + 1
 
-    return data, labels
 
+    return data, labels
 
 def shufle_data(data, labels):
     data_count = labels.shape[-1]
@@ -191,7 +179,7 @@ def shufle_data(data, labels):
 def split_train_test(data, labels, test_portion=0.1):
     assert 1 > test_portion > 0
     data_count = labels.shape[-1]
-    split_index = round((1 - test_portion) * data_count)
+    split_index = round((1-test_portion)*data_count)
 
     train_data = data[:, :, 0:split_index]
     test_data = data[:, :, split_index:data_count]
@@ -223,7 +211,6 @@ def extend_data_blur(data, labels):
 
     return data, labels
 
-
 def create_lobulus_dataset(mask_imgs, mask_map, excel_df, test_ratio):
     train_data = np.zeros((DISPLAY_SIZE, DISPLAY_SIZE, 0))  # cropped images
     train_labels = np.zeros((2, 0))  # [SCI, HOM]
@@ -235,12 +222,12 @@ def create_lobulus_dataset(mask_imgs, mask_map, excel_df, test_ratio):
         hom = get_homogenity(mask_img.file_name, excel_df, mask_img.ann_id)
         sni = get_sni(mask_img.file_name, excel_df, mask_img.ann_id) / 2
 
-        if not sni or not (sni >= 0 and sni <= 1):
-            print("Skipping data with missing SNI")
+        if not sni or not (sni >= 0 and sni <=1 ):
+            print('Skipping data with missing SNI')
             continue
 
         if hom < 0.01:
-            print("Skipping data with homogeneity < 0.01")
+            print('Skipping data with homogeneity < 0.01')
             continue
 
         cuts = cut_the_image(mask_img)
@@ -248,59 +235,40 @@ def create_lobulus_dataset(mask_imgs, mask_map, excel_df, test_ratio):
 
         for cut_point in cuts:
 
-            image_crop = mask_img.image[
-                cut_point[1] : cut_point[1] + crop_size,
-                cut_point[0] : cut_point[0] + crop_size,
-            ]
+            image_crop = mask_img.image[cut_point[1]:cut_point[1] + crop_size, cut_point[0]:cut_point[0] + crop_size]
 
             if image_crop.shape[0] < DISPLAY_SIZE:
-                print("Skipping cropped image which is smaller than display size.")
+                print('Skipping cropped image which is smaller than display size.')
                 # Throw away images with too low resolution
                 continue
 
             image_crop = shrink_image(image_crop)
 
             if i % test_ratio == 0:
-                test_data = np.append(
-                    test_data, image_crop.reshape(DISPLAY_SIZE, DISPLAY_SIZE, 1), axis=2
-                )
-                test_labels = np.append(
-                    test_labels, np.asarray([hom, sni]).reshape(2, 1), axis=1
-                )
+                test_data = np.append(test_data, image_crop.reshape(DISPLAY_SIZE, DISPLAY_SIZE, 1), axis=2)
+                test_labels = np.append(test_labels, np.asarray([hom, sni]).reshape(2, 1), axis=1)
             else:
-                train_data = np.append(
-                    train_data,
-                    image_crop.reshape(DISPLAY_SIZE, DISPLAY_SIZE, 1),
-                    axis=2,
-                )
-                train_labels = np.append(
-                    train_labels, np.asarray([hom, sni]).reshape(2, 1), axis=1
-                )
+                train_data = np.append(train_data, image_crop.reshape(DISPLAY_SIZE, DISPLAY_SIZE, 1), axis=2)
+                train_labels = np.append(train_labels, np.asarray([hom, sni]).reshape(2, 1), axis=1)
+
 
     return train_data, train_labels, test_data, test_labels
-
 
 def visual_1(lobulus):
     cuts = cut_the_image(lobulus)
 
     fig, ax = plt.subplots(1)
-    ax.imshow(lobulus.lobulus_mask.astype(float) * lobulus.image)
+    ax.imshow(lobulus.lobulus_mask.astype(float)*lobulus.image)
 
     for point in cuts:
-        rect = patches.Rectangle(
-            (point[0], point[1]),
-            int((1 / lobulus.view.region_pixelsize[0]) * CUT_SIZE),
-            int((1 / lobulus.view.region_pixelsize[0]) * CUT_SIZE),
-            linewidth=1,
-            edgecolor="r",
-            facecolor="none",
-        )
+        rect = patches.Rectangle((point[0], point[1]), int((1 / lobulus.view.region_pixelsize[0]) * CUT_SIZE),
+                                 int((1 / lobulus.view.region_pixelsize[0]) * CUT_SIZE), linewidth=1, edgecolor='r',
+                                 facecolor='none')
         ax.add_patch(rect)
 
     plt.show()
 
     print(cuts)
-
 
 def save_lobulus_masks(excel_path, ndpi_directory):
     mask_imgs = []
@@ -326,22 +294,15 @@ def save_lobulus_masks(excel_path, ndpi_directory):
 
             lobulus = load_lobulus(anim, ann)
 
-            mask_imgs.append(
-                ImageWithMask(
-                    lobulus.image,
-                    lobulus.lobulus_mask,
-                    file_name,
-                    ann,
-                    lobulus.view.region_pixelsize[0],
-                )
-            )
+            mask_imgs.append(ImageWithMask(lobulus.image, lobulus.lobulus_mask, file_name, ann, lobulus.view.region_pixelsize[0]))
 
             mask_index = mask_index + 1
 
-    with open(MASK_MAP_PATH, "w") as fp:
+    with open(MASK_MAP_PATH, 'w') as fp:
         json.dump(mask_map, fp)
 
-    plk.dump(mask_imgs, open(MASKS_PATH, "wb"))
+    plk.dump(mask_imgs, open(MASKS_PATH, 'wb'))
+
 
 
 def create_training_data(excel_path, ndpi_directory):
@@ -360,18 +321,16 @@ def create_training_data(excel_path, ndpi_directory):
 
     # Phase 1: extract data from excel and .ndpi files using lobulus mask
     if os.path.exists(MASKS_PATH) and os.path.exists(MASK_MAP_PATH):
-        mask_imgs = plk.load(open(MASKS_PATH, "rb"))
-        with open(MASK_MAP_PATH, "r") as f:
+        mask_imgs = plk.load(open(MASKS_PATH, 'rb'))
+        with open(MASK_MAP_PATH, 'r') as f:
             mask_map = json.load(f)
     else:
-        print("No data found. Create lobulus masks started.")
+        print('No data found. Create lobulus masks started.')
         save_lobulus_masks(EXCEL_PATH + EXCEL_NAME, ndpi_directory)
         return
 
     excel_df = pd.read_excel(excel_path)
-    train_data, train_labels, test_data, test_labels = create_lobulus_dataset(
-        mask_imgs, mask_map, excel_df, 10
-    )
+    train_data, train_labels, test_data, test_labels = create_lobulus_dataset(mask_imgs, mask_map, excel_df, 10)
     # np.save(LOBULUS_DATA_SAVE_FILE, data)
     # np.save(LOBULUS_LABELS_SAVE_FILE, labels)
 
@@ -393,12 +352,11 @@ def create_training_data(excel_path, ndpi_directory):
     return train_data, test_data, train_labels, test_labels
 
 
-if __name__ == "__main__":
+
+if __name__ == '__main__':
     # matplotlib problem fix
-    matplotlib.use("TkAgg")
-    train_data, test_data, train_labels, test_labels = create_training_data(
-        EXCEL_PATH + EXCEL_NAME, FILE_PATH
-    )
+    matplotlib.use('TkAgg')
+    train_data, test_data, train_labels, test_labels = create_training_data(EXCEL_PATH + EXCEL_NAME, FILE_PATH)
 
     np.save(TRAIN_DATA_SAVE_FILE, train_data)
     np.save(TRAIN_LABELS_SAVE_FILE, train_labels)

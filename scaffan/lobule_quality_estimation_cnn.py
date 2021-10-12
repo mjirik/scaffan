@@ -9,9 +9,7 @@ import chainer.links as L
 from chainer import serializers
 import os
 from pathlib import Path
-
-# from pprint import pprint, pformat
-# import time
+import time
 
 # import cv2 # pokud potřebujeme jen měnit velikost, raději bych cv2 ze závislostí vynechal
 import skimage.transform
@@ -75,11 +73,6 @@ class LobuleQualityEstimationCNN:
         pass
 
     def init(self, force_download_model=False):
-        import tensorflow
-
-        logger.debug(
-            f"tensorflow version={tensorflow.__version__}, pth={tensorflow.__file__}"
-        )
         from tensorflow.keras.models import load_model
 
         # načtení architektury modelu
@@ -89,9 +82,7 @@ class LobuleQualityEstimationCNN:
         model_path = self._get_devel_model_path()
         if not model_path.exists() or force_download_model:
             model_path = self.download_model(cnn_model_version)
-        logger.debug(
-            f"model_path[{str(type(model_path))}]={model_path} ; exists={model_path.exists()}"
-        )
+        logger.debug(f"model_path[{str(type(model_path))}]={model_path}")
         # model_path = str(model_path)
         # logger.debug(f"model_path[{type(model_path)}:{model_path}")
         # TODO fix the problem with cuda

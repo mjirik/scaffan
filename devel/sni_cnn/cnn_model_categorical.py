@@ -13,16 +13,15 @@ import matplotlib
 import numpy as np
 from tensorflow import saved_model
 
-TRAIN_DATA_SAVE_FILE = "D:\\FAV\\Scaffold\\data\\train_data.npy"
-TRAIN_LABELS_SAVE_FILE = "D:\\FAV\\Scaffold\\data\\train_labels.npy"
-TEST_DATA_SAVE_FILE = "D:\\FAV\\Scaffold\\data\\test_data.npy"
-TEST_LABELS_SAVE_FILE = "D:\\FAV\\Scaffold\\data\\test_labels.npy"
+TRAIN_DATA_SAVE_FILE = 'D:\\FAV\\Scaffold\\data\\train_data.npy'
+TRAIN_LABELS_SAVE_FILE = 'D:\\FAV\\Scaffold\\data\\train_labels.npy'
+TEST_DATA_SAVE_FILE = 'D:\\FAV\\Scaffold\\data\\test_data.npy'
+TEST_LABELS_SAVE_FILE = 'D:\\FAV\\Scaffold\\data\\test_labels.npy'
 
 DISPLAY_SIZE = 80
 
 BATCH_SIZE = 64
 EPOCHS = 10
-
 
 def categorize_labels(labels):
     data_count = labels.shape[0]
@@ -30,9 +29,10 @@ def categorize_labels(labels):
 
     lbls = labels.reshape((data_count,))
 
+
     label_values = list(set(lbls))
 
-    print("Label categories: " + str(label_values))
+    print('Label categories: ' + str(label_values))
 
     # labels = np.zeros((labels.shape[0], len(label_values)))
 
@@ -74,39 +74,32 @@ def load_data():
 
 
 def create_model():
-    model = Sequential(
-        [
-            BatchNormalization(input_shape=(DISPLAY_SIZE, DISPLAY_SIZE, 1)),
-            Conv2D(
-                128,
-                (3, 3),
-                activation="relu",
-                input_shape=(DISPLAY_SIZE, DISPLAY_SIZE, 1),
-            ),
-            MaxPool2D((2, 2)),
-            Dropout(0.2),
-            Conv2D(128, (3, 3), activation="relu"),
-            MaxPool2D((2, 2)),
-            Dropout(0.2),
-            Conv2D(128, (3, 3), activation="relu"),
-            MaxPool2D((2, 2)),
-            Flatten(),
-            Dense(512, activation="relu"),
-            Dropout(0.2),
-            Dense(256, activation="relu"),
-            Dropout(0.2),
-            Dense(128, activation="relu"),
-            Dropout(0.2),
-            Dense(128, activation="relu"),
-            Dropout(0.2),
-            Dense(6, activation="softmax", use_bias=False),
-        ]
-    )
+    model = Sequential([
+        BatchNormalization(input_shape=(DISPLAY_SIZE, DISPLAY_SIZE, 1)),
+        Conv2D(128, (3, 3), activation='relu', input_shape=(DISPLAY_SIZE, DISPLAY_SIZE, 1)),
+        MaxPool2D((2, 2)),
+        Dropout(0.2),
+        Conv2D(128, (3, 3), activation='relu'),
+        MaxPool2D((2, 2)),
+        Dropout(0.2),
+        Conv2D(128, (3, 3), activation='relu'),
+        MaxPool2D((2, 2)),
+        Flatten(),
+        Dense(512, activation='relu'),
+        Dropout(0.2),
+        Dense(256, activation='relu'),
+        Dropout(0.2),
+        Dense(128, activation='relu'),
+        Dropout(0.2),
+        Dense(128, activation='relu'),
+        Dropout(0.2),
+        Dense(6, activation='softmax', use_bias=False)
+    ])
 
     return model
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     train_x, train_y, train_weights, test_x, test_y, test_weights = load_data()
 
     # train_y.reshape((train_y.shape[0], train_y.shape[1], 1))
@@ -117,25 +110,23 @@ if __name__ == "__main__":
 
     model = create_model()
     model.summary()
-    model.compile(
-        optimizer="adam", loss="sparse_categorical_crossentropy", metrics=["accuracy"]
-    )
+    model.compile(optimizer='adam',
+                  loss='sparse_categorical_crossentropy',
+                  metrics=['accuracy'])
 
-    history = model.fit(
-        train_x,
-        train_y,
-        epochs=EPOCHS,
-        batch_size=BATCH_SIZE,
-        sample_weight=train_weights,
-        validation_data=(test_x, test_y, test_weights),
-    )
+    history = model.fit(train_x, train_y,
+                        epochs=EPOCHS,
+                        batch_size=BATCH_SIZE,
+                        sample_weight=train_weights,
+                        validation_data=(test_x, test_y, test_weights))
 
     saved_model.save(model, "export_categorical/")
 
-    matplotlib.use("TkAgg")
+    matplotlib.use('TkAgg')
     plt.figure()
-    plt.plot(history.history["accuracy"], label="accuracy")
-    plt.plot(history.history["val_accuracy"], label="val accuracy")
-    plt.xlabel("Epoch")
-    plt.legend(["accuracy", "val accuracy"])
+    plt.plot(history.history['accuracy'], label='accuracy')
+    plt.plot(history.history['val_accuracy'], label='val accuracy')
+    plt.xlabel('Epoch')
+    plt.legend(['accuracy', 'val accuracy'])
     plt.show()
+

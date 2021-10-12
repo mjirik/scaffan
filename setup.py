@@ -12,7 +12,7 @@ setup(
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # http://packaging.python.org/en/latest/tutorial.html#version
-    version="0.31.2",
+    version="0.29.18",
     url="https://github.com//scaffan",
     author="Miroslav Jirik",
     author_email="miroslav.jirik@gmail.com",
@@ -59,26 +59,17 @@ setup(
     # have to be included in MANIFEST.in as well.
     package_data={
         "sample1": ["scaffan_icon256.png"],
-        "": [
-            "*.png",
-            "*.ico",
-            "*.joblib",
-            "*.pkl",
-            "*.model",
-            # "*.h5"
-        ],
+        "": ["*.png", "*.ico", "*.joblib", "*.pkl", "*.model",
+             # "*.h5"
+             ],
         # "sample2": ["scaffan/scaffan_icon256.png"],
         "segmentation_model_HCTFS": ["segmentation_model_HCTFS.pkl"],
         "segmentation_model_GLCMTFS": ["segmentation_model_GLCMTFS.pkl"],
         # "segmentation_model_not_working": ["scaffan/segmentation_model.pkl"],
-        "cnn_model": [
-            "posenet_highLR.model"
-        ],  # if it works the scaffan way is the right one
+        "cnn_model": ["posenet_highLR.model"], # if it works the scaffan way is the right one
         "sni_area": ["SNI_area_regressor.joblib"],
         "segmentation_model_default_HCTFS": ["segmentation_model_default_HCTFS.pkl"],
-        "segmentation_model_default_GLCMTFS": [
-            "segmentation_model_default_GLCMTFS.pkl"
-        ],
+        "segmentation_model_default_GLCMTFS": ["segmentation_model_default_GLCMTFS.pkl"],
         # "segmentation_model_default_not_working": ["scaffan/segmentation_model_default.pkl"],
         # "cnn_model_not_working": ["scaffan/posenet_highLR.model"],
         # "sni_area_not_working": ["scaffan/SNI_area_regressor.joblib"],

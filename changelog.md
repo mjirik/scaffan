@@ -1,26 +1,8 @@
 # Changelog
 
-Latest version: 0.31.2
+Latest version: 0.29.18
 
 # Not released
-* [Added] Slide segmentation model filename prefix for easier testing
-* [Changed] "Scan Segmentation" renamed to "Whole Scan Segmentation"
-* [Added] Ability to remove some colors from the image by Color Filter
-* [Fixed] Empty manual lobule segmentation for central vein if no central is present
-
-# 0.31
-
-
-* [Added] Calculation of relative metrics (e.g. Skeleton length density and  Equivalent skeleto length density)
-* [Fixed] Problem in testing caused by Path used in sys.path
-* [Added] Read CZI images cropped by Zen Blue
-* [Added] Ability to reset evaluation history after each lobule to save memory
-
-# 0.30
-
-* [Changed] Skeleton analysis - removed areas with hight density of skeleton
-* [Added] Low resolution image of skeleton (intended for web)
-* [Added] Generate preview with numbers of annotations
 
 # 0.29
 
@@ -106,17 +88,17 @@ Latest version: 0.31.2
 
 * [Added] Get view by center in mm
 
-# 0.14
+## 0.14
 
 * [Changed] Compacntess definition
 * [Fixed] Problem with percentile evaluation
 * [Fixed] Debug print on annotation read fail
 
-# 0.13
+## 0.13
 
 * [Added] GLCM texture feature percentile added
 
-# 0.12
+## 0.12
 
 * [Added] Ability to supress exception if no color found (usefull for batch processing)
 * [Added] Calculate perimeter of lobulus
@@ -124,36 +106,36 @@ Latest version: 0.31.2
 * [Changed] Report levels for various output images
 
 
-# 0.11
+## 0.11
 
 * [Added] If more control annotations for central vein are given, use them all.
 * [Added] Testing for manual segmentation
 * [Fixed] Manual segmentation for lobulus border only
 
-# 0.10
+## 0.10
 
 * [Added] Use manual lobulus segmentation with black color
 * [Fixed] Fixed problem in openslide with location idivisible by level scale
 
-# 0.9
+## 0.9
 
 * [Added] Persistent columns added to all rows for description of an experiment
 * [Added] Control parameters from command line
 * [Added] Jaccard index calculation added to lobulus segmentation evaluation
 * [Added] All application parameters are in spreadsheet now
 
-# 0.8
+## 0.8
 
 * [Added] Previous location of Common spreadsheet file is used if available
 * [Added] Annotation title and details are stored to .xls file
 
-# 0.7
+## 0.7
 * [Added] Save all data also into common .xlsx file
 * [Added] Computer info saved into spreadsheet
 * [Added] Image raw input stored to .npz files
 
 
-# 0.6
+## 0.6
 
 * [Added] Data file info in GUI
 * [Added] GLCM texture features analysis independent on input data pixelsize
@@ -169,15 +151,15 @@ Latest version: 0.31.2
 * [Added] Algorithm evaluation added
 * [Added] Lobulus border segmentation and Central vein segmentation evaluation
 
-# 0.4
+## 0.4
 
 * [Added] Create desktop icon from command line
 
-# 0.3
+## 0.3
 
 * [Added] Support for Openslide on 32-bit Windows
 
-# 0.2
+## 0.2
 
 * [Added] Suppression of unimportant warnings
 * [Added] Black code format 
@@ -186,7 +168,7 @@ Latest version: 0.31.2
 * [Added] Logo added
 * [Added] Icon added into window title
 
-# 0.1
+## 0.1
 
 * [Added] Version number in window title
 * [Added] Skeleton threshold is calculated from inner part of lobulus
@@ -198,7 +180,7 @@ Latest version: 0.31.2
 * [Changed] Threshold level for central vein segmentation 
 * [Changed] Size of view according to size of user input increased
 
-# 0.0
+## 0.0
 * [Added] AnotatedImage class
 * [Added] Read pixelsize from image
 * [Added] Export annotation to json

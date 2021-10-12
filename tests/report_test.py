@@ -51,5 +51,5 @@ class ReportTest(unittest.TestCase):
         report.finish_actual_row()
         report.dump()
 
-        df = pd.read_excel(commonsheet, engine='openpyxl')
+        df = pd.read_excel(commonsheet)
         self.assertEqual(len(df), 3, "3 lines expected in the excel file")
