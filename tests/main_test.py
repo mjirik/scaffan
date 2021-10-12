@@ -73,8 +73,8 @@ class MainGuiTest(unittest.TestCase):
         )
         mainapp.set_parameter("Processing;Skeleton Analysis", False)
         mainapp.set_parameter("Processing;Texture Analysis", False)
-        mainapp.set_parameter("Processing;Whole Scan Segmentation;TFS General;Run Training", True)
-        mainapp.set_parameter("Processing;Whole Scan Segmentation;Lobulus Number", 3)
+        mainapp.set_parameter("Processing;Scan Segmentation;TFS General;Run Training", True)
+        mainapp.set_parameter("Processing;Scan Segmentation;Lobulus Number", 3)
 
         # mainapp.set_parameter("Input;Lobulus Selection Method", "Manual")
 
@@ -139,11 +139,11 @@ class MainGuiTest(unittest.TestCase):
         mainapp.set_parameter(
             "Processing;Lobulus Segmentation;Manual Segmentation", False
         )
-        # dont waste time with Whole Scan Segmentation. It is not used in the test
+        # dont waste time with scan segmentation. It is not used in the test
         mainapp.set_parameter(
             "Processing;Lobulus Segmentation;Annotation Margin", view_border
         )  # add 20%
-        mainapp.set_parameter("Processing;Whole Scan Segmentation", False)
+        mainapp.set_parameter("Processing;Scan Segmentation", False)
         mainapp.set_parameter("Processing;Skeleton Analysis", False)
         mainapp.set_parameter("Processing;Texture Analysis", False)
         original_foo = scaffan.image.AnnotatedImage.get_annotations_by_color
@@ -204,11 +204,10 @@ class MainGuiTest(unittest.TestCase):
         mainapp.set_parameter(
             "Processing;Lobulus Segmentation;Manual Segmentation", True
         )
-        # dont waste time with Whole Scan Segmentation. It is not used in the test
-        mainapp.set_parameter("Processing;Whole Scan Segmentation", False)
+        # dont waste time with scan segmentation. It is not used in the test
+        mainapp.set_parameter("Processing;Scan Segmentation", False)
         mainapp.set_parameter("Processing;Skeleton Analysis", True)
         mainapp.set_parameter("Processing;Texture Analysis", True)
-        mainapp.keep_evaluation_history_for_each_lobule = True
 
         mainapp.run_lobuluses()
         self.assert_dice_in_first_evaluated_data(mainapp, error_threshold, i=0)
@@ -337,7 +336,7 @@ class MainGuiTest(unittest.TestCase):
 
     def _testing_slide_segmentation_clf(self, fns, segmentation_method, whole_scan_margin=0.0):
         """
-        Run whole Whole Scan Segmentation on all input files and check whether all three labels are
+        Run whole scan segmentation on all input files and check whether all three labels are
         represented in the output labeling.
 
         :param fns:
@@ -363,18 +362,18 @@ class MainGuiTest(unittest.TestCase):
             mainapp.set_parameter("Processing;Texture Analysis", False)
             mainapp.set_parameter("Processing;Open output dir", False)
             mainapp.set_parameter(
-                "Processing;Whole Scan Segmentation;TFS General;Clean Before Training", False
+                "Processing;Scan Segmentation;TFS General;Clean Before Training", False
             )
             mainapp.set_parameter(
-                "Processing;Whole Scan Segmentation;Segmentation Method", segmentation_method
+                "Processing;Scan Segmentation;Segmentation Method", segmentation_method
             )
             mainapp.set_parameter(
-                "Processing;Whole Scan Segmentation;TFS General;Run Training", False
+                "Processing;Scan Segmentation;TFS General;Run Training", False
             )
 
             # Set some Unet parameter here. It is used if the U-Net Segmentation method is used.
-            # mainapp.set_parameter("Processing;Whole Scan Segmentation;U-Net;Some Parameter", False)
-            mainapp.set_parameter("Processing;Whole Scan Segmentation;Lobulus Number", 0)
+            # mainapp.set_parameter("Processing;Scan Segmentation;U-Net;Some Parameter", False)
+            mainapp.set_parameter("Processing;Scan Segmentation;Lobulus Number", 0)
             mainapp.set_parameter("Processing;Whole Scan Margin", whole_scan_margin)
             # mainapp.start_gui(qapp=qapp)
 
@@ -432,8 +431,7 @@ class MainGuiTest(unittest.TestCase):
         logger.debug(f"classificator prior modification time: {modtime0}")
         if stride:
             logger.debug(f"setting stride {stride}")
-            mainapp.set_parameter("Processing;Whole Scan Segmentation;TFS General;Training Stride", stride)
-        mainapp.slide_segmentation._segmentation_model_filename_prefix="segmentation_model_test_"
+            mainapp.set_parameter("Processing;Scan Segmentation;TFS General;Training Stride", stride)
         mainapp.train_scan_segmentation(fns)
 
         # for i, fn in enumerate(fns):
@@ -448,9 +446,9 @@ class MainGuiTest(unittest.TestCase):
         #     mainapp.set_parameter("Processing;Texture Analysis", False)
         #     if i == 0:
         #     else:
-        #         mainapp.set_parameter("Processing;Whole Scan Segmentation;TFS General;Clean Before Training", False)
-        #     mainapp.set_parameter("Processing;Whole Scan Segmentation;TFS General;Run Training", True)
-        #     mainapp.set_parameter("Processing;Whole Scan Segmentation;Lobulus Number", 0)
+        #         mainapp.set_parameter("Processing;Scan Segmentation;TFS General;Clean Before Training", False)
+        #     mainapp.set_parameter("Processing;Scan Segmentation;TFS General;Run Training", True)
+        #     mainapp.set_parameter("Processing;Scan Segmentation;Lobulus Number", 0)
         #     # mainapp.start_gui(qapp=qapp)
         #     mainapp.run_lobuluses()
 
@@ -492,14 +490,14 @@ class MainGuiTest(unittest.TestCase):
         #     mainapp.set_parameter("Processing;Texture Analysis", False)
         #     mainapp.set_parameter("Processing;Open output dir", False)
         #     mainapp.set_parameter(
-        #         "Processing;Whole Scan Segmentation;TFS General;Clean Before Training", False
+        #         "Processing;Scan Segmentation;TFS General;Clean Before Training", False
         #     )
-        #     mainapp.set_parameter("Processing;Whole Scan Segmentation;Segmentation Method", "U-Net")
-        #     mainapp.set_parameter("Processing;Whole Scan Segmentation;Working Tile Size", 224)
-        #     mainapp.set_parameter("Processing;Whole Scan Segmentation;TFS General;Run Training", False)
+        #     mainapp.set_parameter("Processing;Scan Segmentation;Segmentation Method", "U-Net")
+        #     mainapp.set_parameter("Processing;Scan Segmentation;Working Tile Size", 224)
+        #     mainapp.set_parameter("Processing;Scan Segmentation;TFS General;Run Training", False)
         #     # Set some Unet parameter here. It is used if the U-Net Segmentation method is used.
-        #     # mainapp.set_parameter("Processing;Whole Scan Segmentation;U-Net;Some Parameter", False)
-        #     mainapp.set_parameter("Processing;Whole Scan Segmentation;Lobulus Number", 0)
+        #     # mainapp.set_parameter("Processing;Scan Segmentation;U-Net;Some Parameter", False)
+        #     mainapp.set_parameter("Processing;Scan Segmentation;Lobulus Number", 0)
         #     # mainapp.start_gui(qapp=qapp)
         #     mainapp.run_lobuluses()
         #
@@ -545,7 +543,7 @@ def test_run_lobuluses():
         "medical", "orig", "sample_data", "SCP003", "SCP003.ndpi", get_root=True
     )
     mainapp = scaffan.algorithm.Scaffan()
-    mainapp.set_parameter("Processing;Whole Scan Segmentation", False)
+    mainapp.set_parameter("Processing;Scan Segmentation", False)
     run_on_yellow(mainapp, fn)
 
 def test_run_lobulus_with_seeds_mm():
@@ -558,7 +556,7 @@ def test_run_lobulus_with_seeds_mm():
     )
     mainapp = scaffan.algorithm.Scaffan()
     mainapp.set_output_dir(".test_run_with_seeds_mm")
-    mainapp.set_parameter("Processing;Whole Scan Segmentation", False)
+    mainapp.set_parameter("Processing;Scan Segmentation", False)
     mainapp.set_parameter("Input;Lobulus Selection Method", "Auto") # this is not evaluated
     mainapp.set_parameter("Processing;Skeleton Analysis", False)
     mainapp.set_parameter("Processing;Texture Analysis", False)
@@ -585,7 +583,7 @@ def test_run_lobuluses_czi():
         get_root=True,
     )
     mainapp = scaffan.algorithm.Scaffan()
-    mainapp.set_parameter("Processing;Whole Scan Segmentation", False)
+    mainapp.set_parameter("Processing;Scan Segmentation", False)
     run_on_yellow(mainapp, fn)
 
 
@@ -621,26 +619,5 @@ def run_with_external_seeds_mm():
 
 
     mainapp = scaffan.algorithm.Scaffan()
-    mainapp.set_parameter("Processing;Whole Scan Segmentation", False)
+    mainapp.set_parameter("Processing;Scan Segmentation", False)
     run_on_yellow(mainapp, fn)
-
-def test_run_with_color_filter():
-    fn = io3d.datasets.join_path(
-        "medical/orig/scaffan-analysis-czi/J7_5/J7_5_b_test.czi",
-        get_root=True,
-    )
-
-
-    mainapp = scaffan.algorithm.Scaffan()
-    mainapp.set_input_file(fn)
-    mainapp.set_output_dir("test_run_lobuluses_output_dir_color_filter")
-    mainapp.set_parameter("Input;Lobulus Selection Method", "Manual")
-    # mainapp.set_annotation_color_selection("#FFFF00")
-    mainapp.set_parameter("Processing;Whole Scan Segmentation", False)
-    mainapp.set_parameter("Processing;Lobulus Segmentation;Manual Segmentation", True)
-    mainapp.set_parameter("Processing;Texture Analysis", False)
-    mainapp.set_parameter("Processing;SNI Prediction CNN", False)
-    mainapp.set_parameter("Processing;Report Level", 10)
-    mainapp.run_lobuluses(seeds_mm=[[0.60, 0.90]])
-    # mainapp.run_lobuluses()
-    # run_on_yellow(mainapp, fn)

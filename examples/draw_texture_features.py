@@ -55,25 +55,23 @@ anim = scaffan.image.AnnotatedImage(fn)
 # Get the Signal paper resolution 10um per pixel size 255
 # Semantic Segmentation
 v0 = anim.get_full_view(margin=margin)
-v3 = anim.get_view(
-    location=v0.region_location + np.array([2200, 4400]),
-    # level=seg.level,
-    pixelsize_mm=[0.01, 0.01],
-    # size_on_level=[255, 255],
-    size_on_level=[100, 100],
-    # size_mm=[0.5, 0.5]
-)
+v3 = anim.get_view(location = v0.region_location + np.array([2200, 4400]),
+                   # level=seg.level,
+                   pixelsize_mm=[0.01, 0.01],
+                   # size_on_level=[255, 255],
+                   size_on_level=[100, 100],
+                   # size_mm=[0.5, 0.5]
+                   )
 
 
 feat = seg._get_features(v3)
 logger.debug(f"shape={feat.shape}, pixelsize={v3.region_pixelsize}")
 
 import skimage.io
-
 for i in range(0, feat.shape[2]):
-    skimage.io.imsave(f"features_{seg_method}_{i:03}.png", feat[:, :, i])
+    skimage.io.imsave(f"features_{seg_method}_{i:03}.png", feat[:,:,i])
 
-fig, axs = plt.subplots(3, 3, sharex=True, sharey=True, figsize=(8, 8))
+fig, axs = plt.subplots(3, 3, sharex=True, sharey=True, figsize=(8,8))
 axs = axs.flatten()
 
 suptitles = [

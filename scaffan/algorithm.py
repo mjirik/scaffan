@@ -19,7 +19,6 @@ import platform
 from typing import List, Union, Optional
 import configparser
 import io
-import sys
 
 # import PyQt5.QtWidgets
 # print("start 3")
@@ -48,7 +47,6 @@ from scaffan.pyqt_widgets import BatchFileProcessingParameter
 from scaffan.image_intensity_rescale_pyqtgraph import RescaleIntensityPercentilePQG
 from . import sni_prediction
 from . import lobule_quality_estimation_cnn
-from . import wsi_color_filter
 
 
 class Scaffan:
@@ -88,9 +86,7 @@ class Scaffan:
         self.whole_scan_margin = whole_scan_margin
         self.skeleton_analysis = scaffan.skeleton_analysis.SkeletonAnalysis()
         self.evaluation = scaffan.evaluation.Evaluation()
-        self.keep_evaluation_history_for_each_lobule = True
         self.intensity_rescale = RescaleIntensityPercentilePQG()
-        self.color_filter = wsi_color_filter.WsiColorFilterPQG()
         self.slide_segmentation = scaffan.slide_segmentation.ScanSegmentation(
             report=self.report
         )
@@ -142,7 +138,7 @@ class Scaffan:
                         # "Manual": "Manual",
                         # "Auto": "Auto",
                         # },
-                        "tip": "Auto: select lobulus based on Whole Scan Segmentation.\n"
+                        "tip": "Auto: select lobulus based on Scan Segmentation.\n"
                         "Color: based on annotation color.\n"
                         "Manual: manually pick the lobule. \n\n",
                     },
@@ -150,7 +146,7 @@ class Scaffan:
                     #     "name": "Lobulus Selection Method",
                     #     "type": "bool",
                     #     "value": True,
-                    #     "tip": "Skip selection based on annotation color and select lobulus based on Whole Scan Segmentation. ",
+                    #     "tip": "Skip selection based on annotation color and select lobulus based on Scan Segmentation. ",
                     # },
                     {
                         "name": "Annotation Color",
@@ -226,7 +222,7 @@ class Scaffan:
                         "tip": "Open system window with output dir when processing is finished",
                     },
                     # {
-                    #     "name": "Run Whole Scan Segmentation",
+                    #     "name": "Run Scan Segmentation",
                     #     "type": "bool",
                     #     "value": True,
                     #     "tip": "Run analysis of whole scan before all other processing is perfomed",
@@ -243,7 +239,6 @@ class Scaffan:
                     #     "value": True,
                     #     # "tip": "Show images",
                     # },
-                    self.color_filter.parameters,
                     self.intensity_rescale.parameters,
                     self.slide_segmentation.parameters,
                     self.lobulus_processing.parameters,
@@ -426,10 +421,6 @@ class Scaffan:
         path = fnparam.value()
         # run_resc_int = self.parameters.param("Processing", "Intensity Normalization", "Run Intensity Normalization").value()
         self.anim = image.AnnotatedImage(path)
-        self.anim.raster_image_preprocessing_function_handler.append(
-            self.color_filter.wsi_color_filter.img_processing
-        )
-        self.color_filter.set_anim_params(self.anim)
         self.intensity_rescale.set_anim_params(self.anim)
         fnparam = self.parameters.param("Output", "Directory Path")
         self.report.init_with_output_dir(fnparam.value())
@@ -467,7 +458,7 @@ class Scaffan:
         self, fns: List[Union[str, Path]], clean_before_training=True
     ):
         """
-        Train Whole Scan Segmentation based on list of files with annotation.
+        Train scan segmentation based on list of files with annotation.
         Output dir set before processing is ignored.
         :param fns: list of filenames
         :return:
@@ -492,7 +483,7 @@ class Scaffan:
                 ("Processing;Skeleton Analysis", False),
                 ("Processing;Texture Analysis", False),
                 ("Processing;Lobulus Segmentation", False),
-                ("Processing;Whole Scan Segmentation;Run Prediction", False),
+                ("Processing;Scan Segmentation;Run Prediction", False),
             ]
             prev_values = []
             for key, val in paramlist:
@@ -502,20 +493,20 @@ class Scaffan:
             # self.set_parameter("Processing;Skeleton Analysis", False)
             # self.set_parameter("Processing;Texture Analysis", False)
             # self.set_parameter("Processing;Lobulus Segmentation", False)
-            # self.set_parameter("Processing;Whole Scan Segmentation;Run Prediction", False)
+            # self.set_parameter("Processing;Scan Segmentation;Run Prediction", False)
             if i == 0:
                 if clean_before_training is not None:
                     self.set_parameter(
-                        "Processing;Whole Scan Segmentation;TFS General;Clean Before Training",
+                        "Processing;Scan Segmentation;TFS General;Clean Before Training",
                         clean_before_training,
                     )
             else:
                 self.set_parameter(
-                    "Processing;Whole Scan Segmentation;TFS General;Clean Before Training",
+                    "Processing;Scan Segmentation;TFS General;Clean Before Training",
                     False,
                 )
             self.set_parameter(
-                "Processing;Whole Scan Segmentation;TFS General;Run Training", True
+                "Processing;Scan Segmentation;TFS General;Run Training", True
             )
             #             mainapp.set_parameter("Processing;Slide Segmentation;Lobulus Number", 0)
             # mainapp.start_gui(qapp=qapp)
@@ -530,7 +521,7 @@ class Scaffan:
         self, annotation_ids: Optional[list] = None
     ):
         run_slide_segmentation = self.parameters.param(
-            "Processing", "Whole Scan Segmentation"
+            "Processing", "Scan Segmentation"
         ).value()
         pcolor = self.parameters.param("Input", "Annotation Color")
         color = pcolor.value()
@@ -557,34 +548,13 @@ class Scaffan:
                     annotation_ids = self.slide_segmentation.ann_biggest_ids
                 else:
                     logger.error(
-                        "Cannot do automatic lobulus selection without whole Whole Scan Segmentation"
+                        "Cannot do automatic lobulus selection without whole scan segmentation"
                     )
             else:
                 logger.error(
                     f"Unknown Lobulus Selection Method: {automatic_lobulus_selection}"
                 )
-
-        self._save_preview_with_annotaions_to_report()
         return annotation_ids, automatic_lobulus_selection
-
-    def _save_preview_with_annotaions_to_report(self):
-        # prepare preview with annotations
-        view_corner, img = self.get_preview()
-        # self.get_preview()
-        # fig = plt.figure(figsize=(12, 8))
-        fig = plt.figure()
-        # plt.axis('off')
-        plt.imshow(img)
-        view_corner.plot_annotations(fontsize="small")
-
-        plt.gca().set_axis_off()
-        plt.subplots_adjust(top=1, bottom=0, right=1, left=0, hspace=0, wspace=0)
-        plt.margins(0, 0)
-        plt.gca().xaxis.set_major_locator(plt.NullLocator())
-        plt.gca().yaxis.set_major_locator(plt.NullLocator())
-
-        self.report.savefig("preview_with_annotations.png", level=60)
-        plt.close(fig)
 
     def run_lobuluses(self, event=None, seeds_mm: Optional[list] = None):
         """
@@ -606,7 +576,7 @@ class Scaffan:
         self.report.set_show(show)
         self.report.set_save(True)
         run_slide_segmentation = self.parameters.param(
-            "Processing", "Whole Scan Segmentation"
+            "Processing", "Scan Segmentation"
         ).value()
 
         # if automatic_lobulus_selection == "use annotation_ids": ...
@@ -755,8 +725,6 @@ class Scaffan:
         self.report.add_cols_to_actual_row(self.parameters_to_dict())
 
     def _run_lobulus(self, annotation_id):
-        if not self.keep_evaluation_history_for_each_lobule:
-            self.evaluation.evaluation_history = []
         show = self.parameters.param("Processing", "Show").value()
         t0 = time.time()
         inpath = Path(self.parameters.param("Input", "File Path").value())
@@ -849,13 +817,13 @@ class Scaffan:
         view_corner = full_view.to_pixelsize(pixelsize_mm=[pxsz_mm, pxsz_mm])
         return view_corner
 
-    def get_preview(self) -> (scaffan.image.View, np.ndarray):
+    def get_preview(self):
         view_corner = self.get_preview_view()
         # logger.debug(
         #     f"Manual selection1, view.loc={full_view.region_location}, view.size={full_view.region_size_on_level}, pxsz={full_view.region_pixelsize}"
         # )
         logger.debug(
-            f"Manual selection, view.loc={view_corner.region_location}, view.size={view_corner.region_size_on_level}, pxsz={view_corner.region_pixelsize}"
+            f"Manual selection2, view.loc={view_corner.region_location}, view.size={view_corner.region_size_on_level}, pxsz={view_corner.region_pixelsize}"
         )
         img = view_corner.get_region_image(as_gray=False)
         return view_corner, img
@@ -881,11 +849,7 @@ class Scaffan:
         centers_px = list(zip(*pts_glob_px))
         logger.debug(f"Manual selection5, centers_px_global={centers_px}")
         r_mm = (
-            float(
-                self.get_parameter(
-                    "Processing;Whole Scan Segmentation;Annotation Radius"
-                )
-            )
+            float(self.get_parameter("Processing;Scan Segmentation;Annotation Radius"))
             * 1000
         )
 
@@ -897,7 +861,7 @@ class Scaffan:
         return view_corner, ann_ids
 
     def manual_select(self):
-        logger.debug("Manual selection of lobules.")
+        logger.debug("Manual selection")
         # full_view = self.anim.get_full_view()
         view_corner, img = self.get_preview()
         # full_view = self.anim.get_view(
@@ -918,7 +882,7 @@ class Scaffan:
             "Select lobules. Left/Middle/Right Mouse Button: add/quit/remove"
         )
         logger.debug(
-            f"Manual selection backend={matplotlib.get_backend()}, ion={matplotlib.is_interactive()}, img.shape={img.shape}, img.max={np.max(img)}"
+            f"Manual selection2 backend={matplotlib.get_backend()}, ion={matplotlib.is_interactive()}, img.shape={img.shape}, img.max={np.max(img)}"
         )
         plt.imshow(img)
         # plt.ginput(1)
@@ -928,7 +892,7 @@ class Scaffan:
         # logger.debug("Manual selection4")
         points_px = np.asarray(plt.ginput(-1))
         plt.close(fig)
-        logger.debug(f"Manual selection, centers_px={points_px}")
+        logger.debug(f"Manual selection5, centers_px={points_px}")
 
         # points_px = np.asarray(centers_px)
         from scaffan.image import get_offset_px, get_pixelsize
@@ -1036,24 +1000,3 @@ class Scaffan:
 
 class NoLobulusSelectionUsedError(Exception):
     pass
-
-
-def get_size(obj, seen=None):
-    """Recursively finds size of objects"""
-    size = sys.getsizeof(obj)
-    if seen is None:
-        seen = set()
-    obj_id = id(obj)
-    if obj_id in seen:
-        return 0
-    # Important mark as seen *before* entering recursion to gracefully handle
-    # self-referential objects
-    seen.add(obj_id)
-    if isinstance(obj, dict):
-        size += sum([get_size(v, seen) for v in obj.values()])
-        size += sum([get_size(k, seen) for k in obj.keys()])
-    elif hasattr(obj, "__dict__"):
-        size += get_size(obj.__dict__, seen)
-    elif hasattr(obj, "__iter__") and not isinstance(obj, (str, bytes, bytearray)):
-        size += sum([get_size(i, seen) for i in obj])
-    return size

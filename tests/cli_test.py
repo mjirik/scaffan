@@ -92,7 +92,7 @@ def test_cli_seeds_mm():
         ["nogui", "-i", pth, "-o", expected_pth.parent,
          "--ll", "debug",
          "-c", "#FFFF00",  "--seeds_mm", "6.86", "6.86",
-         "-p", "Processing;Whole Scan Segmentation", "False",
+         "-p", "Processing;Scan Segmentation", "False",
          "-p", "Input;Lobulus Selection Method", "Auto", # note evaluated
          "-p", "Processing;Lobulus Segmentation", "True", # something should run to have output xlsx
          "-p", "Processing;Skeleton Analysis", "False",

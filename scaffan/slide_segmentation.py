@@ -50,7 +50,7 @@ class ScanSegmentation:
     def __init__(
         self,
         report: Report = None,
-        pname="Whole Scan Segmentation",
+        pname="Scan Segmentation",
         ptype="bool",
         pvalue=True,
         ptip="Run analysis of whole scan before all other processing is perfomed.\n"
@@ -196,7 +196,7 @@ class ScanSegmentation:
                 "value": 5,
                 # "suffix": "px",
                 "siPrefix": False,
-                "tip": "Number of lobuluses automatically selected after whole Whole Scan Segmentation",
+                "tip": "Number of lobuluses automatically selected after whole scan segmentation",
             },
             {
                 "name": "Annotation Radius",
@@ -275,7 +275,6 @@ class ScanSegmentation:
         self.sinusoidal_area_mm = None
         self.alternative_get_features = None
         self.accuracy = None
-        self._segmentation_model_filename_prefix = "segmentation_model_"
 
     # def init(self, anim: scim.AnnotatedImage):
     def init(self, view: scim.View):
@@ -300,10 +299,10 @@ class ScanSegmentation:
         method_str = method.replace(" ", "_")
         self.clf = self._clf_object(**self._clf_params)
         self.clf_fn: Path = Path(
-            Path(__file__).parent / f"{self._segmentation_model_filename_prefix}{method_str}.pkl"
+            Path(__file__).parent / f"segmentation_model_{method_str}.pkl"
         )
         self.clf_default_fn: Path = Path(
-            Path(__file__).parent / f"{self._segmentation_model_filename_prefix}default_{method_str}.pkl"
+            Path(__file__).parent / f"segmentation_model_default_{method_str}.pkl"
         )
         if self.clf_fn.exists():
             logger.debug(f"Reading classifier from {str(self.clf_fn)}")
@@ -867,7 +866,7 @@ class ScanSegmentation:
     def evaluate(self):
         logger.debug("evaluate")
         labels, count = np.unique(self.full_output_image, return_counts=True)
-        logger.debug(f"whole Whole Scan Segmentation: labels={labels}, count={count}")
+        logger.debug(f"whole scan segmentation: labels={labels}, count={count}")
         countd = {0: 0, 1: 0, 2: 0}
         countd.update(dict(zip(labels, count)))
         #         plt.figure(figsize=(10, 10))
@@ -892,15 +891,11 @@ class ScanSegmentation:
             "slice_raster.png", img.astype(np.uint8), level_skimage=40, level_npz=30
         )
         fig = plt.figure()
-        logger.debug("Figure created")
         # plt.imshow(img)
         # view_tmp = self.view
         # the view is wrong if it is based on whole scan image
         view_tmp = self.view.to_pixelsize(self.used_pixelsize_mm)
-        logger.debug("resized")
-        raster = view_tmp.get_raster_image(as_gray=False)
-        logger.debug("show raster")
-        plt.imshow(raster)
+        plt.imshow(view_tmp.get_raster_image(as_gray=False))
 
         # logger.debug(f"slice_raster size on pixelsize {self.view.region_pixelsize}, {self.view.annotations}")
         logger.debug(self.view.region_size_on_level)
@@ -922,14 +917,12 @@ class ScanSegmentation:
         logger.debug(f"empty_area_mm={self.empty_area_mm}")
         self.report.set_persistent_cols(
             {
-                "Whole Scan Segmentation Empty Area [mm^2]": self.empty_area_mm,
-                "Whole Scan Segmentation Septum Area [mm^2]": self.septum_area_mm,
-                "Whole Scan Segmentation Sample Area [mm^2]": self.sample_area_mm,
-                "Whole Scan Segmentation Sinusoidal Area [mm^2]": self.sinusoidal_area_mm,
-                "Whole Scan Segmentation Used Pixelsize [mm]": self.used_pixelsize_mm[
-                    0
-                ],
-                "Whole Scan Segmentation Classifier": str(self.clf),
+                "Scan Segmentation Empty Area [mm^2]": self.empty_area_mm,
+                "Scan Segmentation Septum Area [mm^2]": self.septum_area_mm,
+                "Scan Segmentation Sample Area [mm^2]": self.sample_area_mm,
+                "Scan Segmentation Sinusoidal Area [mm^2]": self.sinusoidal_area_mm,
+                "Scan Segmentation Used Pixelsize [mm]": self.used_pixelsize_mm[0],
+                "Scan Segmentation Classifier": str(self.clf),
             }
         )
 
