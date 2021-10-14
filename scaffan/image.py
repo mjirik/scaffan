@@ -805,8 +805,7 @@ class AnnotatedImage:
         )
         if pixelsize_mm is not None:
             view = view_level0.to_pixelsize(
-                pixelsize_mm=pixelsize_mm,
-                safety_bound=safety_bound,
+                pixelsize_mm=pixelsize_mm, safety_bound=safety_bound,
             )
         elif level is not None:
             view = view_level0.to_level(level)
@@ -1618,9 +1617,7 @@ class View:
         return get_region_center_by_location(self.anim.openslide, location, level, size)
 
     def get_region_image_resolution(
-        self,
-        resolution_mm,
-        as_gray=False,
+        self, resolution_mm, as_gray=False,
     ):
         self.anim.openslide.level_downsamples
 
