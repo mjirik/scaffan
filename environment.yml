@@ -11,3 +11,27 @@ dependencies:
     - imma
 #    - openslide-python
     - lxml
+    - io3d
+    # openslide-python # installed with pip on windows or with conda on linux
+    - pyqtgraph
+    - morphsnakes
+    - pandas
+    - openpyxl
+    - xlrd
+    - loguru
+  # higer version work in different way with alpha
+    - scipy=1.2
+    - click
+    - exsu
+    - scikit-learn
+    - scikit-image
+    - chainer
+    - czifile
+    - read-roi
+    - pyqt=5
+  # tensorflow>=2.0 there is no TF2 for py36 on conda
+  # requirements of TF2 installed later by pip
+    - absl-py
+    - termcolor
+  # libiconv because OSError: libiconv.so.2: cannot open shared object file: No suc..
+    - libiconv
