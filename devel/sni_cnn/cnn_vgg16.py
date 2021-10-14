@@ -3,18 +3,19 @@ import numpy as np
 from matplotlib import pyplot as plt
 from numpy import load
 
-TRAIN_DATA_SAVE_FILE = 'D:\\FAV\\Scaffold\\data\\train_data.npy'
-TRAIN_LABELS_SAVE_FILE = 'D:\\FAV\\Scaffold\\data\\train_labels.npy'
-TEST_DATA_SAVE_FILE = 'D:\\FAV\\Scaffold\\data\\test_data.npy'
-TEST_LABELS_SAVE_FILE = 'D:\\FAV\\Scaffold\\data\\test_labels.npy'
+TRAIN_DATA_SAVE_FILE = "D:\\FAV\\Scaffold\\data\\train_data.npy"
+TRAIN_LABELS_SAVE_FILE = "D:\\FAV\\Scaffold\\data\\train_labels.npy"
+TEST_DATA_SAVE_FILE = "D:\\FAV\\Scaffold\\data\\test_data.npy"
+TEST_LABELS_SAVE_FILE = "D:\\FAV\\Scaffold\\data\\test_labels.npy"
 
-VERSION = '_VGG16_2'
+VERSION = "_VGG16_2"
 EXPORT_PATH = "D:\\FAV\\Scaffold\\export\\v" + VERSION + "/"
 
 DISPLAY_SIZE = 80
 
 BATCH_SIZE = 64
 EPOCHS = 10
+
 
 def load_data():
     train_data = load(TRAIN_DATA_SAVE_FILE)
@@ -45,36 +46,44 @@ def create_model():
     from tensorflow.keras.layers import Conv2D, Dense, Flatten, MaxPool2D
     from tensorflow.keras.models import Sequential
     from tensorflow.keras.optimizers import Adam
-    model = Sequential([
-        Conv2D(input_shape=(DISPLAY_SIZE, DISPLAY_SIZE, 1), filters=64, kernel_size=(3, 3), padding="same",
-               activation="relu"),
-        Conv2D(filters=64, kernel_size=(3, 3), padding="same", activation="relu"),
-        MaxPool2D(pool_size=(2, 2), strides=(2, 2)),
-        Conv2D(filters=128, kernel_size=(3, 3), padding="same", activation="relu"),
-        Conv2D(filters=128, kernel_size=(3, 3), padding="same", activation="relu"),
-        MaxPool2D(pool_size=(2, 2), strides=(2, 2)),
-        Conv2D(filters=256, kernel_size=(3, 3), padding="same", activation="relu"),
-        Conv2D(filters=256, kernel_size=(3, 3), padding="same", activation="relu"),
-        Conv2D(filters=256, kernel_size=(3, 3), padding="same", activation="relu"),
-        MaxPool2D(pool_size=(2, 2), strides=(2, 2)),
-        Conv2D(filters=512, kernel_size=(3, 3), padding="same", activation="relu"),
-        Conv2D(filters=512, kernel_size=(3, 3), padding="same", activation="relu"),
-        Conv2D(filters=512, kernel_size=(3, 3), padding="same", activation="relu"),
-        MaxPool2D(pool_size=(2, 2), strides=(2, 2)),
-        Conv2D(filters=512, kernel_size=(3, 3), padding="same", activation="relu"),
-        Conv2D(filters=512, kernel_size=(3, 3), padding="same", activation="relu"),
-        Conv2D(filters=512, kernel_size=(3, 3), padding="same", activation="relu"),
-        MaxPool2D(pool_size=(2, 2), strides=(2, 2)),
-        Flatten(),
-        Dense(units=4096, activation="relu"),
-        Dense(units=4096, activation="relu"),
-        Dense(units=1, activation=None, use_bias=False)
-    ])
+
+    model = Sequential(
+        [
+            Conv2D(
+                input_shape=(DISPLAY_SIZE, DISPLAY_SIZE, 1),
+                filters=64,
+                kernel_size=(3, 3),
+                padding="same",
+                activation="relu",
+            ),
+            Conv2D(filters=64, kernel_size=(3, 3), padding="same", activation="relu"),
+            MaxPool2D(pool_size=(2, 2), strides=(2, 2)),
+            Conv2D(filters=128, kernel_size=(3, 3), padding="same", activation="relu"),
+            Conv2D(filters=128, kernel_size=(3, 3), padding="same", activation="relu"),
+            MaxPool2D(pool_size=(2, 2), strides=(2, 2)),
+            Conv2D(filters=256, kernel_size=(3, 3), padding="same", activation="relu"),
+            Conv2D(filters=256, kernel_size=(3, 3), padding="same", activation="relu"),
+            Conv2D(filters=256, kernel_size=(3, 3), padding="same", activation="relu"),
+            MaxPool2D(pool_size=(2, 2), strides=(2, 2)),
+            Conv2D(filters=512, kernel_size=(3, 3), padding="same", activation="relu"),
+            Conv2D(filters=512, kernel_size=(3, 3), padding="same", activation="relu"),
+            Conv2D(filters=512, kernel_size=(3, 3), padding="same", activation="relu"),
+            MaxPool2D(pool_size=(2, 2), strides=(2, 2)),
+            Conv2D(filters=512, kernel_size=(3, 3), padding="same", activation="relu"),
+            Conv2D(filters=512, kernel_size=(3, 3), padding="same", activation="relu"),
+            Conv2D(filters=512, kernel_size=(3, 3), padding="same", activation="relu"),
+            MaxPool2D(pool_size=(2, 2), strides=(2, 2)),
+            Flatten(),
+            Dense(units=4096, activation="relu"),
+            Dense(units=4096, activation="relu"),
+            Dense(units=1, activation=None, use_bias=False),
+        ]
+    )
 
     return model
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     from tensorflow import saved_model
     from tensorflow.keras.layers import Conv2D, Dense, Flatten, MaxPool2D
     from tensorflow.keras.models import Sequential
@@ -88,22 +97,27 @@ if __name__ == '__main__':
 
     model = create_model()
     model.summary()
-    model.compile(optimizer=Adam(learning_rate=0.001),
-                  loss='mean_squared_error',
-                  metrics=['mean_squared_error'])
+    model.compile(
+        optimizer=Adam(learning_rate=0.001),
+        loss="mean_squared_error",
+        metrics=["mean_squared_error"],
+    )
 
-    history = model.fit(train_x, train_y,
-                        epochs=EPOCHS,
-                        batch_size=BATCH_SIZE,
-                        sample_weight=train_weights,
-                        validation_data=(test_x, test_y, test_weights))
+    history = model.fit(
+        train_x,
+        train_y,
+        epochs=EPOCHS,
+        batch_size=BATCH_SIZE,
+        sample_weight=train_weights,
+        validation_data=(test_x, test_y, test_weights),
+    )
 
     saved_model.save(model, EXPORT_PATH)
 
-    matplotlib.use('TkAgg')
+    matplotlib.use("TkAgg")
     plt.figure()
-    plt.plot(history.history['mean_squared_error'], label='MSE')
-    plt.plot(history.history['val_mean_squared_error'], label='val MSE')
-    plt.xlabel('Epoch')
-    plt.legend(['MSE', 'val MSE'])
+    plt.plot(history.history["mean_squared_error"], label="MSE")
+    plt.plot(history.history["val_mean_squared_error"], label="val MSE")
+    plt.xlabel("Epoch")
+    plt.legend(["MSE", "val MSE"])
     plt.show()

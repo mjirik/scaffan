@@ -14,19 +14,18 @@ NDPI_EXAMPLE.exists()
 NDPI_EXAMPLE.parent / "jiny_soubor.ndpi"
 
 
-custom_grad = [
-    [1.0, 0.0, 0.0],
-    [0.0, 1.0, 0.0],
-    [0.0, 0.0, 1.0]
-]
+custom_grad = [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]]
 
 
 def get_crop_by_center(img, center=None, size=(100, 100)):
     if center is None:
         center = img.shape[0] // 2, img.shape[1] // 2
 
-    return img[center[0] - size[0] // 2: center[0] + size[0] // 2, center[1] - size[1] // 2: center[1] + size[1] // 2,
-           :]
+    return img[
+        center[0] - size[0] // 2 : center[0] + size[0] // 2,
+        center[1] - size[1] // 2 : center[1] + size[1] // 2,
+        :,
+    ]
 
 
 def anotate_texture(img):
@@ -37,15 +36,15 @@ def anotate_texture(img):
     seeds = ed.seeds
     seeds = seeds[:, :, 0]
     # print(img[seeds == 1])
-    seeds = seeds.astype('int8')
+    seeds = seeds.astype("int8")
 
     return seeds
 
 
 def load_data():
-    img = np.load('image.npy')
+    img = np.load("image.npy")
     img = img / 255.0
-    seeds = np.load('seeds.npy')
+    seeds = np.load("seeds.npy")
     return img, seeds
 
 
@@ -64,7 +63,8 @@ def get_centroid_colors_rgb(img, seeds):
         centroids.append(np.sum(img[seeds == level], axis=0) / np.sum(seeds == level))
 
     import sklearn.naive_bayes
-    cl = sklearn.naive_bayes.GaussianNB(priors=[1/3., 1/3., 1/3.])
+
+    cl = sklearn.naive_bayes.GaussianNB(priors=[1 / 3.0, 1 / 3.0, 1 / 3.0])
     # X 4 sloupce, tolik řádek, kolik pixelů
     # Y label 0, 1,2
     # cl.fit(X, Y)
@@ -76,7 +76,9 @@ def get_centroid_colors_rgb(img, seeds):
 def find_centroids():
     img, seeds = load_data()
     centroids_rgb = get_centroid_colors_rgb(img, seeds)
-    centroids_hsv = [hue_to_continuous_2d(rgb2hsv(pixel.reshape(1, 1, 3))) for pixel in centroids_rgb]
+    centroids_hsv = [
+        hue_to_continuous_2d(rgb2hsv(pixel.reshape(1, 1, 3))) for pixel in centroids_rgb
+    ]
 
     return centroids_hsv
 
@@ -133,9 +135,9 @@ def load_example_img(stride=10):
     logger.debug(f"crop y {(np.min(nzy) * stride, np.max(nzy) * stride)}")
 
     img = img[
-        np.min(nzx) * stride:np.max(nzx) * stride,
-        np.min(nzy) * stride:np.max(nzy) * stride,
-        :
+        np.min(nzx) * stride : np.max(nzx) * stride,
+        np.min(nzy) * stride : np.max(nzy) * stride,
+        :,
     ]
     # img = get_crop_by_center(img, (8700, 12000), (1400, 1400))
     return img
@@ -144,8 +146,8 @@ def load_example_img(stride=10):
 def create_annotation():
     img = load_example_img()
     seeds = anotate_texture(img)
-    np.save('seeds.npy', seeds)
-    np.save('image.npy', img)
+    np.save("seeds.npy", seeds)
+    np.save("image.npy", img)
 
 
 def filter_image():
@@ -160,13 +162,15 @@ def filter_image():
     filters = []
 
     plt.figure()
-    plt.imshow(fltr, cmap='brg')
+    plt.imshow(fltr, cmap="brg")
     plt.title("3 different tissue - RGB")
 
     # Black
     plt.figure()
-    plt.imshow(img * np.stack([fltr == 0, fltr == 0, fltr == 0], axis=-1) + np.stack([fltr != 0, fltr != 0, fltr != 0],
-                                                                                     axis=-1).astype('int32'))
+    plt.imshow(
+        img * np.stack([fltr == 0, fltr == 0, fltr == 0], axis=-1)
+        + np.stack([fltr != 0, fltr != 0, fltr != 0], axis=-1).astype("int32")
+    )
     plt.title("Black tissue")
 
     # White
@@ -182,6 +186,6 @@ def filter_image():
     plt.show()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     create_annotation()
     filter_image()

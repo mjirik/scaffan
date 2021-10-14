@@ -4,7 +4,7 @@ import cv2
 
 imgPath = "./imgDir/"  # path to extracted features
 lblPath = "./labelDir/"  # path to GT labels
-outputFile = 'results.txt'  # output txt file
+outputFile = "results.txt"  # output txt file
 
 label = os.listdir(lblPath)
 label.sort()
@@ -15,7 +15,10 @@ num_of_classes = 3
 
 epsilon = 0.000001
 
-def label_generation(original_label, grayscale_values): #generation of maps of labels (0,1,2,3)
+
+def label_generation(
+    original_label, grayscale_values
+):  # generation of maps of labels (0,1,2,3)
     if len(grayscale_values) == 4:
         crop_of_label = np.copy(original_label)
         zero = crop_of_label == grayscale_values[1]
@@ -24,7 +27,7 @@ def label_generation(original_label, grayscale_values): #generation of maps of l
         crop_of_label[one] = 1
         two = crop_of_label == grayscale_values[3]
         crop_of_label[two] = 2
-        trash = crop_of_label ==grayscale_values[0]
+        trash = crop_of_label == grayscale_values[0]
         crop_of_label[trash] = 3
     else:
         crop_of_label = np.copy(original_label)
@@ -35,6 +38,7 @@ def label_generation(original_label, grayscale_values): #generation of maps of l
         two = crop_of_label == grayscale_values[2]
         crop_of_label[two] = 2
     return crop_of_label
+
 
 num_of_img = len(label)
 result_file = open(outputFile, "w")
@@ -57,7 +61,9 @@ for i in range(0, num_of_img):
 
     correct_org = 0
     total = 0
-    for j in range (0, len(loaded_img_generated)): # prochazim pixel po pixelu (ano, je to prasarna)
+    for j in range(
+        0, len(loaded_img_generated)
+    ):  # prochazim pixel po pixelu (ano, je to prasarna)
         if loaded_lbl_generated[j] != 3:
             total += 1
             if loaded_img_generated[j] == loaded_lbl_generated[j]:

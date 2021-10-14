@@ -20,13 +20,17 @@ class NearestNeighborFilter(Filter):
 
         # compute centroid for each class
         for level in ann_types:
-            self.centroids.append(np.sum(img[seeds == level], axis=0) / np.sum(seeds == level))
+            self.centroids.append(
+                np.sum(img[seeds == level], axis=0) / np.sum(seeds == level)
+            )
 
     def predict(self, img):
         # repeat each centroid to match input image shape
         centroid_maps = []
         for centroid in self.centroids:
-            centroid_map = np.tile(centroid, img.shape[0] * img.shape[1]).reshape(img.shape)
+            centroid_map = np.tile(centroid, img.shape[0] * img.shape[1]).reshape(
+                img.shape
+            )
             centroid_maps.append(centroid_map)
 
         # compute distance from each image pixel to each centroid
@@ -40,8 +44,8 @@ class NearestNeighborFilter(Filter):
 
         return filter_mask
 
-    def load_model(self, file_name='nearest_neighbor_filter.npy'):
+    def load_model(self, file_name="nearest_neighbor_filter.npy"):
         self.centroids = np.load(file_name)
 
-    def save_model(self, file_name='nearest_neighbor_filter.npy'):
+    def save_model(self, file_name="nearest_neighbor_filter.npy"):
         np.save(file_name, self.centroids)

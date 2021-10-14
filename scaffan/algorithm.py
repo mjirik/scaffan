@@ -94,8 +94,8 @@ class Scaffan:
         self.slide_segmentation = scaffan.slide_segmentation.ScanSegmentation(
             report=self.report
         )
-        self.lobule_quality_estimation_cnn = lobule_quality_estimation_cnn.LobuleQualityEstimationCNN(
-            report=self.report
+        self.lobule_quality_estimation_cnn = (
+            lobule_quality_estimation_cnn.LobuleQualityEstimationCNN(report=self.report)
         )
         # self.slide_segmentation.report = self.report
 
