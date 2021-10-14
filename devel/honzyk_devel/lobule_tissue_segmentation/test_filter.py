@@ -12,14 +12,15 @@ from .visualization import show_visual
 
 models = [NearestNeighborFilter(), SvmFilter(), NaiveBayesFilter()]
 
+
 @unittest.skipIf(os.environ.get("TRAVIS", default=False), "Skip on Travis-CI")
 class TestFilter(unittest.TestCase):
     """"""
 
     def model_test(self, model):
         """"""
-        img = np.load('image.npy')
-        seeds = np.load('seeds.npy')
+        img = np.load("image.npy")
+        seeds = np.load("seeds.npy")
 
         model.train_model(img, seeds)
         output = model.predict(img)
@@ -37,7 +38,7 @@ class TestFilter(unittest.TestCase):
         plt.imshow(img)
         plt.title("Original image")
 
-        model_names = ['Nearest Neighbor', 'SVM', 'Naive Bayes Gaussian']
+        model_names = ["Nearest Neighbor", "SVM", "Naive Bayes Gaussian"]
 
         for i in range(len(models)):
             show_visual(img, models[i], model_names[i])

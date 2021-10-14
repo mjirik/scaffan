@@ -12,12 +12,12 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.optimizers import SGD
 from tensorflow.keras.optimizers import Adam
 
-TRAIN_DATA_SAVE_FILE = 'D:\\FAV\\Scaffold\\data\\train_data.npy'
-TRAIN_LABELS_SAVE_FILE = 'D:\\FAV\\Scaffold\\data\\train_labels.npy'
-TEST_DATA_SAVE_FILE = 'D:\\FAV\\Scaffold\\data\\test_data.npy'
-TEST_LABELS_SAVE_FILE = 'D:\\FAV\\Scaffold\\data\\test_labels.npy'
+TRAIN_DATA_SAVE_FILE = "D:\\FAV\\Scaffold\\data\\train_data.npy"
+TRAIN_LABELS_SAVE_FILE = "D:\\FAV\\Scaffold\\data\\train_labels.npy"
+TEST_DATA_SAVE_FILE = "D:\\FAV\\Scaffold\\data\\test_data.npy"
+TEST_LABELS_SAVE_FILE = "D:\\FAV\\Scaffold\\data\\test_labels.npy"
 
-VERSION = '1'
+VERSION = "1"
 EXPORT_PATH = "D:\\FAV\\Scaffold\\export\\v" + VERSION + ".h5"
 
 DISPLAY_SIZE = 80
@@ -79,35 +79,42 @@ def load_data():
 
 
 def create_model():
-    model = Sequential([
-        BatchNormalization(input_shape=(DISPLAY_SIZE, DISPLAY_SIZE, 1)),
-        Conv2D(128, (3, 3), activation='relu', input_shape=(DISPLAY_SIZE, DISPLAY_SIZE, 1)),
-        MaxPool2D((2, 2)),
-        Dropout(0.2),
-        Conv2D(128, (3, 3), activation='relu'),
-        MaxPool2D((2, 2)),
-        Dropout(0.2),
-        Conv2D(128, (3, 3), activation='relu'),
-        MaxPool2D((2, 2)),
-        Dropout(0.2),
-        Conv2D(128, (3, 3), activation='relu'),
-        MaxPool2D((2, 2)),
-        Flatten(),
-        Dense(512, activation='relu'),
-        Dropout(0.2),
-        Dense(256, activation='relu'),
-        Dropout(0.2),
-        Dense(128, activation='relu'),
-        Dropout(0.2),
-        Dense(128, activation='relu'),
-        Dropout(0.2),
-        Dense(1, activation=None, use_bias=False)
-    ])
+    model = Sequential(
+        [
+            BatchNormalization(input_shape=(DISPLAY_SIZE, DISPLAY_SIZE, 1)),
+            Conv2D(
+                128,
+                (3, 3),
+                activation="relu",
+                input_shape=(DISPLAY_SIZE, DISPLAY_SIZE, 1),
+            ),
+            MaxPool2D((2, 2)),
+            Dropout(0.2),
+            Conv2D(128, (3, 3), activation="relu"),
+            MaxPool2D((2, 2)),
+            Dropout(0.2),
+            Conv2D(128, (3, 3), activation="relu"),
+            MaxPool2D((2, 2)),
+            Dropout(0.2),
+            Conv2D(128, (3, 3), activation="relu"),
+            MaxPool2D((2, 2)),
+            Flatten(),
+            Dense(512, activation="relu"),
+            Dropout(0.2),
+            Dense(256, activation="relu"),
+            Dropout(0.2),
+            Dense(128, activation="relu"),
+            Dropout(0.2),
+            Dense(128, activation="relu"),
+            Dropout(0.2),
+            Dense(1, activation=None, use_bias=False),
+        ]
+    )
 
     return model
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     from tensorflow import saved_model
 
     train_x, train_y, train_weights, test_x, test_y, test_weights = load_data()
@@ -118,22 +125,27 @@ if __name__ == '__main__':
 
     model = create_model()
     model.summary()
-    model.compile(optimizer=Adam(learning_rate=0.001),
-                  loss='mean_squared_error',
-                  metrics=['mean_squared_error'])
+    model.compile(
+        optimizer=Adam(learning_rate=0.001),
+        loss="mean_squared_error",
+        metrics=["mean_squared_error"],
+    )
 
-    history = model.fit(train_x, train_y,
-                        epochs=EPOCHS,
-                        batch_size=BATCH_SIZE,
-                        sample_weight=train_weights,
-                        validation_data=(test_x, test_y, test_weights))
+    history = model.fit(
+        train_x,
+        train_y,
+        epochs=EPOCHS,
+        batch_size=BATCH_SIZE,
+        sample_weight=train_weights,
+        validation_data=(test_x, test_y, test_weights),
+    )
 
     model.save(EXPORT_PATH)
 
-    matplotlib.use('TkAgg')
+    matplotlib.use("TkAgg")
     plt.figure()
-    plt.plot(history.history['mean_squared_error'], label='MSE')
-    plt.plot(history.history['val_mean_squared_error'], label='val MSE')
-    plt.xlabel('Epoch')
-    plt.legend(['MSE', 'val MSE'])
+    plt.plot(history.history["mean_squared_error"], label="MSE")
+    plt.plot(history.history["val_mean_squared_error"], label="val MSE")
+    plt.xlabel("Epoch")
+    plt.legend(["MSE", "val MSE"])
     plt.show()

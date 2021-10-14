@@ -2,8 +2,6 @@ import configparser
 import io
 
 
-
-
 config = configparser.ConfigParser()
 # config["scaffan"] = {
 #     "param1": "aeqr",
@@ -11,14 +9,16 @@ config = configparser.ConfigParser()
 # }
 #
 
-cfgstr = "" + \
-"""
+cfgstr = (
+    ""
+    + """
 [scaffan]
 val1=1
 Val 2 = 2
 val3 = "werqwrqw"
 My Value = " asdlkfaf ea"
 """
+)
 # cfgstr = "[scaffan]" \
 #          "val1=1" \
 #          "val2=2" \

@@ -20,7 +20,12 @@ experiment_dir = Path(f"SA_{experiment_datetime_fn}_seg_eval")
 experiment_dir.mkdir()
 # logger.add(sys.stderr, format="{time} {level} {message}", filter="my_module", level="DEBUG")
 # logger.add(sys.stderr, format="{time} {level} {message}", level="DEBUG")
-logger.add(experiment_dir/"scaffan.log", format="{time} {level} {message}",  level="DEBUG", backtrace=True)
+logger.add(
+    experiment_dir / "scaffan.log",
+    format="{time} {level} {message}",
+    level="DEBUG",
+    backtrace=True,
+)
 logger.debug("logging init")
 
 path_to_script = os.path.dirname(os.path.abspath(__file__))
@@ -30,6 +35,7 @@ path_to_scaffan = os.path.join(path_to_script, "..")
 sys.path.insert(0, path_to_scaffan)
 import scaffan
 import scaffan.algorithm
+
 # fn = io3d.datasets.join_path(
 #     "medical", "orig", "sample_data", "SCP003", "SCP003.ndpi", get_root=True
 # )
@@ -37,7 +43,7 @@ import scaffan.algorithm
 #     "medical/orig/Scaffan-analysis/PIG-004_BBJ-004-4_HE_parenchyme.ndpi", get_root=True
 # )
 # logger.debug(f"fn exists {Path(fn).exists()}, fn: {fn}")
-    # .isoformat(' ', 'seconds')
+# .isoformat(' ', 'seconds')
 # datetime.datetime.now().
 logger.info(f"running experiment: {experiment_title} started at: {experiment_datetime}")
 # imsl = openslide.OpenSlide(fn)
@@ -49,11 +55,15 @@ mainapp = scaffan.algorithm.Scaffan()
 #############
 # mainapp.set_output_dir(experiment_dir/"PIG-001")
 
-mainapp.set_persistent_cols({
-    "Experiment Title": experiment_title,
-    "Experiment Datetime": experiment_datetime.isoformat(" ", "seconds"),
-    "Job ID": os.environ['PBS_JOBID'] if "PBS_JOBID" in os.environ.keys() else f"{time.time()}"
-})
+mainapp.set_persistent_cols(
+    {
+        "Experiment Title": experiment_title,
+        "Experiment Datetime": experiment_datetime.isoformat(" ", "seconds"),
+        "Job ID": os.environ["PBS_JOBID"]
+        if "PBS_JOBID" in os.environ.keys()
+        else f"{time.time()}",
+    }
+)
 
 # mainapp.set_parameter("Processing;Lobulus Segmentation;Central Vein Segmentation;Threshold", 0.18)
 # mainapp.set_parameter("Processing;Lobulus Segmentation;Central Vein Segmentation;Threshold", 0.20)
@@ -69,6 +79,7 @@ mainapp.set_report_level(10)
 
 # mainapp.set_parameter("Processing;Lobulus Segmentation;Manual Segmentation", True)
 
+
 def set_same(mainapp, fn, color="#00FF00"):
     logger.debug(f"fn exists {Path(fn).exists()}, fn: {fn}")
     mainapp.set_input_file(fn)
@@ -78,6 +89,7 @@ def set_same(mainapp, fn, color="#00FF00"):
     # mainapp.set_annotation_color_selection("#0000FF") # Blue is used for unlabeled
     mainapp.set_annotation_color_selection(color)
     # mainapp.set_parameter("Processing;Lobulus Segmentation;Manual Segmentation", True)
+
 
 fns_green_blue = [
     # "medical/orig/Scaffan-analysis/PIG-001_J-17-0567_edge RM_HE.ndpi",  # no annotation
@@ -98,8 +110,6 @@ fns_green_blue = [
     # # "medical/orig/Scaffan-analysis/PIG-005_J-18-0633_HE_PRML per decell.ndpi",
     # "medical/orig/Scaffan-analysis/PIG-008_P008 LL-C_HE_parenchyme centr..ndpi",
     # "medical/orig/Scaffan-analysis/PIG-008_P008 LL-P_HE_parenchyme perif..ndpi",
-
-
 ]
 
 for fn in fns_green_blue:
@@ -113,4 +123,3 @@ for fn in fns_green_blue:
 #     # mainapp.run_lobuluses(None)
 #     set_same(mainapp, io3d.datasets.join_path(fn, get_root=True), color="#0000FF")
 #     mainapp.run_lobuluses(None)
-

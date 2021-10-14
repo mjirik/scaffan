@@ -23,10 +23,10 @@ def zoom_img(img, stride=10):
 
     # crop original image
     img = img[
-          np.min(nzx) * stride:np.max(nzx) * stride,
-          np.min(nzy) * stride:np.max(nzy) * stride,
-          :
-          ]
+        np.min(nzx) * stride : np.max(nzx) * stride,
+        np.min(nzy) * stride : np.max(nzy) * stride,
+        :,
+    ]
     return img
 
 
@@ -37,7 +37,7 @@ def annotate(img):
 
     seeds = ed.seeds
     seeds = seeds[:, :, 0]
-    seeds = seeds.astype('int8')
+    seeds = seeds.astype("int8")
 
     return seeds
 
@@ -76,9 +76,9 @@ def run():
     img = rgb2hsv(img)
     img = hue_to_continuous_2d(img)
 
-    np.save('seeds.npy', seeds)
-    np.save('image.npy', img)
+    np.save("seeds.npy", seeds)
+    np.save("image.npy", img)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     run()
