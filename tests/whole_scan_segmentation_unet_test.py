@@ -16,7 +16,7 @@ sys.path.insert(0, op.abspath(op.join(path_to_script, "../../exsu")))
 # sys.path.insert(0, op.abspath(op.join(path_to_script, "../../imma")))
 exsu_pth = Path(__file__).parents[2] / "exsu"
 logger.debug(f"exsupth{exsu_pth}, {exsu_pth.exists()}")
-sys.path.insert(0, exsu_pth)
+sys.path.insert(0, str(exsu_pth))
 
 import exsu
 

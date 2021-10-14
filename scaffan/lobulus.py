@@ -286,6 +286,7 @@ class Lobulus:
         self.border_mask = outer.astype(np.uint8)
 
     def find_central_vein(self, show=True):
+        seg_true = np.zeros(self.image.shape[:2], dtype=bool)
         inner_ids = self.anim.select_inner_annotations(
             self.annotation_id, color="#000000"
         )
@@ -302,14 +303,14 @@ class Lobulus:
                 seg_true += self.view.get_annotation_raster(annotation_id=inner_id) > 0
             seg_true = (seg_true > 0).astype(np.uint8)
 
-            use_manual = self.parameters.param(
-                # "Processing", "Lobulus Segmentation",
-                "Manual Segmentation"
-            ).value()
-            if use_manual:
-                # self.central_vein_mask = seg_true.astype(np.float64)
-                self.central_vein_mask = seg_true.astype(np.uint8)
-                return
+        use_manual = self.parameters.param(
+            # "Processing", "Lobulus Segmentation",
+            "Manual Segmentation"
+        ).value()
+        if use_manual:
+            # self.central_vein_mask = seg_true.astype(np.float64)
+            self.central_vein_mask = seg_true.astype(np.uint8)
+            return
         use_texture_features = True
         pixelsize_mm = [
             (self.parameters.param("Working Resolution").value() * 1000)
@@ -425,11 +426,28 @@ class Lobulus:
         self.central_vein_mask = cvmask
 
     def run(self, show=True):
+        if self.report:
+            image_rgba = self.view.get_region_image(as_gray=False)
+            self.report.imsave(
+                f"lobulus_rgb_{self.annotation_id}.jpg", image_rgba, level=90
+            )
 
         logger.debug("Looking for the border")
         self.find_border(show)
         logger.debug("Looking for the central vein")
         self.find_central_vein(show)
+        if self.report:
+            # image_rgba = self.view.get_region_image(as_gray=False)
+            self.report.imsave(
+                f"lobulus_border_mask_{self.annotation_id}.png",
+                self.border_mask,
+                level=30,
+            )
+            self.report.imsave(
+                f"lobulus_central_vein_mask_{self.annotation_id}.png",
+                self.central_vein_mask,
+                level=30,
+            )
         # inner_lobulus_margin_mm = 0.02
 
         # mgac = ms.MorphGAC(im_gradient, smoothing=2, threshold=0.2, balloon=+1)
@@ -443,9 +461,12 @@ class Lobulus:
         # plt.contour(circle + inner + outer)
         fig = plt.figure(figsize=(12, 10))
         plt.imshow(self.image, cmap="gray")
-        plt.colorbar()
-        plt.contour(self.annotation_mask + self.central_vein_mask + self.border_mask)
-        self.view.add_ticks()
+        # plt.colorbar()
+        # plt.contour(self.annotation_mask + self.central_vein_mask + self.border_mask)
+        plt.contour(self.annotation_mask, colors=["blue"])
+        plt.contour(self.border_mask, colors=["red"])
+        plt.contour(self.central_vein_mask, colors=["orange"])
+        self.view.add_ticks(format="{:.2f}")
 
         logger.debug("Preparing lobule mask data to report")
         datarow = {}
@@ -480,7 +501,7 @@ class Lobulus:
 
         perimeter_px = skimage.measure.perimeter(
             scipy.ndimage.morphology.binary_fill_holes(self.lobulus_mask),
-            neighbourhood=8
+            neighbourhood=8,
         )
         datarow["Lobulus Perimeter"] = perimeter_px * self.view.region_pixelsize[0]
         datarow["Lobulus Boundary Compactness"] = (

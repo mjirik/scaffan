@@ -124,9 +124,11 @@ def test_read_czi_with_scaffold_data():
 
     # fn = io3d.datasets.join_path("medical/orig/scaffan-analysis-czi/J7_5/J7_5_b.czi", get_root=True)
     fn = io3d.datasets.join_path(
+        # "medical/orig/scaffan-analysis-czi/Zeiss-scans/01_2019_11_12__RecognizedCode_crop2.czi",
         "medical/orig/scaffan-analysis-czi/Zeiss-scans/01_2019_11_12__RecognizedCode.czi",
         get_root=True,
     )
+    expected_annotations = 1
     logger.debug("filename {}".format(fn))
     anim = scim.AnnotatedImage(fn)
     size_px = 1000
@@ -148,7 +150,7 @@ def test_read_czi_with_scaffold_data():
     assert len(im.shape) == 2, "should be 2D"
 
     annotations = anim.read_annotations()
-    assert len(annotations) == 0, "there should be 0 annotations"
+    assert len(annotations) == expected_annotations, f"there should be {expected_annotations} annotations"
     # assert im[0, 0] == pytest.approx(
     #     0.767964705882353, 0.001
     # )  # expected intensity is 0.76
@@ -174,9 +176,21 @@ def test_read_czi_with_scaffold_data():
 
 def test_read_annotations_czi():
     fn = io3d.datasets.join_path(
-        "medical/orig/scaffan-analysis-czi/Zeiss-scans/01_2019_11_12__RecognizedCode.czi",
+        # "medical/orig/scaffan-analysis-czi/Zeiss-scans/01_2019_11_12__RecognizedCode.czi",
+        "medical/orig/scaffan-analysis-czi/Zeiss-scans/01_2019_11_12__RecognizedCode_crop.czi",
         get_root=True,
     )
     logger.debug("filename {}".format(fn))
     anim = scim.AnnotatedImage(fn)
     assert len(anim.annotations) > 0
+
+    views = anim.get_views(annotation_ids=[0], pixelsize_mm = [0.01, 0.01], margin=0.1)
+    # views = anim.get_views(annotation_ids=[0], level=3, margin=1.5)
+    # # views = anim.get_views(*args, **kwargs) # vybiram, jakou chci zobrazit anotaci
+    view = views[0]
+    img = view.get_region_image(as_gray=False)
+    assert np.max(img) > 50
+    assert np.min(img) < 150
+    # plt.imshow(img)
+    # view.plot_annotations()
+    # plt.show()

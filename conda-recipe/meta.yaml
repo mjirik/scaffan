@@ -1,10 +1,10 @@
 package:
   name: scaffan
-  version: "0.29.18"
+  version: "0.31.2"
 
 source:
 # this is used for build from git hub
-  git_rev: 0.29.18
+  git_rev: 0.31.2
   git_url: https://github.com/mjirik/scaffan.git
 
 # this is used for pypi
@@ -47,7 +47,8 @@ requirements:
     - morphsnakes
     - pyqt  # =5.9.2 # tested
     - pyqtgraph
-    - click
+    - {{ pin_compatible('click', max_pin='x') }}
+#    - click <= 7
     - pywin32 # [win]
     - loguru
     - exsu
@@ -106,7 +107,7 @@ requirements:
     - scikit-learn
     - czifile
 # tensorflow 2 is not available in conda with py36, we need py36 because of openslide
-#    - tensorflow >= 2.0
+    - tensorflow>=2.0 # [not win]
 # h5py 3.0.0 has problems with tensorflow.
     - h5py<3.0.0
     # required by TF2 from pip
