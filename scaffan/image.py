@@ -262,6 +262,7 @@ class ImageSlide:
         return self.imagedata
 
     def get_metadata_czi(anim, picture_path_annotation):
+        from czifile import CziFile
         with CziFile(picture_path_annotation) as czi:
             metadata = czi.metadata()
         return metadata
