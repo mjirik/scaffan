@@ -1,9 +1,11 @@
 from pathlib import Path
 import sys
 import skimage.io
+
 path_to_script = Path("~/projects/scaffan/").expanduser()
 sys.path.insert(0, str(path_to_script))
 import scaffan.image
+
 
 def export_czi_annotations_to_jpg(path_annotations, annotation_name, path_images):
     index = 0
@@ -16,7 +18,9 @@ def export_czi_annotations_to_jpg(path_annotations, annotation_name, path_images
 
         anim = scaffan.image.AnnotatedImage(path=fn_str)
 
-        view = anim.get_full_view(pixelsize_mm=[0.0003, 0.0003]) # wanted pixelsize in mm in view
+        view = anim.get_full_view(
+            pixelsize_mm=[0.0003, 0.0003]
+        )  # wanted pixelsize in mm in view
         img = view.get_raster_image()
         Path(path_images).mkdir(parents=True, exist_ok=True)
         skimage.io.imsave(path_images + str(index) + ".jpg", img)
@@ -24,8 +28,10 @@ def export_czi_annotations_to_jpg(path_annotations, annotation_name, path_images
 
 
 # Loading .czi annotations
-path_annotations = Path(r"H:\zeiss_export_json") # path to main directory, that is where .czi files are
-path_images = "H:\\dataset\\" # path to directory, where the images will be exported
+path_annotations = Path(
+    r"H:\zeiss_export_json"
+)  # path to main directory, that is where .czi files are
+path_images = "H:\\dataset\\"  # path to directory, where the images will be exported
 annotation_name = "annotation"
 
 export_czi_annotations_to_jpg(path_annotations, annotation_name, path_images)
