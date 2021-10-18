@@ -1,6 +1,6 @@
 # Changelog
 
-Latest version: 0.31.2
+Latest version: 0.32.0
 
 # Not released
 * [Changed] The lobule Manual Segmentation (use manual segmentation if possible) is turned on 
