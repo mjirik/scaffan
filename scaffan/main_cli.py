@@ -176,11 +176,7 @@ def install():
     default=None,
 )
 @click.option(
-    "--color",
-    "-c",
-    type=str,
-    help="Annotation color in hexa (#0000FF)",
-    default=None,
+    "--color", "-c", type=str, help="Annotation color in hexa (#0000FF)", default=None,
 )
 @click.option(
     "--output-path",
