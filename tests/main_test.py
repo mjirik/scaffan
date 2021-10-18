@@ -3,6 +3,8 @@
 
 # import logging
 # logger = logging.getLogger(__name__)
+import shutil
+
 from loguru import logger
 import unittest
 import os
@@ -629,11 +631,15 @@ def test_run_with_color_filter():
         "medical/orig/scaffan-analysis-czi/J7_5/J7_5_b_test.czi",
         get_root=True,
     )
+    outpudir_str = "test_run_lobuluses_output_dir_color_filter"
+    outputdir = Path(outpudir_str)
+    if outputdir.exists():
+        shutil.rmtree(outputdir)
 
 
     mainapp = scaffan.algorithm.Scaffan()
     mainapp.set_input_file(fn)
-    mainapp.set_output_dir("test_run_lobuluses_output_dir_color_filter")
+    mainapp.set_output_dir(outpudir_str)
     mainapp.set_parameter("Input;Lobulus Selection Method", "Manual")
     # mainapp.set_annotation_color_selection("#FFFF00")
     mainapp.set_parameter("Processing;Whole Scan Segmentation", False)
@@ -644,3 +650,5 @@ def test_run_with_color_filter():
     mainapp.run_lobuluses(seeds_mm=[[0.60, 0.90]])
     # mainapp.run_lobuluses()
     # run_on_yellow(mainapp, fn)
+    assert outputdir.exists()
+    assert len(list(outputdir.glob("*"))) > 0

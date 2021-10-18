@@ -3,6 +3,7 @@
 Latest version: 0.31.2
 
 # Not released
+* [Changed] The lobule Manual Segmentation (use manual segmentation if possible) is turned on 
 * [Added] Slide segmentation model filename prefix for easier testing
 * [Changed] "Scan Segmentation" renamed to "Whole Scan Segmentation"
 * [Added] Ability to remove some colors from the image by Color Filter

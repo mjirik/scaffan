@@ -165,8 +165,8 @@ class Lobulus:
             {
                 "name": "Manual Segmentation",
                 "type": "bool",
-                "value": False,
-                "tip": "Use manual inner and outer segmentation with black color instead of computed segmentation. Computation is skipped.",
+                "value": True,
+                "tip": "Use manual outer and inner segmentation if outer segmentation is given. Inner and outer segmentation have to be done with black color. Computation of automatic segmentation is skipped.",
             },
         ]
 
@@ -239,7 +239,7 @@ class Lobulus:
             logger.warning(
                 f"More than one outer annotation find to annotation with ID: {self.annotation_id}"
             )
-        elif len(outer_ids) > 0:
+        if len(outer_ids) > 0:
             outer_id = outer_ids[0]
             seg_true = self.view.get_annotation_raster(annotation_id=outer_id) > 0
             use_manual = self.parameters.param(
@@ -290,6 +290,9 @@ class Lobulus:
         inner_ids = self.anim.select_inner_annotations(
             self.annotation_id, color="#000000"
         )
+        # outer_ids = self.anim.select_outer_annotations(
+        #     self.annotation_id, color="#000000", raise_exception_if_not_found=False
+        # )
         if len(inner_ids) > 1:
             logger.warning(
                 "More than one inner annotation find to annotation with ID %i. Combination will be used.",
