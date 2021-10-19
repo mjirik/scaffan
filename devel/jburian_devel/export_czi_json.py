@@ -16,7 +16,9 @@ def get_image_properties(dataset_directory):
     image_name_id = 0
 
     while True:
-        filename_string = str(dataset_directory) + "\\" + str(image_name).zfill(4) + ".jpg"
+        filename_string = (
+            str(dataset_directory) + "\\" + str(image_name).zfill(4) + ".jpg"
+        )
         filename_path = Path(filename_string)
         if not filename_path.exists():
             break
@@ -55,7 +57,9 @@ def get_category_properties(dataset_directory, filename):
     return list_category_dictionaries
 
 
-def get_annotations_properties(czi_files_directory, annotation_name):  # TODO: add bbbox and area if needed
+def get_annotations_properties(
+    czi_files_directory, annotation_name
+):  # TODO: add bbbox and area if needed
     index = 0
     annotation_id = 1
     category_id = 1  # only one category - cells
@@ -65,7 +69,11 @@ def get_annotations_properties(czi_files_directory, annotation_name):  # TODO: a
 
     while True:
         filename_string = (
-            str(czi_files_directory) + "\\" + annotation_name + str(index).zfill(4) + ".czi"
+            str(czi_files_directory)
+            + "\\"
+            + annotation_name
+            + str(index).zfill(4)
+            + ".czi"
         )
         filename_path = Path(filename_string)
         if not filename_path.exists():
@@ -79,8 +87,8 @@ def get_annotations_properties(czi_files_directory, annotation_name):  # TODO: a
 
         for j in range(len(annotations)):
             xy_px_list = []
-            x_px_list = annotations[j]['x_px'].tolist()
-            y_px_list = annotations[j]['y_px'].tolist()
+            x_px_list = annotations[j]["x_px"].tolist()
+            y_px_list = annotations[j]["y_px"].tolist()
 
             for i in range(len(x_px_list)):
                 xy_px_list.append(x_px_list[i])
@@ -144,7 +152,9 @@ data.update({"categories": list_category_dictionaries})
 czi_files_directory = Path(r"H:\zeiss_export_json")  # path to .czi files directory
 annotation_name = "annotation"
 
-list_annotation_dictionaries = get_annotations_properties(czi_files_directory, annotation_name)
+list_annotation_dictionaries = get_annotations_properties(
+    czi_files_directory, annotation_name
+)
 data.update({"annotations": list_annotation_dictionaries})
 
 # Creating .json file
