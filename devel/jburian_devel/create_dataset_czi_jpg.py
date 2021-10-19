@@ -10,7 +10,7 @@ import scaffan.image
 def export_czi_annotations_to_jpg(path_annotations, annotation_name, path_images):
     index = 0
     while True:
-        fn_str = str(path_annotations) + "\\" + annotation_name + str(index) + ".czi"
+        fn_str = str(path_annotations) + "\\" + annotation_name + str(index).zfill(4) + ".czi"
         fn_path = Path(fn_str)
         if not fn_path.exists():
             break
@@ -23,7 +23,7 @@ def export_czi_annotations_to_jpg(path_annotations, annotation_name, path_images
         )  # wanted pixelsize in mm in view
         img = view.get_raster_image()
         Path(path_images).mkdir(parents=True, exist_ok=True)
-        skimage.io.imsave(path_images + str(index) + ".jpg", img)
+        skimage.io.imsave(path_images + str(index).zfill(4) + ".jpg", img)
         index += 1
 
 
