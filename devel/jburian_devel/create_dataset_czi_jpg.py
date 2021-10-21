@@ -6,6 +6,7 @@ path_to_script = Path("~/projects/scaffan/").expanduser()
 sys.path.insert(0, str(path_to_script))
 import scaffan.image
 
+
 def export_czi_annotations_to_jpg(path_annotations, annotation_name, path_images):
     index = 0
     while True:
