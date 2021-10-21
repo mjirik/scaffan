@@ -2,6 +2,7 @@ import datetime
 from pathlib import Path
 import sys
 import skimage.io
+import numpy as np
 
 path_to_script = Path("~/projects/scaffan/").expanduser()
 sys.path.insert(0, str(path_to_script))
@@ -56,6 +57,10 @@ def get_category_properties(dataset_directory, filename):
     return list_category_dictionaries
 
 
+def count_polygon_area(x,y):
+    return 0.5*np.abs(np.dot(x,np.roll(y,1))-np.dot(y,np.roll(x,1)))
+
+
 def get_annotations_properties(
     czi_files_directory, annotation_name
 ):  # TODO: add bbbox and area if needed
@@ -89,6 +94,9 @@ def get_annotations_properties(
             x_px_list = annotations[j]["x_px"].tolist()
             y_px_list = annotations[j]["y_px"].tolist()
 
+            #polygon_area = count_polygon_area(np.array(x_px_list) * 0.0003, np.array(y_px_list) * 0.0003) # in mm
+            polygon_area = count_polygon_area(np.array(x_px_list), np.array(y_px_list))  # in pixels
+
             for i in range(len(x_px_list)):
                 xy_px_list.append(x_px_list[i])
                 xy_px_list.append(y_px_list[i])
@@ -100,7 +108,7 @@ def get_annotations_properties(
                 "image_id": image_id,
                 "category_id": category_id,
                 "segmentation": [segmentation],  # RLE or [polygon]
-                "area": 1234,  # prozatimni hodnota; Shoelace formula
+                "area": polygon_area,  # Shoelace formula
                 "bbox": [],  # [x, y, width, height] # je treba?
                 "iscrowd": 0,  # prozatimni hodnota; 0 nebo 1?
             }
