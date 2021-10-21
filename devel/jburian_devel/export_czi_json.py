@@ -5,7 +5,6 @@ import skimage.io
 
 path_to_script = Path("~/projects/scaffan/").expanduser()
 sys.path.insert(0, str(path_to_script))
-import matplotlib.pyplot as plt
 import scaffan.image
 from datetime import date
 
