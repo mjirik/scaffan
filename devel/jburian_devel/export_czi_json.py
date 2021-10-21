@@ -57,8 +57,8 @@ def get_category_properties(dataset_directory, filename):
     return list_category_dictionaries
 
 
-def count_polygon_area(x,y):
-    return 0.5*np.abs(np.dot(x,np.roll(y,1))-np.dot(y,np.roll(x,1)))
+def count_polygon_area(x, y):
+    return 0.5 * np.abs(np.dot(x, np.roll(y, 1)) - np.dot(y, np.roll(x, 1)))
 
 
 def get_annotations_properties(
@@ -94,8 +94,10 @@ def get_annotations_properties(
             x_px_list = annotations[j]["x_px"].tolist()
             y_px_list = annotations[j]["y_px"].tolist()
 
-            #polygon_area = count_polygon_area(np.array(x_px_list) * 0.0003, np.array(y_px_list) * 0.0003) # in mm
-            polygon_area = count_polygon_area(np.array(x_px_list), np.array(y_px_list))  # in pixels
+            # polygon_area = count_polygon_area(np.array(x_px_list) * 0.0003, np.array(y_px_list) * 0.0003) # in mm
+            polygon_area = count_polygon_area(
+                np.array(x_px_list), np.array(y_px_list)
+            )  # in pixels
 
             for i in range(len(x_px_list)):
                 xy_px_list.append(x_px_list[i])
