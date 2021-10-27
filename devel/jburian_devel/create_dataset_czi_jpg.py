@@ -38,7 +38,9 @@ def export_czi_annotations_to_jpg(path_annotations, annotation_name, path_images
 path_annotations = Path(
     r"H:\zeiss_export_json"
 )  # path to main directory, that is where .czi files are
-path_images = "H:\\COCO_dataset\\images\\"  # path to directory, where the images will be exported
+path_images = (
+    "H:\\COCO_dataset\\images\\"  # path to directory, where the images will be exported
+)
 annotation_name = "annotation"
 
 export_czi_annotations_to_jpg(path_annotations, annotation_name, path_images)

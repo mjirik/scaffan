@@ -62,9 +62,7 @@ def count_polygon_area(x, y):
     return 0.5 * np.abs(np.dot(x, np.roll(y, 1)) - np.dot(y, np.roll(x, 1)))
 
 
-def get_annotations_properties(
-    czi_files_directory, annotation_name
-):
+def get_annotations_properties(czi_files_directory, annotation_name):
     index = 0
     annotation_id = 1
     category_id = 1  # only one category - cells
@@ -114,9 +112,9 @@ def get_annotations_properties(
 
             segmentation = xy_px_list
 
-            #segmentation[0::2]
-            #segmentation[1::2]
-            #np.max(x_px_list)
+            # segmentation[0::2]
+            # segmentation[1::2]
+            # np.max(x_px_list)
 
             annotation_dictionary = {
                 "id": annotation_id,
