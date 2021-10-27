@@ -3,6 +3,7 @@ from pathlib import Path
 import sys
 import skimage.io
 import numpy as np
+import math
 
 path_to_script = Path("~/projects/scaffan/").expanduser()
 sys.path.insert(0, str(path_to_script))
@@ -63,7 +64,7 @@ def count_polygon_area(x, y):
 
 def get_annotations_properties(
     czi_files_directory, annotation_name
-):  # TODO: add bbbox and area if needed
+):
     index = 0
     annotation_id = 1
     category_id = 1  # only one category - cells
@@ -91,19 +92,31 @@ def get_annotations_properties(
 
         for j in range(len(annotations)):
             xy_px_list = []
+
             x_px_list = annotations[j]["x_px"].tolist()
             y_px_list = annotations[j]["y_px"].tolist()
+
+            x_px_min = float(math.floor(np.min(x_px_list)))
+            y_px_min = float(math.floor(np.min(y_px_list)))
+            width = float(math.floor(np.max(x_px_list)) - x_px_min)
+            height = float(math.floor(np.max(y_px_list)) - y_px_min)
+
+            bbox = [x_px_min, y_px_min, width, height]
 
             # polygon_area = count_polygon_area(np.array(x_px_list) * 0.0003, np.array(y_px_list) * 0.0003) # in mm
             polygon_area = count_polygon_area(
                 np.array(x_px_list), np.array(y_px_list)
             )  # in pixels
-
+            x_px_list = np.asarray(x_px_list)
             for i in range(len(x_px_list)):
                 xy_px_list.append(x_px_list[i])
                 xy_px_list.append(y_px_list[i])
 
             segmentation = xy_px_list
+
+            #segmentation[0::2]
+            #segmentation[1::2]
+            #np.max(x_px_list)
 
             annotation_dictionary = {
                 "id": annotation_id,
@@ -111,8 +124,8 @@ def get_annotations_properties(
                 "category_id": category_id,
                 "segmentation": [segmentation],  # RLE or [polygon]
                 "area": polygon_area,  # Shoelace formula
-                "bbox": [],  # [x, y, width, height] # je treba?
-                "iscrowd": 0,  # prozatimni hodnota; 0 nebo 1?
+                "bbox": bbox,  # [x, y, width, height]
+                "iscrowd": 0,
             }
             annotation_id += 1
 
@@ -148,7 +161,7 @@ info_dictionary = {
 }
 data.update({"info": info_dictionary})
 
-dataset_directory = Path(r"H:\dataset")
+dataset_directory = Path(r"H:\COCO_dataset\images")
 
 list_image_dictionaries = get_image_properties(dataset_directory)
 data.update({"images": list_image_dictionaries})
@@ -166,6 +179,8 @@ list_annotation_dictionaries = get_annotations_properties(
 )
 data.update({"annotations": list_annotation_dictionaries})
 
+# Creating COCO format
+path_json = "H:\\COCO_dataset"  # path to directory, where the images will be exported
 # Creating .json file
-with open("data.json", "w", encoding="utf-8") as f:
+with open(path_json + "\\" + "trainval.json", "w", encoding="utf-8") as f:
     json.dump(data, f, ensure_ascii=False, indent=4)
