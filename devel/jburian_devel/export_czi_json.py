@@ -4,6 +4,7 @@ import sys
 import skimage.io
 import numpy as np
 import math
+import matplotlib.pyplot as plt
 
 path_to_script = Path("~/projects/scaffan/").expanduser()
 sys.path.insert(0, str(path_to_script))
@@ -87,6 +88,13 @@ def get_annotations_properties(czi_files_directory, annotation_name):
             pixelsize_mm=[0.0003, 0.0003]
         )  # wanted pixelsize in mm in view
         annotations = view.annotations
+
+        ''' 
+        img = view.get_raster_image()
+        view.plot_annotations()
+        plt.imshow(img)
+        plt.show()
+        '''
 
         for j in range(len(annotations)):
             xy_px_list = []
