@@ -1,4 +1,3 @@
-import datetime
 from pathlib import Path
 import sys
 import skimage.io
@@ -63,7 +62,7 @@ def count_polygon_area(x, y):
     return 0.5 * np.abs(np.dot(x, np.roll(y, 1)) - np.dot(y, np.roll(x, 1)))
 
 
-def get_annotations_properties(czi_files_directory, annotation_name):
+def get_annotations_properties(czi_files_directory, annotation_name, pixelsize_mm):
     index = 0
     annotation_id = 1
     category_id = 1  # only one category - cells
@@ -99,8 +98,8 @@ def get_annotations_properties(czi_files_directory, annotation_name):
         for j in range(len(annotations)):
             xy_px_list = []
 
-            x_px_list = annotations[j]["x_px"].tolist()
-            y_px_list = annotations[j]["y_px"].tolist()
+            x_px_list = (np.asarray(annotations[j]["x_mm"]) / pixelsize_mm[0]).tolist()
+            y_px_list = (np.asarray(annotations[j]["y_mm"]) / pixelsize_mm[1]).tolist()
 
             x_px_min = float(math.floor(np.min(x_px_list)))
             y_px_min = float(math.floor(np.min(y_px_list)))
@@ -180,8 +179,9 @@ data.update({"categories": list_category_dictionaries})
 czi_files_directory = Path(r"H:\zeiss_export_json")  # path to .czi files directory
 annotation_name = "annotation"
 
+pixelsize_mm = [0.0003, 0.0003]
 list_annotation_dictionaries = get_annotations_properties(
-    czi_files_directory, annotation_name
+    czi_files_directory, annotation_name, pixelsize_mm
 )
 data.update({"annotations": list_annotation_dictionaries})
 
