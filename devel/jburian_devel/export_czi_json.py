@@ -88,12 +88,12 @@ def get_annotations_properties(czi_files_directory, annotation_name, pixelsize_m
         )  # wanted pixelsize in mm in view
         annotations = view.annotations
 
-        ''' 
+        """ 
         img = view.get_raster_image()
         view.plot_annotations()
         plt.imshow(img)
         plt.show()
-        '''
+        """
 
         for j in range(len(annotations)):
             xy_px_list = []
