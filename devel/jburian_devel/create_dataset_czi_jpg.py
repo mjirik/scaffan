@@ -9,7 +9,7 @@ import scaffan.image
 
 
 def export_czi_annotations_to_jpg(path_annotations, annotation_name, path_images):
-    '''
+    """
     Creates image dataset from .czi annotations
 
     Parameters:
@@ -20,7 +20,7 @@ def export_czi_annotations_to_jpg(path_annotations, annotation_name, path_images
                       wanted name of the annotations (e.g. ann, annotation, a,...)
     path_images : str
                   path to directory where the images will be saved
-    '''
+    """
     index = 0
     while True:
         fn_str = (

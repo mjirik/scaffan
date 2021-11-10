@@ -12,7 +12,7 @@ from datetime import date
 
 
 def get_image_properties(dataset_directory):
-    '''
+    """
     Returns the properties of the images (list of dictionaries) which are obligatory in COCO data format
     For example (properties of one image):
         image {
@@ -26,7 +26,7 @@ def get_image_properties(dataset_directory):
     -----------
     dataset_directory : Path
                         directory of the image dataset
-    '''
+    """
     image_name = 0
     list_image_dictionaries = []
     image_name_id = 0
@@ -56,7 +56,7 @@ def get_image_properties(dataset_directory):
 
 
 def get_category_properties(dataset_directory, filename):
-    '''
+    """
     Returns properties of category (list of dictionaries)
     It can read categories from .txt file, if each category is on a single line without commas
     For example (properties of one category):
@@ -72,7 +72,7 @@ def get_category_properties(dataset_directory, filename):
                         directory of the image dataset
     filename : str
                filename of the .txt file which is in the same file as dataset
-    '''
+    """
     list_category_dictionaries = []
     with open(str(dataset_directory) + "\\" + filename) as f:
         lines = f.readlines()
@@ -91,19 +91,19 @@ def get_category_properties(dataset_directory, filename):
 
 
 def count_polygon_area(x, y):
-    '''
+    """
     Counts the area of an polygon
 
     Parameters:
     -----------
     x : np.array(x_px_list),
     y : np.array(y_px_list)
-    '''
+    """
     return 0.5 * np.abs(np.dot(x, np.roll(y, 1)) - np.dot(y, np.roll(x, 1)))
 
 
 def get_annotations_properties(czi_files_directory, annotation_name, pixelsize_mm):
-    '''
+    """
     Returns the properties of the annotations (list of dictionaries)
     One dictionary = object instance annotation
     For example (one annotation):
@@ -126,7 +126,7 @@ def get_annotations_properties(czi_files_directory, annotation_name, pixelsize_m
     pixelsize_mm : list
                    defines pixelsize in mm (e.g. pixelsize = [[0.0003, 0.0003])
 
-    '''
+    """
 
     index = 0
     annotation_id = 1
@@ -208,7 +208,7 @@ def get_annotations_properties(czi_files_directory, annotation_name, pixelsize_m
 
 
 def get_info_dictionary(version, description, contributor):
-    '''
+    """
     Returns dictionary with the basic information related to COCO dataset
 
     Parameters:
@@ -216,7 +216,7 @@ def get_info_dictionary(version, description, contributor):
     version : str
     description: str
     contributor : st
-    '''
+    """
 
     info_dictionary = {
         "year": str(date.today().year),
@@ -229,12 +229,12 @@ def get_info_dictionary(version, description, contributor):
 
 
 if __name__ == "__main__":
-    '''
+    """
     Creating of .json file
-    '''
+    """
     import json
 
-    '''
+    """
     .json file structure
     
     data = {    
@@ -244,19 +244,19 @@ if __name__ == "__main__":
         "annotations": [annotation]
         "licenses": [license]
     }
-    '''
+    """
 
-    #Directory of the image dataset
+    # Directory of the image dataset
     dataset_directory = Path(r"H:\COCO_dataset\images")
 
-    #Directory of the .czi files
+    # Directory of the .czi files
     czi_files_directory = Path(r"H:\zeiss_export_json")  # path to .czi files directory
 
     data = {}
 
-    '''
+    """
     Info
-    '''
+    """
     version = "1.0"
     description = "COCO dataset for scaffan"
     contributor = "Jan Burian"
@@ -264,23 +264,23 @@ if __name__ == "__main__":
     info_dictionary = get_info_dictionary(version, description, contributor)
     data.update({"info": info_dictionary})
 
-    '''
+    """
     Images
-    '''
+    """
     list_image_dictionaries = get_image_properties(dataset_directory)
     data.update({"images": list_image_dictionaries})
 
-    '''
+    """
     Categories
-    '''
+    """
     list_category_dictionaries = get_category_properties(
         dataset_directory, "categories.txt"
     )  # directory and .txt file
     data.update({"categories": list_category_dictionaries})
 
-    '''
+    """
     Annotations
-    '''
+    """
     annotation_name = "annotation"
     pixelsize_mm = [0.0003, 0.0003]
     list_annotation_dictionaries = get_annotations_properties(
@@ -288,11 +288,12 @@ if __name__ == "__main__":
     )
     data.update({"annotations": list_annotation_dictionaries})
 
-
-    '''
+    """
     COCO format
-    '''
-    path_json = "H:\\COCO_dataset"  # path to directory, where the .json file will be exported
+    """
+    path_json = (
+        "H:\\COCO_dataset"  # path to directory, where the .json file will be exported
+    )
     # Creating .json file
     with open(path_json + "\\" + "trainval.json", "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=4)
