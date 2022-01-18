@@ -48,10 +48,10 @@ def export_czi_annotations_to_jpg(path_annotations, annotation_name, path_images
 
 # Loading .czi annotations
 path_annotations = Path(
-    r"H:\czi_files"
+    r"H:\BP\data\czi_files_train"
 )  # path to main directory, that is where .czi files are
 path_images = (
-    "H:\\COCO_dataset\\images\\"  # path to directory, where the images will be exported
+    "H:\\BP\\COCO_dataset_train\\images\\"  # path to directory, where the images will be exported
 )
 annotation_name = "annotation"
 
