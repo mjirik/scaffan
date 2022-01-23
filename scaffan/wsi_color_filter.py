@@ -78,7 +78,7 @@ class WsiColorFilter:
         self.models = {}
         self.color_ids = {}
         self.slope = 1
-        self.proportion = 1.
+        self.proportion = 1.0
         pass
 
     def init_color_filter_by_anim(self, anim: image.AnnotatedImage):
