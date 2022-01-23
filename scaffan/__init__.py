@@ -5,7 +5,7 @@ try:
 
     __version__ = subprocess.check_output("git describe".split(" "), cwd="..").strip()
 except (subprocess.CalledProcessError, FileNotFoundError) as e:
-    __version__ = "0.32.1"
+    __version__ = "0.32.2"
 """
 Used for scaffold analysis
 """
