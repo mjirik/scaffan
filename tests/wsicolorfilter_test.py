@@ -24,7 +24,7 @@ def test_change_color_whole_scaffan():
     # mainapp.color_filter.set_anim_params(mainapp.anim)
     view, img = mainapp.get_preview()
     plt.imshow(img)
-    # plt.show()
+    plt.show()
 
     # mainapp.set_parameter("Processing;Skeleton Analysis", False)
     # mainapp.set_parameter("Processing;Texture Analysis", False)
@@ -42,6 +42,9 @@ def test_change_color_of_wsi():
     logger.debug(anim.annotations)
     color_filter = WsiColorFilter()
     color_filter.init_color_filter_by_anim(anim)
+    color_filter.slope = 10000
+    color_filter.proportion = 1.
+
     size_px = 100
     size_on_level = [size_px, size_px]
 
@@ -60,6 +63,7 @@ def test_change_color_of_wsi():
     mask = views[0].get_annotation_region_raster(id)
     new_img, probas = color_filter.img_processing(img, return_proba=True)
 
+
     ####
     # x = np.linspace(-5,5)
     # y = scaffan.image_intensity_rescale.sigmoidal(x* slope)
@@ -73,8 +77,8 @@ def test_change_color_of_wsi():
     assert np.max(list(probas.values())[0]) > 0.6
     assert np.min(list(probas.values())[0]) < 0.4
 
-    if False:
-        plti = 420
+    if True:
+        plti = 430
         plt.subplot(plti + 1)
         plt.imshow(img)
         plt.contour(mask)
@@ -82,29 +86,49 @@ def test_change_color_of_wsi():
 
         plt.subplot(plti + 2)
         plt.imshow(new_img)
+        plt.title("new_img")
         plt.contour(mask)
 
         key = list(probas.keys())[0]
         chsv_proba2_img = probas[key]
 
-        # plt.subplot(plti + 3)
+        plt.subplot(plti + 3)
+        plt.imshow(np.exp(chsv_proba2_img))
+        plt.colorbar()
         # plt.hist(chsv_proba2.flatten(), bins=np.linspace(-10,4,20))
         #
-        # plt.subplot(plti + 4)
+        plt.subplot(plti + 4)
+        plt.hist(np.exp(chsv_proba2_img).flatten(), histtype = 'step',
+                   cumulative = True, density = True
+                 )
+        plt.hist(np.exp(chsv_proba2_img).flatten(), histtype = 'step',
+                 cumulative = False, density = True
+                 )
         # plt.imshow(chsv_proba2.reshape(sh[:2]))
         # plt.contour(mask)
         # plt.colorbar()
 
         plt.subplot(plti + 5)
-        plt.hist(chsv_proba2_img.flatten(), bins=np.linspace(-2,2,30))
+        plt.hist(chsv_proba2_img.flatten(), bins=np.linspace(-2, 2, 30))
         # plt.colorbar()
 
-        plt.subplot(plti+ 6)
+        plt.subplot(plti + 6)
         # plt.imshow(img)
         plt.imshow(chsv_proba2_img)
+        plt.title("original proba")
         plt.colorbar()
 
-        # plt.subplot(plti + 7)
+        plt.subplot(plti + 7)
+        mx = np.max(np.exp(chsv_proba2_img))
+        print(mx)
+        probas_linspace = np.linspace(0, mx, 10000)
+        probas_linspace_weighted = color_filter._soft_maximum_limit(probas_linspace)
+        plt.plot(probas_linspace, probas_linspace_weighted)
+
+
+        plt.subplot(plti + 8)
+        plt.imshow(color_filter._weighted_proba(chsv_proba2_img))
+        plt.colorbar()
         # plt.hist(chsv_proba2_img_exp.flatten(), bins=np.linspace(-2,2,30))
         #
         # plt.subplot(plti+ 8)

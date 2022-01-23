@@ -18,7 +18,8 @@ class WsiColorFilterPQG:
     def __init__(
         self,
         pname="Color Filter",
-        ptype="group",
+        ptype="bool",
+        # ptype="group",
         pvalue=True,
         ptip="A preprocessing of input image. Turns color specified by annotation into color sepcified in annotation title."
         + "The annotation title must contain 'convert color to #ffffff' to turn color to white.",
@@ -36,8 +37,14 @@ class WsiColorFilterPQG:
                 "name": "Sigmoidal Slope",
                 "type": "float",
                 "tip": "Slope of sigmoidal limit function. The lower number means softer application of color change.",
-                "value": 0.5,
+                "value": 0.2,
             },
+            # {
+            #     "name": "Sigmoidal Slope",
+            #     "type": "float",
+            #     "tip": "Slope of sigmoidal limit function. The lower number means softer application of color change.",
+            #     "value": 0.5,
+            # },
         ]
         self.parameters = Parameter.create(
             name=pname,
@@ -71,6 +78,7 @@ class WsiColorFilter:
         self.models = {}
         self.color_ids = {}
         self.slope = 1
+        self.proportion = 1.
         pass
 
     def init_color_filter_by_anim(self, anim: image.AnnotatedImage):
@@ -152,26 +160,34 @@ class WsiColorFilter:
 
             #    limit under zero and suqeeze data
             #    log(exp(log(score)) + 1)
-
-            chsv_proba2_img_exp = np.exp(chsv_proba2_img)
-            # chsv_proba2_img = scaffan.image_intensity_rescale.sigmoidal(np.log(chsv_proba2_img_exp + 1))
-            # chsv_proba2_img = 1 - (np.exp(-np.log(chsv_proba2_img_exp + 1) )) ## this seems to be ok
-            chsv_proba2_img_log = np.log(chsv_proba2_img_exp + 1)
-            # chsv_proba2_img = 1 / (1 + np.exp(-(chsv_proba2_img_exp)))
-            chsv_proba2_img = 1 - np.exp(-chsv_proba2_img_log * self.slope)  # best
-            # chsv_proba2_img = 1-np.exp(-chsv_proba2_img* slope)
-            # chsv_proba2_img = chsv_proba2_img_exp* slope
-            # chsv_proba2_img[chsv_proba2_img > 1.] = 1
+            weighted_chsv_proba2_img = self._weighted_proba(chsv_proba2_img)
 
             #
             if return_proba:
                 proba[hexa] = chsv_proba2_img
-            img = change_color_using_probability(img, chsv_proba2_img, hexa)
+            img = change_color_using_probability(img, weighted_chsv_proba2_img, hexa)
 
         if return_proba:
             return img, proba
         else:
             return img
+
+    def _weighted_proba(self, chsv_proba2_img):
+        chsv_proba2_img_exp = np.exp(chsv_proba2_img)
+        return self._soft_maximum_limit(chsv_proba2_img_exp)
+
+    def _soft_maximum_limit(self, chsv_proba2_img_exp):
+        # chsv_proba2_img = scaffan.image_intensity_rescale.sigmoidal(np.log(chsv_proba2_img_exp + 1))
+        # chsv_proba2_img = 1 - (np.exp(-np.log(chsv_proba2_img_exp + 1) )) ## this seems to be ok
+        chsv_proba2_img_log = np.log(chsv_proba2_img_exp + 1)
+        # chsv_proba2_img = 1 / (1 + np.exp(-(chsv_proba2_img_exp)))
+        chsv_proba2_img_out = 1 - np.exp(-chsv_proba2_img_log * self.slope)  # best
+        # chsv_proba2_img = 1-np.exp(-chsv_proba2_img* slope)
+        # chsv_proba2_img = chsv_proba2_img_exp* slope
+        # chsv_proba2_img[chsv_proba2_img > 1.] = 1
+        x = chsv_proba2_img_exp
+        chsv_proba2_img_out = self.proportion * (1 - np.exp(-x / self.slope))
+        return chsv_proba2_img_out
 
 
 def rgb_image_to_chsv(img):
