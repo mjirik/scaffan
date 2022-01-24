@@ -15,7 +15,7 @@ from loguru import logger
 
 # problem is loading lxml together with openslide
 # from lxml import etree
-from typing import List, Union
+from typing import List, Union, Optional
 import os.path as op
 import glob
 import matplotlib.pyplot as plt
@@ -415,19 +415,19 @@ class AnnotatedImage:
     Read the image and the annotation. The
     """
 
-    def __init__(self, path: str, skip_read_annotations=False):
+    def __init__(self, path:Union[str, Path], skip_read_annotations=False):
         fs_enc = sys.getfilesystemencoding()
         logger.debug(f"fs_enc: {fs_enc}")
-        logger.debug("Reading file {}".format(path))
+        logger.debug("Reading file {}".format(str(path)))
 
-        self.path = path
+        self.path = str(path)
         # pth_encoded = path.encode(fs_enc)
         # path.encode()
         # logger.debug(f"path encoded {pth_encoded}")
         self.image_type: str = Path(self.path).suffix.lower()
         if self.image_type in (".tiff", ".tif"):
             self.image_type = ".tiff"
-        self.openslide: ImageSlide = ImageSlide(path)
+        self.openslide: ImageSlide = ImageSlide(self.path)
         self.region_location = None
         self.region_size = None
         self.region_level = None
@@ -782,10 +782,10 @@ class AnnotatedImage:
 
     def get_full_view(
         self,
-        level=0,
-        pixelsize_mm=None,
-        safety_bound=2,
-        margin=0.0,
+        level:int=0,
+        pixelsize_mm:Optional[float]=None,
+        safety_bound:float=2.,
+        margin:float=0.0,
         # margin_in_pixels=False,
         # annotation_id=None,
         # margin=0.5,
@@ -1307,10 +1307,10 @@ class View:
         pixelsize_mm=None,
         center_mm=None,
         location_mm=None,
-        safety_bound=2,
-        annotation_id=None,
+        safety_bound:float=2,
+        annotation_id:Optional[int]=None,
         # margin=0.5,
-        margin=0.0,
+        margin:float=0.0,
         margin_in_pixels: bool = False,
     ):
         self._requested_size_on_level_when_defined_by_pixelsize = None

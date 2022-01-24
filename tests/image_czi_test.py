@@ -194,3 +194,35 @@ def test_read_annotations_czi():
     # plt.imshow(img)
     # view.plot_annotations()
     # plt.show()
+
+def test_read_czi_to_fix_xml_bytelike_object_is_required_instead_of_none_type():
+
+    fn = io3d.datasets.joinp(
+        # "medical/orig/scaffan-analysis-czi/J7_5/J7_5_b.czi"
+        # "biomedical/orig/scaffan-analysis-czi/J7_5/J7_5_b.czi"
+
+        "medical",
+        "orig",
+        "Scaffan-analysis",
+        "PIG-002_J-18-0091_HE.ndpi",
+    )
+    # fn = io3d.datasets.join_path(
+    #     "medical/orig/scaffan-analysis-czi/Zeiss-scans/01_2019_11_12__RecognizedCode.czi",
+    #     get_root=True)
+    logger.debug(f"filename={fn}")
+    logger.debug(fn.exists())
+    anim = scim.AnnotatedImage(fn)
+    view = anim.get_full_view(pixelsize_mm=0.1)
+    img = view.get_region_image(as_gray=True)
+    plt.imshow(img)
+    plt.show()
+    logger.debug(anim.annotations)
+    views = anim.get_views(annotation_ids=[0], pixelsize_mm = [0.01, 0.01], margin=0.1)
+    # views = anim.get_views(annotation_ids=[0], level=3, margin=1.5)
+    # # views = anim.get_views(*args, **kwargs) # vybiram, jakou chci zobrazit anotaci
+    view = views[0]
+    img = view.get_region_image(as_gray=True)
+    assert np.max(img) > 50
+    assert np.min(img) < 150
+    plt.imshow(img)
+    plt.show()
