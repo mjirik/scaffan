@@ -551,6 +551,7 @@ class AnnotatedImage:
         height0 = self.openslide.properties["openslide.level[0].height"]
         width0 = self.openslide.properties["openslide.level[0].width"]
         size_on_level0 = np.array([int(height0), int(width0)])
+        # size_on_level0 = np.array([int(width0), int(height0)])
         return size_on_level0
 
     def get_image_by_center(self, center, level=3, size=None, as_gray=True):
@@ -799,7 +800,7 @@ class AnnotatedImage:
         view_level0 = self.get_view(
             location=[0, 0],
             level=0,
-            size_on_level=size_on_level,
+            size_on_level=size_on_level[::-1],
             margin=margin,
             margin_in_pixels=False,
         )
@@ -1278,6 +1279,12 @@ class View:
         self._requested_size_on_level_when_defined_by_pixelsize = None
         self._is_resized_by_pixelsize = None
 
+        self.region_level = None
+        self.region_size_on_level = None
+        self.region_pixelsize = None
+        self.region_pixelunit = None
+        self.zoom:Optional[np.array] = None
+
         self.set_region(
             center=center,
             level=level,
@@ -1294,7 +1301,7 @@ class View:
         )
         self.select_outer_annotations = self.anim.select_outer_annotations
         self.select_inner_annotations = self.anim.select_inner_annotations
-        self.get_raster_image = self.get_region_image
+        self.get_region_image = self.get_raster_image
         self.get_annotation_region_raster = self.get_annotation_raster
 
     def set_region(
@@ -1624,7 +1631,7 @@ class View:
     ):
         self.anim.openslide.level_downsamples
 
-    def get_region_image(self, as_gray=False, log_level="TRACE"):
+    def get_raster_image(self, as_gray=False, log_level="TRACE"):
         """
         Get raster image from the view. It can have defined pixelsize, and also the level
         :param as_gray:
@@ -1790,11 +1797,11 @@ class View:
 
     def get_full_view(
         self,
-        level=None,
-        pixelsize_mm=None,
-        safety_bound=2,
-        margin=0.0,
-        margin_in_pixels=False,
+        level:Optional[int]=None,
+        pixelsize_mm:Optional[float]=None,
+        safety_bound:float=2,
+        margin:float=0.0,
+        margin_in_pixels:bool=False,
         # annotation_id=None,
         # margin=0.5,
         # margin_in_pixels=False,

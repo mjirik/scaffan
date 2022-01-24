@@ -184,7 +184,7 @@ def test_read_annotations_czi():
     anim = scim.AnnotatedImage(fn)
     assert len(anim.annotations) > 0
 
-    views = anim.get_views(annotation_ids=[0], pixelsize_mm = [0.01, 0.01], margin=0.1)
+    views = anim.get_views(annotation_ids=[0], pixelsize_mm=[0.01, 0.01], margin=0.1)
     # views = anim.get_views(annotation_ids=[0], level=3, margin=1.5)
     # # views = anim.get_views(*args, **kwargs) # vybiram, jakou chci zobrazit anotaci
     view = views[0]
@@ -195,16 +195,16 @@ def test_read_annotations_czi():
     # view.plot_annotations()
     # plt.show()
 
+pytest.skip("the test is copy of other test used for fixing specific problem")
 def test_read_czi_to_fix_xml_bytelike_object_is_required_instead_of_none_type():
 
     fn = io3d.datasets.joinp(
+        "medical/orig/scaffan-analysis-czi/J7_5/J7_5_b.czi"
+        # "biomedical/orig/Anicka - reticular fibers/J7_5/J7_5_d.czi"
+        # "biomedical/orig/Anicka - reticular fibers/J7_5/J7_5_d_sub_1.czi"
         # "medical/orig/scaffan-analysis-czi/J7_5/J7_5_b.czi"
-        # "biomedical/orig/scaffan-analysis-czi/J7_5/J7_5_b.czi"
 
-        "medical",
-        "orig",
-        "Scaffan-analysis",
-        "PIG-002_J-18-0091_HE.ndpi",
+        # "medical", "orig", "Scaffan-analysis", "PIG-002_J-18-0091_HE.ndpi",
     )
     # fn = io3d.datasets.join_path(
     #     "medical/orig/scaffan-analysis-czi/Zeiss-scans/01_2019_11_12__RecognizedCode.czi",
@@ -214,15 +214,16 @@ def test_read_czi_to_fix_xml_bytelike_object_is_required_instead_of_none_type():
     anim = scim.AnnotatedImage(fn)
     view = anim.get_full_view(pixelsize_mm=0.1)
     img = view.get_region_image(as_gray=True)
-    plt.imshow(img)
-    plt.show()
-    logger.debug(anim.annotations)
-    views = anim.get_views(annotation_ids=[0], pixelsize_mm = [0.01, 0.01], margin=0.1)
+    # plt.imshow(img)
+    # plt.show()
+    logger.debug(len(anim.annotations))
+    views = anim.get_views(annotation_ids=[0], pixelsize_mm=[0.01, 0.01], margin=0.1)
     # views = anim.get_views(annotation_ids=[0], level=3, margin=1.5)
     # # views = anim.get_views(*args, **kwargs) # vybiram, jakou chci zobrazit anotaci
     view = views[0]
     img = view.get_region_image(as_gray=True)
-    assert np.max(img) > 50
-    assert np.min(img) < 150
-    plt.imshow(img)
-    plt.show()
+    # assert np.max(img) > 50
+    # assert np.min(img) < 150
+    # plt.figure()
+    # plt.imshow(img)
+    # plt.show()

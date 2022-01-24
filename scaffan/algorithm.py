@@ -842,9 +842,7 @@ class Scaffan:
         self.report.finish_actual_row()
 
     def get_preview_view(self):
-        full_view = self.anim.get_view(
-            location=[0, 0], level=0, size_on_level=self.anim.get_slide_size()[::-1]
-        )
+        full_view = self.anim.get_full_view()
         pxsz_mm = float(self.get_parameter("Processing;Preview Pixelsize")) * 1000
         view_corner = full_view.to_pixelsize(pixelsize_mm=[pxsz_mm, pxsz_mm])
         return view_corner
@@ -900,9 +898,6 @@ class Scaffan:
         logger.debug("Manual selection of lobules.")
         # full_view = self.anim.get_full_view()
         view_corner, img = self.get_preview()
-        # full_view = self.anim.get_view(
-        #     location=[0, 0], level=0, size_on_level=self.anim.get_slide_size()[::-1]
-        # )
         # pxsz_mm = float(self.get_parameter("Processing;Preview Pixelsize")) * 1000
         # view_corner = full_view.to_pixelsize(pixelsize_mm=[pxsz_mm, pxsz_mm])
         # logger.debug(
