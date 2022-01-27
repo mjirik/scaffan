@@ -415,7 +415,7 @@ class AnnotatedImage:
     Read the image and the annotation. The
     """
 
-    def __init__(self, path:Union[str, Path], skip_read_annotations=False):
+    def __init__(self, path: Union[str, Path], skip_read_annotations=False):
         fs_enc = sys.getfilesystemencoding()
         logger.debug(f"fs_enc: {fs_enc}")
         logger.debug("Reading file {}".format(str(path)))
@@ -783,10 +783,10 @@ class AnnotatedImage:
 
     def get_full_view(
         self,
-        level:int=0,
-        pixelsize_mm:Optional[float]=None,
-        safety_bound:float=2.,
-        margin:float=0.0,
+        level: int = 0,
+        pixelsize_mm: Optional[float] = None,
+        safety_bound: float = 2.0,
+        margin: float = 0.0,
         # margin_in_pixels=False,
         # annotation_id=None,
         # margin=0.5,
@@ -1283,7 +1283,7 @@ class View:
         self.region_size_on_level = None
         self.region_pixelsize = None
         self.region_pixelunit = None
-        self.zoom:Optional[np.array] = None
+        self.zoom: Optional[np.array] = None
 
         self.set_region(
             center=center,
@@ -1314,10 +1314,10 @@ class View:
         pixelsize_mm=None,
         center_mm=None,
         location_mm=None,
-        safety_bound:float=2,
-        annotation_id:Optional[int]=None,
+        safety_bound: float = 2,
+        annotation_id: Optional[int] = None,
         # margin=0.5,
-        margin:float=0.0,
+        margin: float = 0.0,
         margin_in_pixels: bool = False,
     ):
         self._requested_size_on_level_when_defined_by_pixelsize = None
@@ -1797,11 +1797,11 @@ class View:
 
     def get_full_view(
         self,
-        level:Optional[int]=None,
-        pixelsize_mm:Optional[float]=None,
-        safety_bound:float=2,
-        margin:float=0.0,
-        margin_in_pixels:bool=False,
+        level: Optional[int] = None,
+        pixelsize_mm: Optional[float] = None,
+        safety_bound: float = 2,
+        margin: float = 0.0,
+        margin_in_pixels: bool = False,
         # annotation_id=None,
         # margin=0.5,
         # margin_in_pixels=False,
