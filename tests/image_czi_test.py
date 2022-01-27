@@ -195,7 +195,7 @@ def test_read_annotations_czi():
     # view.plot_annotations()
     # plt.show()
 
-pytest.skip("the test is copy of other test used for fixing specific problem")
+@pytest.mark.skip("the test is copy of other test used for fixing specific problem")
 def test_read_czi_to_fix_xml_bytelike_object_is_required_instead_of_none_type():
 
     fn = io3d.datasets.joinp(
