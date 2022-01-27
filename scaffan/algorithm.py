@@ -351,7 +351,7 @@ class Scaffan:
         :param parse_path: Turn on separation of path by ";"
         :return:
         """
-        logger.debug(f"Set {param_path} to {value}")
+        logger.debug(f"Set {param_path} to {value} (type={type(value)})")
         if parse_path:
             param_path = param_path.split(";")
         fnparam = self.parameters.param(*param_path)
@@ -736,7 +736,7 @@ class Scaffan:
     def _set_parameters_from_cfg(self, config):
         dct = dict(config["scaffan"])
         for key in dct:
-            logger.debug(f"{key}, {type(dct[key])}, {dct[key]}")
+            logger.trace(f"{key}, {type(dct[key])}, {dct[key]}")
             self.set_parameter(key, dct[key])
 
     def _add_general_information_to_actual_row(self, update_dict: dict = None):
