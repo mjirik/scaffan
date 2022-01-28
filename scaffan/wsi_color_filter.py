@@ -153,7 +153,9 @@ class WsiColorFilter:
             self.models[hexa] = model
         pass
 
-    def img_processing(self, img: np.ndarray, return_proba=False, return_uint8=True) -> np.ndarray:
+    def img_processing(
+        self, img: np.ndarray, return_proba=False, return_uint8=True
+    ) -> np.ndarray:
         if len(self.models) > 0:
             img_copy = img.copy()
 
@@ -183,7 +185,7 @@ class WsiColorFilter:
             # nmax = np.max(img)
             # logger.debug(nmax)
 
-        if return_uint8 and (img.dtype!=np.uint8):
+        if return_uint8 and (img.dtype != np.uint8):
             img = (255 * img).astype(np.uint8)
         if return_proba:
             return img, proba
@@ -241,8 +243,10 @@ def hue_to_continuous_2d(img):
 
 def change_color_using_probability(img_rgb, img_proba, target_color):
     import matplotlib.colors
+
     img_hsv = rgb2hsv(img_rgb).astype(np.float16)
     return change_color_using_probability_from_hsv(img_hsv, img_proba, target_color)
+
 
 def change_color_using_probability_from_hsv(img_hsv, img_proba, target_color):
     import matplotlib.colors
