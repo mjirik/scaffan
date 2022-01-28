@@ -10,25 +10,29 @@ from scaffan import image
 import matplotlib.pyplot as plt
 import numpy as np
 
-
-def test_change_color_whole_scaffan():
+@pytest.fixture
+def mainapp_j7():
     fn = io3d.datasets.join_path(
         "medical/orig/scaffan-analysis-czi/J7_5/J7_5_b_test.czi", get_root=True
     )
     mainapp = scaffan.algorithm.Scaffan()
     mainapp.set_input_file(fn)
+    return mainapp
+
+
+def test_change_color_whole_scaffan(mainapp_j7):
     # mainapp.set_annotation_color_selection(
     #     "#FFFF00", override_automatic_lobulus_selection=True
     # )
-    mainapp.set_parameter("Processing;Color Filter", False)
-    mainapp.init_run()
+    mainapp_j7.set_parameter("Processing;Color Filter", False)
+    mainapp_j7.init_run()
     # mainapp.color_filter.set_anim_params(mainapp.anim)
-    view, img1 = mainapp.get_preview()
+    view, img1 = mainapp_j7.get_preview()
 
     # plt.show()
-    mainapp.set_parameter("Processing;Color Filter", True)
-    mainapp.init_run()
-    view, img2 = mainapp.get_preview()
+    mainapp_j7.set_parameter("Processing;Color Filter", True)
+    mainapp_j7.init_run()
+    view, img2 = mainapp_j7.get_preview()
 
     s1 = np.mean(img1[:,:,0])
     s2 = np.mean(img2[:,:,0])
@@ -40,8 +44,35 @@ def test_change_color_whole_scaffan():
     # plt.show()
     plt.close('all')
 
-    # mainapp.set_parameter("Processing;Skeleton Analysis", False)
-    # mainapp.set_parameter("Processing;Texture Analysis", False)
+def test_filter_color_in_numeric_format():
+    """
+    Set target color to blue by numeric format
+    """
+    fn = io3d.datasets.join_path(
+        "medical/orig/scaffan-analysis-czi/J7_5/J7_5_b_test.czi", get_root=True
+    )
+    logger.debug("filename {}".format(fn))
+    anim = scim.AnnotatedImage(fn)
+    ids = anim.select_annotations_by_title_contains("#")
+
+    logger.debug(anim.annotations)
+
+    for idd in ids:
+        anim.annotations[idd]["title"] = "convert color to #0,0,200"
+    color_filter = WsiColorFilter()
+    color_filter.init_color_filter_by_anim(anim)
+    img = anim.get_full_view(pixelsize_mm=0.01).get_raster_image()
+    new_img, probas = color_filter.img_processing(img, return_proba=True)
+
+    blue0 = np.mean(img[:,:,2])
+    blue1 = np.mean(new_img[:,:,2])
+
+    # plt.imshow(new_img)
+    # plt.show()
+    assert blue0 < blue1
+
+
+
 
 
 def test_change_color_of_wsi():

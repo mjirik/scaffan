@@ -22,7 +22,8 @@ class WsiColorFilterPQG:
         # ptype="group",
         pvalue=True,
         ptip="A preprocessing of input image. Turns color specified by annotation into color sepcified in annotation title."
-        + "The annotation title must contain 'convert color to #ffffff' to turn color to white.",
+        + "The annotation title must contain 'convert color to #ffffff' to turn color to white. "
+          "Alternative syntax with RGB values in integers is also available: 'convert color to #0,115,26' ",
         pexpanded=False,
     ):
         # self.rescale_intensity_percentile = image_intensity_rescale.RescaleIntensityPercentile()
@@ -88,15 +89,18 @@ class WsiColorFilter:
         self.models = {}
         self.color_ids = {}
 
+
     def init_color_filter_by_anim(self, anim: image.AnnotatedImage):
         logger.trace(anim.id_by_titles)
         self.reset()
-        regex = " *convert *color *to *(#[a-fA-F0-9]{6})"
+        regex = " *convert *color *to *(#[a-fA-F0-9]{6}|#[0-9]{1,3}, *[0-9]{1,3}, *[0-9]{1,3})"
         ids = anim.select_annotations_by_title_regex(regex)
         logger.trace(ids)
 
         color_hexacodes = [
-            re.findall(regex, anim.annotations[id]["title"])[0] for id in ids
+            _convert_color_to_hex(
+                re.findall(regex, anim.annotations[id]["title"])[0]
+            ) for id in ids
         ]
 
         self.color_ids = {
@@ -111,7 +115,9 @@ class WsiColorFilter:
         for id in ids:
             views = anim.get_views(annotation_ids=[id])
             mask = views[0].get_annotation_region_raster(id)
-            color_hexacode = re.findall(regex, anim.annotations[id]["title"])[0]
+            color_hexacode = _convert_color_to_hex(
+                re.findall(regex, anim.annotations[id]["title"])[0]
+            )
 
             from skimage.color import rgb2hsv
 
@@ -200,6 +206,22 @@ class WsiColorFilter:
         x = chsv_proba2_img_exp
         chsv_proba2_img_out = self.proportion * (1 - np.exp(-x / self.slope))
         return chsv_proba2_img_out
+
+def _convert_color_to_hex(color:str):
+    regex = "#([0-9]{1,3}), *([0-9]{1,3}), *([0-9]{1,3})"
+    numbers = re.findall(regex, color)
+    if len(numbers) == 0:
+        return color
+    else:
+        if len(numbers[0]) == 3:
+            n = numbers[0]
+            s = f"#{int(n[0]):02x}{int(n[1]):02x}{int(n[2]):02x}"
+            return s
+
+        else:
+            logger.warning(f"Color code not recognized. (color={color})")
+            return color
+
 
 
 def rgb_image_to_chsv(img):
