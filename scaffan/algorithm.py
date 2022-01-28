@@ -694,6 +694,11 @@ class Scaffan:
         )
         logger.debug("finished")
 
+        if show:
+            pass
+        else:
+            plt.close("all")
+
         # print("ann ids", annotation_ids)
 
     def _get_parameters_as_cfg(self):

@@ -67,7 +67,10 @@ class WsiColorFilterPQG:
         # run_resc_int = int_norm_params.param("Run Intensity Normalization").value()
         # run_resc_int = self.parameters.param("Processing", "Intensity Normalization").value()
         # run_resc_int = self.parameters.value()
-        self.wsi_color_filter.init_color_filter_by_anim(anim)
+        if self.parameters.value():
+            self.wsi_color_filter.init_color_filter_by_anim(anim)
+        else:
+            self.wsi_color_filter.reset()
         self.wsi_color_filter.slope = (
             self.parameters.param("Sigmoidal Slope").value(),
         )
@@ -81,8 +84,13 @@ class WsiColorFilter:
         self.proportion = 1.0
         pass
 
+    def reset(self):
+        self.models = {}
+        self.color_ids = {}
+
     def init_color_filter_by_anim(self, anim: image.AnnotatedImage):
         logger.trace(anim.id_by_titles)
+        self.reset()
         regex = " *convert *color *to *(#[a-fA-F0-9]{6})"
         ids = anim.select_annotations_by_title_regex(regex)
         logger.trace(ids)
@@ -139,18 +147,18 @@ class WsiColorFilter:
             self.models[hexa] = model
         pass
 
-    def img_processing(self, img: np.ndarray, return_proba=False) -> np.ndarray:
+    def img_processing(self, img: np.ndarray, return_proba=False, return_uint8=True) -> np.ndarray:
         if len(self.models) > 0:
             img_copy = img.copy()
 
-        proba = {}
-        for hexa in self.models:
             img_chsv = rgb_image_to_chsv(img_copy)
             sh = img_chsv.shape
             # flatten the image (roll the x and y axes to the end, squeeze, roll back)
             chsv_data2 = np.moveaxis(
                 np.moveaxis(img_chsv, 2, 0).reshape([sh[2], -1]), 0, 1
             )
+        proba = {}
+        for hexa in self.models:
             # chsv_proba = model.predict_proba(chsv_data2)
             chsv_proba2 = self.models[hexa].score_samples(chsv_data2)
             #
@@ -166,7 +174,11 @@ class WsiColorFilter:
             if return_proba:
                 proba[hexa] = chsv_proba2_img
             img = change_color_using_probability(img, weighted_chsv_proba2_img, hexa)
+            # nmax = np.max(img)
+            # logger.debug(nmax)
 
+        if return_uint8 and (img.dtype!=np.uint8):
+            img = (255 * img).astype(np.uint8)
         if return_proba:
             return img, proba
         else:
@@ -207,12 +219,17 @@ def hue_to_continuous_2d(img):
 
 def change_color_using_probability(img_rgb, img_proba, target_color):
     import matplotlib.colors
+    img_hsv = rgb2hsv(img_rgb).astype(np.float16)
+    return change_color_using_probability_from_hsv(img_hsv, img_proba, target_color)
+
+def change_color_using_probability_from_hsv(img_hsv, img_proba, target_color):
+    import matplotlib.colors
 
     # target_color = '#B4FBB8'
     color_rgb = np.asarray(matplotlib.colors.to_rgb(target_color))
-    color_hsv = rgb2hsv(color_rgb.reshape([1, 1, 3]))
-    img_hsv = rgb2hsv(img_rgb)
-    diff = color_hsv - img_hsv
+    color_hsv = rgb2hsv(color_rgb.reshape([1, 1, 3])).astype(np.float16)
+    diff = (color_hsv - img_hsv).astype(np.float16)
+    del color_hsv
 
     # img_hsv - img_hsv - color_hsv
     if img_proba.ndim == 2:
@@ -224,5 +241,6 @@ def change_color_using_probability(img_rgb, img_proba, target_color):
 
     img_proba3 = np.concatenate([img_proba] * 3, axis=2)
 
+    # new_img = hsv2rgb(img_hsv + img_proba3 * diff).astype(np.float16)
     new_img = hsv2rgb(img_hsv + img_proba3 * diff)
     return new_img
