@@ -311,7 +311,7 @@ class Scaffan:
         # import pdb; pdb.set_trace()
         # print("ahoj")
 
-    def set_output_dir(self, path: Union[str,Path,None]=None):
+    def set_output_dir(self, path: Union[str, Path, None] = None):
         """
         Set directory for all outputs. The standard
         :param path: if no parameter is given the standard path in ~/data/SA_%Date_%Time is selected
@@ -570,7 +570,9 @@ class Scaffan:
         self._save_preview_with_annotaions_to_report()
         return annotation_ids, automatic_lobulus_selection
 
-    def _save_preview_with_annotaions_to_report(self, file_name:str="preview_with_annotations.png"):
+    def _save_preview_with_annotaions_to_report(
+        self, file_name: str = "preview_with_annotations.png"
+    ):
         # prepare preview with annotations
         view_corner, img = self.get_preview()
         # self.get_preview()
@@ -586,7 +588,7 @@ class Scaffan:
         plt.gca().xaxis.set_major_locator(plt.NullLocator())
         plt.gca().yaxis.set_major_locator(plt.NullLocator())
 
-        self.report.savefig(file_name, level=60, bbox_inches='tight', pad_inches=0)
+        self.report.savefig(file_name, level=60, bbox_inches="tight", pad_inches=0)
         plt.close(fig)
 
     def run_lobuluses(self, event=None, seeds_mm: Optional[list] = None):

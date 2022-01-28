@@ -19,14 +19,15 @@ import imma.image
 import copy
 from typing import Optional
 
+
 class ImageExport:
     def __init__(
-            self,
-            pname="Image Export",
-            ptype="bool",
-            pvalue=False,
-            ptip="Transform input image to other image format",
-            report:Optional[Report]=None,
+        self,
+        pname="Image Export",
+        ptype="bool",
+        pvalue=False,
+        ptip="Transform input image to other image format",
+        report: Optional[Report] = None,
     ):
 
         params = [
@@ -38,7 +39,7 @@ class ImageExport:
             {
                 "name": "Working Resolution",
                 "type": "float",
-                "value": 0.000001, # 10 µm
+                "value": 0.000001,  # 10 µm
                 # "value": 0.00000091,  # this is typical resolution on level 2
                 # "value": 0.00000091,  # this is typical resolution on level 2
                 # "value": 0.00000182,  # this is typical resolution on level 3
@@ -66,13 +67,13 @@ class ImageExport:
             children=params,
             expanded=False,
         )
-        self.anim:Optional[scaffan.image.AnnotatedImage] = None
+        self.anim: Optional[scaffan.image.AnnotatedImage] = None
         self.report: Report = report
 
     # def set_report(self, report: Report):
     #     self.report = report
 
-    def run(self, anim:scaffan.image.AnnotatedImage):
+    def run(self, anim: scaffan.image.AnnotatedImage):
         self.anim = anim
         pxsz_mm = self.parameters.param("Working Resolution").value() * 1000
         ff = str(self.parameters.param("File Format").value())
