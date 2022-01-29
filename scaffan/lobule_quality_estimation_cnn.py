@@ -127,15 +127,19 @@ class LobuleQualityEstimationCNN:
         # Tady by bylo tělo algoritmu
 
         # Phase 1: Cut out rectangle samples from original image
-        snip_corners = self.cut_the_image(
-            self.lobulus_segmentation, self.parent_view.region_pixelsize[0], False
+        # snip_corners = self.cut_the_image(
+        #     self.lobulus_segmentation, self.parent_view.region_pixelsize[0], False
+        # )
+        snip_corners = self.cut_the_image2(
+            self.lobulus_segmentation, self.parent_view.region_pixelsize[0]
         )
+
         crop_size = int((1 / self.parent_view.region_pixelsize[0]) * self.CUT_SIZE)
         evaluations = []
 
         # Phase 2: Predict SNI value for every sample
         for i, cut_point in enumerate(snip_corners):
-            img = self.parent_view.get_region_image(True)
+            img = self.parent_view.get_region_image(as_gray=True)
             image_snip = img[
                 cut_point[0] : cut_point[0] + crop_size,
                 cut_point[1] : cut_point[1] + crop_size,
@@ -158,6 +162,43 @@ class LobuleQualityEstimationCNN:
             self.report.actual_row[label] = sni_prediction
         return sni_prediction
 
+    def cut_the_image2(self, mask, pixel_size):
+        """
+        Morphological solver for splitting the lobule area.
+        M. Jirik
+        """
+        cut_pixel_size = int((1 / pixel_size) * self.CUT_SIZE)
+        step_size = int(cut_pixel_size / self.STEPS_PER_CUT)
+        half_size = int(cut_pixel_size / 2)
+
+        corner_list = []
+        msk = skimage.morphology.binary_erosion(mask, skimage.morphology.square(cut_pixel_size))
+        # remove borders
+        msk[:half_size, :] = False
+        msk[-half_size:, :] = False
+        msk[:, half_size] = False
+        msk[:, -half_size:] = False
+
+        aa0, aa1 = np.nonzero(msk)
+        is_there_pixel = len(aa0) > 0
+        while is_there_pixel:
+            p0 = aa0[0]
+            p1 = aa1[0]
+
+            min0 = max(p0 - cut_pixel_size, 0)
+            max0 = min(p0 + cut_pixel_size, msk.shape[0])
+            min1 = max(p1 - cut_pixel_size, 0)
+            max1 = min(p1 + cut_pixel_size, msk.shape[1])
+            corner_list.append([p0-half_size, p1-half_size])
+
+            msk[min0:max0, min1:max1] = False
+            aa0, aa1 = np.nonzero(msk)
+            is_there_pixel = len(aa0) > 0
+        return corner_list
+
+
+
+
     def cut_the_image(self, mask, pixel_size, overlap=True):
         """
         Returns list of coordinates of left upper corners of square samples which fit in the mask.
@@ -175,6 +216,8 @@ class LobuleQualityEstimationCNN:
             y = 0
 
             while y < mask.shape[0]:
+                if x<mask.shape[1] and y < mask.shape[0]:
+                    mask[y,x]=5
                 if self.does_the_square_fit(mask, x, y, step_size):
                     corner_list.append([y, x])
 

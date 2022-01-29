@@ -222,11 +222,12 @@ class MainGuiTest(unittest.TestCase):
             mainapp.evaluation.evaluation_history[i]["Lobulus Border Dice"],
             "Lobulus segmentation should have Dice coefficient above some low level",
         )
-        self.assertLess(
-            error_threshold,
-            mainapp.evaluation.evaluation_history[i]["Central Vein Dice"],
-            "Central Vein segmentation should have Dice coefficient above some low level",
-        )
+        if "Central Vein Dice" in mainapp.evaluation.evaluation_history[i]:
+            self.assertLess(
+                error_threshold,
+                mainapp.evaluation.evaluation_history[i]["Central Vein Dice"],
+                "Central Vein segmentation should have Dice coefficient above some low level",
+            )
 
     def test_start_gui_no_exec(self):
         # fn = io3d.datasets.join_path("medical", "orig", "CMU-1.ndpi", get_root=True)

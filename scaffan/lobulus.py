@@ -283,6 +283,26 @@ class Lobulus:
         mgac.levelset = circle.copy()
         mgac.run(iterations=param_acwe_iterations)
         outer = mgac.levelset.copy()
+        #
+        #
+        # inner_lobulus_margin_mm = (
+        #         self.parameters.param("Inner Lobulus Margin").value() * 1000
+        # )
+        #
+        # logger.debug(
+        #     f"Distance transform. type(mask)={str(type(outer))}, "
+        #     f"mask.shape={outer.shape}, "
+        #     f"mask.unique={np.unique(outer, return_counts=True)}"
+        # )
+        # # eroded image for threshold analysis
+        # dstmask = scipy.ndimage.morphology.distance_transform_edt(
+        #     outer.astype(np.uint8), self.view.region_pixelsize[::-1]
+        # )
+        # inner_lobulus_mask = dstmask > inner_lobulus_margin_mm
+        # logger.debug(
+        #     f"inner_lobulus_mask: unique/counts={np.unique(inner_lobulus_mask, return_counts=True)}"
+        # )
+        # self.border_mask = inner_lobulus_mask.astype(np.uint8)
         self.border_mask = outer.astype(np.uint8)
 
     def find_central_vein(self, show=True):

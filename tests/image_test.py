@@ -374,7 +374,7 @@ def test_outer_and_inner_annotation(anim_scp003):
     anim = anim_scp003
     ann_ids = anim.get_annotations_by_color("#00FFFF")
     assert len(ann_ids) > 0
-    assert len(ann_ids) == 2
+    assert len(ann_ids) == 3
 
     # find outer annotation from 0th cyan object
     outer_id = anim.select_outer_annotations(ann_ids[0])
