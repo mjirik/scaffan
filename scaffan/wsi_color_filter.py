@@ -23,7 +23,7 @@ class WsiColorFilterPQG:
         pvalue=True,
         ptip="A preprocessing of input image. Turns color specified by annotation into color sepcified in annotation title."
         + "The annotation title must contain 'convert color to #ffffff' to turn color to white. "
-          "Alternative syntax with RGB values in integers is also available: 'convert color to #0,115,26' ",
+        "Alternative syntax with RGB values in integers is also available: 'convert color to #0,115,26' ",
         pexpanded=False,
     ):
         # self.rescale_intensity_percentile = image_intensity_rescale.RescaleIntensityPercentile()
@@ -89,7 +89,6 @@ class WsiColorFilter:
         self.models = {}
         self.color_ids = {}
 
-
     def init_color_filter_by_anim(self, anim: image.AnnotatedImage):
         logger.trace(anim.id_by_titles)
         self.reset()
@@ -98,9 +97,8 @@ class WsiColorFilter:
         logger.trace(ids)
 
         color_hexacodes = [
-            _convert_color_to_hex(
-                re.findall(regex, anim.annotations[id]["title"])[0]
-            ) for id in ids
+            _convert_color_to_hex(re.findall(regex, anim.annotations[id]["title"])[0])
+            for id in ids
         ]
 
         self.color_ids = {
@@ -209,7 +207,8 @@ class WsiColorFilter:
         chsv_proba2_img_out = self.proportion * (1 - np.exp(-x / self.slope))
         return chsv_proba2_img_out
 
-def _convert_color_to_hex(color:str):
+
+def _convert_color_to_hex(color: str):
     regex = "#([0-9]{1,3}), *([0-9]{1,3}), *([0-9]{1,3})"
     numbers = re.findall(regex, color)
     if len(numbers) == 0:
@@ -223,7 +222,6 @@ def _convert_color_to_hex(color:str):
         else:
             logger.warning(f"Color code not recognized. (color={color})")
             return color
-
 
 
 def rgb_image_to_chsv(img):
