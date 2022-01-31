@@ -74,9 +74,9 @@ class TextureTest(unittest.TestCase):
     def test_plot(self):
 
         # import pdb; pdb.set_trace()
-        print("test plot ...")
+        logger.debug("test plot ...")
         plt.figure()
-        print("test plot ok")
+        logger.debug("test plot ok")
 
     # @unittest.skipIf(
     #     os.environ.get("TRAVIS", False), "Skip on Travis-CI #TODO make it run"

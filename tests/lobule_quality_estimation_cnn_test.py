@@ -38,17 +38,18 @@ def test_get_lobulus_mask_manual():
     lob_proc.run()
 
     # make the calculation faster by using about quater of the lobule
-    sh_half = (np.asarray(lob_proc.lobulus_mask.shape) / 2).astype(int)
-    lob_proc.lobulus_mask[:sh_half[0], :sh_half[1]] = False
+    # sh_half = (np.asarray(lob_proc.lobulus_mask.shape) / 2).astype(int)
+    # lob_proc.lobulus_mask[:sh_half[0], :sh_half[1]] = False
 
     lqe = scaffan.lobule_quality_estimation_cnn.LobuleQualityEstimationCNN()
 
-
-    lqe.init(force_download_model=True) # this will test the model download
+    lqe.init(force_download_model=False)
+    # lqe.init(force_download_model=True) # this will test the model download
     lqe.set_input_data(
         view=lob_proc.view,
         annotation_id=annotation_id,
-        lobulus_segmentation=lob_proc.lobulus_mask,
+        # lobulus_segmentation=lob_proc.lobulus_mask,
+        lobulus_segmentation=lob_proc.border_mask,
     )
     quality = lqe.run()
 

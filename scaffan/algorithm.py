@@ -49,6 +49,7 @@ from scaffan.image_intensity_rescale_pyqtgraph import RescaleIntensityPercentile
 from . import sni_prediction
 from . import lobule_quality_estimation_cnn
 from . import wsi_color_filter
+from . import image_transformation
 
 
 class Scaffan:
@@ -94,6 +95,7 @@ class Scaffan:
         self.slide_segmentation = scaffan.slide_segmentation.ScanSegmentation(
             report=self.report
         )
+        self.image_export = image_transformation.ImageExport(report=self.report)
         self.lobule_quality_estimation_cnn = (
             lobule_quality_estimation_cnn.LobuleQualityEstimationCNN(report=self.report)
         )
@@ -244,6 +246,7 @@ class Scaffan:
                     #     # "tip": "Show images",
                     # },
                     self.color_filter.parameters,
+                    self.image_export.parameters,
                     self.intensity_rescale.parameters,
                     self.slide_segmentation.parameters,
                     self.lobulus_processing.parameters,
@@ -308,7 +311,7 @@ class Scaffan:
         # import pdb; pdb.set_trace()
         # print("ahoj")
 
-    def set_output_dir(self, path: Union[str, Path] = None):
+    def set_output_dir(self, path: Union[str, Path, None] = None):
         """
         Set directory for all outputs. The standard
         :param path: if no parameter is given the standard path in ~/data/SA_%Date_%Time is selected
@@ -348,7 +351,7 @@ class Scaffan:
         :param parse_path: Turn on separation of path by ";"
         :return:
         """
-        logger.debug(f"Set {param_path} to {value}")
+        logger.debug(f"Set {param_path} to {value} (type={type(value)})")
         if parse_path:
             param_path = param_path.split(";")
         fnparam = self.parameters.param(*param_path)
@@ -402,7 +405,7 @@ class Scaffan:
         return default_dir
 
     def _prepare_default_output_dir_prefix(self):
-        default_dir = io3d.datasets.join_path(get_root=True)
+        default_dir = io3d.datasets.join_path("processed", get_root=True)
         # default_dir = op.expanduser("~/data")
         if not op.exists(default_dir):
             default_dir = op.expanduser("~")
@@ -567,7 +570,9 @@ class Scaffan:
         self._save_preview_with_annotaions_to_report()
         return annotation_ids, automatic_lobulus_selection
 
-    def _save_preview_with_annotaions_to_report(self):
+    def _save_preview_with_annotaions_to_report(
+        self, file_name: str = "preview_with_annotations.png"
+    ):
         # prepare preview with annotations
         view_corner, img = self.get_preview()
         # self.get_preview()
@@ -583,7 +588,7 @@ class Scaffan:
         plt.gca().xaxis.set_major_locator(plt.NullLocator())
         plt.gca().yaxis.set_major_locator(plt.NullLocator())
 
-        self.report.savefig("preview_with_annotations.png", level=60)
+        self.report.savefig(file_name, level=60, bbox_inches="tight", pad_inches=0)
         plt.close(fig)
 
     def run_lobuluses(self, event=None, seeds_mm: Optional[list] = None):
@@ -605,6 +610,10 @@ class Scaffan:
         show = self.parameters.param("Processing", "Show").value()
         self.report.set_show(show)
         self.report.set_save(True)
+
+        if self.parameters.param("Processing", "Image Export").value():
+            self.image_export.run(anim=self.anim)
+
         run_slide_segmentation = self.parameters.param(
             "Processing", "Whole Scan Segmentation"
         ).value()
@@ -687,6 +696,11 @@ class Scaffan:
         )
         logger.debug("finished")
 
+        if show:
+            pass
+        else:
+            plt.close("all")
+
         # print("ann ids", annotation_ids)
 
     def _get_parameters_as_cfg(self):
@@ -729,7 +743,7 @@ class Scaffan:
     def _set_parameters_from_cfg(self, config):
         dct = dict(config["scaffan"])
         for key in dct:
-            logger.debug(f"{key}, {type(dct[key])}, {dct[key]}")
+            logger.trace(f"{key}, {type(dct[key])}, {dct[key]}")
             self.set_parameter(key, dct[key])
 
     def _add_general_information_to_actual_row(self, update_dict: dict = None):

@@ -8,8 +8,8 @@ pandas
 openpyxl
 xlrd
 loguru
-# higer version work in different way with alpha
-scipy=1.2
+# higer version than 1.2 work in different way with alpha
+scipy=1.5
 click
 exsu
 scikit-learn
@@ -18,7 +18,7 @@ chainer
 czifile
 read-roi
 pyqt=5.*
-# tensorflow>=2.0 there is no TF2 for py36 on conda
+# tensorflow>=2.0 there is no TF2 for py36 on conda. pip is necessary on Windows.
 # requirements of TF2 installed later by pip
 absl-py
 termcolor

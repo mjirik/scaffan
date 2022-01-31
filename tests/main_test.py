@@ -222,11 +222,12 @@ class MainGuiTest(unittest.TestCase):
             mainapp.evaluation.evaluation_history[i]["Lobulus Border Dice"],
             "Lobulus segmentation should have Dice coefficient above some low level",
         )
-        self.assertLess(
-            error_threshold,
-            mainapp.evaluation.evaluation_history[i]["Central Vein Dice"],
-            "Central Vein segmentation should have Dice coefficient above some low level",
-        )
+        if "Central Vein Dice" in mainapp.evaluation.evaluation_history[i]:
+            self.assertLess(
+                error_threshold,
+                mainapp.evaluation.evaluation_history[i]["Central Vein Dice"],
+                "Central Vein segmentation should have Dice coefficient above some low level",
+            )
 
     def test_start_gui_no_exec(self):
         # fn = io3d.datasets.join_path("medical", "orig", "CMU-1.ndpi", get_root=True)
@@ -626,7 +627,7 @@ def run_with_external_seeds_mm():
     mainapp.set_parameter("Processing;Whole Scan Segmentation", False)
     run_on_yellow(mainapp, fn)
 
-def test_run_with_color_filter():
+def test_run_with_color_filter_and_export():
     fn = io3d.datasets.join_path(
         "medical/orig/scaffan-analysis-czi/J7_5/J7_5_b_test.czi",
         get_root=True,
@@ -647,8 +648,13 @@ def test_run_with_color_filter():
     mainapp.set_parameter("Processing;Texture Analysis", False)
     mainapp.set_parameter("Processing;SNI Prediction CNN", False)
     mainapp.set_parameter("Processing;Report Level", 10)
+    mainapp.set_parameter("Processing;Image Export;Working Resolution", 0.0001) # 100µm
+    mainapp.set_parameter("Processing;Image Export", True)
+    extension = "jpg"
+    mainapp.set_parameter("Processing;Image Export;File Format", extension)
     mainapp.run_lobuluses(seeds_mm=[[0.60, 0.90]])
     # mainapp.run_lobuluses()
     # run_on_yellow(mainapp, fn)
     assert outputdir.exists()
     assert len(list(outputdir.glob("*"))) > 0
+    assert (outputdir / f"whole_scan_export.{extension}").exists()

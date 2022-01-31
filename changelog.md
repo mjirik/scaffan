@@ -1,13 +1,15 @@
 # Changelog
 
-Latest version: 0.32.2
+Latest version: 0.34.0
 
 # Not released
+
 * [Changed] The lobule Manual Segmentation (use manual segmentation if possible) is turned on 
 * [Added] Slide segmentation model filename prefix for easier testing
 * [Changed] "Scan Segmentation" renamed to "Whole Scan Segmentation"
 * [Added] Ability to remove some colors from the image by Color Filter
 * [Fixed] Empty manual lobule segmentation for central vein if no central is present
+* [Added] Color filter target color can be controled in hexa or in RGB integers
 
 # 0.31
 
