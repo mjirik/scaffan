@@ -528,7 +528,7 @@ class Lobulus:
         )
         datarow["Lobulus Perimeter"] = perimeter_px * self.view.region_pixelsize[0]
         datarow["Lobulus Boundary Compactness"] = (
-            4 * np.pi * area_px / perimeter_px ** 2
+            4 * np.pi * area_px / perimeter_px**2
         )
         datarow["Lobulus Equivalent Diameter"] = datarow["Lobulus Perimeter"] / np.pi
         datarow["Lobulus Equivalent Surface"] = (

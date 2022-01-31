@@ -108,7 +108,7 @@ def read_region_with_level(
     :param downscale_factor: it is di
     :return:
     """
-    downscale_factor = int(2 ** level)
+    downscale_factor = int(2**level)
     requested_start = location
     requested_size = size
     value = 0
@@ -154,7 +154,7 @@ def read_region_with_level(
             # if subb.shape == subb.stored_shape:
             # this is fast
             subb_shape = subb.shape[-3:-1]
-            stored_shape = tuple(np.asarray(subb.stored_shape) * 2 ** level)[-3:-1]
+            stored_shape = tuple(np.asarray(subb.stored_shape) * 2**level)[-3:-1]
             if subb_shape == stored_shape:  # subb.stored_shape:
                 sd = subb.data(resize=False)
                 img = sd[..., sl_sn[0], sl_sn[1], :]

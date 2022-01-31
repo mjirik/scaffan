@@ -200,7 +200,7 @@ class ImageSlide:
             self.get_thumbnail = self._get_thumbnail_tiff
             self.read_region = self._read_region_other_than_ndpi
             self._set_properties_tiff()
-            self.level_downsamples = [float(2 ** i) for i in range(0, 8)]
+            self.level_downsamples = [float(2**i) for i in range(0, 8)]
             self.level_count = len(self.level_downsamples)
 
         if Path(self.path).suffix.lower() in (".czi"):
@@ -210,7 +210,7 @@ class ImageSlide:
             # self.read_region = self._read_region_other_than_ndpi
             self.read_region = self._read_region_nzi
             self._set_properties_czi()
-            self.level_downsamples = [float(2 ** i) for i in range(0, 8)]
+            self.level_downsamples = [float(2**i) for i in range(0, 8)]
             self.level_count = len(self.level_downsamples)
             # self.dimensions = asdfimsl.dimensions
 
@@ -279,7 +279,7 @@ class ImageSlide:
         :return:
         """
         img = self._get_imagedata()
-        factor = int(2 ** level)
+        factor = int(2**level)
         # factor = self.level_downsamples[level]
 
         newshape = list(img.shape)
@@ -304,7 +304,7 @@ class ImageSlide:
             location = [location[1], location[0]]
             size = [size[1], size[0]]
 
-        factor = int(2 ** level)
+        factor = int(2**level)
         # factor = self.level_downsamples[level]
 
         with CziFile(self.path) as czi:
@@ -468,7 +468,7 @@ class AnnotatedImage:
         if pixelsize_on_level_0 is not None:
             pixelsize_on_level_0 = np.asarray(pixelsize_on_level_0)
             self.level_pixelsize = [
-                pixelsize_on_level_0 / float(2 ** i) for i in range(0, 7)
+                pixelsize_on_level_0 / float(2**i) for i in range(0, 7)
             ]
             self.level_pixelsize_derived_from_resolution_on_level_0 = True
         else:
