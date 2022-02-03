@@ -42,19 +42,21 @@ requirements:
     - {{ pin_compatible('io3d', max_pin='x') }}
     - {{ pin_compatible('imma', max_pin='x') }}
     - lxml
-    - pandas
+    - pandas >=1.1.5
     - openpyxl
-    - morphsnakes
+#    - morphsnakes # 0.0.11
+    - {{ pin_compatible('morphsnakes', max_pin='x.x', min_pin="x.x.x") }}
     - pyqt  # =5.9.2 # tested
     - pyqtgraph
     - {{ pin_compatible('click', max_pin='x') }}
 #    - click <= 7
     - pywin32 # [win]
     - loguru
-    - exsu
-    - chainer
-    - scikit-image
-    - scikit-learn
+    - {{ pin_compatible('exsu', max_pin='x', min_pin="x.x") }}
+    - chainer >=7.8
+    # scikit - trying to do the build faster
+    - scikit-image >=0.17.0
+    - scikit-learn >=0.24.0
     - read-roi
     # tensorflow 2 is not available in conda with py36, we need py36 because of openslide
 #    - tensorflow >= 2.0
@@ -73,7 +75,7 @@ requirements:
     - {{ pin_compatible('pandas', max_pin='x', min_pin="x.x") }}
 #    - openpyxl
     - {{ pin_compatible('openpyxl', max_pin='x', min_pin="x.x") }}
-    - {{ pin_compatible('morphsnakes', max_pin='x', min_pin="x.x") }}
+    - {{ pin_compatible('morphsnakes', max_pin='x.x', min_pin="x.x.x") }}
 #    - morphsnakes
 #    - pyqt>=5.0
     # 2.12.1
@@ -102,9 +104,10 @@ requirements:
 #    - {{ pin_compatible('scikit-image', max_pin='x.x') }}
 #    - {{ pin_compatible('scikit-learn', max_pin='x.x') }}
 #    - {{ pin_compatible('chainer', max_pin='x.x') }}
-    - chainer
-    - scikit-image
-    - scikit-learn
+    - chainer >=7.8
+    # scikit - trying to do the build faster
+    - scikit-image >=0.17.0
+    - scikit-learn >=0.24.0
     - czifile
 # tensorflow 2 is not available in conda with py36, we need py36 because of openslide
     - tensorflow>=2.0 # [not win]
