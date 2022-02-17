@@ -247,7 +247,9 @@ if __name__ == "__main__":
     """
 
     # Directory of the image dataset
-    dataset_directory = Path(r"H:\BP\datasets\dataset_maxi\COCO_dataset_maxi_validate\images")
+    dataset_directory = Path(
+        r"H:\BP\datasets\dataset_maxi\COCO_dataset_maxi_validate\images"
+    )
 
     # Directory of the .czi files
     czi_files_directory = Path(
