@@ -48,9 +48,9 @@ def export_czi_annotations_to_jpg(path_annotations, annotation_name, path_images
 
 # Loading .czi annotations
 path_annotations = Path(
-    r"H:\BP\data\dataset_brown\czi_files_validate"
+    r"H:\BP\data\dataset_maxi\czi_files_predict"
 )  # path to main directory, that is where .czi files are
-path_images = "H:\\BP\\COCO_dataset_3_validate\\images\\"  # path to directory, where the images will be saved
+path_images = "H:\\BP\\datasets\\dataset_maxi\\COCO_dataset_maxi_prediction\\images\\"  # path to directory, where the images will be saved
 annotation_name = "annotation"
 
 export_czi_annotations_to_jpg(path_annotations, annotation_name, path_images)
