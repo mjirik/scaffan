@@ -247,11 +247,13 @@ if __name__ == "__main__":
     """
 
     # Directory of the image dataset
-    dataset_directory = Path(r"H:\BP\datasets\dataset_3\COCO_dataset_3_validate\images")
+    dataset_directory = Path(
+        r"H:\BP\datasets\dataset_maxi\COCO_dataset_maxi_validate\images"
+    )
 
     # Directory of the .czi files
     czi_files_directory = Path(
-        r"H:\BP\data\dataset_brown\czi_files_validate"
+        r"H:\BP\data\dataset_maxi\czi_files_validate"
     )  # path to .czi files directory
 
     data = {}
@@ -293,7 +295,7 @@ if __name__ == "__main__":
     """
     COCO format
     """
-    path_json = "H:\\BP\\datasets\\dataset_3\\COCO_dataset_3_validate"  # path to directory, where the .json file will be saved
+    path_json = "H:\\BP\\datasets\\dataset_maxi\\COCO_dataset_maxi_validate"  # path to directory, where the .json file will be saved
 
     # Creating .json file
     with open(path_json + "\\" + "trainval.json", "w", encoding="utf-8") as f:
