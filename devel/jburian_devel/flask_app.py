@@ -14,6 +14,7 @@ import sys
 
 app = Flask(__name__)
 
+
 @app.route("/")
 def hello_world():
     return "<p>Hello, World!</p>"
@@ -30,11 +31,13 @@ def exists():
         # return jsonify({"exists": exists})
     return jsonify({})
 
+
 @app.route("/train", methods=["GET", "POST"])
 def train():
     # filename = request.args.get("filename")
     print(request.args, file=sys.stderr)
     return request.args["filenames"]
+
 
 @app.route("/predict", methods=["GET", "POST"])
 def predict():
