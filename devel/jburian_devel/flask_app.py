@@ -16,14 +16,18 @@ import os
 
 app = Flask(__name__)
 
+
 def export_czi_to_jpg():
     pass
+
 
 def create_COCO_json():
     pass
 
+
 def create_COCO():
     pass
+
 
 @app.route("/")
 def hello_world():
@@ -52,7 +56,6 @@ def train():
 @app.route("/predict", methods=["GET", "POST"])
 def predict():
     pass
-
 
 
 if __name__ == "__main__":
