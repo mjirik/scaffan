@@ -1,6 +1,8 @@
 from flask import Flask
 from flask import request, jsonify, render_template
 import sys
+import os
+
 
 # Upload file
 
@@ -14,6 +16,14 @@ import sys
 
 app = Flask(__name__)
 
+def export_czi_to_jpg():
+    pass
+
+def create_COCO_json():
+    pass
+
+def create_COCO():
+    pass
 
 @app.route("/")
 def hello_world():
@@ -42,6 +52,7 @@ def train():
 @app.route("/predict", methods=["GET", "POST"])
 def predict():
     pass
+
 
 
 if __name__ == "__main__":
