@@ -19,16 +19,15 @@ import os
 # predikce s modelem
 # curl -X GET 147.228.140.130:5000/predict?filename="img100.czi"?modelname="mujmodel"
 
-UPLOAD_FOLDER = Path('C:\Temp')
-ALLOWED_EXTENSIONS = {'czi'}
+UPLOAD_FOLDER = Path("C:\Temp")
+ALLOWED_EXTENSIONS = {"czi"}
 
 app = Flask(__name__)
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+
 
 def allowed_file(filename):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
+    return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
 def export_czi_to_jpg():
@@ -52,7 +51,7 @@ def hello_world():
 def exists():
     if request.method == "POST":
         filename = request.args.get("filename")
-        #print(filename)
+        # print(filename)
         file_existence = Path(filename).exists()
         logger.debug(f"file_exists={file_existence}")
         return jsonify(file_existence)
@@ -85,6 +84,7 @@ def train():
 def predict():
     if request.method == "POST":
         filename = request.args.get("filename")
+
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=5000)
