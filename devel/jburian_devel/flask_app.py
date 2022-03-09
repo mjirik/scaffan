@@ -30,14 +30,18 @@ def allowed_file(filename):
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
+
 def export_czi_to_jpg():
     pass
+
 
 def create_COCO_json():
     pass
 
+
 def create_COCO():
     pass
+
 
 @app.route("/")
 def hello_world():
@@ -81,7 +85,6 @@ def train():
 def predict():
     if request.method == "POST":
         filename = request.args.get("filename")
-
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=5000)
