@@ -23,11 +23,11 @@ import os
 # curl -X GET 147.228.140.130:5000/predict?filename="img100.czi"?modelname="mujmodel"
 
 UPLOAD_FOLDER = "/Temp/Uploaded_files"
-ALLOWED_EXTENSIONS = {".czi"} # povolene formaty
+ALLOWED_EXTENSIONS = {".czi"}  # povolene formaty
 
 app = Flask(__name__)
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
-#app.config["MAX_CONTENT_LENGTH"] = 16 * 1000 * 1000 # maximalni velikost souboru
+# app.config["MAX_CONTENT_LENGTH"] = 16 * 1000 * 1000 # maximalni velikost souboru
 
 
 def allowed_file(filename):
@@ -66,7 +66,7 @@ def exists():
 @app.route("/upload", methods=["GET", "POST"])
 def upload():
     if request.method == "POST":
-        file = request.files['file']
+        file = request.files["file"]
 
         if file.filename == "":
             logger.debug(f"No file selected.")
@@ -82,11 +82,11 @@ def upload():
 
         if file:
             filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            file.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
             logger.debug(f"Everything ok. filename={filename}")
-            #return redirect(url_for('download_file', name=filename))
+            # return redirect(url_for('download_file', name=filename))
             return jsonify({"OK-200"})
-    return '''
+    return """
     <!doctype html>
     <title>Upload new File</title>
     <h1>Upload new File</h1>
@@ -94,12 +94,13 @@ def upload():
       <input type=file name=file>
       <input type=submit value=Upload>
     </form>
-    '''
+    """
 
 
-@app.route('/uploads/<name>')
+@app.route("/uploads/<name>")
 def download_file(name):
     return send_from_directory(app.config["UPLOAD_FOLDER"], name)
+
 
 @app.route("/train", methods=["GET", "POST"])
 def train():
