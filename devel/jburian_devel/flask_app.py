@@ -115,7 +115,7 @@ def upload_file():
     if request.method == "POST":
 
         # check if the post request has the file part
-        if 'file' not in request.files:
+        if "file" not in request.files:
             logger.debug(f"No file part")
             return jsonify({"No file part"})
 
@@ -167,8 +167,8 @@ def train():
 @app.route("/predict", methods=["POST"])
 def predict():
     if request.method == "POST":
-        file = request.files['file']
-        
+        file = request.files["file"]
+
     # nacteni obrazku
     # spusteni detectronu s modelem
 
