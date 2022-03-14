@@ -113,7 +113,15 @@ def exists():
 @app.route("/upload", methods=["GET", "POST"])
 def upload_file():
     if request.method == "POST":
+
+        # check if the post request has the file part
+        if 'file' not in request.files:
+            logger.debug(f"No file part")
+            return jsonify({"No file part"})
+
         file = request.files["file"]
+
+        test = request.args.get("filename")
 
         if file.filename == "":
             logger.debug(f"No file selected.")
@@ -156,14 +164,11 @@ def train():
     return request.args["filenames"]
 
 
-@app.route("/predict", methods=["GET", "POST"])
-def predict(fname):
-    """
-    Predicts the category in jpg images
-    @param fname: path to filename
-    """
+@app.route("/predict", methods=["POST"])
+def predict():
     if request.method == "POST":
-        filename = request.args.get("filename")
+        file = request.files['file']
+        
     # nacteni obrazku
     # spusteni detectronu s modelem
 
