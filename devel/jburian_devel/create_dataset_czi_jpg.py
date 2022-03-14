@@ -41,8 +41,8 @@ def export_czi_annotations_to_jpg(path_annotations, annotation_name, path_images
             pixelsize_mm=[0.0003, 0.0003]
         )  # wanted pixelsize in mm in view
         img = view.get_raster_image()
-        os.makedirs(os.path.dirname(path_images), exist_ok=True)
-        skimage.io.imsave(path_images + str(index).zfill(4) + ".jpg", img)
+        os.makedirs(path_images, exist_ok=True)
+        skimage.io.imsave(os.path.join(path_images, str(index).zfill(4) + ".jpg"), img)
         index += 1
 
 
@@ -50,7 +50,7 @@ def export_czi_annotations_to_jpg(path_annotations, annotation_name, path_images
 path_annotations = Path(
     r"H:\BP\data\dataset_maxi\czi_files_predict"
 )  # path to main directory, that is where .czi files are
-path_images = "H:\\BP\\datasets\\dataset_maxi\\COCO_dataset_maxi_prediction\\images\\"  # path to directory, where the images will be saved
+path_images = Path(r"H:\BP\datasets\dataset_maxi\dataset_maxi_prediction")  # path to directory, where the images will be saved
 annotation_name = "annotation"
 
 export_czi_annotations_to_jpg(path_annotations, annotation_name, path_images)
