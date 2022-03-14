@@ -51,11 +51,7 @@ def export_czi_to_jpg(czi_input_path, jpg_output_path, annotation_name):
     index = 0
     while True:
         fn_str = (
-                str(czi_input_path)
-                + "\\"
-                + annotation_name
-                + str(index).zfill(4)
-                + ".czi"
+            str(czi_input_path) + "\\" + annotation_name + str(index).zfill(4) + ".czi"
         )
         if not czi_input_path.exists():
             break
@@ -68,8 +64,11 @@ def export_czi_to_jpg(czi_input_path, jpg_output_path, annotation_name):
         )  # wanted pixelsize in mm in view
         img = view.get_raster_image()
         os.makedirs(jpg_output_path, exist_ok=True)
-        skimage.io.imsave(os.path.join(jpg_output_path, str(index).zfill(4) + ".jpg"), img)
+        skimage.io.imsave(
+            os.path.join(jpg_output_path, str(index).zfill(4) + ".jpg"), img
+        )
         index += 1
+
 
 def create_COCO_json(czi_input_path, jpg_input_path, txt_input_path, json_output_path):
     """
