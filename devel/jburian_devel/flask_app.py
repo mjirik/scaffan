@@ -10,8 +10,15 @@ from loguru import logger
 
 from pathlib import Path
 
+
+import skimage.io
 import os
 
+path_to_script = Path("~/projects/scaffan/").expanduser()
+sys.path.insert(0, str(path_to_script))
+import scaffan.image
+
+import os
 
 # Upload file
 
@@ -22,7 +29,7 @@ import os
 # predikce s modelem
 # curl -X GET 147.228.140.130:5000/predict?filename="img100.czi"?modelname="mujmodel"
 
-UPLOAD_FOLDER = "/Temp/Uploaded_files"
+UPLOAD_FOLDER = "C:/Temp/Uploaded_files"
 ALLOWED_EXTENSIONS = {".czi"}  # povolene formaty
 
 app = Flask(__name__)
@@ -34,15 +41,56 @@ def allowed_file(filename):
     return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
-def export_czi_to_jpg():
+def export_czi_to_jpg(czi_input_path, jpg_output_path, annotation_name):
+    """
+    Exports czi files to jpg
+    @param czi_input_path: Path path to czi files
+    @param jpg_output_path: Path output path to jpg files
+    @param annotation_name: Name of saved annotations
+    """
+    index = 0
+    while True:
+        fn_str = (
+                str(czi_input_path)
+                + "\\"
+                + annotation_name
+                + str(index).zfill(4)
+                + ".czi"
+        )
+        if not czi_input_path.exists():
+            break
+        print(f"filename: {czi_input_path} {czi_input_path.exists()}")
+
+        anim = scaffan.image.AnnotatedImage(path=fn_str)
+
+        view = anim.get_full_view(
+            pixelsize_mm=[0.0003, 0.0003]
+        )  # wanted pixelsize in mm in view
+        img = view.get_raster_image()
+        os.makedirs(jpg_output_path, exist_ok=True)
+        skimage.io.imsave(os.path.join(jpg_output_path, str(index).zfill(4) + ".jpg"), img)
+        index += 1
+
+def create_COCO_json(czi_input_path, jpg_input_path, txt_input_path, json_output_path):
+    """
+
+    @param czi_input_path:
+    @param jpg_input_path:
+    @param txt_input_path:
+    @param json_output_path:
+    """
+    # path jpg input directory
+    # path czi input directory
+    # path to txt category file
+    # path output json file
+
     pass
 
 
-def create_COCO_json():
-    pass
-
-
-def create_COCO():
+def create_COCO(jpg_input_path, json_input_path):
+    # completing json file with jpg images and creating COCO dataset
+    # saves COCO dataset to certain directory
+    # validation, training
     pass
 
 
@@ -64,7 +112,7 @@ def exists():
 
 
 @app.route("/upload", methods=["GET", "POST"])
-def upload():
+def upload_file():
     if request.method == "POST":
         file = request.files["file"]
 
@@ -110,9 +158,15 @@ def train():
 
 
 @app.route("/predict", methods=["GET", "POST"])
-def predict():
+def predict(fname):
+    """
+    Predicts the category in jpg images
+    @param fname: path to filename
+    """
     if request.method == "POST":
         filename = request.args.get("filename")
+    # nacteni obrazku
+    # spusteni detectronu s modelem
 
 
 if __name__ == "__main__":
