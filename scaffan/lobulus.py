@@ -122,7 +122,8 @@ class Lobulus:
             },
             {
                 "name": "Central Vein Segmentation",
-                "type": "group",
+                "type": "bool",
+                "value": True,
                 "tip": "MorphGAC algorithm parameters. " + _cite,
                 "children": [
                     {
