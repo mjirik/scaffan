@@ -296,7 +296,9 @@ if __name__ == "__main__":
     """
     COCO format
     """
-    path_json = Path(r"H:\\BP\\datasets\\dataset_final\\COCO_dataset_final_validate")  # path to directory, where the .json file will be saved
+    path_json = Path(
+        r"H:\\BP\\datasets\\dataset_final\\COCO_dataset_final_validate"
+    )  # path to directory, where the .json file will be saved
     name_json = "trainval.json"
 
     # Creating .json file
