@@ -2,6 +2,8 @@ from flask import Flask
 from flask import request, jsonify, render_template
 from flask import redirect, url_for
 from flask import send_from_directory
+from flask import session
+import export_czi_json
 
 import sys
 from werkzeug.utils import secure_filename
@@ -9,7 +11,6 @@ from werkzeug.utils import secure_filename
 from loguru import logger
 
 from pathlib import Path
-
 
 import skimage.io
 import os
@@ -29,7 +30,7 @@ import os
 # predikce s modelem
 # curl -X GET 147.228.140.130:5000/predict?filename="img100.czi"?modelname="mujmodel"
 
-UPLOAD_FOLDER = "C:/Temp/Uploaded_files"
+UPLOAD_FOLDER = "/Temp/Uploaded_files"
 ALLOWED_EXTENSIONS = {".czi"}  # povolene formaty
 
 app = Flask(__name__)
@@ -39,6 +40,38 @@ app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
 def allowed_file(filename):
     return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
+
+@app.route("/hello")
+def hello_world():
+    return "<p>Hello, World!</p>"
+
+# Set the secret key to some random bytes. Keep this really secret!
+app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
+
+@app.route('/')
+def index():
+    if 'username' in session:
+        return f'Logged in as {session["username"]}'
+    return 'You are not logged in'
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        session['username'] = request.form['username']
+        return redirect(url_for('index'))
+    return '''
+        <form method="post">
+            <p><input type=text name=username>
+            <p><input type=submit value=Login>
+        </form>
+    '''
+
+@app.route('/logout')
+def logout():
+    # remove the username from the session if it's there
+    session.pop('username', None)
+    return redirect(url_for('index'))
+
 
 
 def export_czi_to_jpg(czi_input_path, jpg_output_path, annotation_name):
@@ -91,11 +124,6 @@ def create_COCO(jpg_input_path, json_input_path):
     # saves COCO dataset to certain directory
     # validation, training
     pass
-
-
-@app.route("/")
-def hello_world():
-    return "<p>Hello, World!</p>"
 
 
 @app.route("/exists", methods=["GET", "POST"])
