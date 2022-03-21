@@ -247,6 +247,10 @@ if __name__ == "__main__":
     }
     """
 
+
+    """
+    PARAMETERS 
+    """
     # Directory of the image dataset
     dataset_directory = Path(
         r"H:\BP\datasets\dataset_final\COCO_dataset_final_validate\images"
@@ -257,7 +261,13 @@ if __name__ == "__main__":
         r"H:\BP\data\dataset_final\czi_files_validate"
     )  # path to .czi files directory
 
+    path_json = Path(
+        r"H:\BP\datasets\dataset_final\COCO_dataset_final_validate"
+    )  # path to directory, where the .json file will be saved
+    name_json = "trainval.json"
+
     data = {}
+
 
     """
     Info
@@ -293,14 +303,10 @@ if __name__ == "__main__":
     )
     data.update({"annotations": list_annotation_dictionaries})
 
-    """
-    COCO format
-    """
-    path_json = Path(
-        r"H:\\BP\\datasets\\dataset_final\\COCO_dataset_final_validate"
-    )  # path to directory, where the .json file will be saved
-    name_json = "trainval.json"
 
+    """
+    Final .json file
+    """
     # Creating .json file
     with open(os.path.join(path_json, name_json), "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=4)
