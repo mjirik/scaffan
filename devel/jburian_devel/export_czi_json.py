@@ -247,7 +247,6 @@ if __name__ == "__main__":
     }
     """
 
-
     """
     PARAMETERS 
     """
@@ -267,7 +266,6 @@ if __name__ == "__main__":
     name_json = "trainval.json"
 
     data = {}
-
 
     """
     Info
@@ -302,7 +300,6 @@ if __name__ == "__main__":
         czi_files_directory, annotation_name, pixelsize_mm
     )
     data.update({"annotations": list_annotation_dictionaries})
-
 
     """
     Final .json file
