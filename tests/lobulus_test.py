@@ -158,6 +158,7 @@ def test_get_lobulus_mask_manual():
     anns = anim.get_annotations_by_color("#FFFF00")
 
     report = None
+    report = exsu.Report(outputdir="./test_get_lobulus_mask_manual/", show=False)
     lob_proc = scaffan.lobulus.Lobulus(report=report)
     lob_proc.parameters.param("Manual Segmentation").setValue(True)
     lob_proc.set_annotated_image_and_id(anim, anns[0])
