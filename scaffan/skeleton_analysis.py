@@ -183,7 +183,9 @@ class SkeletonAnalysis:
             fig = plt.figure(figsize=(12, 10))
             hist_out = plt.hist(detail_image[detail_inner_lobulus_mask == 1])
             plt.axvline(threshold, color="r")
-            self.report.savefig("lobulus_skeleton_histogram_with_threshold_{}.png", level=55)
+            self.report.savefig(
+                "lobulus_skeleton_histogram_with_threshold_{}.png", level=55
+            )
             fig.close()
             logger.debug(f"histogram={hist_out}")
         # plt.figure()
