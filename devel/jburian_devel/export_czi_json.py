@@ -1,3 +1,4 @@
+import os.path
 from pathlib import Path
 import sys
 import skimage.io
@@ -246,15 +247,23 @@ if __name__ == "__main__":
     }
     """
 
+    """
+    PARAMETERS 
+    """
     # Directory of the image dataset
     dataset_directory = Path(
-        r"H:\BP\datasets\dataset_maxi\COCO_dataset_maxi_validate\images"
+        r"H:\BP\datasets\dataset_final\COCO_dataset_final_validate\images"
     )
 
     # Directory of the .czi files
     czi_files_directory = Path(
-        r"H:\BP\data\dataset_maxi\czi_files_validate"
+        r"H:\BP\data\dataset_final\czi_files_validate"
     )  # path to .czi files directory
+
+    path_json = Path(
+        r"H:\BP\datasets\dataset_final\COCO_dataset_final_validate"
+    )  # path to directory, where the .json file will be saved
+    name_json = "trainval.json"
 
     data = {}
 
@@ -293,10 +302,9 @@ if __name__ == "__main__":
     data.update({"annotations": list_annotation_dictionaries})
 
     """
-    COCO format
+    Final .json file
     """
-    path_json = "H:\\BP\\datasets\\dataset_maxi\\COCO_dataset_maxi_validate"  # path to directory, where the .json file will be saved
-
     # Creating .json file
-    with open(path_json + "\\" + "trainval.json", "w", encoding="utf-8") as f:
+    with open(os.path.join(path_json, name_json), "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=4)
+        f.close()

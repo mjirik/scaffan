@@ -18,7 +18,7 @@ def export_czi_annotations_to_jpg(path_annotations, annotation_name, path_images
                        path to .czi files
     annotation_name : str
                       wanted name of the annotations (e.g. ann, annotation, a,...)
-    path_images : str
+    path_images : Path
                   path to directory where the images will be saved
     """
     index = 0
