@@ -186,7 +186,7 @@ class SkeletonAnalysis:
             self.report.savefig(
                 "lobulus_skeleton_histogram_with_threshold_{}.png", level=55
             )
-            fig.close()
+            plt.close(fig)
             logger.debug(f"histogram={hist_out}")
         # plt.figure()
         # plt.imshow(imthr)
