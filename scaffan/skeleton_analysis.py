@@ -32,7 +32,6 @@ class SkeletonAnalysis:
         pvalue=True,
         ptip="Skeleton Analysis after lobulus segmentation is performed",
     ):
-
         params = [
             # {
             #     "name": "Tile Size",
@@ -193,7 +192,8 @@ class SkeletonAnalysis:
             hist_out = plt.hist(detail_image[detail_inner_lobulus_mask == 1])
             plt.axvline(threshold, color="r")
             self.report.savefig(
-                f"lobulus_skeleton_histogram_with_threshold_{self.lobulus.annotation_id}.png", level=55
+                f"lobulus_skeleton_histogram_with_threshold_{self.lobulus.annotation_id}.png",
+                level=55,
             )
             plt.close(fig)
             logger.debug(f"histogram={hist_out}")

@@ -23,7 +23,6 @@ def download_and_unzip(url, outdir):
     #     import wget as pywget
 
     if outdir is None:
-
         outdir = tempfile.gettempdir()
         # print("temp directory ", outdir)
         outdir = tempfile.mkdtemp()
@@ -43,7 +42,6 @@ def download_and_unzip(url, outdir):
 
 
 def libfix():
-
     # glob.glob(op.expanduser("~/Downloads/"))
     if sys.platform.startswith("win"):
         # print("Trying to download .dll libraries")

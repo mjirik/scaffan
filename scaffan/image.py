@@ -308,7 +308,6 @@ class ImageSlide:
         # factor = self.level_downsamples[level]
 
         with CziFile(self.path) as czi:
-
             location_fixed = np.asarray(location) + self._czi_start
             # self._czi_start = czi.start[-3:-1]
             output = image_czi.read_region_with_level(
@@ -445,7 +444,6 @@ class AnnotatedImage:
         self.raster_image_preprocessing_function_handler = []  # you can add
 
     def _run_raster_image_preprocessing_function_handler(self, img):
-
         for fcn in self.raster_image_preprocessing_function_handler:
             img = fcn(img)
         return img
@@ -475,7 +473,6 @@ class AnnotatedImage:
             self._set_level_pixelsize_with_openslide()
 
     def _set_level_pixelsize_with_openslide(self):
-
         self.level_pixelsize = [
             get_pixelsize(self.openslide, i, requested_unit=self.pixelunit)[0]
             for i in range(0, self.openslide.level_count)
@@ -615,7 +612,6 @@ class AnnotatedImage:
                     listOfBeziersNames.append(name)
                     stroke = child.getElementsByTagName("Stroke")
                     if len(stroke) > 0:
-
                         # remove alpha:   #FFFF0000 -> #FF0000
                         color = "#" + stroke[0].firstChild.nodeValue[-6:]
                     else:
@@ -792,7 +788,6 @@ class AnnotatedImage:
         # margin=0.5,
         # margin_in_pixels=False,
     ) -> "View":
-
         height0 = self.openslide.properties["openslide.level[0].height"]
         width0 = self.openslide.properties["openslide.level[0].width"]
         size_on_level = np.array([int(height0), int(width0)])
@@ -832,7 +827,6 @@ class AnnotatedImage:
         margin=0.0,
         margin_in_pixels=False,
     ) -> "View":
-
         view = View(
             anim=self,
             center=center,
@@ -1040,7 +1034,6 @@ class AnnotatedImage:
         return views
 
     def set_region(self, center=None, level=0, size=None, location=None):
-
         if size is None:
             size = [256, 256]
 
@@ -1180,7 +1173,6 @@ class AnnotatedImage:
         return center, size
 
     def get_region_image(self, as_gray=False, as_unit8=False):
-
         location = fix_location_ndpi(
             self.openslide, self.region_location, self.region_level
         )
@@ -1528,7 +1520,6 @@ class View:
         #     # ann_raster = ann_raster1
         # else:
         for hole_id in holes_ids:
-
             ann_raster2 = self.get_annotation_raster(hole_id)
             ann_raster = ann_raster ^ ann_raster2
         return ann_raster
@@ -1865,7 +1856,6 @@ def imshow_with_colorbar(*args, **kwargs):
 
 
 def get_offset_px(imsl: ImageSlide):
-
     pm = imsl.properties
     pixelsize, pixelunit = get_pixelsize(imsl, requested_unit="mm")
     offset = np.asarray(

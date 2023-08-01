@@ -21,6 +21,7 @@ fn = io3d.datasets.join_path(
     "medical", "orig", "sample_data", "SCP003", "SCP003.ndpi", get_root=True
 )
 
+
 # Read annotated image
 def get_metadata(anim, picture_path_annotation):
     with CziFile(picture_path_annotation) as czi:

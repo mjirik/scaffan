@@ -250,7 +250,6 @@ class Lobulus:
             # import pdb
             # pdb.set_trace()
             if use_manual:
-
                 self.border_mask = seg_true.astype(np.uint8)
                 logger.debug("Manual segmentation ")
                 return

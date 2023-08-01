@@ -37,7 +37,6 @@ def create_icon(
         package_name = app_name
 
     if platform.system() == "Windows":
-
         # logo_fn2 = pathlib.Path(__file__).parent / pathlib.Path("scaffan_icon512.ico")
 
         # logo_fn = op.join(op.dirname(__file__), icon_filename)

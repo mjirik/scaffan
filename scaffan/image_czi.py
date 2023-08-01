@@ -54,7 +54,6 @@ def get_py_slices(
 
     # TODO the size of the endpoint should be probably +1
     if isconj:
-
         st_in_s = np.max(np.vstack([r_st - s_st, [0, 0]]), axis=0).astype(int)
         sp_in_s = np.min(np.vstack([r_st + r_sh - s_st, s_sh]), axis=0).astype(int)
         st_in_sn = np.max(np.vstack([(r_st - s_st) / odf, [0, 0]]), axis=0).astype(int)
