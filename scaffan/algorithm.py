@@ -782,76 +782,81 @@ class Scaffan:
             }
         )
         logger.info(f"Processing file: {fn} with Annotation ID: {annotation_id}")
+        try:
 
-        self.lobulus_processing.set_annotated_image_and_id(self.anim, annotation_id)
-        self.lobulus_processing.run(show=show)
-        logger.trace(
-            f"type lobulus_processing.lobulus_mask: {type(self.lobulus_processing.lobulus_mask)}"
-        )
-        self.skeleton_analysis.set_lobulus(lobulus=self.lobulus_processing)
-        logger.debug("set lobulus done")
-        # run_slide_segmentation = self.parameters.param("Processing", "Texture Analysis").value()
-        run_skeleton_analysis = self.parameters.param(
-            "Processing", "Skeleton Analysis"
-        ).value()
-        run_texture_analysis = self.parameters.param(
-            "Processing", "Texture Analysis"
-        ).value()
-        run_lobule_quality_estimation = self.parameters.param(
-            "Processing", "SNI Prediction CNN"
-        ).value()
-        if run_skeleton_analysis:
-            logger.debug("Skeleton analysis...")
-            self.skeleton_analysis.skeleton_analysis(show=show)
-        if run_texture_analysis:
-            logger.debug("Texture analysis...")
-            # self.glcm_textures.report = self.report
-            self.glcm_textures.set_input_data(
-                view=self.lobulus_processing.view,
-                annotation_id=annotation_id,
-                lobulus_segmentation=self.lobulus_processing.lobulus_mask,
+            self.lobulus_processing.set_annotated_image_and_id(self.anim, annotation_id)
+            self.lobulus_processing.run(show=show)
+            logger.trace(
+                f"type lobulus_processing.lobulus_mask: {type(self.lobulus_processing.lobulus_mask)}"
+            )
+            self.skeleton_analysis.set_lobulus(lobulus=self.lobulus_processing)
+            logger.debug("set lobulus done")
+            # run_slide_segmentation = self.parameters.param("Processing", "Texture Analysis").value()
+            run_skeleton_analysis = self.parameters.param(
+                "Processing", "Skeleton Analysis"
+            ).value()
+            run_texture_analysis = self.parameters.param(
+                "Processing", "Texture Analysis"
+            ).value()
+            run_lobule_quality_estimation = self.parameters.param(
+                "Processing", "SNI Prediction CNN"
+            ).value()
+            if run_skeleton_analysis:
+                logger.debug("Skeleton analysis...")
+                self.skeleton_analysis.skeleton_analysis(show=show)
+            if run_texture_analysis:
+                logger.debug("Texture analysis...")
+                # self.glcm_textures.report = self.report
+                self.glcm_textures.set_input_data(
+                    view=self.lobulus_processing.view,
+                    annotation_id=annotation_id,
+                    lobulus_segmentation=self.lobulus_processing.lobulus_mask,
+                )
+                logger.debug("...run...")
+                self.glcm_textures.run()
+                logger.debug("Texture analysis finished")
+            if run_lobule_quality_estimation:
+                logger.debug("Lobule quality estimation CNN...")
+                self.lobule_quality_estimation_cnn.set_input_data(
+                    view=self.lobulus_processing.view,
+                    annotation_id=annotation_id,
+                    lobulus_segmentation=self.lobulus_processing.lobulus_mask,
+                )
+                logger.debug("...run...")
+                self.lobule_quality_estimation_cnn.run()
+                logger.debug("Lobule quality estimation CNN finished.")
+            logger.trace("after texture analysis")
+            t1 = time.time()
+            ann_center = self.anim.get_annotation_center_mm(annotation_id)
+            # inpath = Path(self.parameters.param("Input", "File Path").value())
+            # fn = inpath.parts[-1]
+            self._add_general_information_to_actual_row()
+            self.report.add_cols_to_actual_row(
+                {
+                    # "File Path": str(inpath),
+                    # "Annotation Color": self.parameters.param("Input", "Annotation Color").value(),
+                    "Annotation Center X [mm]": ann_center[0],
+                    "Annotation Center Y [mm]": ann_center[1],
+                    "Processing Time [s]": t1 - t0,
+                    # "Datetime": datetime.datetime.now().isoformat(' ', 'seconds'),
+                    # "platform.system": platform.uname().system,
+                    # "platform.node": platform.uname().node,
+                    # "platform.processor": platform.uname().processor,
+                    # "Scaffan Version": scaffan.__version__,
+                }
+            )
+            # evaluation
+            logger.debug("Evaluation...")
+            t1 = time.time()
+            self.evaluation.set_input_data(
+                self.anim, annotation_id, self.lobulus_processing
             )
             logger.debug("...run...")
-            self.glcm_textures.run()
-            logger.debug("Texture analysis finished")
-        if run_lobule_quality_estimation:
-            logger.debug("Lobule quality estimation CNN...")
-            self.lobule_quality_estimation_cnn.set_input_data(
-                view=self.lobulus_processing.view,
-                annotation_id=annotation_id,
-                lobulus_segmentation=self.lobulus_processing.lobulus_mask,
-            )
-            logger.debug("...run...")
-            self.lobule_quality_estimation_cnn.run()
-            logger.debug("Lobule quality estimation CNN finished.")
-        logger.trace("after texture analysis")
-        t1 = time.time()
-        ann_center = self.anim.get_annotation_center_mm(annotation_id)
-        # inpath = Path(self.parameters.param("Input", "File Path").value())
-        # fn = inpath.parts[-1]
-        self._add_general_information_to_actual_row()
-        self.report.add_cols_to_actual_row(
-            {
-                # "File Path": str(inpath),
-                # "Annotation Color": self.parameters.param("Input", "Annotation Color").value(),
-                "Annotation Center X [mm]": ann_center[0],
-                "Annotation Center Y [mm]": ann_center[1],
-                "Processing Time [s]": t1 - t0,
-                # "Datetime": datetime.datetime.now().isoformat(' ', 'seconds'),
-                # "platform.system": platform.uname().system,
-                # "platform.node": platform.uname().node,
-                # "platform.processor": platform.uname().processor,
-                # "Scaffan Version": scaffan.__version__,
-            }
-        )
-        # evaluation
-        logger.debug("Evaluation...")
-        t1 = time.time()
-        self.evaluation.set_input_data(
-            self.anim, annotation_id, self.lobulus_processing
-        )
-        logger.debug("...run...")
-        self.evaluation.run()
+            self.evaluation.run()
+        except:
+            import traceback
+            logger.error("Unexpected error in lobule processing:")
+            logger.error(traceback.format_exc())
         # Copy all parameters to table
         self.report.finish_actual_row()
 
