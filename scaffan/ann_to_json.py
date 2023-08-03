@@ -13,7 +13,6 @@ from scaffan import annotation
 # print("ann to json")
 
 if __name__ == "__main__":
-
     # print(sys.argv)
     pth = op.expanduser(sys.argv[1])
     # print(pth)

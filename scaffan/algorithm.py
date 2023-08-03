@@ -412,7 +412,6 @@ class Scaffan:
         return default_dir
 
     def _prepare_default_output_dir(self):
-
         # timestamp = datetime.datetime.now().strftime("SA_%Y-%m-%d_%H:%M:%S")
         timestamp = datetime.datetime.now().strftime("SA_%Y%m%d_%H%M%S")
         default_dir = op.join(self._default_output_dir_prefix, timestamp)
@@ -542,7 +541,6 @@ class Scaffan:
         ).value()
         logger.debug(f"Lobulus Selection={automatic_lobulus_selection}")
         if annotation_ids is None:
-
             if automatic_lobulus_selection == "Color":
                 annotation_ids = self.anim.get_annotations_by_color(
                     color,
@@ -889,7 +887,6 @@ class Scaffan:
     def prepare_circle_annotations_from_points_px_in_preview(
         self, view_corner, centers_px_view
     ):
-
         x_px_view, y_px_view = zip(*list(centers_px_view))
         logger.debug(x_px_view)
         pts_glob_px = view_corner.coords_view_px_to_glob_px(
@@ -995,7 +992,6 @@ class Scaffan:
             # self.parameters.param("Input", "Select").setValue(anim.get_file_info())
 
     def start_gui(self, skip_exec=False, qapp=None):
-
         from PyQt5 import QtWidgets
         import scaffan.qtexceptionhook
 
@@ -1044,7 +1040,6 @@ class Scaffan:
         self.win = win
         # win.
         if not skip_exec:
-
             qapp.exec_()
 
 

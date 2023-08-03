@@ -247,7 +247,6 @@ def create_lobulus_dataset(mask_imgs, mask_map, excel_df, test_ratio):
         crop_size = int((1 / mask_img.pixel_size) * CUT_SIZE)
 
         for cut_point in cuts:
-
             image_crop = mask_img.image[
                 cut_point[1] : cut_point[1] + crop_size,
                 cut_point[0] : cut_point[0] + crop_size,
@@ -312,7 +311,6 @@ def save_lobulus_masks(excel_path, ndpi_directory):
     file_names = get_all_filenames(excel_df)
 
     for i, file_name in file_names:
-
         if not os.path.exists(ndpi_directory + file_name):
             continue
 

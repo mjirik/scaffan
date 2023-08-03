@@ -187,7 +187,6 @@ if __name__ == "__main__":
         sni = float(re.match(r".*SNI=(\d*\.?\d*)", details).group(1)) / 2
 
         for cut_point in cuts:
-
             image_crop = lobul.image[
                 cut_point[0] : cut_point[0] + crop_size,
                 cut_point[1] : cut_point[1] + crop_size,

@@ -330,7 +330,6 @@ class GLCMTextureMeasurement:
         t.ravel()[2] = 0.5
         plt.imshow(energy * w + t)
         if self.report is not None:
-
             self.report.savefig_and_show(
                 "glcm_features_color_{}.png".format(fn_id),
                 fig,
@@ -412,7 +411,6 @@ def make_stats(prefix: str, data, dct=None):
 
 class TextureSegmentation:
     def __init__(self, feature_function=None, classifier=None):
-
         params = [
             {"name": "Tile Size", "type": "int", "value": 256},
             # {

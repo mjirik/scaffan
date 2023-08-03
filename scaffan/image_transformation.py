@@ -29,7 +29,6 @@ class ImageExport:
         ptip="Transform input image to other image format",
         report: Optional[Report] = None,
     ):
-
         params = [
             # {
             #     "name": "Tile Size",
