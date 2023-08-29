@@ -29,7 +29,6 @@ def get_crop_by_center(img, center=None, size=(100, 100)):
 
 
 def anotate_texture(img):
-
     ed = sed3.sed3(img)
     ed.show()
 

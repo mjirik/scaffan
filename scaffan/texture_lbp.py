@@ -66,7 +66,6 @@ class KLDClassifier:
         pass
 
     def fit(self, data, target):
-
         self.data = data
         self.target = target
         # self.refs = list(zip(data, target))

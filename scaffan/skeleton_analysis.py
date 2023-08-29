@@ -32,7 +32,6 @@ class SkeletonAnalysis:
         pvalue=True,
         ptip="Skeleton Analysis after lobulus segmentation is performed",
     ):
-
         params = [
             # {
             #     "name": "Tile Size",
@@ -170,20 +169,32 @@ class SkeletonAnalysis:
         # from pdb import set_trace
         # set_trace()
         logger.debug(
-            f"detail_inner_lobulus_mask {detail_central_vein_mask.shape} {detail_central_vein_mask.dtype} "
-            f"{np.min(detail_central_vein_mask)} {np.max(detail_central_vein_mask)}"
+            f"detail_cenral_vein_mask {detail_central_vein_mask.shape} dtype={detail_central_vein_mask.dtype} "
+            f"min={np.min(detail_central_vein_mask)} max={np.max(detail_central_vein_mask)}"
         )
+        logger.debug(
+            f"detail_inner_lobulus_mask {detail_inner_lobulus_mask.shape} dtype={detail_inner_lobulus_mask.dtype} "
+            f"min={np.min(detail_inner_lobulus_mask)} max={np.max(detail_inner_lobulus_mask)}"
+        )
+
         logger.debug("Thresholding and skeletonization...")
-        threshold = skimage.filters.threshold_otsu(
-            detail_image[detail_inner_lobulus_mask == 1]
-        )
+        if np.sum(detail_inner_lobulus_mask == 1) == 0:
+            logger.debug("No inner lobulus found")
+            threshold = 0.5
+        else:
+            threshold = skimage.filters.threshold_otsu(
+                detail_image[detail_inner_lobulus_mask == 1]
+            )
         imthr = detail_image < threshold
         imthr[detail_mask != 1] = 0
         if self.report is not None:
             fig = plt.figure(figsize=(12, 10))
             hist_out = plt.hist(detail_image[detail_inner_lobulus_mask == 1])
             plt.axvline(threshold, color="r")
-            self.report.savefig("lobulus_skeleton_histogram_with_threshold_{}.png", level=55)
+            self.report.savefig(
+                f"lobulus_skeleton_histogram_with_threshold_{self.lobulus.annotation_id}.png",
+                level=55,
+            )
             plt.close(fig)
             logger.debug(f"histogram={hist_out}")
         # plt.figure()

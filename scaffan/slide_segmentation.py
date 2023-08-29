@@ -936,7 +936,6 @@ class ScanSegmentation:
         )
 
     def evaluate_labels(self):
-
         if (
             self.whole_slide_training_labels is not None
             and self.full_output_image is not None
@@ -1137,7 +1136,6 @@ def kick_close_points(coords, min_distance):
 
 
 def add_circle_annotation(view_corner: scim.View, centers_px_global, r_mm, annotations):
-
     # r_mm = 0.1
     t = np.linspace(0, 2 * np.pi, 30)
 
