@@ -445,11 +445,12 @@ class Scaffan:
 
         # generate random hash with letters and numbers
         hash = "".join(random.choices(string.ascii_letters + string.digits, k=8))
-        self.report.set_persistent_cols({
-            "Run Datetime": datetime.datetime.now().isoformat(" ", "seconds"),
-            "Run Hash": hash
-        })
-
+        self.report.set_persistent_cols(
+            {
+                "Run Datetime": datetime.datetime.now().isoformat(" ", "seconds"),
+                "Run Hash": hash,
+            }
+        )
 
     def set_annotation_color_selection(
         self, color: str, override_automatic_lobulus_selection=True
