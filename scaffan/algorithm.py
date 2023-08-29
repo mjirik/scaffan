@@ -20,6 +20,8 @@ from typing import List, Union, Optional
 import configparser
 import io
 import sys
+import random
+import string
 
 # import PyQt5.QtWidgets
 # print("start 3")
@@ -441,6 +443,14 @@ class Scaffan:
         self.report.additional_spreadsheet_fn = str(fn_spreadsheet.value())
         if self.get_parameter("Processing;SNI Prediction CNN") == True:
             self.lobule_quality_estimation_cnn.init()
+
+        # generate random hash with letters and numbers
+        hash = "".join(random.choices(string.ascii_letters + string.digits, k=8))
+        self.report.set_persistent_cols({
+            "Run Datetime": datetime.datetime.now().isoformat(" ", "seconds"),
+            "Run Hash": hash
+        })
+
 
     def set_annotation_color_selection(
         self, color: str, override_automatic_lobulus_selection=True
