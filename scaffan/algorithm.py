@@ -824,15 +824,22 @@ class Scaffan:
                 self.glcm_textures.run()
                 logger.debug("Texture analysis finished")
             if run_lobule_quality_estimation:
-                logger.debug("Lobule quality estimation CNN...")
-                self.lobule_quality_estimation_cnn.set_input_data(
-                    view=self.lobulus_processing.view,
-                    annotation_id=annotation_id,
-                    lobulus_segmentation=self.lobulus_processing.lobulus_mask,
-                )
-                logger.debug("...run...")
-                self.lobule_quality_estimation_cnn.run()
-                logger.debug("Lobule quality estimation CNN finished.")
+                try:
+                    logger.debug("Lobule quality estimation CNN...")
+                    self.lobule_quality_estimation_cnn.set_input_data(
+                        view=self.lobulus_processing.view,
+                        annotation_id=annotation_id,
+                        lobulus_segmentation=self.lobulus_processing.lobulus_mask,
+                    )
+                    logger.debug("...run...")
+                    self.lobule_quality_estimation_cnn.run()
+                    logger.debug("Lobule quality estimation CNN finished.")
+                except:
+                    import traceback
+
+                    logger.error("Unexpected error in Lobule quality estimation CNN processing:")
+                    logger.error(traceback.format_exc())
+
             logger.trace("after texture analysis")
             t1 = time.time()
             ann_center = self.anim.get_annotation_center_mm(annotation_id)
