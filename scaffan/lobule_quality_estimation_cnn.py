@@ -155,6 +155,7 @@ class LobuleQualityEstimationCNN:
                 evaluations.append(sni_prediction)
             except ValueError:
                 import traceback
+
                 logger.error(traceback.format_exc())
                 logger.debug(f"crop_size={crop_size}")
                 logger.debug(f"img.shape={img.shape}")
