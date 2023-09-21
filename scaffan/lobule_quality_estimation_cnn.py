@@ -139,19 +139,26 @@ class LobuleQualityEstimationCNN:
 
         # Phase 2: Predict SNI value for every sample
         for i, cut_point in enumerate(snip_corners):
-            img = self.parent_view.get_region_image(as_gray=True)
-            image_snip = img[
-                cut_point[0] : cut_point[0] + crop_size,
-                cut_point[1] : cut_point[1] + crop_size,
-            ]
-            image_snip = self.shrink_image(image_snip)
-            prediction = self.model.predict(
-                image_snip.reshape(1, self.DISPLAY_SIZE, self.DISPLAY_SIZE, 1),
-                verbose=0,
-            )
-            # Predictions are normalized to an interval <0,1> but SNI belongs to <0,2>
-            sni_prediction = 2 * np.float(prediction)
-            evaluations.append(sni_prediction)
+            try:
+                img = self.parent_view.get_region_image(as_gray=True)
+                image_snip = img[
+                    cut_point[0] : cut_point[0] + crop_size,
+                    cut_point[1] : cut_point[1] + crop_size,
+                ]
+                image_snip = self.shrink_image(image_snip)
+                prediction = self.model.predict(
+                    image_snip.reshape(1, self.DISPLAY_SIZE, self.DISPLAY_SIZE, 1),
+                    verbose=0,
+                )
+                # Predictions are normalized to an interval <0,1> but SNI belongs to <0,2>
+                sni_prediction = 2 * np.float(prediction)
+                evaluations.append(sni_prediction)
+            except ValueError:
+                import traceback
+                logger.error(traceback.format_exc())
+                logger.debug(f"crop_size={crop_size}")
+                logger.debug(f"img.shape={img.shape}")
+                logger.debug(f"cut_point={cut_point}")
 
         # výsledek uložený do proměnné sni_prediction
 
