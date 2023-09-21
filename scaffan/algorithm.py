@@ -837,7 +837,9 @@ class Scaffan:
                 except:
                     import traceback
 
-                    logger.error("Unexpected error in Lobule quality estimation CNN processing:")
+                    logger.error(
+                        "Unexpected error in Lobule quality estimation CNN processing:"
+                    )
                     logger.error(traceback.format_exc())
 
             logger.trace("after texture analysis")
