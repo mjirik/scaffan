@@ -22,6 +22,7 @@ from exsu.report import Report
 from pyqtgraph.parametertree import Parameter
 import imma.image
 import copy
+from typing import Optional
 
 
 class SkeletonAnalysis:
@@ -146,6 +147,7 @@ class SkeletonAnalysis:
         logger.debug(f"view={detail_view}")
         # TODO change log_level to trace
         detail_image = detail_view.get_region_image(as_gray=True, log_level="DEBUG")
+        # detail_image = detail_view.anim.fix_image_shape(detail_image, detail_mask)
         logger.debug("preparing figure")
         fig = plt.figure()
         plt.imshow(detail_image)
@@ -176,152 +178,205 @@ class SkeletonAnalysis:
             f"detail_inner_lobulus_mask {detail_inner_lobulus_mask.shape} dtype={detail_inner_lobulus_mask.dtype} "
             f"min={np.min(detail_inner_lobulus_mask)} max={np.max(detail_inner_lobulus_mask)}"
         )
+        _thresholding_and_skeletonization(detail_image, detail_mask, detail_inner_lobulus_mask,
+                                          detail_central_vein_mask, detail_view=detail_view, skeleton_analysis=self)
 
-        logger.debug("Thresholding and skeletonization...")
-        if np.sum(detail_inner_lobulus_mask == 1) == 0:
-            logger.debug("No inner lobulus found")
-            threshold = 0.5
-        else:
-            threshold = skimage.filters.threshold_otsu(
-                detail_image[detail_inner_lobulus_mask == 1]
-            )
-        imthr = detail_image < threshold
-        imthr[detail_mask != 1] = 0
-        if self.report is not None:
-            fig = plt.figure(figsize=(12, 10))
-            hist_out = plt.hist(detail_image[detail_inner_lobulus_mask == 1])
-            plt.axvline(threshold, color="r")
-            self.report.savefig(
-                f"lobulus_skeleton_histogram_with_threshold_{self.lobulus.annotation_id}.png",
-                level=55,
-            )
-            plt.close(fig)
-            logger.debug(f"histogram={hist_out}")
-        # plt.figure()
-        # plt.imshow(imthr)
-        # if show:
-        #     plt.show()
-        skeleton = (skeletonize(imthr) > 0).astype(np.uint8)
-        sumskel = np.sum(skeleton)
-        logger.debug(
-            f"Skeletonization finished. threshold={threshold}, raw sumskel[px]={sumskel}"
-        )
-        raw_skeleton = imthr.copy()
-        if self.report is not None:
-            self.imsave("lobulus_raw_skeleton_{}.png", raw_skeleton, severity=40)
-        gs = skimage.filters.gaussian((skeleton > 0).astype(np.uint8), sigma=10)
-        skeleton[gs > 0.001] = 0
-        sumskel = np.sum(skeleton)
-        logger.debug(
-            f"Skeletonization finished. threshold={threshold}, sumskel[px]={sumskel}"
-        )
-
-        datarow["Skeleton length"] = sumskel * detail_view.region_pixelsize[0]
-        datarow["Output pixel size 0"] = detail_view.region_pixelsize[0]
-        datarow["Output pixel size 1"] = detail_view.region_pixelsize[1]
-        datarow["Output image size 0"] = (
-            detail_view.region_pixelsize[0] * imthr.shape[0]
-        )
-        datarow["Output image size 1"] = (
-            detail_view.region_pixelsize[1] * imthr.shape[1]
-        )
-        fig = plt.figure(figsize=(12, 10))
-        plt.imshow(skeleton + imthr)
-        detail_view.add_ticks()
-        if self.report is not None:
-            self.report.savefig_and_show(
-                "thumb_skeleton_thr_{}.png".format(self.lobulus.annotation_id), fig
-            )
-
-        if self.report is not None:
-            imall = detail_mask.astype(np.uint8)
-            imall[detail_central_vein_mask > 0] = 2
-            imall[imthr > 0] = 3
-            imall[skeleton > 0] = 4
-            # imall = (skeleton.astype(np.uint8) + imthr.astype(np.uint8) +  + (detail_central_vein_mask.astype(np.uint8) * 2)).astype(np.uint8)
-            self.imsave("lobulus_central_thr_skeleton_{}.png", imall)
-            self.imsave(
-                "lobulus_thr_skeleton_{}.png",
-                (skeleton.astype(np.uint8) + imthr + detail_mask).astype(np.uint8),
-                severity=55,
-            )
-            self.imsave("skeleton_{}.png", skeleton, 55)
-            self.imsave("thr_{}.png", imthr)
-
-            logger.debug("Preparing low resoluion skeleton...")
-            skeleton_lowres = scipy.ndimage.zoom(
-                skimage.morphology.binary_dilation(
-                    (skeleton > 0).astype(np.uint8), skimage.morphology.disk(2)
-                ).astype(np.uint8),
-                0.5,
-            )
-            self.imsave("skeleton_lowres_{}.png", skeleton_lowres, 60)
-            # plt.imsave(op.join(self.report.outputdir, "skeleton_thr_lobulus_{}.png".format(self.annotation_id)), skeleton.astype(np.uint8) + imthr + detail_mask)
-            # plt.imsave(op.join(self.report.outputdir, "skeleton_{}.png".format(self.annotation_id)), skeleton)
-            # plt.imsave(op.join(self.report.outputdir, "thr_{}.png".format(self.annotation_id)), imthr)
-            # skimage.io.imsave(op.join(self.report.outputdir, "raw_skeleton_thr_lobulus_{}.png".format(self.annotation_id)),
-            #                   (50 * skeleton + 50 * imthr + 50 * detail_mask).astype(np.uint8))
-            # skimage.io.imsave(op.join(self.report.outputdir, "raw_skeleton_{}.png".format(self.annotation_id)), 50 * skeleton)
-            # skimage.io.imsave(op.join(self.report.outputdir, "raw_thr_{}.png".format(self.annotation_id)), 50 * imthr)
-
-        logger.debug("Branching points detection...")
-        conv = scipy.signal.convolve2d(skeleton, np.ones([3, 3]), mode="same")
-        conv = conv * skeleton
-        fig = plt.figure(figsize=(12, 10))
-        plt.imshow(conv)
-        detail_view.add_ticks()
-        if self.report is not None:
-            self.report.savefig_and_show(
-                "figure_skeleton_nodes_{}.png".format(self.lobulus.annotation_id), fig
-            )
-
-            with warnings.catch_warnings():
-                # warnings.simplefilter("low contrast image")
-                warnings.filterwarnings("ignore", ".*low contrast image.*")
-                self.imsave("skeleton_nodes_raw_{}.png", conv, 20)
-            # plt.imsave(op.join(self.report.outputdir, "skeleton_nodes_{}.png".format(self.annotation_id)), conv.astype(np.uint8))
-            # skimage.io.imsave(op.join(self.report.outputdir, "raw_skeleton_nodes_{}.png".format(self.annotation_id)), (conv * 20).astype(np.uint8))
-
-        conv[conv > 3] = 0
-        label, num = scipy.ndimage.label(conv)
-        datarow["Branch number"] = num
-        label, num = scipy.ndimage.label(conv == 1)
-        datarow["Dead ends number"] = num
-        if "Area" in datarow:
-            area_unit = datarow["Area unit"]
-            datarow[f"Branch number density [1/{area_unit}^2]"] = (
-                datarow["Branch number"] / datarow["Area"]
-            )
-            datarow[f"Dead ends number density [1/{area_unit}^2]"] = (
-                datarow["Dead ends number"] / datarow["Area"]
-            )
-            datarow[f"Skeleton length density [{area_unit}/{area_unit}^2]"] = (
-                datarow["Skeleton length"] / datarow["Area"]
-            )
-        else:
-            # probably area can be estimated by view area
-            logger.debug("Unknown area. Skipping density calculation")
-
-        if "Lobulus Equivalent Surface" in datarow:
-            area_unit = datarow["Area unit"]
-            datarow[f"Equivalent branch number density [1/{area_unit}^2]"] = (
-                datarow["Branch number"] / datarow["Lobulus Equivalent Surface"]
-            )
-            datarow[f"Equivalent dead ends number density [1/{area_unit}^2]"] = (
-                datarow["Dead ends number"] / datarow["Lobulus Equivalent Surface"]
-            )
-            datarow[
-                f"Equivalent skeleton length density [{area_unit}/{area_unit}^2]"
-            ] = (datarow["Skeleton length"] / datarow["Lobulus Equivalent Surface"])
-        else:
-            # probably area can be estimated by view area
-            logger.debug(
-                "Unknown 'Lobulus Equivalent Surface'. Skipping density calculation"
-            )
-
-        self.report.add_cols_to_actual_row(datarow)
-        logger.debug("Skeleton analysis finished.")
 
     def imsave(self, base_fn, arr, severity=50):
         base_fn = base_fn.format(self.lobulus.annotation_id)
         self.report.imsave(base_fn, arr, severity)
+
+
+
+def _thresholding_and_skeletonization(
+        detail_image:np.ndarray,
+        detail_lobulus_mask: Optional[np.ndarray]=None,
+        detail_inner_lobulus_mask: Optional[np.ndarray]=None,
+        detail_central_vein_mask: Optional[np.ndarray]=None,
+        data_row:Optional[dict]=None,
+        detail_view=None, skeleton_analysis = None,
+        region_pixelsize: list = None,
+        report = None
+
+) -> dict:
+    """
+    :param detail_image: pixel values
+    :param detail_lobulus_mask: 0 outside, 1 inside of lobulus
+    :param detail_inner_lobulus_mask: 0 outside, 1 inside of lobulus with margin
+    :param detail_central_vein_mask: 0 outside, 1 inside of central vein
+    :param data_row: data row for report
+    :param detail_view: type scaffan.image.View
+    :param skeleton_analysis: type SkeletonAnalysis
+    :param region_pixelsize: pixel resolution in mm
+
+    """
+
+    logger.debug("Thresholding and skeletonization...")
+    if data_row is None:
+        datarow = {}
+    ############
+    if skeleton_analysis:
+        report = skeleton_analysis.report
+
+    if detail_lobulus_mask is None:
+        detail_lobulus_mask = np.zeros(detail_image.shape, dtype=np.uint8)
+    if detail_inner_lobulus_mask is None:
+        detail_inner_lobulus_mask = np.zeros(detail_image.shape, dtype=np.uint8)
+    if detail_central_vein_mask is None:
+        detail_central_vein_mask = np.zeros(detail_image.shape, dtype=np.uint8)
+
+    if np.sum(detail_inner_lobulus_mask == 1) == 0:
+        logger.debug("No inner lobulus found")
+        threshold = 0.5
+    else:
+        threshold = skimage.filters.threshold_otsu(
+            detail_image[detail_inner_lobulus_mask == 1]
+        )
+    if (skeleton_analysis is not None) and (report is not None):
+        fig = plt.figure(figsize=(12, 10))
+        hist_out = plt.hist(detail_image[detail_inner_lobulus_mask == 1])
+        plt.axvline(threshold, color="r")
+        report.savefig(
+            f"lobulus_skeleton_histogram_with_threshold_{skeleton_analysis.lobulus.annotation_id}.png",
+            level=55,
+        )
+        plt.close(fig)
+        logger.debug(f"histogram={hist_out}")
+
+    ###############################################
+
+    imthr = detail_image < threshold
+    imthr[detail_lobulus_mask != 1] = 0
+    # plt.figure()
+    # plt.imshow(imthr)
+    # if show:
+    #     plt.show()
+
+
+    skeleton = (skeletonize(imthr) > 0).astype(np.uint8)
+    sumskel = np.sum(skeleton)
+    logger.debug(
+        f"Skeletonization finished. threshold={threshold}, raw sumskel[px]={sumskel}"
+    )
+    raw_skeleton = imthr.copy()
+    if (skeleton_analysis is not None) and (report is not None):
+        skeleton_analysis.imsave("lobulus_raw_skeleton_{}.png", raw_skeleton, severity=40)
+    gs = skimage.filters.gaussian((skeleton > 0).astype(np.uint8), sigma=10)
+    skeleton[gs > 0.001] = 0
+    sumskel = np.sum(skeleton)
+    logger.debug(
+        f"Skeletonization finished. threshold={threshold}, sumskel[px]={sumskel}"
+    )
+
+    if (detail_view is not None):
+        region_pixelsize = detail_view.region_pixelsize
+    if region_pixelsize is not None:
+        datarow["Skeleton length"] = sumskel * region_pixelsize[0]
+        datarow["Output pixel size 0"] = region_pixelsize[0]
+        datarow["Output pixel size 1"] = region_pixelsize[1]
+        datarow["Output image size 0"] = (
+                region_pixelsize[0] * imthr.shape[0]
+        )
+        datarow["Output image size 1"] = (
+                region_pixelsize[1] * imthr.shape[1]
+        )
+        fig = plt.figure(figsize=(12, 10))
+        plt.imshow(skeleton + imthr)
+    if detail_view:
+        detail_view.add_ticks()
+    if (skeleton_analysis is not None) and (report is not None):
+        report.savefig_and_show(
+            "thumb_skeleton_thr_{}.png".format(skeleton_analysis.lobulus.annotation_id), fig
+        )
+
+        imall = detail_lobulus_mask.astype(np.uint8)
+        imall[detail_central_vein_mask > 0] = 2
+        imall[imthr > 0] = 3
+        imall[skeleton > 0] = 4
+        # imall = (skeleton.astype(np.uint8) + imthr.astype(np.uint8) +  + (detail_central_vein_mask.astype(np.uint8) * 2)).astype(np.uint8)
+        skeleton_analysis.imsave("lobulus_central_thr_skeleton_{}.png", imall)
+        skeleton_analysis.imsave(
+            "lobulus_thr_skeleton_{}.png",
+            (skeleton.astype(np.uint8) + imthr + detail_lobulus_mask).astype(np.uint8),
+            severity=55,
+        )
+        skeleton_analysis.imsave("skeleton_{}.png", skeleton, 55)
+        skeleton_analysis.imsave("thr_{}.png", imthr)
+
+        logger.debug("Preparing low resoluion skeleton...")
+        skeleton_lowres = scipy.ndimage.zoom(
+            skimage.morphology.binary_dilation(
+                (skeleton > 0).astype(np.uint8), skimage.morphology.disk(2)
+            ).astype(np.uint8),
+            0.5,
+        )
+        skeleton_analysis.imsave("skeleton_lowres_{}.png", skeleton_lowres, 60)
+        # plt.imsave(op.join(self.report.outputdir, "skeleton_thr_lobulus_{}.png".format(self.annotation_id)), skeleton.astype(np.uint8) + imthr + detail_mask)
+        # plt.imsave(op.join(self.report.outputdir, "skeleton_{}.png".format(self.annotation_id)), skeleton)
+        # plt.imsave(op.join(self.report.outputdir, "thr_{}.png".format(self.annotation_id)), imthr)
+        # skimage.io.imsave(op.join(self.report.outputdir, "raw_skeleton_thr_lobulus_{}.png".format(self.annotation_id)),
+        #                   (50 * skeleton + 50 * imthr + 50 * detail_mask).astype(np.uint8))
+        # skimage.io.imsave(op.join(self.report.outputdir, "raw_skeleton_{}.png".format(self.annotation_id)), 50 * skeleton)
+        # skimage.io.imsave(op.join(self.report.outputdir, "raw_thr_{}.png".format(self.annotation_id)), 50 * imthr)
+
+    logger.debug("Branching points detection...")
+    conv = scipy.signal.convolve2d(skeleton, np.ones([3, 3]), mode="same")
+    conv = conv * skeleton
+    fig = plt.figure(figsize=(12, 10))
+    plt.imshow(conv)
+    if detail_view:
+        detail_view.add_ticks()
+    if (skeleton_analysis is not None) and (report is not None):
+        report.savefig_and_show(
+            "figure_skeleton_nodes_{}.png".format(skeleton_analysis.lobulus.annotation_id), fig
+        )
+
+        with warnings.catch_warnings():
+            # warnings.simplefilter("low contrast image")
+            warnings.filterwarnings("ignore", ".*low contrast image.*")
+            skeleton_analysis.imsave("skeleton_nodes_raw_{}.png", conv, 20)
+        # plt.imsave(op.join(self.report.outputdir, "skeleton_nodes_{}.png".format(self.annotation_id)), conv.astype(np.uint8))
+        # skimage.io.imsave(op.join(self.report.outputdir, "raw_skeleton_nodes_{}.png".format(self.annotation_id)), (conv * 20).astype(np.uint8))
+
+    conv[conv > 3] = 0
+    label, num = scipy.ndimage.label(conv)
+    datarow["Branch number"] = num
+    label, num = scipy.ndimage.label(conv == 1)
+    datarow["Dead ends number"] = num
+    if "Area" in datarow:
+        area_unit = datarow["Area unit"]
+        datarow[f"Branch number density [1/{area_unit}^2]"] = (
+                datarow["Branch number"] / datarow["Area"]
+        )
+        datarow[f"Dead ends number density [1/{area_unit}^2]"] = (
+                datarow["Dead ends number"] / datarow["Area"]
+        )
+        datarow[f"Skeleton length density [{area_unit}/{area_unit}^2]"] = (
+                datarow["Skeleton length"] / datarow["Area"]
+        )
+    else:
+        # probably area can be estimated by view area
+        logger.debug("Unknown area. Skipping density calculation")
+
+    if "Lobulus Equivalent Surface" in datarow:
+        area_unit = datarow["Area unit"]
+        datarow[f"Equivalent branch number density [1/{area_unit}^2]"] = (
+                datarow["Branch number"] / datarow["Lobulus Equivalent Surface"]
+        )
+        datarow[f"Equivalent dead ends number density [1/{area_unit}^2]"] = (
+                datarow["Dead ends number"] / datarow["Lobulus Equivalent Surface"]
+        )
+        datarow[
+            f"Equivalent skeleton length density [{area_unit}/{area_unit}^2]"
+        ] = (datarow["Skeleton length"] / datarow["Lobulus Equivalent Surface"])
+    else:
+        # probably area can be estimated by view area
+        logger.debug(
+            "Unknown 'Lobulus Equivalent Surface'. Skipping density calculation"
+        )
+
+    if report is not None:
+        report.add_cols_to_actual_row(datarow)
+    logger.debug("Skeleton analysis finished.")
+    return datarow
+
