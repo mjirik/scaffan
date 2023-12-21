@@ -178,26 +178,30 @@ class SkeletonAnalysis:
             f"detail_inner_lobulus_mask {detail_inner_lobulus_mask.shape} dtype={detail_inner_lobulus_mask.dtype} "
             f"min={np.min(detail_inner_lobulus_mask)} max={np.max(detail_inner_lobulus_mask)}"
         )
-        _thresholding_and_skeletonization(detail_image, detail_mask, detail_inner_lobulus_mask,
-                                          detail_central_vein_mask, detail_view=detail_view, skeleton_analysis=self)
-
+        _thresholding_and_skeletonization(
+            detail_image,
+            detail_mask,
+            detail_inner_lobulus_mask,
+            detail_central_vein_mask,
+            detail_view=detail_view,
+            skeleton_analysis=self,
+        )
 
     def imsave(self, base_fn, arr, severity=50):
         base_fn = base_fn.format(self.lobulus.annotation_id)
         self.report.imsave(base_fn, arr, severity)
 
 
-
 def _thresholding_and_skeletonization(
-        detail_image:np.ndarray,
-        detail_lobulus_mask: Optional[np.ndarray]=None,
-        detail_inner_lobulus_mask: Optional[np.ndarray]=None,
-        detail_central_vein_mask: Optional[np.ndarray]=None,
-        data_row:Optional[dict]=None,
-        detail_view=None, skeleton_analysis = None,
-        region_pixelsize: list = None,
-        report = None
-
+    detail_image: np.ndarray,
+    detail_lobulus_mask: Optional[np.ndarray] = None,
+    detail_inner_lobulus_mask: Optional[np.ndarray] = None,
+    detail_central_vein_mask: Optional[np.ndarray] = None,
+    data_row: Optional[dict] = None,
+    detail_view=None,
+    skeleton_analysis=None,
+    region_pixelsize: list = None,
+    report=None,
 ) -> dict:
     """
     :param detail_image: pixel values
@@ -252,7 +256,6 @@ def _thresholding_and_skeletonization(
     # if show:
     #     plt.show()
 
-
     skeleton = (skeletonize(imthr) > 0).astype(np.uint8)
     sumskel = np.sum(skeleton)
     logger.debug(
@@ -260,7 +263,9 @@ def _thresholding_and_skeletonization(
     )
     raw_skeleton = imthr.copy()
     if (skeleton_analysis is not None) and (report is not None):
-        skeleton_analysis.imsave("lobulus_raw_skeleton_{}.png", raw_skeleton, severity=40)
+        skeleton_analysis.imsave(
+            "lobulus_raw_skeleton_{}.png", raw_skeleton, severity=40
+        )
     gs = skimage.filters.gaussian((skeleton > 0).astype(np.uint8), sigma=10)
     skeleton[gs > 0.001] = 0
     sumskel = np.sum(skeleton)
@@ -268,25 +273,22 @@ def _thresholding_and_skeletonization(
         f"Skeletonization finished. threshold={threshold}, sumskel[px]={sumskel}"
     )
 
-    if (detail_view is not None):
+    if detail_view is not None:
         region_pixelsize = detail_view.region_pixelsize
     if region_pixelsize is not None:
         datarow["Skeleton length"] = sumskel * region_pixelsize[0]
         datarow["Output pixel size 0"] = region_pixelsize[0]
         datarow["Output pixel size 1"] = region_pixelsize[1]
-        datarow["Output image size 0"] = (
-                region_pixelsize[0] * imthr.shape[0]
-        )
-        datarow["Output image size 1"] = (
-                region_pixelsize[1] * imthr.shape[1]
-        )
+        datarow["Output image size 0"] = region_pixelsize[0] * imthr.shape[0]
+        datarow["Output image size 1"] = region_pixelsize[1] * imthr.shape[1]
         fig = plt.figure(figsize=(12, 10))
         plt.imshow(skeleton + imthr)
     if detail_view:
         detail_view.add_ticks()
     if (skeleton_analysis is not None) and (report is not None):
         report.savefig_and_show(
-            "thumb_skeleton_thr_{}.png".format(skeleton_analysis.lobulus.annotation_id), fig
+            "thumb_skeleton_thr_{}.png".format(skeleton_analysis.lobulus.annotation_id),
+            fig,
         )
 
         imall = detail_lobulus_mask.astype(np.uint8)
@@ -328,7 +330,10 @@ def _thresholding_and_skeletonization(
         detail_view.add_ticks()
     if (skeleton_analysis is not None) and (report is not None):
         report.savefig_and_show(
-            "figure_skeleton_nodes_{}.png".format(skeleton_analysis.lobulus.annotation_id), fig
+            "figure_skeleton_nodes_{}.png".format(
+                skeleton_analysis.lobulus.annotation_id
+            ),
+            fig,
         )
 
         with warnings.catch_warnings():
@@ -346,13 +351,13 @@ def _thresholding_and_skeletonization(
     if "Area" in datarow:
         area_unit = datarow["Area unit"]
         datarow[f"Branch number density [1/{area_unit}^2]"] = (
-                datarow["Branch number"] / datarow["Area"]
+            datarow["Branch number"] / datarow["Area"]
         )
         datarow[f"Dead ends number density [1/{area_unit}^2]"] = (
-                datarow["Dead ends number"] / datarow["Area"]
+            datarow["Dead ends number"] / datarow["Area"]
         )
         datarow[f"Skeleton length density [{area_unit}/{area_unit}^2]"] = (
-                datarow["Skeleton length"] / datarow["Area"]
+            datarow["Skeleton length"] / datarow["Area"]
         )
     else:
         # probably area can be estimated by view area
@@ -361,14 +366,14 @@ def _thresholding_and_skeletonization(
     if "Lobulus Equivalent Surface" in datarow:
         area_unit = datarow["Area unit"]
         datarow[f"Equivalent branch number density [1/{area_unit}^2]"] = (
-                datarow["Branch number"] / datarow["Lobulus Equivalent Surface"]
+            datarow["Branch number"] / datarow["Lobulus Equivalent Surface"]
         )
         datarow[f"Equivalent dead ends number density [1/{area_unit}^2]"] = (
-                datarow["Dead ends number"] / datarow["Lobulus Equivalent Surface"]
+            datarow["Dead ends number"] / datarow["Lobulus Equivalent Surface"]
         )
-        datarow[
-            f"Equivalent skeleton length density [{area_unit}/{area_unit}^2]"
-        ] = (datarow["Skeleton length"] / datarow["Lobulus Equivalent Surface"])
+        datarow[f"Equivalent skeleton length density [{area_unit}/{area_unit}^2]"] = (
+            datarow["Skeleton length"] / datarow["Lobulus Equivalent Surface"]
+        )
     else:
         # probably area can be estimated by view area
         logger.debug(
@@ -379,4 +384,3 @@ def _thresholding_and_skeletonization(
         report.add_cols_to_actual_row(datarow)
     logger.debug("Skeleton analysis finished.")
     return datarow
-
